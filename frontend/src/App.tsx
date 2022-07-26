@@ -17,7 +17,9 @@ import PasswordScreen from './screens/PasswordScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import RoomDetailsScreen from './screens/RoomDetailsScreen';
+import { io } from "socket.io-client";
 
+const socket = io();
 function App() {
   return (
     <BrowserRouter>
