@@ -25,7 +25,13 @@ app.use(cors());
 app.use(express.json());
 
 // app.use("/", express.static(path.join(__dirname, "/build")));
-app.use(express.static(path.join(__dirname, "../build")));
+// app.use(express.static(path.join(__dirname, "../build")));
+if (process.env.NODE_ENV === "development") {
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
+} else {
+  app.use(express.static(path.join(__dirname, "../build")));
+}
+
 // Default
 app.get('/', (req: Request, res: Response) => {
   res.sendFile('index.html');
