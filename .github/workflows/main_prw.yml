@@ -34,7 +34,7 @@ jobs:
         working-directory: ./frontend
       
       - name: Zip artifact for deployment
-        run: Compress-Archive *.*, ./frontend/build, ./backend release.zip
+        run: Compress-Archive *.*, ./node_modules, ./frontend/build, ./backend release.zip
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
