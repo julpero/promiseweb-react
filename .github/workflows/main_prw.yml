@@ -36,7 +36,7 @@ jobs:
       - name: Zip artifact for deployment
         run: Compress-Archive web.config, ./node_modules, ./frontend/build release.zip
       - name: Update Zip artifact for deployment
-        run: Compress-Archive --Update ./serverBuild/* release.zip
+        run: Compress-Archive -Update ./serverBuild/* release.zip
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
