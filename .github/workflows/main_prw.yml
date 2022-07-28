@@ -21,21 +21,23 @@ jobs:
         with:
           node-version: '16.x'
 
-      - name: npm install, build, and test
+      - name: npm install, build, and test in backend
         run: |
           npm install
           npm run build --if-present
           npm run test --if-present
-      
+
       - name: npm install, build and test in frontend
         run: |
           npm install
           npm run build --if-present
         working-directory: ./frontend
-      
+
       - name: Zip artifact for deployment
-        run: Compress-Archive *.*, ./node_modules, ./frontend/build, ./backend release.zip
-      
+        run: Compress-Archive web.config, ./node_modules, ./frontend/build release.zip
+      - name: Update Zip artifact for deployment
+        run: Compress-Archive --Update ./serverBuild/* release.zip
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
@@ -54,10 +56,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: node-app
-          
+
       - name: UnZip artifact for deployment
         run: unzip release.zip
-        
+
       - name: Delete zip package
         run: rm release.zip
 

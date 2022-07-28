@@ -5,8 +5,8 @@
   "main": "server.ts",
   "scripts": {
     "server": "ts-node-dev server.ts",
-    "start": "ts-node ./server.ts",
-    "client": "npm start --prefix frontend"
+    "client": "npm start --prefix frontend",
+    "build": "tsc -p ."
   },
   "keywords": [],
   "author": "Juha Korhonen",
