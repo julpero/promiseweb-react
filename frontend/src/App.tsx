@@ -10,11 +10,9 @@ class App extends React.Component {
     return (
       <BrowserRouter>
         <div className="App">
-          <div className="mt-4">
-            <Routes>
-                <Route index element={<HomeScreen />} />
-            </Routes>
-          </div>
+          <Routes>
+            <Route index element={<HomeScreen />} />
+          </Routes>
         </div>
       </BrowserRouter>
     );
