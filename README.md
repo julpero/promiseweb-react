@@ -1,18 +1,7 @@
-# HotelBooking
+# PromiseWeb
 
-Hotel Booking App Using The MERN Stack With TypeScript & Redux 🤩
+PromiseWeb Card Game App Using The MERN Stack With TypeScript & Redux 🤩
 
-![screenshot](https://i.ibb.co/5Fprvgc/roomhotel.png)
-
-## Features:
-
-- Room reviews and ratings
-- Room pagination
-- Room search feature
-- User profile with bookings
-- Admin Room management
-- Admin User management
-- Admin Booking management
 
 ## Technology Stack:
 
@@ -20,7 +9,6 @@ Hotel Booking App Using The MERN Stack With TypeScript & Redux 🤩
 - Node js
 - Express Js
 - MongoDB
-- JWT
 - React
 - React Bootstrap
 - Redux
@@ -58,6 +46,7 @@ npm run client
 npm run server
 ```
 
-- Version: 1.0.0
+- Version: 0.0.1
 - License: MIT
-- Author: Said Mounaim
+- Author: Juha Korhonen
+
