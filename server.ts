@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
-import connectDB from './config/db';
+import connectDB from './backend/config/db';
 
 import bcrypt from 'bcrypt';
 
@@ -27,9 +27,9 @@ app.use(express.json());
 // app.use("/", express.static(path.join(__dirname, "/build")));
 // app.use(express.static(path.join(__dirname, "../build")));
 if (process.env.NODE_ENV === "development") {
-  app.use(express.static(path.join(__dirname, "../frontend/build")));
+  app.use(express.static(path.join(__dirname, "./frontend/build")));
 } else {
-  app.use(express.static(path.join(__dirname, "../build")));
+  app.use(express.static(path.join(__dirname, "./build")));
 }
 
 // Default
