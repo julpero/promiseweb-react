@@ -10,6 +10,13 @@ import CheckboxInput from "./FormComponents/CheckBoxInput";
 
 import { NewGame, initialNewGameValues } from "../interfaces/INewGame";
 
+interface FormValidationFields {
+  newGameTurnRound?: string,
+  newGameEndRound?: string,
+  newGameMyName?: string
+  password1?: string
+}
+
 class CreateGame extends React.Component {
   initialValues: NewGame = initialNewGameValues;
 
@@ -22,6 +29,7 @@ class CreateGame extends React.Component {
       <Form
         onSubmit={this.onSubmit}
         initialValues={this.initialValues}
+        validate={validateForm}
         render={({handleSubmit}) => (
           <form onSubmit={handleSubmit}>
             <div className="row">
@@ -251,6 +259,30 @@ class CreateGame extends React.Component {
       />
     )
   }
+}
+
+const validateForm = (values: NewGame) => {
+  const errors: FormValidationFields = {};
+
+  const startRound = parseInt(values.newGameStartRound, 10);
+  const turnRound = parseInt(values.newGameTurnRound, 10);
+  const endRound = parseInt(values.newGameEndRound, 10);
+  if (turnRound > startRound) {
+    errors.newGameTurnRound = "Turn round must be equal or less than start round";
+  }
+  if (endRound < turnRound) {
+    errors.newGameEndRound = "End round must be equal or greater than turn round";
+  }
+
+  if (values.password1.length < 4) {
+    errors.password1 = "Password must be at least four characters long";
+  }
+
+  if (values.newGameMyName.length < 4) {
+    errors.newGameMyName = "Your (nick)name must be at least four characters long";
+  }
+
+  return errors;
 }
 
 export default CreateGame;

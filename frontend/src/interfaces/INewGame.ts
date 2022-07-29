@@ -39,3 +39,35 @@ export const initialNewGameValues: NewGame = {
   opponentGameCardValue: false,
   thisIsDemoGame: false,
 }
+
+export interface GameOptions {
+  humanPlayersCount: number,
+  botPlayersCount: number,
+  startRound: number,
+  turnRound: number,
+  endRound: number,
+  adminName: string,
+  userPassword1: string,
+  userPassword2: string,
+  password: string,
+  gameStatus: number,
+  humanPlayers: HumanPlayer[],
+  createDateTime: Date,
+  evenPromisesAllowed: boolean,
+  visiblePromiseRound: boolean,
+  onlyTotalPromise: boolean,
+  freeTrump: boolean,
+  hiddenTrump: boolean,
+  speedPromise: boolean,
+  privateSpeedGame: boolean,
+  opponentPromiseCardValue: boolean,
+  opponentGameCardValue: boolean,
+  thisIsDemoGame: boolean,
+  hiddenCardsMode: number,
+}
+
+export interface HumanPlayer {
+  name: string,
+  playerId: string,
+  active: boolean,
+}

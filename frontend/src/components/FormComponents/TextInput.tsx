@@ -1,21 +1,13 @@
 import React from "react";
 import { FieldRenderProps } from "react-final-form";
+import { FormMetaData, dangerStyle, renderError, renderLabel } from "./Decorators";
 
 type Props = FieldRenderProps<string, any>;
-
-const renderLabel = (label: string) => {
-  if (!label) return null;
-
-  return(
-    <label>
-      {label}
-    </label>
-  )
-}
 
 const TextInput: React.FC<Props> = ({ input, meta, ...rest }: Props) => (
   <div className="form-floating">
     <input
+      style={dangerStyle(meta as FormMetaData)}
       className="form-control"
       placeholder={rest.label}
       type={rest.ispassword ? "password" : "text"}
@@ -23,6 +15,7 @@ const TextInput: React.FC<Props> = ({ input, meta, ...rest }: Props) => (
       {...input} {...rest}
     />
     {renderLabel(rest.label)}
+    {renderError(meta as FormMetaData)}
   </div>
 );
 
