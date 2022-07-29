@@ -8,7 +8,9 @@ import reduxThunk from "redux-thunk";
 import reducers from './redux/reducers';
 
 import './bootstrap.min.css';
-import 'bootstrap-icons/font/bootstrap-icons.css'
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import "react-bootstrap/dist/react-bootstrap.min.js";
+
 import App from './App';
 
 const composeEnhancers = (window && (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose;
