@@ -17,6 +17,7 @@ const TextInput: React.FC<Props> = ({ input, meta, ...rest }: Props) => (
   <div className="form-floating">
     <input
       className="form-control"
+      placeholder={rest.label}
       type={rest.ispassword ? "password" : "text"}
       autoComplete={rest.ispassword ? "off" : "on"}
       {...input} {...rest}

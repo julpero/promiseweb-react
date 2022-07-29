@@ -1,5 +1,6 @@
 import React from "react";
 import { Form, Field } from "react-final-form";
+
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 
@@ -7,8 +8,12 @@ import SelectInput from "./FormComponents/SelectInput";
 import TextInput from "./FormComponents/TextInput";
 import CheckboxInput from "./FormComponents/CheckBoxInput";
 
+import { NewGame, initialNewGameValues } from "../interfaces/INewGame";
+
 class CreateGame extends React.Component {
-  onSubmit = (values: any) => {
+  initialValues: NewGame = initialNewGameValues;
+
+  onSubmit = (values: NewGame) => {
     window.alert(JSON.stringify(values, undefined, 2));
   }
 
@@ -16,8 +21,8 @@ class CreateGame extends React.Component {
     return (
       <Form
         onSubmit={this.onSubmit}
-      >
-        {({handleSubmit}) => (
+        initialValues={this.initialValues}
+        render={({handleSubmit}) => (
           <form onSubmit={handleSubmit}>
             <div className="row">
               <div className="col">
@@ -238,12 +243,12 @@ class CreateGame extends React.Component {
             <div className="row">
               <div className="col">
                 <hr />
-                <Button variant="success">Create Game</Button>
+                <Button variant="success" type="submit">Create Game</Button>
               </div>
             </div>
           </form>
         )}
-      </Form>
+      />
     )
   }
 }
