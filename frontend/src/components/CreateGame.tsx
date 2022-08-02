@@ -12,10 +12,11 @@ import CheckboxInput from "./FormComponents/CheckBoxInput";
 import { NewGame, initialNewGameValues } from "../interfaces/INewGame";
 
 interface FormValidationFields {
+  newGameHumanPlayersCount?: string,
   newGameTurnRound?: string,
   newGameEndRound?: string,
-  newGameMyName?: string
-  password1?: string
+  newGameMyName?: string,
+  password1?: string,
 }
 
 class CreateGame extends React.Component {
@@ -327,6 +328,10 @@ const validateForm = (values: NewGame) => {
 
   if (values.newGameMyName.length < 4) {
     errors.newGameMyName = "Your (nick)name must be at least four characters long";
+  }
+
+  if (parseInt(values.newGameHumanPlayersCount, 10) > 5 && (startRound > 8 || endRound > 8)) {
+    errors.newGameHumanPlayersCount = "For six players eight is maximum start and end round";
   }
 
   return errors;
