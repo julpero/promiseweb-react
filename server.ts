@@ -50,5 +50,9 @@ io.on("connection", (socket: Socket) => {
   console.log(socket.id);
   socket.on("disconnect", () => {
     console.warn("user disconnected");
+  });
+
+  socket.on("testi", (juu: any) => {
+    console.log(juu);
   })
 })
