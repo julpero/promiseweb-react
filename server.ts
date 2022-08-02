@@ -7,6 +7,8 @@ import dotenv from 'dotenv';
 import path from 'path';
 import connectDB from './backend/config/db';
 
+import { INewGame } from "./frontend/src/interfaces/IGameOptions";
+
 import bcrypt from 'bcrypt';
 
 
@@ -18,8 +20,6 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 dotenv.config();
-
-connectDB();
 
 app.use(cors());
 app.use(express.json());
@@ -37,22 +37,21 @@ app.get('/', (req: Request, res: Response) => {
   res.sendFile('index.html');
 });
 
-
 const PORT = process.env.PORT || 5000;
-
-// app.listen(PORT, (): void => console.log(`Server is running on PORT ${PORT}`));
-server.listen(PORT, () => {
-  console.log('server listening on *:' + PORT);
-});
-
-io.on("connection", (socket: Socket) => {
-  console.log("connected!");
-  console.log(socket.id);
-  socket.on("disconnect", () => {
-    console.warn("user disconnected");
+connectDB().then(() => {
+  server.listen(PORT, () => {
+    console.log('server listening on *:' + PORT);
   });
 
-  socket.on("testi", (juu: any) => {
-    console.log(juu);
+  io.on("connection", (socket: Socket) => {
+    console.log("connected!", socket.id);
+    socket.on("disconnect", () => {
+      console.warn("user disconnected", socket.id);
+    });
+
+    socket.on("create game", (gameOptions: INewGame) => {
+      console.log(gameOptions);
+    })
   })
-})
+});
+

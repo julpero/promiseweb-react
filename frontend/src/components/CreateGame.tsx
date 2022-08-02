@@ -9,7 +9,8 @@ import SelectInput from "./FormComponents/SelectInput";
 import TextInput from "./FormComponents/TextInput";
 import CheckboxInput from "./FormComponents/CheckBoxInput";
 
-import { NewGame, initialNewGameValues } from "../interfaces/INewGame";
+import { INewGameForm, initialNewGameValues } from "../interfaces/INewGame";
+import { INewGame, GAMESTATUS, HIDDENCARDSMODE } from "../interfaces/IGameOptions";
 
 interface FormValidationFields {
   newGameHumanPlayersCount?: string,
@@ -21,15 +22,47 @@ interface FormValidationFields {
 
 class CreateGame extends React.Component {
   static socket = SocketContext;
-  initialValues: NewGame = initialNewGameValues;
+  initialValues: INewGameForm = initialNewGameValues;
 
-  onSubmit = (values: NewGame) => {
-    socket.emit("testi", values);
+  onSubmit = (values: INewGameForm) => {
+    const gameOptions = this.createGameOptions(values);
+    socket.emit("create game", gameOptions);
   }
 
-  onCheckChange = (e: any) => {
-    console.log("main", e);
-    console.log(this.state);
+  hiddenCardsModeToEnum = (selected: string): HIDDENCARDSMODE => {
+    switch (selected) {
+      case "1": return HIDDENCARDSMODE.only_card_in_charge;
+      case "2": return HIDDENCARDSMODE.card_in_charge_and_winning;
+      default: return HIDDENCARDSMODE.normal;
+    }
+  }
+
+  createGameOptions = (values: INewGameForm): INewGame => {
+    return {
+      humanPlayersCount: parseInt(values.newGameHumanPlayersCount, 10),
+      botPlayersCount: 0,
+      startRound: parseInt(values.newGameStartRound, 10),
+      turnRound: parseInt(values.newGameTurnRound, 10),
+      endRound: parseInt(values.newGameEndRound, 10),
+      adminName: values.newGameMyName,
+      userPassword1: values.password1,
+      userPassword2: values.password2,
+      password: values.newGamePassword,
+      gameStatus: GAMESTATUS.Created,
+      humanPlayers: [{name: values.newGameMyName, playerId: window.localStorage.getItem('uUID'), active: true}],
+      createDateTime: new Date(),
+      evenPromisesAllowed: !values.noEvenPromises,
+      visiblePromiseRound: !values.hidePromiseRound,
+      onlyTotalPromise: values.onlyTotalPromise,
+      freeTrump: !values.mustTrump,
+      hiddenTrump: values.hiddenTrump,
+      speedPromise: values.speedPromise,
+      privateSpeedGame: values.privateSpeedGame,
+      opponentPromiseCardValue: values.opponentPromiseCardValue,
+      opponentGameCardValue: values.opponentGameCardValue,
+      thisIsDemoGame: values.thisIsDemoGame,
+      hiddenCardsMode: this.hiddenCardsModeToEnum(values.hiddenCardsMode),
+    } as INewGame;
   }
 
   render() {
@@ -309,7 +342,7 @@ class CreateGame extends React.Component {
   }
 }
 
-const validateForm = (values: NewGame) => {
+const validateForm = (values: INewGameForm) => {
   const errors: FormValidationFields = {};
 
   const startRound = parseInt(values.newGameStartRound, 10);
