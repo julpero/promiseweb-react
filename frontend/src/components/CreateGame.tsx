@@ -1,4 +1,5 @@
 import React from "react";
+import { socket, SocketContext } from "../socket";
 import { Form, Field } from "react-final-form";
 
 import Card from 'react-bootstrap/Card';
@@ -18,10 +19,16 @@ interface FormValidationFields {
 }
 
 class CreateGame extends React.Component {
+  static socket = SocketContext;
   initialValues: NewGame = initialNewGameValues;
 
   onSubmit = (values: NewGame) => {
-    window.alert(JSON.stringify(values, undefined, 2));
+    socket.emit("testi", values);
+  }
+
+  onCheckChange = (e: any) => {
+    console.log("main", e);
+    console.log(this.state);
   }
 
   render() {
@@ -30,7 +37,7 @@ class CreateGame extends React.Component {
         onSubmit={this.onSubmit}
         initialValues={this.initialValues}
         validate={validateForm}
-        render={({handleSubmit}) => (
+        render={({handleSubmit, form, submitting}) => (
           <form onSubmit={handleSubmit}>
             <div className="row">
               <div className="col">
@@ -140,6 +147,10 @@ class CreateGame extends React.Component {
                         type="checkbox"
                         component={CheckboxInput}
                         label="Do not allow even promises"
+                        value={form.getFieldState("noEvenPromises")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("noEvenPromises", checked);
+                        }}
                       />
                     </div>
                     <div className="col">
@@ -148,6 +159,10 @@ class CreateGame extends React.Component {
                         type="checkbox"
                         component={CheckboxInput}
                         label="Hidden promise round"
+                        value={form.getFieldState("hidePromiseRound")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("hidePromiseRound", checked);
+                        }}
                       />
                     </div>
                   </div>
@@ -158,6 +173,10 @@ class CreateGame extends React.Component {
                         type="checkbox"
                         component={CheckboxInput}
                         label="Show only total promises"
+                        value={form.getFieldState("onlyTotalPromise")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("onlyTotalPromise", checked);
+                        }}
                       />
                     </div>
                     <div className="col">
@@ -166,6 +185,10 @@ class CreateGame extends React.Component {
                         type="checkbox"
                         component={CheckboxInput}
                         label="Must play trump"
+                        value={form.getFieldState("mustTrump")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("mustTrump", checked);
+                        }}
                       />
                     </div>
                   </div>
@@ -176,6 +199,10 @@ class CreateGame extends React.Component {
                         type="checkbox"
                         component={CheckboxInput}
                         label="Trump is hidden when promising"
+                        value={form.getFieldState("hiddenTrump")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("hiddenTrump", checked);
+                        }}
                       />
                     </div>
                     <div className="col">
@@ -184,6 +211,10 @@ class CreateGame extends React.Component {
                         type="checkbox"
                         component={CheckboxInput}
                         label="Speed promise"
+                        value={form.getFieldState("speedPromise")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("speedPromise", checked);
+                        }}
                       />
                     </div>
                   </div>
@@ -194,6 +225,10 @@ class CreateGame extends React.Component {
                         type="checkbox"
                         component={CheckboxInput}
                         label="Private speed game"
+                        value={form.getFieldState("privateSpeedGame")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("privateSpeedGame", checked);
+                        }}
                       />
                     </div>
                     <div className="col">
@@ -215,6 +250,10 @@ class CreateGame extends React.Component {
                         type="checkbox"
                         component={CheckboxInput}
                         label="Show hand value when promising"
+                        value={form.getFieldState("opponentPromiseCardValue")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("opponentPromiseCardValue", checked);
+                        }}
                       />
                     </div>
                     <div className="col">
@@ -223,6 +262,10 @@ class CreateGame extends React.Component {
                         type="checkbox"
                         component={CheckboxInput}
                         label="Show hand value in the game"
+                        value={form.getFieldState("opponentGameCardValue")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("opponentGameCardValue", checked);
+                        }}
                       />
                     </div>
                   </div>
@@ -233,6 +276,10 @@ class CreateGame extends React.Component {
                         type="checkbox"
                         component={CheckboxInput}
                         label="This is demo game"
+                        value={form.getFieldState("thisIsDemoGame")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("thisIsDemoGame", checked);
+                        }}
                       />
                     </div>
                   </div>
@@ -251,7 +298,7 @@ class CreateGame extends React.Component {
             <div className="row">
               <div className="col">
                 <hr />
-                <Button variant="success" type="submit">Create Game</Button>
+                <Button variant="success" type="submit" disabled={submitting}>Create Game</Button>
               </div>
             </div>
           </form>

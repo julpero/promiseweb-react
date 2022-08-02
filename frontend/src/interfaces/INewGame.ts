@@ -34,7 +34,7 @@ export const initialNewGameValues: NewGame = {
   hiddenTrump: false,
   speedPromise: false,
   privateSpeedGame: false,
-  hiddenCardsMode: "1",
+  hiddenCardsMode: "0",
   opponentPromiseCardValue: false,
   opponentGameCardValue: false,
   thisIsDemoGame: false,

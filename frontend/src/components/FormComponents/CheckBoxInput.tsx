@@ -1,23 +1,24 @@
 import React from "react";
+import Form from "react-bootstrap/Form";
 import { FieldRenderProps } from "react-final-form";
 
 type Props = FieldRenderProps<boolean, any>;
 
-const renderLabel = (label: any) => {
-  if (!label) return null;
-
-  return(
-    <label className="form-check-label">
-      {label}
-    </label>
-  )
-}
-
-const CheckboxInput: React.FC<Props> = ({input: { value, ...input }, ...rest}: Props) => (
-  <div className="form-check">
-    <input className="form-check-input" {...input} type="checkbox" checked={!!value} />
-    {renderLabel(rest.label)}
-  </div>
-);
+const CheckboxInput: React.FC<Props> = ( { input: { value }, onChange, label, ...rest}: Props) => {
+  return (
+    <div>
+      <Form.Check
+        inline
+        type="switch"
+        checked={!!value}
+        label={label}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+          onChange(event.target.checked);
+        }}
+        {...rest}
+      />
+    </div>
+  );
+};
 
 export default CheckboxInput;
