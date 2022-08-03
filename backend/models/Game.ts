@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import { IGame } from "../../frontend/src/interfaces/IGameOptions"
+import Round from "./Round";
 
 const playerOrderPlayerSchema: Schema = new Schema({
   name: {type: String, required: true},
@@ -8,7 +9,7 @@ const playerOrderPlayerSchema: Schema = new Schema({
 
 const gameSchema: Schema = new Schema({
   playerOrder: [playerOrderPlayerSchema],
-  rounds: [],
+  rounds: [Round],
   lastTimeStamp: {type: Number, required: false},
 });
 

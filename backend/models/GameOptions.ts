@@ -29,6 +29,8 @@ const gameOptionsSchema: Schema = new Schema({
   hiddenCardsMode: {type: Number, required: false},
   game: {type: Game, required: false},
   gameStarted: {type: Date, required: false},
+  gameStatistics: [],
+  lastUpdate: {type: Date, required: false},
 }, {
   collection: PROMISEWEBCOLLECTION,
   timestamps: true,
