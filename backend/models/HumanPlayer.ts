@@ -1,7 +1,7 @@
-import { model, Schema } from "mongoose";
-import { IHumanPlayer } from "../../frontend/src/interfaces/IGameOptions"
+import { Schema } from "mongoose";
+import { IHumanPlayer } from "../interfaces/IGameOptions"
 
-const humanPlayerSchema: Schema = new Schema({
+const humanPlayerSchema = new Schema<IHumanPlayer>({
   name: {
     type: String,
     required: true,
@@ -10,13 +10,16 @@ const humanPlayerSchema: Schema = new Schema({
     type: String,
     required: true,
   },
-  type: {
-    type: String,
+  active: {
+    type: Boolean,
     required: true,
   },
   playerStats: {
     playerAvgPointsInRounds: [Number],
   },
+},
+{
+  timestamps: true,
 });
 
-export default model<IHumanPlayer>("HumanPlayer", humanPlayerSchema);
+export default humanPlayerSchema;

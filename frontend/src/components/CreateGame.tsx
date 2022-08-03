@@ -9,8 +9,7 @@ import SelectInput from "./FormComponents/SelectInput";
 import TextInput from "./FormComponents/TextInput";
 import CheckboxInput from "./FormComponents/CheckBoxInput";
 
-import { INewGameForm, initialNewGameValues } from "../interfaces/INewGame";
-import { INewGame, GAMESTATUS, HIDDENCARDSMODE } from "../interfaces/IGameOptions";
+import { INewGameForm, initialNewGameValues, ICreateGameRequest, ICreateGameResponse } from "../interfaces/INewGame";
 
 interface FormValidationFields {
   newGameHumanPlayersCount?: string,
@@ -25,44 +24,11 @@ class CreateGame extends React.Component {
   initialValues: INewGameForm = initialNewGameValues;
 
   onSubmit = (values: INewGameForm) => {
-    const gameOptions = this.createGameOptions(values);
-    socket.emit("create game", gameOptions);
-  }
-
-  hiddenCardsModeToEnum = (selected: string): HIDDENCARDSMODE => {
-    switch (selected) {
-      case "1": return HIDDENCARDSMODE.only_card_in_charge;
-      case "2": return HIDDENCARDSMODE.card_in_charge_and_winning;
-      default: return HIDDENCARDSMODE.normal;
-    }
-  }
-
-  createGameOptions = (values: INewGameForm): INewGame => {
-    return {
-      humanPlayersCount: parseInt(values.newGameHumanPlayersCount, 10),
-      botPlayersCount: 0,
-      startRound: parseInt(values.newGameStartRound, 10),
-      turnRound: parseInt(values.newGameTurnRound, 10),
-      endRound: parseInt(values.newGameEndRound, 10),
-      adminName: values.newGameMyName,
-      userPassword1: values.password1,
-      userPassword2: values.password2,
-      password: values.newGamePassword,
-      gameStatus: GAMESTATUS.Created,
-      humanPlayers: [{name: values.newGameMyName, playerId: window.localStorage.getItem('uUID'), active: true}],
-      createDateTime: new Date(),
-      evenPromisesAllowed: !values.noEvenPromises,
-      visiblePromiseRound: !values.hidePromiseRound,
-      onlyTotalPromise: values.onlyTotalPromise,
-      freeTrump: !values.mustTrump,
-      hiddenTrump: values.hiddenTrump,
-      speedPromise: values.speedPromise,
-      privateSpeedGame: values.privateSpeedGame,
-      opponentPromiseCardValue: values.opponentPromiseCardValue,
-      opponentGameCardValue: values.opponentGameCardValue,
-      thisIsDemoGame: values.thisIsDemoGame,
-      hiddenCardsMode: this.hiddenCardsModeToEnum(values.hiddenCardsMode),
-    } as INewGame;
+    const playerId: string = window.localStorage.getItem('uUID') ?? "ERROR";
+    const newGameRequest: ICreateGameRequest = {...values, playerId };
+    socket.emit("create game", newGameRequest, (createGameResponse: ICreateGameResponse) => {
+      console.log("ICreateGameResponse", createGameResponse);
+    });
   }
 
   render() {

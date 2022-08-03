@@ -22,7 +22,7 @@
   },
   "include": [
     "src"
-  ],
+, "../backend/interfaces/IGameOptions.ts"  ],
   "typeRoots": [
     "../node_modules/@types",
     "../@types"

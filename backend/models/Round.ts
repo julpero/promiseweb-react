@@ -1,25 +1,25 @@
-import { model, Schema } from "mongoose";
-import { IRound } from "../../frontend/src/interfaces/IGameOptions"
-import Card from "./Card";
-import RoundPlayer from "./RoundPlayer";
+import { Schema } from "mongoose";
+import { IRound, ICardPlayed } from "../interfaces/IGameOptions"
+import cardSchema from "./Card";
+import roundPlayerSchema from "./RoundPlayer";
 
-const cardPlayedSchema: Schema = new Schema({
+const cardPlayedSchema = new Schema<ICardPlayed>({
   name: {type: String, required: true},
-  card: Card,
+  card: cardSchema,
   playedTime: {type: Number, required: false},
   playStarted: {type: Number, required: false},
 });
 
-const roundSchema: Schema = new Schema({
+const roundSchema = new Schema<IRound>({
   roundIndex: {type: Number, required: true},
   cardsInRound: {type: Number, required: true},
   dealerPositionIndex: {type: Number, required: true},
   starterPositionIndex: {type: Number, required: true},
-  roundPlayers: [RoundPlayer],
-  trumpCard: Card,
+  roundPlayers: [roundPlayerSchema],
+  trumpCard: cardSchema,
   totalPromise: {type: Number, required: false},
   cardsPlayed: [[cardPlayedSchema]],
   roundStatus: {type: Number, required: true},
 });
 
-export default model<IRound>("Round", roundSchema);
+export default roundSchema;

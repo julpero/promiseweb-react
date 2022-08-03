@@ -1,9 +1,9 @@
-import { model, Schema } from "mongoose";
-import { ICard } from "../../frontend/src/interfaces/IGameOptions"
+import { Schema } from "mongoose";
+import { ICard } from "../interfaces/IGameOptions"
 
-const cardSchema: Schema = new Schema({
-  suit: String,
-  rank: Number,
+const cardSchema = new Schema<ICard>({
+  suit: {type: String, required: true},
+  rank: {type: Number, required: true},
 });
 
-export default model<ICard>("Game", cardSchema);
+export default cardSchema;

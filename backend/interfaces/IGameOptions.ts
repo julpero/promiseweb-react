@@ -1,20 +1,20 @@
-export enum GAMESTATUS {
+export enum GAME_STATUS {
   Created = 0,
   OnGoing = 1,
   Played = 2,
   Dismissed = 99,
 }
 
-export enum ROUNDSTATUS {
+export enum ROUND_STATUS {
   Initialized = 0,
   OnGoing = 1,
   Played = 2,
 }
 
-export enum HIDDENCARDSMODE {
+export enum HIDDEN_CARDS_MODE {
   normal = 0,
-  only_card_in_charge = 1,
-  card_in_charge_and_winning = 2,
+  onlyCardInCharge = 1,
+  cardInChargeAndWinning = 2,
 }
 
 export type PlayerType = 'human';
@@ -30,7 +30,7 @@ export interface IGameOptions {
   endRound: number,
   adminName: string,
   password: string,
-  gameStatus: GAMESTATUS,
+  gameStatus: GAME_STATUS,
   humanPlayers: IHumanPlayer[],
   createDateTime: Date,
   evenPromisesAllowed: boolean,
@@ -43,7 +43,7 @@ export interface IGameOptions {
   opponentPromiseCardValue: boolean,
   opponentGameCardValue: boolean,
   thisIsDemoGame: boolean,
-  hiddenCardsMode: HIDDENCARDSMODE,
+  hiddenCardsMode: HIDDEN_CARDS_MODE,
   game: IGame,
   gameStarted: Date,
   gameStatistics: IGameStatistics,
@@ -59,10 +59,15 @@ export interface IHumanPlayer {
   name: string,
   playerId: string,
   active: boolean,
+  playerStats: IPlayerStats,
+}
+
+export interface IPlayerStats {
+  playerAvgPointsInRounds: number[],
 }
 
 export interface IGame {
-  playerOrder: IPlayer[],
+  playerOrder: IPlayer[] | string[],
   rounds: IRound[],
   lastTimeStamp: number,
 }
@@ -75,7 +80,7 @@ export interface IPlayer {
 
 export interface IGameStatistics {
   generated: number,
-  playerStatistics: IPlayerStatistic[],
+  playersStatistics: IPlayerStatistic[],
   winnerName: string,
   winnerPoints: number,
   roundsPlayed: number,
@@ -121,7 +126,7 @@ export interface IRound {
   trumpCard: ICard,
   totalPromise: number,
   cardsPlayed: ICardPlayed[][],
-  roundStatus: ROUNDSTATUS,
+  roundStatus: ROUND_STATUS,
 }
 
 export interface ICard {

@@ -7,9 +7,8 @@ import dotenv from 'dotenv';
 import path from 'path';
 import connectDB from './backend/config/db';
 
-import { INewGame } from "./frontend/src/interfaces/IGameOptions";
-
-import bcrypt from 'bcrypt';
+import createGame from './backend/actions/createGame';
+import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./frontend/src/interfaces/INewGame";
 
 
 // Routes
@@ -49,8 +48,13 @@ connectDB().then(() => {
       console.warn("user disconnected", socket.id);
     });
 
-    socket.on("create game", (gameOptions: INewGame) => {
-      console.log(gameOptions);
+    socket.on("create game", async (createGameRequest: ICreateGameRequest, fn: Function) => {
+      console.log("createGameRequest", createGameRequest);
+      const createGameResponse: ICreateGameResponse = await createGame(createGameRequest);
+      if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
+        socket.join(createGameResponse.newGameId);
+      }
+      fn(createGameResponse);
     })
   })
 });

@@ -41,3 +41,18 @@ export const initialNewGameValues: INewGameForm = {
   thisIsDemoGame: false,
   newGamePassword: "",
 }
+
+export interface ICreateGameRequest extends INewGameForm {
+  playerId: string,
+}
+
+export enum CREATE_GAME_STATUS {
+  ok,
+  notOk,
+  notValidPlayerId,
+}
+
+export interface ICreateGameResponse {
+  responseStatus: CREATE_GAME_STATUS,
+  newGameId: string,
+}

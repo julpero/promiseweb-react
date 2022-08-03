@@ -1,9 +1,9 @@
 import { model, Schema } from "mongoose";
-import { IGameOptions } from "../../frontend/src/interfaces/IGameOptions"
-import HumanPlayer from "./HumanPlayer";
-import Game from "./Game";
+import { IGameOptions } from "../interfaces/IGameOptions"
+import humanPlayerSchema from "./HumanPlayer";
+import gameSchema from "./Game";
 
-import { PROMISEWEBCOLLECTION } from "./Collections";
+import { PROMISEWEB_COLLECTION } from "./Collections";
 
 const gameOptionsSchema: Schema = new Schema({
   humanPlayersCount: {type: Number, required: true},
@@ -14,7 +14,7 @@ const gameOptionsSchema: Schema = new Schema({
   adminName: {type: String, required: true},
   password: {type: String, required: false},
   gameStatus: {type: Number, required: true},
-  humanPlayers: [HumanPlayer],
+  humanPlayers: [humanPlayerSchema],
   createDateTime: {type: Date, required: true},
   evenPromisesAllowed: {type: Boolean, required: false},
   visiblePromiseRound: {type: Boolean, required: false},
@@ -27,12 +27,12 @@ const gameOptionsSchema: Schema = new Schema({
   opponentGameCardValue: {type: Boolean, required: false},
   thisIsDemoGame: {type: Boolean, required: false},
   hiddenCardsMode: {type: Number, required: false},
-  game: {type: Game, required: false},
+  game: {type: gameSchema, required: false},
   gameStarted: {type: Date, required: false},
   gameStatistics: [],
   lastUpdate: {type: Date, required: false},
 }, {
-  collection: PROMISEWEBCOLLECTION,
+  collection: PROMISEWEB_COLLECTION,
   timestamps: true,
 });
 

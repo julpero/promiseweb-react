@@ -1,16 +1,16 @@
-import { model, Schema } from "mongoose";
-import { IGame } from "../../frontend/src/interfaces/IGameOptions"
-import Round from "./Round";
+import { Schema } from "mongoose";
+import { IGame, IPlayer } from "../interfaces/IGameOptions"
+import roundSchema from "./Round";
 
-const playerOrderPlayerSchema: Schema = new Schema({
+const playerOrderPlayerSchema = new Schema<IPlayer>({
   name: {type: String, required: true},
   type: {type: String, required: true},
 });
 
-const gameSchema: Schema = new Schema({
+const gameSchema = new Schema<IGame>({
   playerOrder: [playerOrderPlayerSchema],
-  rounds: [Round],
+  rounds: [roundSchema],
   lastTimeStamp: {type: Number, required: false},
 });
 
-export default model<IGame>("Game", gameSchema);
+export default gameSchema;
