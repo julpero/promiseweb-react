@@ -43,7 +43,7 @@ const createGameOptions = (values: ICreateGameRequest): IGameOptions => {
   } as IGameOptions;
 }
 
-export default async function createGame(createGameRequest: ICreateGameRequest): Promise<ICreateGameResponse> {
+const createGame = async (createGameRequest: ICreateGameRequest): Promise<ICreateGameResponse> => {
   const response: ICreateGameResponse = {
     responseStatus: CREATE_GAME_STATUS.notOk,
     newGameId: "",
@@ -87,3 +87,5 @@ export default async function createGame(createGameRequest: ICreateGameRequest):
 
   return response;
 }
+
+export default createGame;

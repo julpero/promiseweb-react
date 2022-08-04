@@ -1,5 +1,5 @@
 import User from "../models/User";
-import { ICheckLoginRequest, ICheckLoginResponse, IUser } from "../interfaces/IUser";
+import { ICheckLoginRequest, ICheckLoginResponse } from "../interfaces/IUser";
 import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IUser";
 
 import bcrypt from 'bcrypt';

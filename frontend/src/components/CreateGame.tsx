@@ -27,7 +27,11 @@ interface IState {
   createGameStatus: CREATE_GAME_STATUS | null,
 }
 
-class CreateGame extends React.Component<{}, IState> {
+interface IProps {
+  onCreateGame: Function,
+}
+
+class CreateGame extends React.Component<IProps, IState> {
   stete: IState = {
     loginStatus: null,
     createGameStatus: null,
@@ -40,11 +44,14 @@ class CreateGame extends React.Component<{}, IState> {
     const playerId: string = window.localStorage.getItem('uUID') ?? "ERROR";
     const newGameRequest: ICreateGameRequest = {...values, playerId };
     socket.emit("create game", newGameRequest, (createGameResponse: ICreateGameResponse) => {
-      console.log("ICreateGameResponse", createGameResponse);
       this.setState({
         loginStatus: createGameResponse.loginStatus,
         createGameStatus: createGameResponse.responseStatus,
       });
+      if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
+        // created new game
+        this.props.onCreateGame();
+      }
     });
   }
 
@@ -98,6 +105,7 @@ class CreateGame extends React.Component<{}, IState> {
   render() {
     return (
       <React.Fragment>
+        <Button onClick={() => this.props.onCreateGame()}>CLICK</Button>
         <Form
           onSubmit={this.onSubmit}
           initialValues={this.initialValues}

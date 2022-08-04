@@ -8,7 +8,9 @@ import path from 'path';
 import connectDB from './backend/config/db';
 
 import createGame from './backend/actions/createGame';
+import { getOpenGamesList } from './backend/actions/getGameList';
 import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./frontend/src/interfaces/INewGame";
+import { IGetGameListRequest, IGetGameListResponse } from "./frontend/src/interfaces/IGameList";
 
 
 // Routes
@@ -49,13 +51,17 @@ connectDB().then(() => {
     });
 
     socket.on("create game", async (createGameRequest: ICreateGameRequest, fn: Function) => {
-      console.log("createGameRequest", createGameRequest);
       const createGameResponse: ICreateGameResponse = await createGame(createGameRequest);
       if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
         socket.join(createGameResponse.newGameId);
       }
       fn(createGameResponse);
-    })
+    });
+
+    socket.on("get games", async (getGameListRequest: IGetGameListRequest, fn: Function) => {
+      const getGameListResponse: IGetGameListResponse = await getOpenGamesList(getGameListRequest);
+      fn(getGameListResponse);
+    });
   })
 });
 
