@@ -1,3 +1,4 @@
+import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IUser";
 export interface IUser {
   playerName: string,
   passHash: string,
@@ -12,12 +13,4 @@ export interface ICheckLoginRequest {
 export interface ICheckLoginResponse {
   result: LOGIN_RESPONSE,
   loginOk: boolean,
-}
-
-export enum LOGIN_RESPONSE {
-  Ok,
-  PasswordFails,
-  PasswordMismatch,
-  Password2Empty,
-  PasswordShort,
 }

@@ -1,3 +1,5 @@
+import { LOGIN_RESPONSE } from "./IUser";
+
 export interface INewGameForm {
   newGameHumanPlayersCount: string;
   newGameStartRound: string;
@@ -54,5 +56,6 @@ export enum CREATE_GAME_STATUS {
 
 export interface ICreateGameResponse {
   responseStatus: CREATE_GAME_STATUS,
+  loginStatus: LOGIN_RESPONSE,
   newGameId: string,
 }

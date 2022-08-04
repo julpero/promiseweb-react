@@ -50,11 +50,6 @@ export interface IGameOptions {
   lastUpdate: Date, // obsolete
 }
 
-export interface INewGame extends IGameOptions {
-  userPassword1: string,
-  userPassword2: string,
-}
-
 export interface IHumanPlayer {
   name: string,
   playerId: string,
