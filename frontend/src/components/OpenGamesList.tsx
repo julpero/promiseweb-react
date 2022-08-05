@@ -13,6 +13,18 @@ class OpenGamesList extends React.Component<IProps, {}> {
   static socket = SocketContext;
   myId: string = window.localStorage.getItem('uUID') ?? "";
 
+  renderGameItems = () => {
+    return this.props.gameItemList.map(({id, rules, humanPlayers, imInTheGame}: IGameListItem) => {
+      return(
+        <GameItem
+          id={id}
+          rules={rules}
+          humanPlayers={humanPlayers}
+          imInTheGame={imInTheGame}
+        />
+      );
+    }
+  )};
 
   render() {
     if (this.props.isFetching) {
@@ -20,6 +32,7 @@ class OpenGamesList extends React.Component<IProps, {}> {
     } else {
       return (
         <React.Fragment>
+          <div>{this.renderGameItems()}</div>
           <div>gameItemList { JSON.stringify(this.props.gameItemList) }</div>
         </React.Fragment>
       )
