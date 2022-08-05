@@ -11,12 +11,13 @@ interface IProps {
 
 class OpenGamesList extends React.Component<IProps, {}> {
   static socket = SocketContext;
-  myId: string = window.localStorage.getItem('uUID') ?? "";
+  getMyId = (): string => window.localStorage.getItem('uUID') ?? "";
 
   renderGameItems = () => {
     return this.props.gameItemList.map(({id, rules, humanPlayers, imInTheGame}: IGameListItem) => {
       return(
         <GameItem
+          key={id}
           id={id}
           rules={rules}
           humanPlayers={humanPlayers}

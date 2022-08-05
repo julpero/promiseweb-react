@@ -54,6 +54,7 @@ connectDB().then(() => {
       const createGameResponse: ICreateGameResponse = await createGame(createGameRequest);
       if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
         socket.join(createGameResponse.newGameId);
+        io.emit("new game created", createGameResponse.newGameId);
       }
       fn(createGameResponse);
     });
