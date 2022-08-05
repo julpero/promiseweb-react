@@ -1,6 +1,7 @@
 import React from "react";
 import { socket, SocketContext } from "../socket";
 import { Form, Field } from "react-final-form";
+import { v4 as uuidv4 } from "uuid";
 
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
@@ -85,7 +86,7 @@ class CreateGame extends React.Component<IProps, IState> {
       }
       switch (this.state.createGameStatus) {
         case CREATE_GAME_STATUS.notValidPlayerId: {
-          return "Player id is not valid. Try to use different browser, clear your browsers cache and local storage or use incognito-mode.";
+          return "Player id is not valid. Try to use different browser, reset your local storage (click button below), browsers cache or use incognito-mode.";
         }
         case CREATE_GAME_STATUS.notOk: {
           return "You have already created game!";
@@ -93,6 +94,27 @@ class CreateGame extends React.Component<IProps, IState> {
       }
     }
     return "Unexpected error";
+  }
+
+  resetLocalStorage = () => {
+    console.log("old uuid", window.localStorage.getItem('uUID'));
+    window.localStorage.removeItem("uUID");
+    const uuid = uuidv4();
+    window.localStorage.setItem('uUID', uuid);
+    console.log("new uuid", window.localStorage.getItem('uUID'));
+    this.handleErrorClose();
+}
+
+  renderResetUuidButton = () => {
+    if (this.state && this.state.createGameStatus === CREATE_GAME_STATUS.notValidPlayerId) {
+      return (
+        <Modal.Footer>
+          <Button variant="warning" onClick={this.resetLocalStorage}>Reset local storage</Button>
+        </Modal.Footer>
+      )
+    } else {
+      return null;
+    }
   }
 
   handleErrorClose = (): void => {
@@ -390,6 +412,7 @@ class CreateGame extends React.Component<IProps, IState> {
           <Modal.Body>
             {this.createGameErrorStr()}
           </Modal.Body>
+          {this.renderResetUuidButton()}
         </Modal>
       </React.Fragment>
     )
