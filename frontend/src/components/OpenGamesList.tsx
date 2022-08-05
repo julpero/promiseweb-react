@@ -57,21 +57,24 @@ class OpenGamesList extends React.Component<{}, IState> {
 
 
   joinGameMethod = (gameId: string, form: any) => {
-    console.log("join click", gameId);
     this.setState({gameId: gameId, method: "join"}, () => {
       form.submit();
     });
   }
 
   leaveGameMethod = (gameId: string, form: any) => {
-    console.log("leave click", gameId);
     this.setState({gameId: gameId, method: "leave"}, () => {
       form.submit();
     });
   }
 
   joinGame = (joinGameRequest: IJoinLeaveGameRequest) => {
+    console.log("join", joinGameRequest);
 
+  }
+
+  leaveGame = (joinGameRequest: IJoinLeaveGameRequest) => {
+    console.log("leave", joinGameRequest);
   }
 
   renderGameItems = (form: any) => {
@@ -100,13 +103,23 @@ class OpenGamesList extends React.Component<{}, IState> {
   onSubmit = (values: IFormFields) => {
     const gameId = this.state.gameId;
     const method = this.state.method;
-    console.log("submit values", values);
     if (gameId.length > 0 && method !== null) {
+      const request: IJoinLeaveGameRequest = {
+        myId: this.getMyId(),
+        gameId: gameId,
+        myName: values.myName,
+        password1: values.password1,
+        password2: values.password2,
+        gamePassword: values.gamePassword ?? "",
+        method: method,
+      }
       switch (this.state.method) {
         case "join": {
+          this.joinGame(request);
           break;
         }
         case "leave": {
+          this.leaveGame(request);
           break;
         }
       }
