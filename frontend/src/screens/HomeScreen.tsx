@@ -1,5 +1,5 @@
 import React from "react";
-import { socket, SocketContext } from "../socket";
+// import { socket, SocketContext } from "../socket";
 import Accordion from "react-bootstrap/Accordion";
 
 import OpenGamesList from "../components/OpenGamesList";
@@ -14,7 +14,7 @@ class HomeScreen extends React.Component<{}, IState> {
     selectedAccordion: "",
   };
 
-  static socket = SocketContext;
+  // static socket = SocketContext;
 
   accRef: any;
   constructor(props: any) {
