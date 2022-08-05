@@ -1,6 +1,7 @@
 import { getGameReport } from "../common/reportFunctions";
 import GameOptions from "../models/GameOptions";
-import { GAME_STATUS, IGameOptions } from "../interfaces/IGameOptions";
+import { IGameOptions } from "../interfaces/IGameOptions";
+import { GAME_STATUS } from "../../frontend/src/interfaces/IGameOptions";
 
 export const insertNewGame = async (gameModel: IGameOptions): Promise<string> => {
   const createGameObj = new GameOptions(gameModel);

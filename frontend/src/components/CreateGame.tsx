@@ -14,7 +14,7 @@ import CheckboxInput from "./FormComponents/CheckBoxInput";
 import { INewGameForm, initialNewGameValues, ICreateGameRequest, ICreateGameResponse, CREATE_GAME_STATUS } from "../interfaces/INewGame";
 import { LOGIN_RESPONSE } from "../interfaces/IUser";
 
-interface FormValidationFields {
+interface IFormValidationFields {
   newGameHumanPlayersCount?: string,
   newGameTurnRound?: string,
   newGameEndRound?: string,
@@ -103,7 +103,7 @@ class CreateGame extends React.Component<IProps, IState> {
     window.localStorage.setItem('uUID', uuid);
     console.log("new uuid", window.localStorage.getItem('uUID'));
     this.handleErrorClose();
-}
+  }
 
   renderResetUuidButton = () => {
     if (this.state && this.state.createGameStatus === CREATE_GAME_STATUS.notValidPlayerId) {
@@ -420,7 +420,7 @@ class CreateGame extends React.Component<IProps, IState> {
 }
 
 const validateForm = (values: INewGameForm) => {
-  const errors: FormValidationFields = {};
+  const errors: IFormValidationFields = {};
 
   const startRound = parseInt(values.newGameStartRound, 10);
   const turnRound = parseInt(values.newGameTurnRound, 10);

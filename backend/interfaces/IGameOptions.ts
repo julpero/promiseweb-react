@@ -1,21 +1,4 @@
-export enum GAME_STATUS {
-  Created = 0,
-  OnGoing = 1,
-  Played = 2,
-  Dismissed = 99,
-}
-
-export enum ROUND_STATUS {
-  Initialized = 0,
-  OnGoing = 1,
-  Played = 2,
-}
-
-export enum HIDDEN_CARDS_MODE {
-  normal = 0,
-  onlyCardInCharge = 1,
-  cardInChargeAndWinning = 2,
-}
+import { GAME_STATUS, HIDDEN_CARDS_MODE, ROUND_STATUS } from "../../frontend/src/interfaces/IGameOptions";
 
 export type PlayerType = 'human';
 export type CardSuit = "spades" | "hearts" | "diamonds" | "clubs";

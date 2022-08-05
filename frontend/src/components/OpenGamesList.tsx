@@ -1,44 +1,182 @@
 import React from "react";
+import { Form, Field } from "react-final-form";
 import { socket, SocketContext } from "../socket";
-import Loader from "./Loader";
 import GameItem from "./GameItem";
-import { IGameListItem, IGetGameListRequest, IGetGameListResponse } from "../interfaces/IGameList";
+import { IGameListItem, IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest } from "../interfaces/IGameList";
+import TextInput from "./FormComponents/TextInput";
 
-interface IProps {
+interface IFormValidationFields {
+  myName?: string,
+  password1?: string,
+  password2?: string,
+  gamePassword?: string,
+}
+
+interface IFormFields {
+  myName: string,
+  password1: string,
+  password2: string,
+  gamePassword?: string,
+}
+
+interface IState {
+  gameId: string,
+  method: null | "join" | "leave",
   isFetching: boolean,
   gameItemList: IGameListItem[],
 }
 
-class OpenGamesList extends React.Component<IProps, {}> {
+class OpenGamesList extends React.Component<{}, IState> {
+  state: IState = {
+    gameId: "",
+    method: null,
+    isFetching: false,
+    gameItemList: [],
+  }
+
   static socket = SocketContext;
+
   getMyId = (): string => window.localStorage.getItem('uUID') ?? "";
 
-  renderGameItems = () => {
-    return this.props.gameItemList.map(({id, rules, humanPlayers, imInTheGame}: IGameListItem) => {
+  componentDidMount() {
+    this.fetchGameItemList();
+    socket.on("new game created", (id) => {
+      console.log("new game id", id);
+      this.fetchGameItemList();
+    });
+  }
+
+  fetchGameItemList = () => {
+    this.setState({ isFetching: true });
+    const gameListRequest: IGetGameListRequest = { myId: this.getMyId() };
+    socket.emit("get games", gameListRequest, (gameList: IGetGameListResponse) => {
+      console.log("gameList", gameList);
+      this.setState({ gameItemList: gameList.games, isFetching: false });
+    });
+  }
+
+
+  joinGameMethod = (gameId: string, form: any) => {
+    console.log("join click", gameId);
+    this.setState({gameId: gameId, method: "join"}, () => {
+      form.submit();
+    });
+  }
+
+  leaveGameMethod = (gameId: string, form: any) => {
+    console.log("leave click", gameId);
+    this.setState({gameId: gameId, method: "leave"}, () => {
+      form.submit();
+    });
+  }
+
+  joinGame = (joinGameRequest: IJoinLeaveGameRequest) => {
+
+  }
+
+  renderGameItems = (form: any) => {
+    if (this.state.gameItemList.length === 0) {
+      return "No open games at the moment, why don't you just create one by your self?";
+    }
+    return this.state.gameItemList.map(({created, id, rules, humanPlayers, imInTheGame, playerCount, gameHasPassword}: IGameListItem) => {
       return(
         <GameItem
           key={id}
+          created={created}
           id={id}
           rules={rules}
           humanPlayers={humanPlayers}
           imInTheGame={imInTheGame}
+          playerCount= {playerCount}
+          gameHasPassword={gameHasPassword}
+          joinedGameId=""
+          onJoin={() => {this.joinGameMethod(id, form)}}
+          onLeave={() => {this.leaveGameMethod(id, form)}}
         />
       );
     }
   )};
 
-  render() {
-    if (this.props.isFetching) {
-      return <Loader />
-    } else {
-      return (
-        <React.Fragment>
-          <div>{this.renderGameItems()}</div>
-          <div>gameItemList { JSON.stringify(this.props.gameItemList) }</div>
-        </React.Fragment>
-      )
+  onSubmit = (values: IFormFields) => {
+    const gameId = this.state.gameId;
+    const method = this.state.method;
+    console.log("submit values", values);
+    if (gameId.length > 0 && method !== null) {
+      switch (this.state.method) {
+        case "join": {
+          break;
+        }
+        case "leave": {
+          break;
+        }
+      }
     }
   }
+
+  render() {
+    return (
+      <React.Fragment>
+        <Form
+          onSubmit={this.onSubmit}
+          validate={validateForm}
+          render={({handleSubmit, form }) => (
+            <form onSubmit={handleSubmit}>
+              <div className="row">
+                <div className="col">
+                  <Field<string>
+                    name="myName"
+                    component={TextInput}
+                    label="My (nick)name in the game"
+                  />
+                </div>
+                <div className="col">
+                  <Field<string>
+                    name="password1"
+                    component={TextInput}
+                    label="Password"
+                    ispassword="true"
+                  />
+                </div>
+                <div className="col">
+                  <Field<string>
+                    name="password2"
+                    component={TextInput}
+                    label="Re-type password if first time user"
+                    ispassword="true"
+                  />
+                </div>
+              </div>
+              <div className="row">
+                <div className="col">
+                  {this.renderGameItems(form)}
+                </div>
+              </div>
+              <input type="hidden" name="gameId" />
+            </form>
+          )}
+        />
+        <div>gameItemList { JSON.stringify(this.state.gameItemList) }</div>
+      </React.Fragment>
+    )
+  }
+}
+
+const validateForm = (values: IFormFields ) => {
+  const errors: IFormValidationFields = {};
+
+  if (!values.password1 || values.password1.length < 4) {
+    errors.password1 = "Password must be at least four characters long";
+  }
+
+  if (!values.myName || values.myName.length < 4) {
+    errors.myName = "Your (nick)name must be at least four characters long";
+  }
+
+  if (values.password2?.length > 0 && values.password1 !== values.password2) {
+    errors.password2 = "Password doesn't match!";
+  }
+
+  return errors;
 }
 
 export default OpenGamesList;

@@ -1,5 +1,6 @@
 import { IGameListItem, IGetGameListRequest, IGetGameListResponse } from "../../frontend/src/interfaces/IGameList";
-import { GAME_STATUS, IGameOptions } from "../interfaces/IGameOptions";
+import { IGameOptions } from "../interfaces/IGameOptions";
+import { GAME_STATUS } from "../../frontend/src/interfaces/IGameOptions";
 import { getGamesByStatus } from "../dbActions/games";
 import { playersToArr, rulesToArr } from "../common/model";
 
@@ -12,13 +13,21 @@ export const getOpenGamesList = async (getGameListRequest: IGetGameListRequest):
     console.log("openGame type", typeof openGame);
     console.log("openGame", openGame);
     response.games.push({
+      created: openGame.createDateTime,
       id: openGame.id,
       rules: {
         ruleList: rulesToArr(openGame),
         hiddenCardsMode: openGame.hiddenCardsMode,
+        roundInfo: {
+          startRound: openGame.startRound,
+          turnRound: openGame.turnRound,
+          endRound: openGame.endRound,
+        }
       },
       humanPlayers: playersToArr(openGame.humanPlayers),
       imInTheGame: openGame.humanPlayers.filter((player) => player.playerId === getGameListRequest.myId).length !== 0,
+      playerCount: openGame.humanPlayersCount,
+      gameHasPassword: openGame.password.length > 0,
     } as IGameListItem);
   });
   console.log("response", response);

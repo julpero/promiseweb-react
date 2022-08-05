@@ -2,8 +2,9 @@ import { insertNewGame, hasOngoingCreatedGame } from "../dbActions/promiseweb";
 import { checkLogin } from "../dbActions/users";
 import { getPlayerStats } from "../common/common";
 
-import { IGameOptions, GAME_STATUS, HIDDEN_CARDS_MODE} from "../interfaces/IGameOptions";
+import { IGameOptions} from "../interfaces/IGameOptions";
 import { ICreateGameRequest, ICreateGameResponse, CREATE_GAME_STATUS } from "../../frontend/src/interfaces/INewGame";
+import { GAME_STATUS, HIDDEN_CARDS_MODE } from "../../frontend/src/interfaces/IGameOptions";
 import { ICheckLoginRequest, ICheckLoginResponse, IUser } from "../interfaces/IUser";
 import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IUser";
 
