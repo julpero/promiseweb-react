@@ -59,20 +59,23 @@ const createGame = async (createGameRequest: ICreateGameRequest): Promise<ICreat
   const adminUserName = createGameRequest.newGameMyName;
   const adminId = createGameRequest.playerId;
 
-  let okToCreate = !(await hasOngoingCreatedGame(adminId));
-  if (!okToCreate) {
-    console.log("hasOngoingCreatedGame");
-    return response;
-  }
-
   const checkLoginObj: ICheckLoginRequest = {
     userName: adminUserName,
     userPass1: createGameRequest.password1 ?? "",
     userPass2: createGameRequest.password2 ?? "",
   }
   const loginObj = await checkLogin(checkLoginObj);
-  console.log("loginObj after", loginObj);
   response.loginStatus = loginObj.result;
+  if (response.loginStatus !== LOGIN_RESPONSE.ok) {
+    console.log("loginFailed", response.loginStatus);
+    return response;
+  }
+
+  let okToCreate = !(await hasOngoingCreatedGame(adminId));
+  if (!okToCreate) {
+    console.log("hasOngoingCreatedGame");
+    return response;
+  }
 
   if (okToCreate && loginObj.loginOk) {
       const gameOptions = createGameOptions(createGameRequest);

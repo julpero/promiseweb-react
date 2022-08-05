@@ -20,7 +20,6 @@ class HomeScreen extends React.Component<{}, IState> {
   };
 
   static socket = SocketContext;
-  myId: string = window.localStorage.getItem('uUID') ?? "";
 
   accRef: any;
 
@@ -29,8 +28,18 @@ class HomeScreen extends React.Component<{}, IState> {
     this.accRef = React.createRef();
   }
 
+  componentDidMount() {
+    this.fetchGameItemList();
+    socket.on("new game created", (id) => {
+      console.log("new game id", id);
+    });
+  }
+
+  getMyId = (): string => window.localStorage.getItem('uUID') ?? "";
+
   fetchGameItemList = () => {
-    const gameListRequest: IGetGameListRequest = { myId: this.myId };
+    this.setState({ isFetching: true });
+    const gameListRequest: IGetGameListRequest = { myId: this.getMyId() };
     socket.emit("get games", gameListRequest, (gameList: IGetGameListResponse) => {
       console.log("gameList", gameList);
       this.setState({ gameItemList: gameList.games, isFetching: false });
