@@ -40,5 +40,5 @@ export enum JOIN_LEAVE_RESULT {
 }
 
 export interface IJoinLeaveGameResponse {
-  joinResult: JOIN_LEAVE_RESULT,
+  joinLeaveResult: JOIN_LEAVE_RESULT,
 }

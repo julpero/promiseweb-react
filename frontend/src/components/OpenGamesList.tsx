@@ -2,7 +2,7 @@ import React from "react";
 import { Form, Field } from "react-final-form";
 import { socket, SocketContext } from "../socket";
 import GameItem from "./GameItem";
-import { IGameListItem, IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest } from "../interfaces/IGameList";
+import { IGameListItem, IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse } from "../interfaces/IGameList";
 import TextInput from "./FormComponents/TextInput";
 
 interface IFormValidationFields {
@@ -55,7 +55,6 @@ class OpenGamesList extends React.Component<{}, IState> {
     });
   }
 
-
   joinGameMethod = (gameId: string, form: any) => {
     this.setState({gameId: gameId, method: "join"}, () => {
       form.submit();
@@ -69,12 +68,19 @@ class OpenGamesList extends React.Component<{}, IState> {
   }
 
   joinGame = (joinGameRequest: IJoinLeaveGameRequest) => {
-    console.log("join", joinGameRequest);
+    console.log("join request", joinGameRequest);
+    socket.emit("join game", joinGameRequest, (response: IJoinLeaveGameResponse) => {
+      console.log("join response", response);
 
+    });
   }
 
-  leaveGame = (joinGameRequest: IJoinLeaveGameRequest) => {
-    console.log("leave", joinGameRequest);
+  leaveGame = (leaveGameRequest: IJoinLeaveGameRequest) => {
+    console.log("leave request", leaveGameRequest);
+    socket.emit("leave game", leaveGameRequest, (response: IJoinLeaveGameResponse) => {
+      console.log("leave response", response);
+
+    });
   }
 
   renderGameItems = (form: any) => {
