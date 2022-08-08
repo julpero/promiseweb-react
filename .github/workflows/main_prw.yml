@@ -72,5 +72,3 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_31C155B008F24DCCB455525162776DC5 }}
           package: .
       
-      - name: install prod npm packages
-        run: npm install --omit=dev
