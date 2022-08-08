@@ -57,12 +57,6 @@ jobs:
         with:
           name: node-app
 
-      - name: UnZip artifact for deployment
-        run: unzip release.zip
-
-      - name: Delete zip package
-        run: rm release.zip
-
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
