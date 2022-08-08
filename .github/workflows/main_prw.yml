@@ -34,7 +34,7 @@ jobs:
         working-directory: ./frontend
 
       - name: Zip artifact for deployment
-        run: Compress-Archive package.json, package-lock.json, web.config, ./node_modules, ./frontend/build release.zip
+        run: Compress-Archive package.json, web.config, ./node_modules, ./frontend/build release.zip
       - name: Update Zip artifact for deployment
         run: Compress-Archive -Update ./serverBuild/* release.zip
 
