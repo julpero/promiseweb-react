@@ -60,9 +60,6 @@ jobs:
       - name: UnZip artifact for deployment
         run: unzip release.zip
 
-      - name: Delete zip package
-        run: rm release.zip
-
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
@@ -72,3 +69,5 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_31C155B008F24DCCB455525162776DC5 }}
           package: .
       
+      - name: Delete zip package
+        run: rm release.zip
