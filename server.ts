@@ -12,7 +12,7 @@ import { getOpenGamesList } from './backend/actions/getGameList';
 import { joinGame } from './backend/actions/joinGame';
 import { leaveGame } from './backend/actions/leaveGame';
 import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./frontend/src/interfaces/INewGame";
-import { IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse } from "./frontend/src/interfaces/IGameList";
+import { IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IGameList";
 
 
 // Routes
@@ -68,11 +68,21 @@ connectDB().then(() => {
 
     socket.on("join game", async (joinGameRequest: IJoinLeaveGameRequest, fn: Function) => {
       const joinResponse: IJoinLeaveGameResponse = await joinGame(joinGameRequest);
+      if (joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.ok) {
+        socket.join(joinGameRequest.gameId);
+        // notify other users
+        io.emit("game list updated");
+      }
       fn(joinResponse);
     });
 
     socket.on("leave game", async (leaveGameRequest: IJoinLeaveGameRequest, fn: Function) => {
       const leaveResponse: IJoinLeaveGameResponse = await leaveGame(leaveGameRequest);
+      if (leaveResponse.joinLeaveResult === JOIN_LEAVE_RESULT.ok) {
+        socket.leave(leaveGameRequest.gameId);
+        // notify other users
+        io.emit("game list updated");
+      }
       fn(leaveResponse);
     });
   })

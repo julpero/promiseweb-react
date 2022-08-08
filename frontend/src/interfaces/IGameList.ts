@@ -1,4 +1,5 @@
 import { HIDDEN_CARDS_MODE, IRoundInfo, RULES } from "./IGameOptions";
+import { LOGIN_RESPONSE } from "./IUser";
 
 export interface IRules {
   ruleList: RULES[],
@@ -37,8 +38,11 @@ export interface IJoinLeaveGameRequest {
 export enum JOIN_LEAVE_RESULT {
   ok,
   notOk,
+  lastOk,
 }
 
 export interface IJoinLeaveGameResponse {
   joinLeaveResult: JOIN_LEAVE_RESULT,
+  loginStatus: LOGIN_RESPONSE,
+  startGame?: boolean,
 }

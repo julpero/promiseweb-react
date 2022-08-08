@@ -1,11 +1,11 @@
 import { insertNewGame, hasOngoingCreatedGame } from "../dbActions/promiseweb";
 import { checkLogin } from "../dbActions/users";
-import { getPlayerStats } from "../common/common";
+import { getPlayerStats, getGameRoundCount } from "../common/common";
 
 import { IGameOptions} from "../interfaces/IGameOptions";
 import { ICreateGameRequest, ICreateGameResponse, CREATE_GAME_STATUS } from "../../frontend/src/interfaces/INewGame";
 import { GAME_STATUS, HIDDEN_CARDS_MODE } from "../../frontend/src/interfaces/IGameOptions";
-import { ICheckLoginRequest, ICheckLoginResponse, IUser } from "../interfaces/IUser";
+import { ICheckLoginRequest  } from "../interfaces/IUser";
 import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IUser";
 
 import { validate as uuidValidate } from 'uuid';
@@ -67,7 +67,7 @@ const createGame = async (createGameRequest: ICreateGameRequest): Promise<ICreat
   }
   const loginObj = await checkLogin(checkLoginObj);
   response.loginStatus = loginObj.result;
-  if (response.loginStatus !== LOGIN_RESPONSE.ok) {
+  if (!loginObj.loginOk) {
     console.log("loginFailed", response.loginStatus);
     return response;
   }
@@ -82,7 +82,7 @@ const createGame = async (createGameRequest: ICreateGameRequest): Promise<ICreat
       const gameOptions = createGameOptions(createGameRequest);
       console.log("gameOptions", gameOptions);
 
-      gameOptions.humanPlayers[0].playerStats = await getPlayerStats(gameOptions, gameOptions.adminName);
+      gameOptions.humanPlayers[0].playerStats = await getPlayerStats(getGameRoundCount(gameOptions), gameOptions.adminName);
       const createdGameIdStr = await insertNewGame(gameOptions);
       console.log('create game - gameOptions inserted with _id: ' + createdGameIdStr);
       response.responseStatus = CREATE_GAME_STATUS.ok;

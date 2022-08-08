@@ -44,6 +44,10 @@ class OpenGamesList extends React.Component<{}, IState> {
       console.log("new game id", id);
       this.fetchGameItemList();
     });
+
+    socket.on("game list updated", () => {
+      this.fetchGameItemList();
+    });
   }
 
   fetchGameItemList = () => {
