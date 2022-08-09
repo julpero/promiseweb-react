@@ -6,6 +6,7 @@ import "./App.css";
 import { v4 as uuidv4 } from "uuid";
 
 import HomeScreen from "./screens/HomeScreen";
+import GameTable from "./screens/GameTable";
 
 class App extends React.Component {
   render(): React.ReactNode {
@@ -24,6 +25,7 @@ class App extends React.Component {
           <div className="App">
             <Routes>
               <Route index element={<HomeScreen />} />
+              <Route path="/gametable" element={<GameTable />} />
             </Routes>
           </div>
         </BrowserRouter>
