@@ -2,6 +2,7 @@ import React from "react";
 import Form from "react-bootstrap/Form";
 import { FieldRenderProps } from "react-final-form";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Props = FieldRenderProps<boolean, any>;
 
 const CheckboxInput: React.FC<Props> = ( { input: { value }, onChange, label, ...rest}: Props) => {
