@@ -1,21 +1,21 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { socket, SocketContext } from "./socket";
 
-import './App.css';
+import "./App.css";
 import { v4 as uuidv4 } from "uuid";
 
-import HomeScreen from './screens/HomeScreen';
+import HomeScreen from "./screens/HomeScreen";
 
 class App extends React.Component {
   render(): React.ReactNode {
     console.log("app...");
-    if (window.localStorage.getItem('uUID')) {
-      console.log(window.localStorage.getItem('uUID'));
+    if (window.localStorage.getItem("uUID")) {
+      console.log(window.localStorage.getItem("uUID"));
     } else {
       const uuid = uuidv4();
-      console.log('uUID set: ', uuid);
-      window.localStorage.setItem('uUID', uuid);
+      console.log("uUID set: ", uuid);
+      window.localStorage.setItem("uUID", uuid);
     }
 
     return (

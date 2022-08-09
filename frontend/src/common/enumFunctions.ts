@@ -13,7 +13,7 @@ export const ruleToStr = (rule: RULES): string => {
     case RULES.opponentGameCardValue: return "show opponent hand value in game";
     default: return "unknown rule";
   }
-}
+};
 
 export const hiddenCardsModeToStr = (mode: HIDDEN_CARDS_MODE) => {
   switch (mode) {
@@ -21,4 +21,4 @@ export const hiddenCardsModeToStr = (mode: HIDDEN_CARDS_MODE) => {
     case HIDDEN_CARDS_MODE.cardInChargeAndWinning: return "show card in charge and winning card";
     default: return "normal";
   }
-}
+};

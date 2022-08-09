@@ -1,1 +1,3 @@
-export function testi() {};
+export function testi() {
+  return;
+}

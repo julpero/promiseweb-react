@@ -3,8 +3,8 @@ import { socket, SocketContext } from "../socket";
 import { Form, Field } from "react-final-form";
 import { v4 as uuidv4 } from "uuid";
 
-import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
 import { Modal } from "react-bootstrap";
 
 import SelectInput from "./FormComponents/SelectInput";
@@ -29,7 +29,7 @@ interface IState {
 }
 
 interface IProps {
-  onCreateGame: Function,
+  onCreateGame: () => void,
 }
 
 class CreateGame extends React.Component<IProps, IState> {
@@ -42,7 +42,7 @@ class CreateGame extends React.Component<IProps, IState> {
   initialValues: INewGameForm = initialNewGameValues;
 
   onSubmit = (values: INewGameForm) => {
-    const playerId: string = window.localStorage.getItem('uUID') ?? "ERROR";
+    const playerId: string = window.localStorage.getItem("uUID") ?? "ERROR";
     const newGameRequest: ICreateGameRequest = {...values, playerId };
     socket.emit("create game", newGameRequest, (createGameResponse: ICreateGameResponse) => {
       this.setState({
@@ -54,7 +54,7 @@ class CreateGame extends React.Component<IProps, IState> {
         this.props.onCreateGame();
       }
     });
-  }
+  };
 
   createGameErrorHeaderStr = (): string => {
     if (this.state) {
@@ -66,7 +66,7 @@ class CreateGame extends React.Component<IProps, IState> {
       }
     }
     return "Error";
-  }
+  };
 
   createGameErrorStr = (): string => {
     if (this.state) {
@@ -94,16 +94,16 @@ class CreateGame extends React.Component<IProps, IState> {
       }
     }
     return "Unexpected error";
-  }
+  };
 
   resetLocalStorage = () => {
-    console.log("old uuid", window.localStorage.getItem('uUID'));
+    console.log("old uuid", window.localStorage.getItem("uUID"));
     window.localStorage.removeItem("uUID");
     const uuid = uuidv4();
-    window.localStorage.setItem('uUID', uuid);
-    console.log("new uuid", window.localStorage.getItem('uUID'));
+    window.localStorage.setItem("uUID", uuid);
+    console.log("new uuid", window.localStorage.getItem("uUID"));
     this.handleErrorClose();
-  }
+  };
 
   renderResetUuidButton = () => {
     if (this.state && this.state.createGameStatus === CREATE_GAME_STATUS.notValidPlayerId) {
@@ -111,18 +111,18 @@ class CreateGame extends React.Component<IProps, IState> {
         <Modal.Footer>
           <Button variant="warning" onClick={this.resetLocalStorage}>Reset local storage</Button>
         </Modal.Footer>
-      )
+      );
     } else {
       return null;
     }
-  }
+  };
 
   handleErrorClose = (): void => {
     this.setState({
       loginStatus: null,
       createGameStatus: null,
     });
-  }
+  };
 
   render() {
     return (
@@ -327,15 +327,15 @@ class CreateGame extends React.Component<IProps, IState> {
                         />
                       </div>
                       <div className="col">
-                      <Field<string>
-                        name="hiddenCardsMode"
-                        issmall="true"
-                        component={SelectInput}
-                      >
-                        <option value="0">show cards normally</option>
-                        <option value="1">show only card in charge</option>
-                        <option value="2">show card in charge and winning card</option>
-                      </Field>
+                        <Field<string>
+                          name="hiddenCardsMode"
+                          issmall="true"
+                          component={SelectInput}
+                        >
+                          <option value="0">show cards normally</option>
+                          <option value="1">show only card in charge</option>
+                          <option value="2">show card in charge and winning card</option>
+                        </Field>
                       </div>
                     </div>
                     <div className="row">
@@ -415,7 +415,7 @@ class CreateGame extends React.Component<IProps, IState> {
           {this.renderResetUuidButton()}
         </Modal>
       </React.Fragment>
-    )
+    );
   }
 }
 
@@ -449,6 +449,6 @@ const validateForm = (values: INewGameForm) => {
   }
 
   return errors;
-}
+};
 
 export default CreateGame;

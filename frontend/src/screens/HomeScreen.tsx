@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createRef } from "react";
 // import { socket, SocketContext } from "../socket";
 import Accordion from "react-bootstrap/Accordion";
 
@@ -9,23 +9,26 @@ interface IState {
   selectedAccordion: string,
 }
 
-class HomeScreen extends React.Component<{}, IState> {
+class HomeScreen extends React.Component<Record<string, never>, IState> {
   state: Readonly<IState> = {
     selectedAccordion: "",
   };
 
   // static socket = SocketContext;
 
-  accRef: any;
-  constructor(props: any) {
+  // private accRef: React.RefObject(typeof HTMLHeadingElement);
+  private accRef = createRef<HTMLHeadingElement>();
+  constructor(props: never) {
     super(props);
-    this.accRef = React.createRef();
+    // this.accRef = React.createRef<HTMLHeadingElement>();
   }
 
   handleGameCreation = () => {
     this.setState({selectedAccordion: "0"});
-    this.accRef.current.firstElementChild.click();
-  }
+    if (this.accRef.current?.firstElementChild) {
+      (this.accRef.current.firstElementChild as HTMLButtonElement).click();
+    }
+  };
 
   render() {
     return(
@@ -43,7 +46,7 @@ class HomeScreen extends React.Component<{}, IState> {
           </Accordion.Item>
         </Accordion>
       </div>
-    )
+    );
   }
 }
 

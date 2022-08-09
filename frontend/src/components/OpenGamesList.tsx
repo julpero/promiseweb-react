@@ -4,6 +4,7 @@ import { socket, SocketContext } from "../socket";
 import GameItem from "./GameItem";
 import { IGameListItem, IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse } from "../interfaces/IGameList";
 import TextInput from "./FormComponents/TextInput";
+import { FormApi } from "final-form";
 
 interface IFormValidationFields {
   myName?: string,
@@ -26,17 +27,17 @@ interface IState {
   gameItemList: IGameListItem[],
 }
 
-class OpenGamesList extends React.Component<{}, IState> {
+class OpenGamesList extends React.Component<Record<string, never>, IState> {
   state: IState = {
     gameId: "",
     method: null,
     isFetching: false,
     gameItemList: [],
-  }
+  };
 
   static socket = SocketContext;
 
-  getMyId = (): string => window.localStorage.getItem('uUID') ?? "";
+  getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
 
   componentDidMount() {
     this.fetchGameItemList();
@@ -57,19 +58,19 @@ class OpenGamesList extends React.Component<{}, IState> {
       console.log("gameList", gameList);
       this.setState({ gameItemList: gameList.games, isFetching: false });
     });
-  }
+  };
 
-  joinGameMethod = (gameId: string, form: any) => {
+  joinGameMethod = (gameId: string, form: FormApi<IFormFields, Partial<IFormFields>>) => {
     this.setState({gameId: gameId, method: "join"}, () => {
       form.submit();
     });
-  }
+  };
 
-  leaveGameMethod = (gameId: string, form: any) => {
+  leaveGameMethod = (gameId: string, form: FormApi<IFormFields, Partial<IFormFields>>) => {
     this.setState({gameId: gameId, method: "leave"}, () => {
       form.submit();
     });
-  }
+  };
 
   joinGame = (joinGameRequest: IJoinLeaveGameRequest) => {
     console.log("join request", joinGameRequest);
@@ -77,7 +78,7 @@ class OpenGamesList extends React.Component<{}, IState> {
       console.log("join response", response);
 
     });
-  }
+  };
 
   leaveGame = (leaveGameRequest: IJoinLeaveGameRequest) => {
     console.log("leave request", leaveGameRequest);
@@ -85,9 +86,9 @@ class OpenGamesList extends React.Component<{}, IState> {
       console.log("leave response", response);
 
     });
-  }
+  };
 
-  renderGameItems = (form: any) => {
+  renderGameItems = (form: FormApi<IFormFields, Partial<IFormFields>>) => {
     if (this.state.gameItemList.length === 0) {
       return "No open games at the moment, why don't you just create one by your self?";
     }
@@ -103,12 +104,12 @@ class OpenGamesList extends React.Component<{}, IState> {
           playerCount= {playerCount}
           gameHasPassword={gameHasPassword}
           joinedGameId=""
-          onJoin={() => {this.joinGameMethod(id, form)}}
-          onLeave={() => {this.leaveGameMethod(id, form)}}
+          onJoin={() => {this.joinGameMethod(id, form);}}
+          onLeave={() => {this.leaveGameMethod(id, form);}}
         />
       );
-    }
-  )};
+    });
+  };
 
   onSubmit = (values: IFormFields) => {
     const gameId = this.state.gameId;
@@ -122,7 +123,7 @@ class OpenGamesList extends React.Component<{}, IState> {
         password2: values.password2,
         gamePassword: values.gamePassword ?? "",
         method: method,
-      }
+      };
       switch (this.state.method) {
         case "join": {
           this.joinGame(request);
@@ -134,7 +135,7 @@ class OpenGamesList extends React.Component<{}, IState> {
         }
       }
     }
-  }
+  };
 
   render() {
     return (
@@ -180,7 +181,7 @@ class OpenGamesList extends React.Component<{}, IState> {
         />
         <div>gameItemList { JSON.stringify(this.state.gameItemList) }</div>
       </React.Fragment>
-    )
+    );
   }
 }
 
@@ -200,6 +201,6 @@ const validateForm = (values: IFormFields ) => {
   }
 
   return errors;
-}
+};
 
 export default OpenGamesList;

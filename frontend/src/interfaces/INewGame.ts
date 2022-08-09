@@ -42,7 +42,7 @@ export const initialNewGameValues: INewGameForm = {
   opponentGameCardValue: false,
   thisIsDemoGame: false,
   newGamePassword: "",
-}
+};
 
 export interface ICreateGameRequest extends INewGameForm {
   playerId: string,

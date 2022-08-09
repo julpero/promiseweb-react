@@ -5,23 +5,23 @@ import { ruleToStr, hiddenCardsModeToStr } from "../common/enumFunctions";
 import { Card } from "react-bootstrap";
 import { Field } from "react-final-form";
 import TextInput from "./FormComponents/TextInput";
-import Button from 'react-bootstrap/Button';
+import Button from "react-bootstrap/Button";
 
 interface IProps {
-  onJoin: any,
-  onLeave: any,
+  onJoin: () => void,
+  onLeave: () => void,
   joinedGameId: string,
 }
 
-class GameItem extends React.Component<IGameListItem & IProps, {}> {
+class GameItem extends React.Component<IGameListItem & IProps> {
   dateFormatOptions: Intl.DateTimeFormatOptions = {
-      year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric", hour12: false
+    year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric", hour12: false
   };
 
   renderDateStr = (dateAsStr: string): string => {
     const dateAsDate = new Date(dateAsStr);
     return dateAsDate.toLocaleString("fi-FI", this.dateFormatOptions);
-  }
+  };
 
   renderRuleList = () => {
     return this.props.rules.ruleList.map((rule) => {
@@ -29,12 +29,12 @@ class GameItem extends React.Component<IGameListItem & IProps, {}> {
         <li key={rule.toString()}>{ruleToStr(rule)}</li>
       );
     });
-  }
+  };
 
   renderHiddenCardsMode = () => {
     if (this.props.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal) return null;
-    return <li>{hiddenCardsModeToStr(this.props.rules.hiddenCardsMode)}</li>
-  }
+    return <li>{hiddenCardsModeToStr(this.props.rules.hiddenCardsMode)}</li>;
+  };
 
   renderRules = () => {
     if (this.props.rules.ruleList.length === 0 && this.props.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal) {
@@ -46,7 +46,7 @@ class GameItem extends React.Component<IGameListItem & IProps, {}> {
         </ul>
       );
     }
-  }
+  };
 
   renderCreatedAndTurns = () => {
     return (
@@ -59,21 +59,21 @@ class GameItem extends React.Component<IGameListItem & IProps, {}> {
         </div>
       </React.Fragment>
     );
-  }
+  };
 
   renderEmptyPlayers = () => {
-    const emptyPlayers: any[] = [];
+    const emptyPlayers: JSX.Element[] = [];
     for (let i = this.props.humanPlayers.length; i < this.props.playerCount; i++) {
       emptyPlayers.push(<li key={i}>[ ]</li>);
     }
     return emptyPlayers;
-  }
+  };
 
   renderPlayerList = () => {
     return this.props.humanPlayers.map(player => {
       return <li key={player}>{player}</li>;
     });
-  }
+  };
 
   renderPlayers = () => {
     return (
@@ -81,8 +81,8 @@ class GameItem extends React.Component<IGameListItem & IProps, {}> {
         {this.renderPlayerList()}
         {this.renderEmptyPlayers()}
       </ul>
-    )
-  }
+    );
+  };
 
   renderPasswordField = () => {
     if (this.props.gameHasPassword) {
@@ -97,11 +97,11 @@ class GameItem extends React.Component<IGameListItem & IProps, {}> {
           />
           <hr />
         </div>
-      )
+      );
     } else {
       return null;
     }
-  }
+  };
 
   renderButtons = () => {
     return (
@@ -118,7 +118,7 @@ class GameItem extends React.Component<IGameListItem & IProps, {}> {
         >LEAVE GAME</Button>
       </div>
     );
-  }
+  };
 
   render() {
     return (
@@ -141,7 +141,7 @@ class GameItem extends React.Component<IGameListItem & IProps, {}> {
           </div>
         </Card.Body>
       </Card>
-    )
+    );
   }
 }
 

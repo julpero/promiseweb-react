@@ -7,7 +7,7 @@ export interface FormMetaData {
 
 export const dangerStyle = ({error, touched}: FormMetaData) => {
   return (touched && error) ? {"borderColor": "red", "color": "red"} as React.CSSProperties : undefined;
-}
+};
 
 export const renderLabel = (label: string) => {
   if (!label) return null;
@@ -16,8 +16,8 @@ export const renderLabel = (label: string) => {
     <label>
       {label}
     </label>
-  )
-}
+  );
+};
 
 export const renderError = ({error, touched}: FormMetaData) => {
   if (!touched || !error) return null;
@@ -25,5 +25,5 @@ export const renderError = ({error, touched}: FormMetaData) => {
     <p className="text-danger">
       {error}
     </p>
-  )
-}
+  );
+};
