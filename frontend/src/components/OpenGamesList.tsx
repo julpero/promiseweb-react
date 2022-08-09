@@ -4,7 +4,9 @@ import { socket, SocketContext } from "../socket";
 import GameItem from "./GameItem";
 import { IGameListItem, IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse } from "../interfaces/IGameList";
 import TextInput from "./FormComponents/TextInput";
+import { Modal } from "react-bootstrap";
 import { FormApi } from "final-form";
+import { LOGIN_RESPONSE } from "../interfaces/IUser";
 
 interface IFormValidationFields {
   myName?: string,
@@ -25,6 +27,7 @@ interface IState {
   method: null | "join" | "leave",
   isFetching: boolean,
   gameItemList: IGameListItem[],
+  loginStatus: LOGIN_RESPONSE | null,
 }
 
 class OpenGamesList extends React.Component<Record<string, never>, IState> {
@@ -33,6 +36,7 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
     method: null,
     isFetching: false,
     gameItemList: [],
+    loginStatus: null,
   };
 
   static socket = SocketContext;
@@ -72,11 +76,46 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
     });
   };
 
+  createGameErrorStr = (): string => {
+    if (this.state) {
+      switch (this.state.loginStatus) {
+        case LOGIN_RESPONSE.passwordFails: {
+          return "Password doesn't match!";
+        }
+        case LOGIN_RESPONSE.passwordMismatch: {
+          return "Password doesn't match!";
+        }
+        case LOGIN_RESPONSE.password2Empty: {
+          return "New username, enter password to both fields!";
+        }
+        case LOGIN_RESPONSE.passwordShort: {
+          return "Password must be at least four characters long!";
+        }
+      }
+    }
+    return "Unexpected error";
+  };
+
+  handleErrorClose = (): void => {
+    this.setState({
+      loginStatus: null,
+    });
+  };
+
+  createGameErrorHeaderStr = (): string => {
+    if (this.state) {
+      if (this.state.loginStatus) {
+        return "Check your password";
+      }
+    }
+    return "Error";
+  };
+
   joinGame = (joinGameRequest: IJoinLeaveGameRequest) => {
     console.log("join request", joinGameRequest);
     socket.emit("join game", joinGameRequest, (response: IJoinLeaveGameResponse) => {
       console.log("join response", response);
-
+      this.setState({ loginStatus: response.loginStatus });
     });
   };
 
@@ -180,6 +219,19 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
           )}
         />
         <div>gameItemList { JSON.stringify(this.state.gameItemList) }</div>
+        <Modal
+          show={(this.state !== null && (this.state.loginStatus)) as boolean }
+          onHide={this.handleErrorClose}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              {this.createGameErrorHeaderStr()}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {this.createGameErrorStr()}
+          </Modal.Body>
+        </Modal>
       </React.Fragment>
     );
   }
