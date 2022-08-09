@@ -67,11 +67,17 @@ connectDB().then(() => {
     });
 
     socket.on("join game", async (joinGameRequest: IJoinLeaveGameRequest, fn: (joinResponse: IJoinLeaveGameResponse) => void) => {
+      const gameIdStr = joinGameRequest.gameId;
       const joinResponse: IJoinLeaveGameResponse = await joinGame(joinGameRequest);
-      if (joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.ok) {
-        socket.join(joinGameRequest.gameId);
+      if (joinResponse.joinLeaveResult !== JOIN_LEAVE_RESULT.notOk) {
+        socket.join(gameIdStr);
         // notify other users
         io.emit("game list updated");
+      }
+      if (joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.lastOk) {
+        socket.join(gameIdStr);
+        // notify all games players about game start
+        io.to(gameIdStr).emit("game begins");
       }
       fn(joinResponse);
     });
