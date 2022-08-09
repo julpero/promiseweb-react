@@ -13,7 +13,7 @@ import { joinGame } from "./backend/actions/joinGame";
 import { leaveGame } from "./backend/actions/leaveGame";
 import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./frontend/src/interfaces/INewGame";
 import { IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IGameList";
-
+import { ICheckGameRequest, ICheckGameResponse } from "./frontend/src/interfaces/ICheckGame";
 
 // Routes
 // not defined
@@ -91,6 +91,10 @@ connectDB().then(() => {
       }
       fn(leaveResponse);
     });
+
+    socket.on("check ongoing game", async (checkGameRequest: ICheckGameRequest, fn: (checkResponse: ICheckGameResponse) => void) => {
+      const checkResponse: ICheckGameResponse =
+      fn(checkResponse);
+    });
   });
 });
-

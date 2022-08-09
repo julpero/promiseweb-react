@@ -115,7 +115,6 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
   };
 
   joinGame = (joinGameRequest: IJoinLeaveGameRequest) => {
-    console.log("join request", joinGameRequest);
     socket.emit("join game", joinGameRequest, (response: IJoinLeaveGameResponse) => {
       console.log("join response", response);
       this.setState({ loginStatus: response.loginStatus, joinLeaveStatus: response.joinLeaveResult });
@@ -126,7 +125,6 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
   };
 
   leaveGame = (leaveGameRequest: IJoinLeaveGameRequest) => {
-    console.log("leave request", leaveGameRequest);
     socket.emit("leave game", leaveGameRequest, (response: IJoinLeaveGameResponse) => {
       console.log("leave response", response);
       this.setState({ loginStatus: response.loginStatus, joinLeaveStatus: response.joinLeaveResult });

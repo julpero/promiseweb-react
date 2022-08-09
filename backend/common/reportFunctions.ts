@@ -106,4 +106,3 @@ export const getGameReport = (game: IGame, playersStatistics: IPlayerStatistic[]
 
   return retObj;
 };
-

@@ -8,6 +8,8 @@ import { v4 as uuidv4 } from "uuid";
 import HomeScreen from "./screens/HomeScreen";
 import GameTable from "./screens/GameTable";
 
+import { ICheckGameRequest, ICheckGameResponse } from "./interfaces/ICheckGame";
+
 class App extends React.Component {
   componentDidMount() {
     if (window.localStorage.getItem("uUID")) {
@@ -17,8 +19,13 @@ class App extends React.Component {
       console.log("uUID set: ", uuid);
       window.localStorage.setItem("uUID", uuid);
     }
+    const checkGameRequest: ICheckGameRequest = {
+      myId: window.localStorage.getItem("uUID") ?? "",
+    };
 
-    // const hasOnGoingGame
+    socket.emit("check ongoing game", checkGameRequest, (response: ICheckGameResponse) => {
+      console.log("check response", response);
+    });
   }
 
   static socket = SocketContext;
