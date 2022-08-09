@@ -1,9 +1,10 @@
 import { Schema } from "mongoose";
-import { ICard } from "../interfaces/IGameOptions"
+import { ICard } from "../interfaces/IGameOptions";
 
 const cardSchema = new Schema<ICard>({
-  suit: {type: String, required: true},
-  rank: {type: Number, required: true},
+  suite: {type: String, required: true},
+  value: {type: Number, required: true},
+  rank: {type: String, required: false},
 });
 
 export default cardSchema;

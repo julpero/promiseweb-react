@@ -1,14 +1,13 @@
 import { insertNewGame, hasOngoingCreatedGame } from "../dbActions/promiseweb";
 import { checkLogin } from "../dbActions/users";
 import { getPlayerStats, getGameRoundCount } from "../common/common";
-
 import { IGameOptions} from "../interfaces/IGameOptions";
 import { ICreateGameRequest, ICreateGameResponse, CREATE_GAME_STATUS } from "../../frontend/src/interfaces/INewGame";
 import { GAME_STATUS, HIDDEN_CARDS_MODE } from "../../frontend/src/interfaces/IGameOptions";
 import { ICheckLoginRequest  } from "../interfaces/IUser";
 import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IUser";
 
-import { validate as uuidValidate } from 'uuid';
+import { validate as uuidValidate } from "uuid";
 
 const hiddenCardsModeToEnum = (selected: string): HIDDEN_CARDS_MODE => {
   switch (selected) {
@@ -16,7 +15,7 @@ const hiddenCardsModeToEnum = (selected: string): HIDDEN_CARDS_MODE => {
     case "2": return HIDDEN_CARDS_MODE.cardInChargeAndWinning;
     default: return HIDDEN_CARDS_MODE.normal;
   }
-}
+};
 
 const createGameOptions = (values: ICreateGameRequest): IGameOptions => {
   return {
@@ -42,14 +41,14 @@ const createGameOptions = (values: ICreateGameRequest): IGameOptions => {
     thisIsDemoGame: values.thisIsDemoGame,
     hiddenCardsMode: hiddenCardsModeToEnum(values.hiddenCardsMode),
   } as IGameOptions;
-}
+};
 
 const createGame = async (createGameRequest: ICreateGameRequest): Promise<ICreateGameResponse> => {
   const response: ICreateGameResponse = {
     responseStatus: CREATE_GAME_STATUS.notOk,
     newGameId: "",
     loginStatus: LOGIN_RESPONSE.ok
-  }
+  };
 
   if (!uuidValidate(createGameRequest.playerId)) {
     console.log("uuidValidate");
@@ -64,7 +63,7 @@ const createGame = async (createGameRequest: ICreateGameRequest): Promise<ICreat
     userName: adminUserName,
     userPass1: createGameRequest.password1 ?? "",
     userPass2: createGameRequest.password2 ?? "",
-  }
+  };
   const loginObj = await checkLogin(checkLoginObj);
   response.loginStatus = loginObj.result;
   if (!loginObj.loginOk) {
@@ -72,24 +71,24 @@ const createGame = async (createGameRequest: ICreateGameRequest): Promise<ICreat
     return response;
   }
 
-  let okToCreate = !(await hasOngoingCreatedGame(adminId));
+  const okToCreate = !(await hasOngoingCreatedGame(adminId));
   if (!okToCreate) {
     console.log("hasOngoingCreatedGame");
     return response;
   }
 
   if (okToCreate && loginObj.loginOk) {
-      const gameOptions = createGameOptions(createGameRequest);
-      console.log("gameOptions", gameOptions);
+    const gameOptions = createGameOptions(createGameRequest);
+    console.log("gameOptions", gameOptions);
 
-      gameOptions.humanPlayers[0].playerStats = await getPlayerStats(getGameRoundCount(gameOptions), gameOptions.adminName);
-      const createdGameIdStr = await insertNewGame(gameOptions);
-      console.log('create game - gameOptions inserted with _id: ' + createdGameIdStr);
-      response.responseStatus = CREATE_GAME_STATUS.ok;
-      response.newGameId = createdGameIdStr;
+    gameOptions.humanPlayers[0].playerStats = await getPlayerStats(getGameRoundCount(gameOptions), gameOptions.adminName);
+    const createdGameIdStr = await insertNewGame(gameOptions);
+    console.log("create game - gameOptions inserted with _id: " + createdGameIdStr);
+    response.responseStatus = CREATE_GAME_STATUS.ok;
+    response.newGameId = createdGameIdStr;
   }
 
   return response;
-}
+};
 
 export default createGame;

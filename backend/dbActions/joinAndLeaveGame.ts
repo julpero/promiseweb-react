@@ -1,6 +1,6 @@
 import { IJoinLeaveGameRequest, JOIN_LEAVE_RESULT } from "../../frontend/src/interfaces/IGameList";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IGameOptions";
-import { IGameOptions, IHumanPlayer, IPlayer, IRound } from "../interfaces/IGameOptions";
+import { IHumanPlayer } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
 import { getPlayerStats, getGameRoundCount } from "../common/common";
 
@@ -34,7 +34,7 @@ export const joinOnGame = async (joinGameRequest: IJoinLeaveGameRequest): Promis
     playerId: joinGameRequest.myId,
     active: true,
     playerStats: newPlayerStats,
-  }
+  };
 
   game.humanPlayers.push(newPlayer);
 
@@ -51,7 +51,7 @@ export const joinOnGame = async (joinGameRequest: IJoinLeaveGameRequest): Promis
   } else {
     return JOIN_LEAVE_RESULT.ok;
   }
-}
+};
 
 export const leaveTheGame = async (leaveGameRequest: IJoinLeaveGameRequest): Promise<JOIN_LEAVE_RESULT> => {
   const game = await GameOptions.findById(leaveGameRequest.gameId);
@@ -82,4 +82,4 @@ export const leaveTheGame = async (leaveGameRequest: IJoinLeaveGameRequest): Pro
 
   const gameAfter = await game.save();
   return gameAfter !== null ? JOIN_LEAVE_RESULT.ok : JOIN_LEAVE_RESULT.notOk;
-}
+};

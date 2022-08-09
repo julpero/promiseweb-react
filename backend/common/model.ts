@@ -1,11 +1,11 @@
-import { IGameOptions, IHumanPlayer } from "../interfaces/IGameOptions"
-import { RULES } from "../../frontend/src/interfaces/IGameOptions"
+import { IGameOptions, IHumanPlayer } from "../interfaces/IGameOptions";
+import { RULES } from "../../frontend/src/interfaces/IGameOptions";
 
 export const playersToArr = (players: IHumanPlayer[]): string[] => {
   const playerArr: string[] = players.map(player => player.name);
 
   return playerArr;
-}
+};
 
 export const rulesToArr = (gameOptions: IGameOptions): RULES[] => {
   const rulesArr: RULES[] = [];
@@ -21,7 +21,7 @@ export const rulesToArr = (gameOptions: IGameOptions): RULES[] => {
   if (gameOptions.opponentGameCardValue) rulesArr.push(RULES.opponentGameCardValue);
 
   return rulesArr;
-}
+};
 
 /*
 export const rulesToArr = (gameOptions: IGameOptions): string[] => {

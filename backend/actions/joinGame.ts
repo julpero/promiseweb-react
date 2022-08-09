@@ -9,13 +9,13 @@ export const joinGame = async (joinGameRequest: IJoinLeaveGameRequest): Promise<
   const response: IJoinLeaveGameResponse = {
     joinLeaveResult: JOIN_LEAVE_RESULT.notOk,
     loginStatus: LOGIN_RESPONSE.ok,
-  }
+  };
 
   const checkLoginObj: ICheckLoginRequest = {
     userName: joinGameRequest.myName,
     userPass1: joinGameRequest.password1 ?? "",
     userPass2: joinGameRequest.password2 ?? "",
-  }
+  };
   const loginObj = await checkLogin(checkLoginObj);
   response.loginStatus = loginObj.result;
 
@@ -27,4 +27,4 @@ export const joinGame = async (joinGameRequest: IJoinLeaveGameRequest): Promise<
   response.joinLeaveResult = await joinOnGame(joinGameRequest);
 
   return response;
-}
+};

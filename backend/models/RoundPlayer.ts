@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { IRoundPlayer } from "../interfaces/IGameOptions"
+import { IRoundPlayer } from "../interfaces/IGameOptions";
 import cardSchema from "./Card";
 
 const roundPlayerSchema = new Schema<IRoundPlayer>({

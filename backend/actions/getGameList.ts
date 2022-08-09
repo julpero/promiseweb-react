@@ -7,7 +7,7 @@ import { playersToArr, rulesToArr } from "../common/model";
 export const getOpenGamesList = async (getGameListRequest: IGetGameListRequest): Promise<IGetGameListResponse> => {
   const response: IGetGameListResponse = {
     games: [],
-  }
+  };
   const openGames: (IGameOptions & {id: string})[] = await getGamesByStatus(GAME_STATUS.Created);
   openGames.forEach(openGame => {
     console.log("openGame type", typeof openGame);
@@ -32,4 +32,4 @@ export const getOpenGamesList = async (getGameListRequest: IGetGameListRequest):
   });
   console.log("response", response);
   return response;
-}
+};

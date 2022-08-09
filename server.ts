@@ -1,16 +1,16 @@
-import express from 'express';
-import { Application, Request, Response } from 'express';
-import http from 'http';
-import { Server, Socket } from 'socket.io';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import path from 'path';
-import connectDB from './backend/config/db';
+import express from "express";
+import { Application, Request, Response } from "express";
+import http from "http";
+import { Server, Socket } from "socket.io";
+import cors from "cors";
+import dotenv from "dotenv";
+import path from "path";
+import connectDB from "./backend/config/db";
 
-import createGame from './backend/actions/createGame';
-import { getOpenGamesList } from './backend/actions/getGameList';
-import { joinGame } from './backend/actions/joinGame';
-import { leaveGame } from './backend/actions/leaveGame';
+import createGame from "./backend/actions/createGame";
+import { getOpenGamesList } from "./backend/actions/getGameList";
+import { joinGame } from "./backend/actions/joinGame";
+import { leaveGame } from "./backend/actions/leaveGame";
 import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./frontend/src/interfaces/INewGame";
 import { IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IGameList";
 
@@ -36,14 +36,14 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Default
-app.get('/', (req: Request, res: Response) => {
-  res.sendFile('index.html');
+app.get("/", (req: Request, res: Response) => {
+  res.sendFile("index.html");
 });
 
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
   server.listen(PORT, () => {
-    console.log('server listening on *:' + PORT);
+    console.log("server listening on *:" + PORT);
   });
 
   io.on("connection", (socket: Socket) => {
@@ -52,7 +52,7 @@ connectDB().then(() => {
       console.warn("user disconnected", socket.id);
     });
 
-    socket.on("create game", async (createGameRequest: ICreateGameRequest, fn: Function) => {
+    socket.on("create game", async (createGameRequest: ICreateGameRequest, fn: (createGameResponse: ICreateGameResponse) => void) => {
       const createGameResponse: ICreateGameResponse = await createGame(createGameRequest);
       if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
         socket.join(createGameResponse.newGameId);
@@ -61,12 +61,12 @@ connectDB().then(() => {
       fn(createGameResponse);
     });
 
-    socket.on("get games", async (getGameListRequest: IGetGameListRequest, fn: Function) => {
+    socket.on("get games", async (getGameListRequest: IGetGameListRequest, fn: (getGameListResponse: IGetGameListResponse) => void) => {
       const getGameListResponse: IGetGameListResponse = await getOpenGamesList(getGameListRequest);
       fn(getGameListResponse);
     });
 
-    socket.on("join game", async (joinGameRequest: IJoinLeaveGameRequest, fn: Function) => {
+    socket.on("join game", async (joinGameRequest: IJoinLeaveGameRequest, fn: (joinResponse: IJoinLeaveGameResponse) => void) => {
       const joinResponse: IJoinLeaveGameResponse = await joinGame(joinGameRequest);
       if (joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.ok) {
         socket.join(joinGameRequest.gameId);
@@ -76,7 +76,7 @@ connectDB().then(() => {
       fn(joinResponse);
     });
 
-    socket.on("leave game", async (leaveGameRequest: IJoinLeaveGameRequest, fn: Function) => {
+    socket.on("leave game", async (leaveGameRequest: IJoinLeaveGameRequest, fn: (leaveResponse: IJoinLeaveGameResponse) => void) => {
       const leaveResponse: IJoinLeaveGameResponse = await leaveGame(leaveGameRequest);
       if (leaveResponse.joinLeaveResult === JOIN_LEAVE_RESULT.ok) {
         socket.leave(leaveGameRequest.gameId);
@@ -85,6 +85,6 @@ connectDB().then(() => {
       }
       fn(leaveResponse);
     });
-  })
+  });
 });
 

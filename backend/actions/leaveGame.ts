@@ -9,13 +9,13 @@ export const leaveGame = async (leaveGameRequest: IJoinLeaveGameRequest): Promis
   const response: IJoinLeaveGameResponse = {
     joinLeaveResult: JOIN_LEAVE_RESULT.notOk,
     loginStatus: LOGIN_RESPONSE.ok,
-  }
+  };
 
   const checkLoginObj: ICheckLoginRequest = {
     userName: leaveGameRequest.myName,
     userPass1: leaveGameRequest.password1 ?? "",
     userPass2: leaveGameRequest.password2 ?? "",
-  }
+  };
   const loginObj = await checkLogin(checkLoginObj);
   response.loginStatus = loginObj.result;
 
@@ -27,4 +27,4 @@ export const leaveGame = async (leaveGameRequest: IJoinLeaveGameRequest): Promis
   response.joinLeaveResult = await leaveTheGame(leaveGameRequest);
 
   return response;
-}
+};

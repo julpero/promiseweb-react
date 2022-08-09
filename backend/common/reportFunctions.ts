@@ -1,12 +1,5 @@
-import { IGame, IPlayer, IPlayerStatistic } from "../interfaces/IGameOptions";
-
-const getPlayerNameInPlayerOrder = (player: IPlayer | string): string => {
-  if (typeof player === "string") {
-    return player;
-  } else {
-    return player.name;
-  }
-}
+import { IGame, IPlayerStatistic } from "../interfaces/IGameOptions";
+import { getPlayerNameInPlayerOrder } from "./common";
 
 interface IGameReport {
   players: string[],
@@ -26,17 +19,17 @@ interface IGameReport {
 
 export const getGameReport = (game: IGame, playersStatistics: IPlayerStatistic[], onlyName: string): IGameReport => {
   const retObj: IGameReport = {
-      players: [],
-      points: [],
-      rounds: [],
-      pointsBig: [], // rounds of 6-10 cards
-      pointsSmall: [], // rounds of 1-5 cards
-      keepsBig: [], // rounds of 6-10 cards
-      keepsSmall: [], // rounds of 1-5 cards
-      trumps: [],
-      bigCards: [],
-      smallCards: [],
-      otherCards: [],
+    players: [],
+    points: [],
+    rounds: [],
+    pointsBig: [], // rounds of 6-10 cards
+    pointsSmall: [], // rounds of 1-5 cards
+    keepsBig: [], // rounds of 6-10 cards
+    keepsSmall: [], // rounds of 1-5 cards
+    trumps: [],
+    bigCards: [],
+    smallCards: [],
+    otherCards: [],
   };
 
   const players: string[] = [];
@@ -53,66 +46,66 @@ export const getGameReport = (game: IGame, playersStatistics: IPlayerStatistic[]
   const otherCardsArr: number[] = [];
 
   for (let i = 0; i < game.playerOrder.length; i++) {
-      const playerName = getPlayerNameInPlayerOrder(game.playerOrder[i]);
-      if (onlyName !== undefined && onlyName !== playerName) continue;
-      players.push(playerName);
-      startPointsArr.push(0);
-      keepsBigArr.push(0);
-      keepsSmallArr.push(0);
-      const totalPointsByPlayer = [0];
-      let pointsPerPlayer = 0;
-      let bigPointsPerPlayer = 0;
-      let smallPointsPerPlayer = 0;
-      for (let j = 0; j < game.rounds.length; j++) {
-          for (let k = 0; k < game.rounds[j].roundPlayers.length; k++) {
-              if (game.rounds[j].roundPlayers[k].name == playerName) {
-                  const pointsFromRound = game.rounds[j].roundPlayers[k].points;
-                  pointsPerPlayer+= pointsFromRound;
-                  totalPointsByPlayer.push(pointsPerPlayer);
-                  if (game.rounds[j].cardsInRound > 5) {
-                      bigPointsPerPlayer+= pointsFromRound;
-                  } else {
-                      smallPointsPerPlayer+= pointsFromRound;
-                  }
-                  break;
-              }
+    const playerName = getPlayerNameInPlayerOrder(game.playerOrder[i]);
+    if (onlyName !== undefined && onlyName !== playerName) continue;
+    players.push(playerName);
+    startPointsArr.push(0);
+    keepsBigArr.push(0);
+    keepsSmallArr.push(0);
+    const totalPointsByPlayer = [0];
+    let pointsPerPlayer = 0;
+    let bigPointsPerPlayer = 0;
+    let smallPointsPerPlayer = 0;
+    for (let j = 0; j < game.rounds.length; j++) {
+      for (let k = 0; k < game.rounds[j].roundPlayers.length; k++) {
+        if (game.rounds[j].roundPlayers[k].name == playerName) {
+          const pointsFromRound = game.rounds[j].roundPlayers[k].points ?? 0;
+          pointsPerPlayer+= pointsFromRound;
+          totalPointsByPlayer.push(pointsPerPlayer);
+          if (game.rounds[j].cardsInRound > 5) {
+            bigPointsPerPlayer+= pointsFromRound;
+          } else {
+            smallPointsPerPlayer+= pointsFromRound;
           }
+          break;
+        }
       }
-      if (playersStatistics != null) {
-          for (let j = 0; j < playersStatistics.length; j++) {
-              if (playersStatistics[j].playerName == playerName) {
-                  trumpsArr.push(playersStatistics[j].trumpsInGame);
-                  bigCardsArr.push(playersStatistics[j].bigsCardsInGame);
-                  smallCardsArr.push(playersStatistics[j].smallCardsInGame);
-                  otherCardsArr.push(playersStatistics[j].otherCardsInGame);
-                  break;
-              }
-          }
+    }
+    if (playersStatistics != null) {
+      for (let j = 0; j < playersStatistics.length; j++) {
+        if (playersStatistics[j].playerName == playerName) {
+          trumpsArr.push(playersStatistics[j].trumpsInGame);
+          bigCardsArr.push(playersStatistics[j].bigsCardsInGame);
+          smallCardsArr.push(playersStatistics[j].smallCardsInGame);
+          otherCardsArr.push(playersStatistics[j].otherCardsInGame);
+          break;
+        }
       }
-      pointsArr.push(totalPointsByPlayer);
-      pointsBigArr.push(bigPointsPerPlayer);
-      pointsSmallArr.push(smallPointsPerPlayer);
+    }
+    pointsArr.push(totalPointsByPlayer);
+    pointsBigArr.push(bigPointsPerPlayer);
+    pointsSmallArr.push(smallPointsPerPlayer);
   }
   retObj.players = players;
 
   for (let i = 0; i < game.rounds.length; i++) {
-      if (game.rounds[i].roundStatus != 2) break;
-      roundsArr.push(i+1);
-      for (let j = 0; j < game.rounds[i].roundPlayers.length; j++) {
-          if (game.rounds[i].roundPlayers[j].promise == game.rounds[i].roundPlayers[j].keeps) {
-              if (game.rounds[i].cardsInRound > 5) {
-                  if (retObj.smallStart != null && retObj.smallEnd == null) {
-                      retObj.smallEnd = i;
-                  }
-                  keepsBigArr[j]++;
-              } else {
-                  if (retObj.smallStart == null) {
-                      retObj.smallStart = i;
-                  }
-                  keepsSmallArr[j]++;
-              }
+    if (game.rounds[i].roundStatus != 2) break;
+    roundsArr.push(i+1);
+    for (let j = 0; j < game.rounds[i].roundPlayers.length; j++) {
+      if (game.rounds[i].roundPlayers[j].promise == game.rounds[i].roundPlayers[j].keeps) {
+        if (game.rounds[i].cardsInRound > 5) {
+          if (retObj.smallStart != null && retObj.smallEnd == null) {
+            retObj.smallEnd = i;
           }
+          keepsBigArr[j]++;
+        } else {
+          if (retObj.smallStart == null) {
+            retObj.smallStart = i;
+          }
+          keepsSmallArr[j]++;
+        }
       }
+    }
   }
 
   retObj.points = pointsArr;
@@ -127,5 +120,5 @@ export const getGameReport = (game: IGame, playersStatistics: IPlayerStatistic[]
   retObj.otherCards = otherCardsArr;
 
   return retObj;
-}
+};
 
