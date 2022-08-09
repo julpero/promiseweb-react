@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { IHumanPlayer } from "../interfaces/IGameOptions"
+import { IHumanPlayer } from "../interfaces/IGameOptions";
 
 const humanPlayerSchema = new Schema<IHumanPlayer>({
   name: {

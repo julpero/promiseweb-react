@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { IGameStatistics } from "../interfaces/IGameOptions"
+import { IGameStatistics } from "../interfaces/IGameOptions";
 import PlayerStatistic from "./PlayerStatistic";
 
 const spurtAndMeltSchema: Schema = new Schema({

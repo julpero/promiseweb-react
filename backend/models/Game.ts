@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { IGame, IPlayer } from "../interfaces/IGameOptions"
+import { IGame, IPlayer } from "../interfaces/IGameOptions";
 import roundSchema from "./Round";
 
 const playerOrderPlayerSchema = new Schema<IPlayer>({

@@ -2,7 +2,7 @@ import React from "react";
 import { Form, Field } from "react-final-form";
 import { socket, SocketContext } from "../socket";
 import GameItem from "./GameItem";
-import { IGameListItem, IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse } from "../interfaces/IGameList";
+import { IGameListItem, IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "../interfaces/IGameList";
 import TextInput from "./FormComponents/TextInput";
 import { Modal } from "react-bootstrap";
 import { FormApi } from "final-form";
@@ -28,6 +28,7 @@ interface IState {
   isFetching: boolean,
   gameItemList: IGameListItem[],
   loginStatus: LOGIN_RESPONSE | null,
+  joinLeaveStatus: JOIN_LEAVE_RESULT | null,
 }
 
 class OpenGamesList extends React.Component<Record<string, never>, IState> {
@@ -37,6 +38,7 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
     isFetching: false,
     gameItemList: [],
     loginStatus: null,
+    joinLeaveStatus: null,
   };
 
   static socket = SocketContext;
@@ -99,6 +101,7 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
   handleErrorClose = (): void => {
     this.setState({
       loginStatus: null,
+      joinLeaveStatus: null,
     });
   };
 
@@ -115,7 +118,10 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
     console.log("join request", joinGameRequest);
     socket.emit("join game", joinGameRequest, (response: IJoinLeaveGameResponse) => {
       console.log("join response", response);
-      this.setState({ loginStatus: response.loginStatus });
+      this.setState({ loginStatus: response.loginStatus, joinLeaveStatus: response.joinLeaveResult });
+      if (response.loginStatus !== LOGIN_RESPONSE.ok || response.joinLeaveResult === JOIN_LEAVE_RESULT.notOk) {
+        this.fetchGameItemList();
+      }
     });
   };
 
@@ -123,7 +129,10 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
     console.log("leave request", leaveGameRequest);
     socket.emit("leave game", leaveGameRequest, (response: IJoinLeaveGameResponse) => {
       console.log("leave response", response);
-
+      this.setState({ loginStatus: response.loginStatus, joinLeaveStatus: response.joinLeaveResult });
+      if (response.loginStatus !== LOGIN_RESPONSE.ok || response.joinLeaveResult === JOIN_LEAVE_RESULT.notOk) {
+        this.fetchGameItemList();
+      }
     });
   };
 
@@ -220,7 +229,7 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
         />
         <div>gameItemList { JSON.stringify(this.state.gameItemList) }</div>
         <Modal
-          show={(this.state !== null && (this.state.loginStatus)) as boolean }
+          show={(this.state !== null && (this.state.loginStatus || (this.state.joinLeaveStatus !== null && this.state.joinLeaveStatus === JOIN_LEAVE_RESULT.notOk))) as boolean }
           onHide={this.handleErrorClose}
         >
           <Modal.Header closeButton>

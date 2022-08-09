@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { IPlayerStatistic } from "../interfaces/IGameOptions"
+import { IPlayerStatistic } from "../interfaces/IGameOptions";
 
 const playerStatisticSchema: Schema = new Schema({
   playerName: {type: String, required: true},

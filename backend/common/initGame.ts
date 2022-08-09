@@ -1,12 +1,27 @@
 import { knuthShuffle } from "knuth-shuffle";
 import { Card, DeckOfCards, Suite } from "card-games-typescript";
-import { ICardPlayed, IGameOptions, IPlayer, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
+import { ICardPlayed, IGameOptions, IGame, IPlayer, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 import { getPlayerNameInPlayerOrder } from "./common";
-import { ROUND_STATUS } from "../../frontend/src/interfaces/IGameOptions";
+import { GAME_STATUS, ROUND_STATUS } from "../../frontend/src/interfaces/IGameOptions";
 
-export const startGame = (gameInDb: IGameOptions) => {
-  initPlayers(gameInDb);
-  initRounds(gameInDb);
+export const startGame = (gameInDb: IGameOptions): boolean => {
+  try {
+    gameInDb.game = {
+      playerOrder: [],
+      rounds: [],
+      lastTimeStamp: 0,
+    } as IGame;
+    initPlayers(gameInDb);
+    initRounds(gameInDb);
+
+    gameInDb.game.lastTimeStamp = Date.now();
+    gameInDb.gameStatus = GAME_STATUS.OnGoing;
+    gameInDb.gameStarted = new Date();
+  } catch (error: unknown) {
+    console.error("startGame exception!", error);
+    return false;
+  }
+  return true;
 };
 
 const getDealerPositionIndex = (roundIndex: number, totalPlayers: number): number => {
@@ -25,9 +40,7 @@ const initPlayers = (gameInDb: IGameOptions): void => {
 
 const initDeck = (): DeckOfCards => {
   const deck = new DeckOfCards(52);
-  console.log("deck init", deck);
   deck.shuffleDeck(5);
-  console.log("deck shuffled", deck);
   return deck;
 };
 
@@ -36,7 +49,9 @@ const sortCards = (cards: Card[]): Card[] => {
   const suits: Suite[] = ["hearts", "diamonds", "clubs", "spades"];
   suits.forEach(suit => {
     for (let i = 2; i <= 14; i++) {
-      if (cards[i].suite === suit && cards[i].value === i) sortedCards.push(cards[i]);
+      for (let j = 0; j < cards.length; j++) {
+        if (cards[j].suite === suit && cards[j].value === i) sortedCards.push(cards[j]);
+      }
     }
   });
 
@@ -51,9 +66,7 @@ const initRound = (roundIndex: number, cardsInRound: number, players: IPlayer[] 
     for (let i = 0; i < cardsInRound; i++) {
       playerCards.push(deck.drawCard());
     }
-    console.log("cards before", playerCards);
     const sortedCards = sortCards(playerCards);
-    console.log("cards after", sortedCards);
     roundPlayers.push({
       name: getPlayerNameInPlayerOrder(player),
       cards: sortedCards,

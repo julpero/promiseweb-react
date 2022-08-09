@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { IGameOptions } from "../interfaces/IGameOptions"
+import { IGameOptions } from "../interfaces/IGameOptions";
 import humanPlayerSchema from "./HumanPlayer";
 import gameSchema from "./Game";
 

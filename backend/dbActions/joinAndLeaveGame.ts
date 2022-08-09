@@ -3,32 +3,34 @@ import { GAME_STATUS } from "../../frontend/src/interfaces/IGameOptions";
 import { IHumanPlayer } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
 import { getPlayerStats, getGameRoundCount } from "../common/common";
+import { startGame } from "../common/initGame";
+import { startRound } from "../common/game";
 
 export const joinOnGame = async (joinGameRequest: IJoinLeaveGameRequest): Promise<JOIN_LEAVE_RESULT> => {
-  const game = await GameOptions.findById(joinGameRequest.gameId);
-  console.log("game", game);
-  if (!game) return JOIN_LEAVE_RESULT.notOk;
+  const gameInDb = await GameOptions.findById(joinGameRequest.gameId);
+  console.log("gameInDb", gameInDb);
+  if (!gameInDb) return JOIN_LEAVE_RESULT.notOk;
 
-  if (game.gameStatus !== GAME_STATUS.Created) {
-    console.log("wrong game status", game.gameStatus);
+  if (gameInDb.gameStatus !== GAME_STATUS.Created) {
+    console.log("wrong game status", gameInDb.gameStatus);
     return JOIN_LEAVE_RESULT.notOk;
   }
 
-  if (game.humanPlayers.length === game.humanPlayersCount) {
-    console.log("wrong human players length", game.humanPlayers.length, game.humanPlayersCount);
+  if (gameInDb.humanPlayers.length === gameInDb.humanPlayersCount) {
+    console.log("wrong human players length", gameInDb.humanPlayers.length, gameInDb.humanPlayersCount);
     return JOIN_LEAVE_RESULT.notOk;
   }
 
-  if (game.humanPlayers.find(player => player.name === joinGameRequest.myName) !== undefined) {
+  if (gameInDb.humanPlayers.find(player => player.name === joinGameRequest.myName) !== undefined) {
     console.log("player name is already in game", joinGameRequest.myName);
     return JOIN_LEAVE_RESULT.notOk;
   }
-  if (game.humanPlayers.find(player => player.playerId === joinGameRequest.myId) !== undefined) {
+  if (gameInDb.humanPlayers.find(player => player.playerId === joinGameRequest.myId) !== undefined) {
     console.log("player id is already in game", joinGameRequest.myId);
     return JOIN_LEAVE_RESULT.notOk;
   }
 
-  const newPlayerStats = await getPlayerStats(getGameRoundCount(game), joinGameRequest.myName);
+  const newPlayerStats = await getPlayerStats(getGameRoundCount(gameInDb), joinGameRequest.myName);
   const newPlayer: IHumanPlayer = {
     name: joinGameRequest.myName,
     playerId: joinGameRequest.myId,
@@ -36,14 +38,20 @@ export const joinOnGame = async (joinGameRequest: IJoinLeaveGameRequest): Promis
     playerStats: newPlayerStats,
   };
 
-  game.humanPlayers.push(newPlayer);
+  gameInDb.humanPlayers.push(newPlayer);
 
-  if (game.humanPlayers.length === game.humanPlayersCount) {
+  let gameStartOk = true;
+  if (gameInDb.humanPlayers.length === gameInDb.humanPlayersCount) {
     // start game
-
+    console.log("start game!");
+    gameStartOk = startGame(gameInDb);
+    if (gameStartOk) {
+      startRound(gameInDb, 0);
+    }
+    console.log("started game", gameInDb);
   }
 
-  const gameAfter = await game.save();
+  const gameAfter = await gameInDb.save();
   if (!gameAfter) {
     return JOIN_LEAVE_RESULT.notOk;
   } else if (gameAfter.humanPlayers.length === gameAfter.humanPlayersCount) {
