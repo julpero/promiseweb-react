@@ -9,15 +9,22 @@ import HomeScreen from "./screens/HomeScreen";
 import GameTable from "./screens/GameTable";
 
 class App extends React.Component {
-  render(): React.ReactNode {
-    console.log("app...");
+  componentDidMount() {
     if (window.localStorage.getItem("uUID")) {
-      console.log(window.localStorage.getItem("uUID"));
+      console.log("has uUid:", window.localStorage.getItem("uUID"));
     } else {
       const uuid = uuidv4();
       console.log("uUID set: ", uuid);
       window.localStorage.setItem("uUID", uuid);
     }
+
+    // const hasOnGoingGame
+  }
+
+  static socket = SocketContext;
+
+  render(): React.ReactNode {
+    console.log("app...");
 
     return (
       <SocketContext.Provider value={socket}>
