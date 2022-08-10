@@ -14,7 +14,8 @@ import { leaveGame } from "./backend/actions/leaveGame";
 import { checkGame } from "./backend/actions/checkGame";
 import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./frontend/src/interfaces/INewGame";
 import { IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IGameList";
-import { ICheckGameRequest, ICheckGameResponse } from "./frontend/src/interfaces/ICheckGame";
+import { CHECK_GAME_STATUS, ICheckGameRequest, ICheckGameResponse } from "./frontend/src/interfaces/ICheckGame";
+import { IChatObj } from "./frontend/src/interfaces/IChat";
 
 // Routes
 // not defined
@@ -95,7 +96,28 @@ connectDB().then(() => {
 
     socket.on("check ongoing game", async (checkGameRequest: ICheckGameRequest, fn: (checkResponse: ICheckGameResponse) => void) => {
       const checkResponse: ICheckGameResponse = await checkGame(checkGameRequest);
+      switch (checkResponse.checkStatus) {
+        case CHECK_GAME_STATUS.joinedGame:
+        case CHECK_GAME_STATUS.onGoingGame:
+        case CHECK_GAME_STATUS.observedGame: {
+          const gameIdStr = checkResponse.gameId ?? "";
+          const playerName = checkResponse.asAPlayer ?? "";
+          socket.join(gameIdStr);
+          const chatLine = playerName + " joined game!";
+          console.log("sending new chat line", chatLine, gameIdStr);
+          io.to(gameIdStr).emit("new chat line", chatLine);
+
+          break;
+        }
+      }
       fn(checkResponse);
+    });
+
+    socket.on("write chat", async (chatObj: IChatObj ) => {
+      const gameIdStr = chatObj.gameId;
+      const chatLine = chatObj.myName + ": " + chatObj.chatLine;
+      console.log("sending new chat line", chatLine, gameIdStr);
+      io.to(gameIdStr).emit("new chat line", chatLine);
     });
   });
 });

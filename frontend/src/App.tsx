@@ -45,7 +45,7 @@ class App extends React.Component<Record<string, never>, IState> {
 
     switch (this.state.gameStatus) {
       case CHECK_GAME_STATUS.onGoingGame:
-        return <GameTable />;
+        return <GameTable gameId={this.state.gameId ?? ""} />;
       default:
         return <HomeScreen />;
     }

@@ -12,4 +12,5 @@ export enum CHECK_GAME_STATUS {
 export interface ICheckGameResponse {
   gameId: string | null,
   checkStatus: CHECK_GAME_STATUS,
+  asAPlayer: string | null,
 }

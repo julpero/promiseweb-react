@@ -4,6 +4,11 @@ import { IGameOptions } from "../interfaces/IGameOptions";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IGameOptions";
 import { IGameReport } from "../../frontend/src/interfaces/IReports";
 
+export interface ILastGameStatusResponse {
+  gameId: string,
+  asAPlayer: string,
+}
+
 export const insertNewGame = async (gameModel: IGameOptions): Promise<string> => {
   const createGameObj = new GameOptions(gameModel);
   const createdGame = await createGameObj.save();
@@ -20,16 +25,20 @@ export const hasOngoingOrCreatedGame = async (playerId: string): Promise<boolean
   return onGoingOrCreatedGameCount > 0;
 };
 
-export const getLastGameByStatus = async (playerId: string, status: GAME_STATUS): Promise<string> => {
+export const getLastGameByStatus = async (playerId: string, status: GAME_STATUS): Promise<ILastGameStatusResponse | null> => {
   const games = await GameOptions.find({
     gameStatus: { $eq: status },
     "humanPlayers.playerId": { $eq: playerId },
   });
   console.log("games", games);
   if (games) {
-    return games.pop()?._id.toString() ?? "";
+    const game = games.pop();
+    return {
+      gameId: game?._id.toString() ?? "",
+      asAPlayer: game?.humanPlayers.find(player => player.playerId === playerId)?.name ?? "",
+    } as ILastGameStatusResponse;
   } else {
-    return "";
+    return null;
   }
 };
 

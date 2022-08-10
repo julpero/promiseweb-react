@@ -1,10 +1,15 @@
 import React from "react";
+
 import CardBoard from "../components/CardBoard";
 import Chat from "../components/Chat";
 import PromiseTable from "../components/PromiseTable";
 import ScoreBoard from "../components/ScoreBoard";
 
-class GameTable extends React.Component {
+interface IProps {
+  gameId: string,
+}
+
+class GameTable extends React.Component<IProps> {
 
   render() {
     return (

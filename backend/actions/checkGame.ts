@@ -9,18 +9,21 @@ export const checkGame = async (checkRequest: ICheckGameRequest): Promise<ICheck
   const response: ICheckGameResponse = {
     checkStatus: CHECK_GAME_STATUS.noGame,
     gameId: null,
+    asAPlayer: null,
   };
 
-  const ongoingGameId = await getLastGameByStatus(playerId, GAME_STATUS.OnGoing);
-  if (ongoingGameId) {
+  const ongoingGameResponse = await getLastGameByStatus(playerId, GAME_STATUS.OnGoing);
+  if (ongoingGameResponse) {
     response.checkStatus = CHECK_GAME_STATUS.onGoingGame;
-    response.gameId = ongoingGameId;
+    response.gameId = ongoingGameResponse.gameId;
+    response.asAPlayer = ongoingGameResponse.asAPlayer;
     return response;
   }
-  const joinedGameId = await getLastGameByStatus(playerId, GAME_STATUS.Created);
-  if (ongoingGameId) {
+  const joinedGameResponse = await getLastGameByStatus(playerId, GAME_STATUS.Created);
+  if (joinedGameResponse) {
     response.checkStatus = CHECK_GAME_STATUS.joinedGame;
-    response.gameId = joinedGameId;
+    response.gameId = joinedGameResponse.gameId;
+    response.asAPlayer = joinedGameResponse.asAPlayer;
     return response;
   }
 
