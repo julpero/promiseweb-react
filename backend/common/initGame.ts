@@ -3,6 +3,7 @@ import { Card, DeckOfCards, Suite } from "card-games-typescript";
 import { ICardPlayed, IGameOptions, IGame, IPlayer, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 import { getPlayerNameInPlayerOrder } from "./common";
 import { GAME_STATUS, ROUND_STATUS } from "../../frontend/src/interfaces/IGameOptions";
+import { startRound } from "./game";
 
 export const startGame = (gameInDb: IGameOptions): boolean => {
   try {
@@ -17,6 +18,7 @@ export const startGame = (gameInDb: IGameOptions): boolean => {
     gameInDb.game.lastTimeStamp = Date.now();
     gameInDb.gameStatus = GAME_STATUS.OnGoing;
     gameInDb.gameStarted = new Date();
+    startRound(gameInDb, 0);
   } catch (error: unknown) {
     console.error("startGame exception!", error);
     return false;

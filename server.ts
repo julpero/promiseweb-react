@@ -16,6 +16,8 @@ import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./f
 import { IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IGameList";
 import { CHECK_GAME_STATUS, ICheckGameRequest, ICheckGameResponse } from "./frontend/src/interfaces/ICheckGame";
 import { IChatObj } from "./frontend/src/interfaces/IChat";
+import { IGetRoundRequest, IGetRoundResponse } from "./frontend/src/interfaces/IPlayingGame";
+import { getRound } from "./backend/actions/playingGame";
 
 // Routes
 // not defined
@@ -77,9 +79,8 @@ connectDB().then(() => {
         io.emit("game list updated");
       }
       if (joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.lastOk) {
-        socket.join(gameIdStr);
         // notify all games players about game start
-        io.to(gameIdStr).emit("game begins");
+        io.to(gameIdStr).emit("game begins", gameIdStr);
       }
       fn(joinResponse);
     });
@@ -111,6 +112,19 @@ connectDB().then(() => {
         }
       }
       fn(checkResponse);
+    });
+
+    socket.on("get round", async (getRoundObj: IGetRoundRequest, fn: (roundResponse: IGetRoundResponse) => void) => {
+      console.log("get round", getRoundObj);
+      if (getRoundObj.gameId === "") {
+        return null;
+      }
+      const roundResponse: IGetRoundResponse | null = await getRound(getRoundObj);
+      if (roundResponse === null) {
+        return null;
+      }
+
+      fn(roundResponse);
     });
 
     socket.on("write chat", async (chatObj: IChatObj ) => {

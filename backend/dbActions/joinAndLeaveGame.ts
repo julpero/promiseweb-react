@@ -46,9 +46,8 @@ export const joinOnGame = async (joinGameRequest: IJoinLeaveGameRequest): Promis
     console.log("start game!");
     gameStartOk = startGame(gameInDb);
     if (gameStartOk) {
-      startRound(gameInDb, 0);
+      console.log("started game", gameInDb);
     }
-    console.log("started game", gameInDb);
   }
 
   const gameAfter = await gameInDb.save();

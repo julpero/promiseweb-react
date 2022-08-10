@@ -1,12 +1,13 @@
 import { getGameReport } from "../common/reportFunctions";
 import GameOptions from "../models/GameOptions";
 import { IGameOptions } from "../interfaces/IGameOptions";
-import { GAME_STATUS } from "../../frontend/src/interfaces/IGameOptions";
+import { GAME_STATUS, ROUND_STATUS } from "../../frontend/src/interfaces/IGameOptions";
 import { IGameReport } from "../../frontend/src/interfaces/IReports";
 
 export interface ILastGameStatusResponse {
   gameId: string,
   asAPlayer: string,
+  currentRound: number,
 }
 
 export const insertNewGame = async (gameModel: IGameOptions): Promise<string> => {
@@ -26,16 +27,16 @@ export const hasOngoingOrCreatedGame = async (playerId: string): Promise<boolean
 };
 
 export const getLastGameByStatus = async (playerId: string, status: GAME_STATUS): Promise<ILastGameStatusResponse | null> => {
-  const games = await GameOptions.find({
+  const gamesInDb = await GameOptions.find({
     gameStatus: { $eq: status },
     "humanPlayers.playerId": { $eq: playerId },
   });
-  console.log("games", games);
-  if (games) {
-    const game = games.pop();
+  if (gamesInDb && gamesInDb.length > 0) {
+    const gameInDb = gamesInDb.pop();
     return {
-      gameId: game?._id.toString() ?? "",
-      asAPlayer: game?.humanPlayers.find(player => player.playerId === playerId)?.name ?? "",
+      gameId: gameInDb?._id.toString() ?? "",
+      asAPlayer: gameInDb?.humanPlayers.find(player => player.playerId === playerId)?.name ?? "",
+      currentRound: gameInDb?.game.rounds.find(round => round.roundStatus === ROUND_STATUS.OnGoing)?.roundIndex ?? -1,
     } as ILastGameStatusResponse;
   } else {
     return null;

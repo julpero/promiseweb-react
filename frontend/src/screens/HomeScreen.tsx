@@ -37,7 +37,9 @@ class HomeScreen extends React.Component<Record<string, never>, IState> {
           </Accordion.Item>
           <Accordion.Item eventKey="1" onSelect={() => this.setState({selectedAccordion: "1"})}>
             <Accordion.Header>Create New Game</Accordion.Header>
-            <Accordion.Body><CreateGame onCreateGame={this.handleGameCreation} /></Accordion.Body>
+            <Accordion.Body>
+              <CreateGame onCreateGame={this.handleGameCreation} />
+            </Accordion.Body>
           </Accordion.Item>
         </Accordion>
       </div>

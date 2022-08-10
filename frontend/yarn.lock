@@ -3529,6 +3529,11 @@
   "resolved" "https://registry.npmjs.org/decimal.js/-/decimal.js-10.3.1.tgz"
   "version" "10.3.1"
 
+"deck-of-cards@^0.1.8":
+  "integrity" "sha512-bmj5Y4uAQV9h+hrWqpHaODVdV1h8Naa5eQIJXWRnm3gzjqlqtVxxHnjxYwlv/ZkKlkdwvDyTLUqHWUDs4wPD2w=="
+  "resolved" "https://registry.npmjs.org/deck-of-cards/-/deck-of-cards-0.1.8.tgz"
+  "version" "0.1.8"
+
 "decode-uri-component@^0.2.0":
   "integrity" "sha1-6zkTMzRYd1y4TNGh+uBiEGu4dUU="
   "resolved" "https://registry.npmjs.org/decode-uri-component/-/decode-uri-component-0.2.0.tgz"

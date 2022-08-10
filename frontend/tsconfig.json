@@ -18,11 +18,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "paths": {
+      "deck-of-cards":["../@types/deck-of-cards"]
+    }
   },
   "include": [
     "src"
-, "../backend/interfaces/IGameOptions.ts"  ],
+  ],
   "typeRoots": [
     "../node_modules/@types",
     "../@types"

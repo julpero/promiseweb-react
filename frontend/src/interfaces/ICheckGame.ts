@@ -13,4 +13,5 @@ export interface ICheckGameResponse {
   gameId: string | null,
   checkStatus: CHECK_GAME_STATUS,
   asAPlayer: string | null,
+  currentRound: number | null,
 }

@@ -36,18 +36,24 @@ class App extends React.Component<Record<string, never>, IState> {
       console.log("check response", response);
       this.setState({gameStatus: response.checkStatus, gameId: response.gameId});
     });
+
+    socket.on("game begins", (gameId: string) => {
+      console.log("game begins call");
+      if (gameId !== "") {
+        this.setState({gameStatus: CHECK_GAME_STATUS.onGoingGame, gameId: gameId});
+      }
+    });
   }
 
   static socket = SocketContext;
 
   render(): React.ReactNode {
-    console.log("app...");
+    console.log("render app...");
 
-    switch (this.state.gameStatus) {
-      case CHECK_GAME_STATUS.onGoingGame:
-        return <GameTable gameId={this.state.gameId ?? ""} />;
-      default:
-        return <HomeScreen />;
+    if (this.state.gameStatus === CHECK_GAME_STATUS.onGoingGame && this.state.gameId !== "") {
+      return <GameTable gameId={this.state.gameId ?? ""} />;
+    } else {
+      return <HomeScreen />;
     }
   }
 }
