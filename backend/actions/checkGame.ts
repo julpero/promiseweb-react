@@ -8,6 +8,7 @@ export const checkGame = async (checkRequest: ICheckGameRequest): Promise<ICheck
 
   const response: ICheckGameResponse = {
     checkStatus: CHECK_GAME_STATUS.noGame,
+    gameId: null,
   };
 
   const ongoingGameId = await getLastGameByStatus(playerId, GAME_STATUS.OnGoing);

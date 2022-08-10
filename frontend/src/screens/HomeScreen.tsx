@@ -16,12 +16,7 @@ class HomeScreen extends React.Component<Record<string, never>, IState> {
 
   // static socket = SocketContext;
 
-  // private accRef: React.RefObject(typeof HTMLHeadingElement);
   private accRef = createRef<HTMLHeadingElement>();
-  constructor(props: never) {
-    super(props);
-    // this.accRef = React.createRef<HTMLHeadingElement>();
-  }
 
   handleGameCreation = () => {
     this.setState({selectedAccordion: "0"});
