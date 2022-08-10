@@ -1,4 +1,4 @@
-import { insertNewGame, hasOngoingCreatedGame } from "../dbActions/promiseweb";
+import { insertNewGame, hasOngoingOrCreatedGame } from "../dbActions/promiseweb";
 import { checkLogin } from "../dbActions/users";
 import { getPlayerStats, getGameRoundCount } from "../common/common";
 import { IGameOptions} from "../interfaces/IGameOptions";
@@ -71,9 +71,9 @@ const createGame = async (createGameRequest: ICreateGameRequest): Promise<ICreat
     return response;
   }
 
-  const okToCreate = !(await hasOngoingCreatedGame(adminId));
+  const okToCreate = !(await hasOngoingOrCreatedGame(adminId));
   if (!okToCreate) {
-    console.log("hasOngoingCreatedGame");
+    console.log("hasOngoingOrCreatedGame");
     return response;
   }
 

@@ -11,14 +11,26 @@ export const insertNewGame = async (gameModel: IGameOptions): Promise<string> =>
   return createdGame._id.toString();
 };
 
-export const hasOngoingCreatedGame = async (playerId: string): Promise<boolean> => {
-  let onGoingGames = 0;
-  onGoingGames = await GameOptions.countDocuments({
+export const hasOngoingOrCreatedGame = async (playerId: string): Promise<boolean> => {
+  const onGoingOrCreatedGameCount = await GameOptions.countDocuments({
     gameStatus: { $lte: GAME_STATUS.OnGoing },
     "humanPlayers.playerId": { $eq: playerId },
   });
-  console.log("onGoingGames", onGoingGames);
-  return onGoingGames > 0;
+  console.log("onGoingOrCreatedGameCount", onGoingOrCreatedGameCount);
+  return onGoingOrCreatedGameCount > 0;
+};
+
+export const getLastGameByStatus = async (playerId: string, status: GAME_STATUS): Promise<string> => {
+  const games = await GameOptions.find({
+    gameStatus: { $eq: status },
+    "humanPlayers.playerId": { $eq: playerId },
+  });
+  console.log("games", games);
+  if (games) {
+    return games.pop()?._id.toString() ?? "";
+  } else {
+    return "";
+  }
 };
 
 export const getPlayerAvgPoints = async (playerName: string, roundsInGame: number): Promise<number[]> => {

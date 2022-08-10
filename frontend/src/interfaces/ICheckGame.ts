@@ -2,6 +2,14 @@ export interface ICheckGameRequest {
   myId: string,
 }
 
+export enum CHECK_GAME_STATUS {
+  noGame,
+  joinedGame,
+  onGoingGame,
+  observedGame,
+}
+
 export interface ICheckGameResponse {
-  myId: string,
+  gameId: string | null,
+  checkStatus: CHECK_GAME_STATUS,
 }

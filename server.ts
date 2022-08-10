@@ -11,6 +11,7 @@ import createGame from "./backend/actions/createGame";
 import { getOpenGamesList } from "./backend/actions/getGameList";
 import { joinGame } from "./backend/actions/joinGame";
 import { leaveGame } from "./backend/actions/leaveGame";
+import { checkGame } from "./backend/actions/checkGame";
 import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./frontend/src/interfaces/INewGame";
 import { IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IGameList";
 import { ICheckGameRequest, ICheckGameResponse } from "./frontend/src/interfaces/ICheckGame";
@@ -93,7 +94,7 @@ connectDB().then(() => {
     });
 
     socket.on("check ongoing game", async (checkGameRequest: ICheckGameRequest, fn: (checkResponse: ICheckGameResponse) => void) => {
-      const checkResponse: ICheckGameResponse =
+      const checkResponse: ICheckGameResponse = await checkGame(checkGameRequest);
       fn(checkResponse);
     });
   });
