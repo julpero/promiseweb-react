@@ -54,7 +54,7 @@ class GameTable extends React.Component<IProps, IState> {
       <div className="container-fluid" style={{width: "100vw", height: "100vh"}}>
         <div className="row">
           <div className="col-10">
-            <CardBoard />
+            <CardBoard gameInfo={this.state.gameInfo} roundInfo={this.state.roundInfo} />
           </div>
           <div className="col-2">
             <ScoreBoard />
