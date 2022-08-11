@@ -1,5 +1,6 @@
 import { IGameOptions, IHumanPlayer } from "../interfaces/IGameOptions";
-import { RULES } from "../../frontend/src/interfaces/IGameOptions";
+import { RULE } from "../../frontend/src/interfaces/IGameOptions";
+import { IRules } from "../../frontend/src/interfaces/IGameList";
 
 export const playersToArr = (players: IHumanPlayer[]): string[] => {
   const playerArr: string[] = players.map(player => player.name);
@@ -7,20 +8,65 @@ export const playersToArr = (players: IHumanPlayer[]): string[] => {
   return playerArr;
 };
 
-export const rulesToArr = (gameOptions: IGameOptions): RULES[] => {
-  const rulesArr: RULES[] = [];
+const rulesToArr = (gameOptions: IGameOptions): RULE[] => {
+  const rulesArr: RULE[] = [];
 
-  if (!gameOptions.evenPromisesAllowed) rulesArr.push(RULES.noEvenPromisesAllowed);
-  if (!gameOptions.visiblePromiseRound) rulesArr.push(RULES.hiddenPromiseRound);
-  if (gameOptions.onlyTotalPromise) rulesArr.push(RULES.onlyTotalPromise);
-  if (!gameOptions.freeTrump) rulesArr.push(RULES.mustPlayTrump);
-  if (gameOptions.hiddenTrump) rulesArr.push(RULES.hiddenTrump);
-  if (gameOptions.speedPromise) rulesArr.push(RULES.speedPromise);
-  if (gameOptions.privateSpeedGame) rulesArr.push(RULES.privateSpeedGame);
-  if (gameOptions.opponentPromiseCardValue) rulesArr.push(RULES.opponentPromiseCardValue);
-  if (gameOptions.opponentGameCardValue) rulesArr.push(RULES.opponentGameCardValue);
+  if (!gameOptions.evenPromisesAllowed) rulesArr.push(RULE.noEvenPromisesAllowed);
+  if (!gameOptions.visiblePromiseRound) rulesArr.push(RULE.hiddenPromiseRound);
+  if (gameOptions.onlyTotalPromise) rulesArr.push(RULE.onlyTotalPromise);
+  if (!gameOptions.freeTrump) rulesArr.push(RULE.mustPlayTrump);
+  if (gameOptions.hiddenTrump) rulesArr.push(RULE.hiddenTrump);
+  if (gameOptions.speedPromise) rulesArr.push(RULE.speedPromise);
+  if (gameOptions.privateSpeedGame) rulesArr.push(RULE.privateSpeedGame);
+  if (gameOptions.opponentPromiseCardValue) rulesArr.push(RULE.opponentPromiseCardValue);
+  if (gameOptions.opponentGameCardValue) rulesArr.push(RULE.opponentGameCardValue);
 
   return rulesArr;
+};
+
+export const rulesToRuleObj = (gameOptions: IGameOptions): IRules => {
+  return {
+    ruleList: rulesToArr(gameOptions),
+    hiddenCardsMode: gameOptions.hiddenCardsMode,
+    roundInfo: {
+      startRound: gameOptions.startRound,
+      turnRound: gameOptions.turnRound,
+      endRound: gameOptions.endRound,
+    }
+  } as IRules;
+};
+
+export const isRuleActive = (gameOptions: IGameOptions, rule: RULE): boolean => {
+  switch (rule) {
+    case RULE.noEvenPromisesAllowed: {
+      return !gameOptions.evenPromisesAllowed;
+    }
+    case RULE.hiddenPromiseRound: {
+      return !gameOptions.visiblePromiseRound;
+    }
+    case RULE.onlyTotalPromise: {
+      return gameOptions.onlyTotalPromise;
+    }
+    case RULE.mustPlayTrump: {
+      return !gameOptions.freeTrump;
+    }
+    case RULE.hiddenTrump: {
+      return gameOptions.hiddenTrump;
+    }
+    case RULE.speedPromise: {
+      return gameOptions.speedPromise;
+    }
+    case RULE.privateSpeedGame: {
+      return gameOptions.privateSpeedGame;
+    }
+    case RULE.opponentPromiseCardValue: {
+      return gameOptions.opponentPromiseCardValue;
+    }
+    case RULE.opponentGameCardValue: {
+      return gameOptions.opponentGameCardValue;
+    }
+    default: return false;
+  }
 };
 
 /*

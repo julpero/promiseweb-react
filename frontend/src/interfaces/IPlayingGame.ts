@@ -1,6 +1,9 @@
+import { IRules } from "./IGameList";
+
 // import Card from "deck-of-cards";
-export type CardValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14;
-export type Suite = "hearts" | "spades" | "diamonds" | "clubs";
+// in frontend we have also a dummy card with value of 0
+export type CardValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 0;
+export type Suite = "hearts" | "spades" | "diamonds" | "clubs" | "dummy";
 export type PromiseValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 export interface IGetRoundRequest {
@@ -11,6 +14,38 @@ export interface IGetRoundRequest {
 
 export interface IGetRoundResponse {
   gameId: string,
+  roundInd: number,
+  myName: string,
+  roundToPlayer: IRoundToPlayer,
+}
+
+export interface IGetGameInfoRequest {
+  myId: string,
+  gameId: string,
+}
+
+export interface IPlayerStats {
+  playerAvgPointsInRounds: number[],
+}
+
+export interface IParsedHumanPlayer {
+  name: string,
+  type: "human",
+  playerStats: IPlayerStats,
+}
+
+export interface IGetGameInfoResponse {
+  gameId: string,
+  humanPlayersCount: number,
+  computerPlayersCount: number,
+  rules: IRules,
+  humanPlayers: IParsedHumanPlayer[],
+  hasPassword: boolean,
+  /** index of rounds array */
+  currentRound: number | null,
+  reloaded: boolean,
+  eventInfo: any, // TODO
+  thisIsDemoGame: boolean,
 }
 
 export interface ICard {
@@ -25,9 +60,8 @@ export interface IRoundPlayer {
   promise: number | null,
   keeps: number,
   cardPlayed: ICard | null,
-  speedPromisePoints: number,
-  speedPromiseTotal: number,
-  playerStats: null, // TODO implement playerStats
+  speedPromisePoints: number | null,
+  speedPromiseTotal: number | null,
 }
 
 export interface ICardPlayed {
@@ -55,11 +89,9 @@ export interface IPromiseTable {
 }
 
 export interface IRoundToPlayer {
-  roundInd: number,
   cardsInRound: number,
   dealerPositionIndex: number,
   starterPositionIndex: number,
-  myName: string,
   myCards: ICard[],
   players: IRoundPlayer[],
   trumpCard: ICard | null,

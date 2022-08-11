@@ -1,16 +1,16 @@
-import { RULES, HIDDEN_CARDS_MODE } from "../interfaces/IGameOptions";
+import { RULE, HIDDEN_CARDS_MODE } from "../interfaces/IGameOptions";
 
-export const ruleToStr = (rule: RULES): string => {
+export const ruleToStr = (rule: RULE): string => {
   switch (rule) {
-    case RULES.noEvenPromisesAllowed: return "no even promises";
-    case RULES.hiddenPromiseRound: return "hidden promise round";
-    case RULES.onlyTotalPromise: return "show only total promise";
-    case RULES.mustPlayTrump: return "must play trump";
-    case RULES.hiddenTrump: return "hidden trump when promising";
-    case RULES.speedPromise: return "speed promise round";
-    case RULES.privateSpeedGame: return "speed game";
-    case RULES.opponentPromiseCardValue: return "show opponent hand value when promising";
-    case RULES.opponentGameCardValue: return "show opponent hand value in game";
+    case RULE.noEvenPromisesAllowed: return "no even promises";
+    case RULE.hiddenPromiseRound: return "hidden promise round";
+    case RULE.onlyTotalPromise: return "show only total promise";
+    case RULE.mustPlayTrump: return "must play trump";
+    case RULE.hiddenTrump: return "hidden trump when promising";
+    case RULE.speedPromise: return "speed promise round";
+    case RULE.privateSpeedGame: return "speed game";
+    case RULE.opponentPromiseCardValue: return "show opponent hand value when promising";
+    case RULE.opponentGameCardValue: return "show opponent hand value in game";
     default: return "unknown rule";
   }
 };

@@ -2,7 +2,7 @@ import { IGameListItem, IGetGameListRequest, IGetGameListResponse } from "../../
 import { IGameOptions } from "../interfaces/IGameOptions";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IGameOptions";
 import { getGamesByStatus } from "../dbActions/games";
-import { playersToArr, rulesToArr } from "../common/model";
+import { playersToArr, rulesToRuleObj } from "../common/model";
 
 export const getOpenGamesList = async (getGameListRequest: IGetGameListRequest): Promise<IGetGameListResponse> => {
   const response: IGetGameListResponse = {
@@ -15,15 +15,7 @@ export const getOpenGamesList = async (getGameListRequest: IGetGameListRequest):
     response.games.push({
       created: openGame.createDateTime,
       id: openGame.id,
-      rules: {
-        ruleList: rulesToArr(openGame),
-        hiddenCardsMode: openGame.hiddenCardsMode,
-        roundInfo: {
-          startRound: openGame.startRound,
-          turnRound: openGame.turnRound,
-          endRound: openGame.endRound,
-        }
-      },
+      rules: rulesToRuleObj(openGame),
       humanPlayers: playersToArr(openGame.humanPlayers),
       imInTheGame: openGame.humanPlayers.filter((player) => player.playerId === getGameListRequest.myId).length !== 0,
       playerCount: openGame.humanPlayersCount,

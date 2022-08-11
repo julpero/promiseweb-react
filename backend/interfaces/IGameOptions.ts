@@ -115,7 +115,7 @@ export interface ICard {
 
 export interface IRoundPlayer extends IPlayer {
   cards: ICard[],
-  promise?: PromiseValue | null,
+  promise: PromiseValue | null,
   promiseStarted: number | null,
   promiseMade: number | null,
   keeps: number,

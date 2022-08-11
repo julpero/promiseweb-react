@@ -17,7 +17,7 @@ export enum HIDDEN_CARDS_MODE {
   cardInChargeAndWinning = 2,
 }
 
-export enum RULES {
+export enum RULE {
   noEvenPromisesAllowed,
   hiddenPromiseRound,
   onlyTotalPromise,

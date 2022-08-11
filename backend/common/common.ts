@@ -1,5 +1,5 @@
 import { getPlayerAvgPoints } from "../dbActions/promiseweb";
-import { IGameOptions, IPlayer, IPlayerStats } from "../interfaces/IGameOptions";
+import { IGameOptions, IHumanPlayer, IPlayer, IPlayerStats } from "../interfaces/IGameOptions";
 
 export const getPlayerStats = async (roundCount: number, playerName: string): Promise<IPlayerStats> => {
   const statsGamesObj = {
@@ -18,4 +18,8 @@ export const getPlayerNameInPlayerOrder = (player: IPlayer | string): string => 
   } else {
     return player.name;
   }
+};
+
+export const getPlayerNameById = (players: IHumanPlayer[], playerId: string): string => {
+  return players.find(player => player.playerId == playerId)?.name ?? "";
 };

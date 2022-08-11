@@ -16,8 +16,8 @@ import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./f
 import { IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IGameList";
 import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "./frontend/src/interfaces/ICheckIfOngoingGame";
 import { IChatObj } from "./frontend/src/interfaces/IChat";
-import { IGetRoundRequest, IGetRoundResponse } from "./frontend/src/interfaces/IPlayingGame";
-import { getRound } from "./backend/actions/playingGame";
+import { IGetGameInfoRequest, IGetGameInfoResponse, IGetRoundRequest, IGetRoundResponse } from "./frontend/src/interfaces/IPlayingGame";
+import { getGameInfo, getRound } from "./backend/actions/playingGame";
 
 // Routes
 // not defined
@@ -114,9 +114,19 @@ connectDB().then(() => {
       fn(checkResponse);
     });
 
-    // socket.on("check game", async () => {
+    socket.on("check game", async (getGameInfoRequest: IGetGameInfoRequest, fn: (gameInfoResponse: IGetGameInfoResponse) => void) => {
+      console.log("check game", getGameInfoRequest);
+      if (getGameInfoRequest.gameId === "" || getGameInfoRequest.myId === "") {
+        return null;
+      }
+      const gameInfoResponse: IGetGameInfoResponse | null = await getGameInfo(getGameInfoRequest);
+      console.log("gameInfoResponse", gameInfoResponse);
+      if (gameInfoResponse === null) {
+        return null;
+      }
 
-    // });
+      fn(gameInfoResponse);
+    });
 
     socket.on("get round", async (getRoundObj: IGetRoundRequest, fn: (roundResponse: IGetRoundResponse) => void) => {
       console.log("get round", getRoundObj);
@@ -124,6 +134,7 @@ connectDB().then(() => {
         return null;
       }
       const roundResponse: IGetRoundResponse | null = await getRound(getRoundObj);
+      console.log("roundResponse", roundResponse);
       if (roundResponse === null) {
         return null;
       }

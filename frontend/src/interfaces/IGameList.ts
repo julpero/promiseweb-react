@@ -1,8 +1,8 @@
-import { HIDDEN_CARDS_MODE, IRoundInfo, RULES } from "./IGameOptions";
+import { HIDDEN_CARDS_MODE, IRoundInfo, RULE } from "./IGameOptions";
 import { LOGIN_RESPONSE } from "./IUser";
 
 export interface IRules {
-  ruleList: RULES[],
+  ruleList: RULE[],
   hiddenCardsMode: HIDDEN_CARDS_MODE,
   roundInfo: IRoundInfo,
 }
