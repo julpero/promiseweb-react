@@ -1,4 +1,4 @@
-import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IUser";
+import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
 export interface IUser {
   playerName: string,
   passHash: string,

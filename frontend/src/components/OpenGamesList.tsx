@@ -2,11 +2,11 @@ import React from "react";
 import { Form, Field } from "react-final-form";
 import { socket, SocketContext } from "../socket";
 import GameItem from "./GameItem";
-import { IGameListItem, IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "../interfaces/IGameList";
+import { IGameListItem, IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "../interfaces/IuiGameList";
 import TextInput from "./FormComponents/TextInput";
 import { Modal } from "react-bootstrap";
 import { FormApi } from "final-form";
-import { LOGIN_RESPONSE } from "../interfaces/IUser";
+import { LOGIN_RESPONSE } from "../interfaces/IuiUser";
 
 interface IFormValidationFields {
   myName?: string,

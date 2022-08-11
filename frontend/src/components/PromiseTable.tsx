@@ -1,5 +1,5 @@
 import React from "react";
-import { IGetRoundResponse } from "../interfaces/IPlayingGame";
+import { IGetRoundResponse } from "../interfaces/IuiPlayingGame";
 
 interface IProps {
   roundInfo: IGetRoundResponse | null,

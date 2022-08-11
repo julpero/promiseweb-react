@@ -1,8 +1,8 @@
 import { getGameReport } from "../common/reportFunctions";
 import GameOptions from "../models/GameOptions";
 import { IGameOptions } from "../interfaces/IGameOptions";
-import { GAME_STATUS, ROUND_STATUS } from "../../frontend/src/interfaces/IGameOptions";
-import { IGameReport } from "../../frontend/src/interfaces/IReports";
+import { GAME_STATUS, ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
+import { IGameReport } from "../../frontend/src/interfaces/IuiReports";
 
 export interface ILastGameStatusResponse {
   gameId: string,

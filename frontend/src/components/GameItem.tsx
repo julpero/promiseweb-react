@@ -1,6 +1,6 @@
 import React from "react";
-import { HIDDEN_CARDS_MODE } from "../interfaces/IGameOptions";
-import { IGameListItem } from "../interfaces/IGameList";
+import { HIDDEN_CARDS_MODE } from "../interfaces/IuiGameOptions";
+import { IGameListItem } from "../interfaces/IuiGameList";
 import { ruleToStr, hiddenCardsModeToStr } from "../common/enumFunctions";
 import { Card } from "react-bootstrap";
 import { Field } from "react-final-form";

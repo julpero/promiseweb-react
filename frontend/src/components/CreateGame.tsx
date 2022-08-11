@@ -11,8 +11,8 @@ import SelectInput from "./FormComponents/SelectInput";
 import TextInput from "./FormComponents/TextInput";
 import CheckboxInput from "./FormComponents/CheckBoxInput";
 
-import { INewGameForm, initialNewGameValues, ICreateGameRequest, ICreateGameResponse, CREATE_GAME_STATUS } from "../interfaces/INewGame";
-import { LOGIN_RESPONSE } from "../interfaces/IUser";
+import { INewGameForm, initialNewGameValues, ICreateGameRequest, ICreateGameResponse, CREATE_GAME_STATUS } from "../interfaces/IuiNewGame";
+import { LOGIN_RESPONSE } from "../interfaces/IuiUser";
 
 interface IFormValidationFields {
   newGameHumanPlayersCount?: string,

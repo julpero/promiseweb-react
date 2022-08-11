@@ -1,4 +1,4 @@
-import { RULE, HIDDEN_CARDS_MODE } from "../interfaces/IGameOptions";
+import { RULE, HIDDEN_CARDS_MODE } from "../interfaces/IuiGameOptions";
 
 export const ruleToStr = (rule: RULE): string => {
   switch (rule) {

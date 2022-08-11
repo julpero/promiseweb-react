@@ -1,6 +1,6 @@
-import { IGameListItem, IGetGameListRequest, IGetGameListResponse } from "../../frontend/src/interfaces/IGameList";
+import { IGameListItem, IGetGameListRequest, IGetGameListResponse } from "../../frontend/src/interfaces/IuiGameList";
 import { IGameOptions } from "../interfaces/IGameOptions";
-import { GAME_STATUS } from "../../frontend/src/interfaces/IGameOptions";
+import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { getGamesByStatus } from "../dbActions/games";
 import { playersToArr, rulesToRuleObj } from "../common/model";
 

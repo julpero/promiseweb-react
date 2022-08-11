@@ -12,10 +12,10 @@ import { getOpenGamesList } from "./backend/actions/getGameList";
 import { joinGame } from "./backend/actions/joinGame";
 import { leaveGame } from "./backend/actions/leaveGame";
 import { checkIfOngoingGame } from "./backend/actions/checkIfOngoingGame";
-import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./frontend/src/interfaces/INewGame";
-import { IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IGameList";
-import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "./frontend/src/interfaces/ICheckIfOngoingGame";
-import { IChatObj } from "./frontend/src/interfaces/IChat";
+import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./frontend/src/interfaces/IuiNewGame";
+import { IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IuiGameList";
+import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "./frontend/src/interfaces/IuiCheckIfOngoingGame";
+import { IChatObj } from "./frontend/src/interfaces/IuiChat";
 import { IGetGameInfoRequest, IGetGameInfoResponse, IGetRoundRequest, IGetRoundResponse } from "./frontend/src/interfaces/IPlayingGame";
 import { getGameInfo, getRound } from "./backend/actions/playingGame";
 

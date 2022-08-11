@@ -1,5 +1,5 @@
-import { HIDDEN_CARDS_MODE, IRoundInfo, RULE } from "./IGameOptions";
-import { LOGIN_RESPONSE } from "./IUser";
+import { HIDDEN_CARDS_MODE, IRoundInfo, RULE } from "./IuiGameOptions";
+import { LOGIN_RESPONSE } from "./IuiUser";
 
 export interface IRules {
   ruleList: RULE[],

@@ -1,5 +1,5 @@
-import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "../../frontend/src/interfaces/ICheckIfOngoingGame";
-import { GAME_STATUS } from "../../frontend/src/interfaces/IGameOptions";
+import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "../../frontend/src/interfaces/IuiCheckIfOngoingGame";
+import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { getLastGameByStatus, ILastGameStatusResponse } from "../dbActions/promiseweb";
 
 export const checkIfOngoingGame = async (checkRequest: ICheckIfOngoingGameRequest): Promise<ICheckIfOngoingGameResponse> => {

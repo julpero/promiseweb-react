@@ -1,6 +1,6 @@
 import { IGame, IPlayerStatistic } from "../interfaces/IGameOptions";
 import { getPlayerNameInPlayerOrder } from "./common";
-import { IGameReport } from "../../frontend/src/interfaces/IReports";
+import { IGameReport } from "../../frontend/src/interfaces/IuiReports";
 
 export const getGameReport = (game: IGame, playersStatistics: IPlayerStatistic[], onlyName: string): IGameReport => {
   const retObj: IGameReport = {

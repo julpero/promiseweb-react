@@ -1,5 +1,5 @@
 import { Rank, Suite } from "card-games-typescript";
-import { GAME_STATUS, HIDDEN_CARDS_MODE, ROUND_STATUS } from "../../frontend/src/interfaces/IGameOptions";
+import { GAME_STATUS, HIDDEN_CARDS_MODE, ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 
 export type PlayerType = "human";
 export type CardValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14;

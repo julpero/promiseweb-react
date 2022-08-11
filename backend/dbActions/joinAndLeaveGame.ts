@@ -1,5 +1,5 @@
-import { IJoinLeaveGameRequest, JOIN_LEAVE_RESULT } from "../../frontend/src/interfaces/IGameList";
-import { GAME_STATUS } from "../../frontend/src/interfaces/IGameOptions";
+import { IJoinLeaveGameRequest, JOIN_LEAVE_RESULT } from "../../frontend/src/interfaces/IuiGameList";
+import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { IHumanPlayer } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
 import { getPlayerStats, getGameRoundCount } from "../common/common";

@@ -1,4 +1,4 @@
-import { ROUND_STATUS } from "../../frontend/src/interfaces/IGameOptions";
+import { ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { IGameOptions } from "../interfaces/IGameOptions";
 
 export const startRound = (gameInDb: IGameOptions, roundInd: number) => {

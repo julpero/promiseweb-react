@@ -6,7 +6,7 @@ import Chat from "../components/Chat";
 import PromiseTable from "../components/PromiseTable";
 import ScoreBoard from "../components/ScoreBoard";
 
-import { IGetGameInfoRequest, IGetGameInfoResponse, IGetRoundRequest, IGetRoundResponse } from "../interfaces/IPlayingGame";
+import { IGetGameInfoRequest, IGetGameInfoResponse, IGetRoundRequest, IGetRoundResponse } from "../interfaces/IuiPlayingGame";
 
 interface IProps {
   gameId: string,

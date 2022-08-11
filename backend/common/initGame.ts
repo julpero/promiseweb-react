@@ -2,7 +2,7 @@ import { knuthShuffle } from "knuth-shuffle";
 import { Card, DeckOfCards, Suite } from "card-games-typescript";
 import { ICardPlayed, IGameOptions, IGame, IPlayer, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 import { getPlayerNameInPlayerOrder } from "./common";
-import { GAME_STATUS, ROUND_STATUS } from "../../frontend/src/interfaces/IGameOptions";
+import { GAME_STATUS, ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { startRound } from "./game";
 
 export const startGame = (gameInDb: IGameOptions): boolean => {

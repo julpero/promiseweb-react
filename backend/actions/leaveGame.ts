@@ -1,5 +1,5 @@
-import { IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "../../frontend/src/interfaces/IGameList";
-import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IUser";
+import { IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "../../frontend/src/interfaces/IuiGameList";
+import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
 import { ICheckLoginRequest  } from "../interfaces/IUser";
 import { checkLogin } from "../dbActions/users";
 import { leaveTheGame } from "../dbActions/joinAndLeaveGame";

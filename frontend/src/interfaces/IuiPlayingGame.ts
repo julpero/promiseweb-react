@@ -1,4 +1,4 @@
-import { IRules } from "./IGameList";
+import { IRules } from "./IuiGameList";
 
 // import Card from "deck-of-cards";
 // in frontend we have also a dummy card with value of 0

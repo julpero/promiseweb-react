@@ -1,5 +1,5 @@
-import { ROUND_STATUS, RULE } from "../../frontend/src/interfaces/IGameOptions";
-import { ICard, IGetGameInfoRequest, IGetGameInfoResponse, IGetRoundRequest, IGetRoundResponse, IParsedHumanPlayer, IPlayerStats, IRoundPlayer, IRoundToPlayer } from "../../frontend/src/interfaces/IPlayingGame";
+import { ROUND_STATUS, RULE } from "../../frontend/src/interfaces/IuiGameOptions";
+import { ICard, IGetGameInfoRequest, IGetGameInfoResponse, IGetRoundRequest, IGetRoundResponse, IParsedHumanPlayer, IPlayerStats, IRoundPlayer, IRoundToPlayer } from "../../frontend/src/interfaces/IuiPlayingGame";
 import { getPlayerNameById } from "../common/common";
 import { isRuleActive, rulesToRuleObj } from "../common/model";
 import { getGame, getGameWithPlayer } from "../dbActions/playingGame";

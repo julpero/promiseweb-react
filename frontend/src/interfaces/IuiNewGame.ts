@@ -1,4 +1,4 @@
-import { LOGIN_RESPONSE } from "./IUser";
+import { LOGIN_RESPONSE } from "./IuiUser";
 
 export interface INewGameForm {
   newGameHumanPlayersCount: string;

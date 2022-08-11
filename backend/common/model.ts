@@ -1,6 +1,6 @@
 import { IGameOptions, IHumanPlayer } from "../interfaces/IGameOptions";
-import { RULE } from "../../frontend/src/interfaces/IGameOptions";
-import { IRules } from "../../frontend/src/interfaces/IGameList";
+import { RULE } from "../../frontend/src/interfaces/IuiGameOptions";
+import { IRules } from "../../frontend/src/interfaces/IuiGameList";
 
 export const playersToArr = (players: IHumanPlayer[]): string[] => {
   const playerArr: string[] = players.map(player => player.name);
