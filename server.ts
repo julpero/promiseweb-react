@@ -14,7 +14,7 @@ import { leaveGame } from "./backend/actions/leaveGame";
 import { checkIfOngoingGame } from "./backend/actions/checkIfOngoingGame";
 import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./frontend/src/interfaces/INewGame";
 import { IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IGameList";
-import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "./frontend/src/interfaces/ICheckGame";
+import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "./frontend/src/interfaces/ICheckIfOngoingGame";
 import { IChatObj } from "./frontend/src/interfaces/IChat";
 import { IGetRoundRequest, IGetRoundResponse } from "./frontend/src/interfaces/IPlayingGame";
 import { getRound } from "./backend/actions/playingGame";

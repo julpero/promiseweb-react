@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import HomeScreen from "./screens/HomeScreen";
 import GameTable from "./screens/GameTable";
 
-import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "./interfaces/ICheckGame";
+import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "./interfaces/ICheckIfOngoingGame";
 
 interface IState {
   gameStatus: CHECK_GAME_STATUS,

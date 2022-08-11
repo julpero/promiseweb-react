@@ -1,4 +1,4 @@
-import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "../../frontend/src/interfaces/ICheckGame";
+import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "../../frontend/src/interfaces/ICheckIfOngoingGame";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IGameOptions";
 import { getLastGameByStatus, ILastGameStatusResponse } from "../dbActions/promiseweb";
 
