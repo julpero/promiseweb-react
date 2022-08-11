@@ -51,18 +51,25 @@ class GameTable extends React.Component<IProps, IState> {
 
   render() {
     return (
-      <div style={{width: "100vw", height: "100vh"}}>
-        <div>
-          <PromiseTable roundInfo={this.state.roundInfo} />
+      <div className="container-fluid" style={{width: "100vw", height: "100vh"}}>
+        <div className="row">
+          <div className="col-10">
+            <CardBoard />
+          </div>
+          <div className="col-2">
+            <ScoreBoard />
+          </div>
         </div>
-        <div>
-          <ScoreBoard />
-        </div>
-        <div>
-          <CardBoard />
-        </div>
-        <div>
-          <Chat />
+        <div className="row fixed-bottom" style={{height: "150px", margin: "0px 0px"}}>
+          <div className="col-6">
+            <PromiseTable promiseTable={this.state.roundInfo?.roundToPlayer.promiseTable ?? null} />
+          </div>
+          <div className="col-4">
+            <Chat />
+          </div>
+          <div className="col-2">
+            buttons and menu
+          </div>
         </div>
       </div>
     );
