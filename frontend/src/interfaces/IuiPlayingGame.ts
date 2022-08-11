@@ -82,9 +82,9 @@ export interface IuiRoundTotalPromise {
   totalPromise: number | null,
 }
 
-export interface IPromiseTable {
+export interface IuiPromiseTable {
   players: string[],
-  promisesByPlayers: IuiPlayerPromise[],
+  promisesByPlayers: IuiPlayerPromise[][],
   rounds: IuiRoundTotalPromise[],
 }
 
@@ -96,7 +96,7 @@ export interface IuiRoundToPlayer {
   players: IuiRoundPlayer[],
   trumpCard: IuiCard | null,
   playerInCharge: number,
-  promiseTable: IPromiseTable,
+  promiseTable: IuiPromiseTable,
   cardInCharge: IuiCard | null,
   playerGoingToWinThisPlay: string | null,
   cardsPlayed: IuiCardPlayed[][],

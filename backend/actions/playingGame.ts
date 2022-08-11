@@ -6,11 +6,14 @@ import {
   IuiGetRoundRequest,
   IuiGetRoundResponse,
   IuiParsedHumanPlayer,
+  IuiPlayerPromise,
   IuiPlayerStats,
+  IuiPromiseTable,
   IuiRoundPlayer,
   IuiRoundToPlayer,
+  IuiRoundTotalPromise,
 } from "../../frontend/src/interfaces/IuiPlayingGame";
-import { getPlayerNameById } from "../common/common";
+import { getPlayerNameById, getPlayerNameInPlayerOrder } from "../common/common";
 import { isRuleActive, rulesToRuleObj } from "../common/model";
 import { getGame, getGameWithPlayer } from "../dbActions/playingGame";
 import { ICardPlayed, IGameOptions, IRound } from "../interfaces/IGameOptions";
@@ -44,9 +47,11 @@ export const getGameInfo = async (getGameInfoRequest: IuiGetGameInfoRequest): Pr
   }
 };
 
-// const parsePlayerStats = () => {
-
-// };
+const parsePlayerStats = (gameInDb: IGameOptions, playerName: string): IuiPlayerStats => {
+  return {
+    playerAvgPointsInRounds: gameInDb.humanPlayers.find(player => player.name == playerName)?.playerStats.playerAvgPointsInRounds ?? [],
+  } as IuiPlayerStats;
+};
 
 const showSpeedPromiseCards = (): boolean => {
   return true;
@@ -101,6 +106,41 @@ const getRoundPlayers = (myName: string, round: IRound, playIndex: number, showP
   return players;
 };
 
+const getPromisesByPlayers = (gameInDb: IGameOptions): IuiPlayerPromise[][] => {
+  const game = gameInDb.game;
+  const promisesByPlayers: IuiPlayerPromise[][] = [];
+  for (let i = 0; i < game.playerOrder.length; i++) {
+    const playerPromises: IuiPlayerPromise[] = [];
+    for (let j = 0; j < game.rounds.length; j++) {
+      const roundPlayer = game.rounds[j].roundPlayers[i];
+      playerPromises.push({
+        // TODO promise: showPromisesNow('player', thisGame, j) ? game.rounds[j].roundPlayers[i].promise : null,
+        promise: roundPlayer.promise,
+        keep: roundPlayer.keeps,
+        points: roundPlayer.points,
+        speedPromisePoints: roundPlayer.speedPromisePoints,
+        speedPromiseTotal: roundPlayer.speedPromiseTotal,
+      } as IuiPlayerPromise);
+    }
+    promisesByPlayers.push(playerPromises);
+  }
+  return promisesByPlayers;
+};
+
+const getPromiseTable = (gameInDb: IGameOptions): IuiPromiseTable => {
+  const game = gameInDb.game;
+  return {
+    players: game.playerOrder.map(player => getPlayerNameInPlayerOrder(player)),
+    promisesByPlayers: getPromisesByPlayers(gameInDb),
+    rounds: game.rounds.map(round => {
+      return {
+        cardsInRound: round.cardsInRound,
+        totalPromise: round.totalPromise, // TODO showPromisesNow('total', thisGame, j)
+      } as IuiRoundTotalPromise;
+    }),
+  } as IuiPromiseTable;
+};
+
 const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerName: string): IuiRoundToPlayer => {
   const round = gameInDb.game.rounds[roundInd];
   const playIndex = getCurrentPlayIndex(round);
@@ -121,11 +161,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerName: str
     gameOver: false, // TODO
     handValues: null, // TODO getHandValues(thisGame, roundInd),
     obsGame: null, // TODO obsGameToRoundObj
-    promiseTable: {
-      players: [],
-      promisesByPlayers: [],
-      rounds: [],
-    }
+    promiseTable: getPromiseTable(gameInDb),
   } as IuiRoundToPlayer;
 };
 
@@ -147,9 +183,7 @@ const gameToGameInfo = (gameIdStr: string, gameInDb: IGameOptions): IuiGetGameIn
       return {
         name: player.name,
         type: "human",
-        playerStats: {
-          playerAvgPointsInRounds: [], // TODO
-        } as IuiPlayerStats,
+        playerStats: parsePlayerStats(gameInDb, player.name),
       } as IuiParsedHumanPlayer;
     }), // TODO
     hasPassword: gameInDb.password.length > 0,
