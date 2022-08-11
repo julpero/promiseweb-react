@@ -11,10 +11,10 @@ import createGame from "./backend/actions/createGame";
 import { getOpenGamesList } from "./backend/actions/getGameList";
 import { joinGame } from "./backend/actions/joinGame";
 import { leaveGame } from "./backend/actions/leaveGame";
-import { checkGame } from "./backend/actions/checkGame";
+import { checkIfOngoingGame } from "./backend/actions/checkIfOngoingGame";
 import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./frontend/src/interfaces/INewGame";
 import { IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IGameList";
-import { CHECK_GAME_STATUS, ICheckGameRequest, ICheckGameResponse } from "./frontend/src/interfaces/ICheckGame";
+import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "./frontend/src/interfaces/ICheckGame";
 import { IChatObj } from "./frontend/src/interfaces/IChat";
 import { IGetRoundRequest, IGetRoundResponse } from "./frontend/src/interfaces/IPlayingGame";
 import { getRound } from "./backend/actions/playingGame";
@@ -95,8 +95,8 @@ connectDB().then(() => {
       fn(leaveResponse);
     });
 
-    socket.on("check ongoing game", async (checkGameRequest: ICheckGameRequest, fn: (checkResponse: ICheckGameResponse) => void) => {
-      const checkResponse: ICheckGameResponse = await checkGame(checkGameRequest);
+    socket.on("check if ongoing game", async (checkIfOngoingGameRequest: ICheckIfOngoingGameRequest, fn: (checkResponse: ICheckIfOngoingGameResponse) => void) => {
+      const checkResponse: ICheckIfOngoingGameResponse = await checkIfOngoingGame(checkIfOngoingGameRequest);
       switch (checkResponse.checkStatus) {
         case CHECK_GAME_STATUS.joinedGame:
         case CHECK_GAME_STATUS.onGoingGame:
@@ -113,6 +113,10 @@ connectDB().then(() => {
       }
       fn(checkResponse);
     });
+
+    // socket.on("check game", async () => {
+
+    // });
 
     socket.on("get round", async (getRoundObj: IGetRoundRequest, fn: (roundResponse: IGetRoundResponse) => void) => {
       console.log("get round", getRoundObj);

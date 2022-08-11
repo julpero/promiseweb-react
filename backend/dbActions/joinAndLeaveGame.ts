@@ -4,7 +4,6 @@ import { IHumanPlayer } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
 import { getPlayerStats, getGameRoundCount } from "../common/common";
 import { startGame } from "../common/initGame";
-import { startRound } from "../common/game";
 
 export const joinOnGame = async (joinGameRequest: IJoinLeaveGameRequest): Promise<JOIN_LEAVE_RESULT> => {
   const gameInDb = await GameOptions.findById(joinGameRequest.gameId);
