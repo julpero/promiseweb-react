@@ -1,31 +1,31 @@
-import { HIDDEN_CARDS_MODE, IRoundInfo, RULE } from "./IuiGameOptions";
+import { HIDDEN_CARDS_MODE, IuiRoundInfo, RULE } from "./IuiGameOptions";
 import { LOGIN_RESPONSE } from "./IuiUser";
 
-export interface IRules {
+export interface IuiRules {
   ruleList: RULE[],
   hiddenCardsMode: HIDDEN_CARDS_MODE,
-  roundInfo: IRoundInfo,
+  roundInfo: IuiRoundInfo,
 }
 
-export interface IGameListItem {
+export interface IuiGameListItem {
   created: Date,
   id: string,
-  rules: IRules,
+  rules: IuiRules,
   humanPlayers: string[],
   imInTheGame: boolean,
   playerCount: number,
   gameHasPassword: boolean,
 }
 
-export interface IGetGameListRequest {
+export interface IuiGetGameListRequest {
   myId: string,
 }
 
-export interface IGetGameListResponse {
-  games: IGameListItem[],
+export interface IuiGetGameListResponse {
+  games: IuiGameListItem[],
 }
 
-export interface IJoinLeaveGameRequest {
+export interface IuiJoinLeaveGameRequest {
   myId: string,
   gameId: string,
   myName: string,
@@ -41,7 +41,7 @@ export enum JOIN_LEAVE_RESULT {
   lastOk,
 }
 
-export interface IJoinLeaveGameResponse {
+export interface IuiJoinLeaveGameResponse {
   joinLeaveResult: JOIN_LEAVE_RESULT,
   loginStatus: LOGIN_RESPONSE,
   startGame?: boolean,

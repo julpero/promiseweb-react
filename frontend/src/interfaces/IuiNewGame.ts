@@ -1,6 +1,6 @@
 import { LOGIN_RESPONSE } from "./IuiUser";
 
-export interface INewGameForm {
+export interface IuiNewGameForm {
   newGameHumanPlayersCount: string;
   newGameStartRound: string;
   newGameTurnRound: string;
@@ -22,7 +22,7 @@ export interface INewGameForm {
   newGamePassword: string;
 }
 
-export const initialNewGameValues: INewGameForm = {
+export const initialNewGameValues: IuiNewGameForm = {
   newGameHumanPlayersCount: "3",
   newGameStartRound: "10",
   newGameTurnRound: "1",
@@ -44,7 +44,7 @@ export const initialNewGameValues: INewGameForm = {
   newGamePassword: "",
 };
 
-export interface ICreateGameRequest extends INewGameForm {
+export interface IuiCreateGameRequest extends IuiNewGameForm {
   playerId: string,
 }
 
@@ -54,7 +54,7 @@ export enum CREATE_GAME_STATUS {
   notValidPlayerId,
 }
 
-export interface ICreateGameResponse {
+export interface IuiCreateGameResponse {
   responseStatus: CREATE_GAME_STATUS,
   loginStatus: LOGIN_RESPONSE,
   newGameId: string,

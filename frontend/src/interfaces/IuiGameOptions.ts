@@ -29,7 +29,7 @@ export enum RULE {
   opponentGameCardValue,
 }
 
-export interface IRoundInfo {
+export interface IuiRoundInfo {
   startRound: number,
   turnRound: number,
   endRound: number,

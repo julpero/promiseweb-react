@@ -1,4 +1,4 @@
-import { IRules } from "./IuiGameList";
+import { IuiRules } from "./IuiGameList";
 
 // import Card from "deck-of-cards";
 // in frontend we have also a dummy card with value of 0
@@ -6,40 +6,40 @@ export type CardValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 
 export type Suite = "hearts" | "spades" | "diamonds" | "clubs" | "dummy";
 export type PromiseValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
-export interface IGetRoundRequest {
+export interface IuiGetRoundRequest {
   gameId: string,
   myId: string,
   round: number,
 }
 
-export interface IGetRoundResponse {
+export interface IuiGetRoundResponse {
   gameId: string,
   roundInd: number,
   myName: string,
-  roundToPlayer: IRoundToPlayer,
+  roundToPlayer: IuiRoundToPlayer,
 }
 
-export interface IGetGameInfoRequest {
+export interface IuiGetGameInfoRequest {
   myId: string,
   gameId: string,
 }
 
-export interface IPlayerStats {
+export interface IuiPlayerStats {
   playerAvgPointsInRounds: number[],
 }
 
-export interface IParsedHumanPlayer {
+export interface IuiParsedHumanPlayer {
   name: string,
   type: "human",
-  playerStats: IPlayerStats,
+  playerStats: IuiPlayerStats,
 }
 
-export interface IGetGameInfoResponse {
+export interface IuiGetGameInfoResponse {
   gameId: string,
   humanPlayersCount: number,
   computerPlayersCount: number,
-  rules: IRules,
-  humanPlayers: IParsedHumanPlayer[],
+  rules: IuiRules,
+  humanPlayers: IuiParsedHumanPlayer[],
   hasPassword: boolean,
   /** index of rounds array */
   currentRound: number | null,
@@ -48,28 +48,28 @@ export interface IGetGameInfoResponse {
   thisIsDemoGame: boolean,
 }
 
-export interface ICard {
+export interface IuiCard {
   suite: Suite,
   value: CardValue,
 }
 
-export interface IRoundPlayer {
+export interface IuiRoundPlayer {
   thisIsMe: boolean,
   dealer: boolean,
   name: string,
   promise: number | null,
   keeps: number,
-  cardPlayed: ICard | null,
+  cardPlayed: IuiCard | null,
   speedPromisePoints: number | null,
   speedPromiseTotal: number | null,
 }
 
-export interface ICardPlayed {
+export interface IuiCardPlayed {
   name: string,
-  card: ICard,
+  card: IuiCard,
 }
 
-export interface IPlayerPromise {
+export interface IuiPlayerPromise {
   promise: number | null,
   keep: number,
   points: number,
@@ -77,29 +77,29 @@ export interface IPlayerPromise {
   speedPromiseTotal: number,
 }
 
-export interface IRoundTotalPromise {
+export interface IuiRoundTotalPromise {
   cardsInRound: number,
   totalPromise: number | null,
 }
 
 export interface IPromiseTable {
   players: string[],
-  promisesByPlayers: IPlayerPromise[],
-  rounds: IRoundTotalPromise[],
+  promisesByPlayers: IuiPlayerPromise[],
+  rounds: IuiRoundTotalPromise[],
 }
 
-export interface IRoundToPlayer {
+export interface IuiRoundToPlayer {
   cardsInRound: number,
   dealerPositionIndex: number,
   starterPositionIndex: number,
-  myCards: ICard[],
-  players: IRoundPlayer[],
-  trumpCard: ICard | null,
+  myCards: IuiCard[],
+  players: IuiRoundPlayer[],
+  trumpCard: IuiCard | null,
   playerInCharge: number,
   promiseTable: IPromiseTable,
-  cardInCharge: ICard | null,
+  cardInCharge: IuiCard | null,
   playerGoingToWinThisPlay: string | null,
-  cardsPlayed: ICardPlayed[][],
+  cardsPlayed: IuiCardPlayed[][],
   doReloadInit: boolean,
   newRound: boolean,
   gameOver: boolean,

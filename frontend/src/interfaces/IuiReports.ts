@@ -1,4 +1,4 @@
-export interface IGameReport {
+export interface IuiGameReport {
   players: string[],
   points: number[][],
   rounds: number[],

@@ -1,4 +1,4 @@
-export interface ICheckIfOngoingGameRequest {
+export interface IuiCheckIfOngoingGameRequest {
   myId: string,
 }
 
@@ -9,7 +9,7 @@ export enum CHECK_GAME_STATUS {
   observedGame,
 }
 
-export interface ICheckIfOngoingGameResponse {
+export interface IuiCheckIfOngoingGameResponse {
   gameId: string | null,
   checkStatus: CHECK_GAME_STATUS,
   asAPlayer: string | null,
