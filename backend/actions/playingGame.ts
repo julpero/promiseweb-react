@@ -1,11 +1,21 @@
 import { ROUND_STATUS, RULE } from "../../frontend/src/interfaces/IuiGameOptions";
-import { ICard, IGetGameInfoRequest, IGetGameInfoResponse, IGetRoundRequest, IGetRoundResponse, IParsedHumanPlayer, IPlayerStats, IRoundPlayer, IRoundToPlayer } from "../../frontend/src/interfaces/IuiPlayingGame";
+import {
+  IuiCard,
+  IuiGetGameInfoRequest,
+  IuiGetGameInfoResponse,
+  IuiGetRoundRequest,
+  IuiGetRoundResponse,
+  IuiParsedHumanPlayer,
+  IuiPlayerStats,
+  IuiRoundPlayer,
+  IuiRoundToPlayer,
+} from "../../frontend/src/interfaces/IuiPlayingGame";
 import { getPlayerNameById } from "../common/common";
 import { isRuleActive, rulesToRuleObj } from "../common/model";
 import { getGame, getGameWithPlayer } from "../dbActions/playingGame";
 import { ICardPlayed, IGameOptions, IRound } from "../interfaces/IGameOptions";
 
-export const getRound = async (getRoundObj: IGetRoundRequest): Promise<IGetRoundResponse | null> => {
+export const getRound = async (getRoundObj: IuiGetRoundRequest): Promise<IuiGetRoundResponse | null> => {
   const {gameId, myId, round} = getRoundObj;
   const gameInDb = await getGame(gameId);
 
@@ -15,7 +25,7 @@ export const getRound = async (getRoundObj: IGetRoundRequest): Promise<IGetRound
 
   const myName = getPlayerNameById(gameInDb.humanPlayers, myId);
 
-  const roundResponse: IGetRoundResponse = {
+  const roundResponse: IuiGetRoundResponse = {
     gameId: gameId,
     roundInd: round,
     myName: myName,
@@ -24,7 +34,7 @@ export const getRound = async (getRoundObj: IGetRoundRequest): Promise<IGetRound
   return roundResponse;
 };
 
-export const getGameInfo = async (getGameInfoRequest: IGetGameInfoRequest): Promise<IGetGameInfoResponse | null> => {
+export const getGameInfo = async (getGameInfoRequest: IuiGetGameInfoRequest): Promise<IuiGetGameInfoResponse | null> => {
   const gameId = getGameInfoRequest.gameId;
   const gameInDb = await getGameWithPlayer(gameId, getGameInfoRequest.myId);
   if (gameInDb) {
@@ -42,13 +52,13 @@ const showSpeedPromiseCards = (): boolean => {
   return true;
 };
 
-const getMyCards = (myName: string, round: IRound, speedPromise: boolean): ICard[] => {
+const getMyCards = (myName: string, round: IRound, speedPromise: boolean): IuiCard[] => {
   if (!speedPromise || showSpeedPromiseCards()) {
     return round.roundPlayers.find(player => player.name === myName)?.cards.map(card => {
       return {
         suite: card.suite,
         value: card.value,
-      } as ICard;
+      } as IuiCard;
     }) ?? [];
   } else {
     return [];
@@ -59,16 +69,16 @@ const getCurrentPlayIndex = (round: IRound): number => {
   return round.cardsPlayed.length - 1;
 };
 
-const getPlayerPlayedCard = (playerName: string, cardsPlayed: ICardPlayed[], returnCard: boolean): ICard | null => {
+const getPlayerPlayedCard = (playerName: string, cardsPlayed: ICardPlayed[], returnCard: boolean): IuiCard | null => {
   const cardPlayed = cardsPlayed.find(cardPlayed => cardPlayed.name === playerName);
   if (cardPlayed) {
-    return returnCard ? cardPlayed.card : { suite: "dummy", value: 0 } as ICard;
+    return returnCard ? cardPlayed.card : { suite: "dummy", value: 0 } as IuiCard;
   }
   return null;
 };
 
-const getRoundPlayers = (myName: string, round: IRound, playIndex: number, showPromises: boolean): IRoundPlayer[] => {
-  const players: IRoundPlayer[] = [];
+const getRoundPlayers = (myName: string, round: IRound, playIndex: number, showPromises: boolean): IuiRoundPlayer[] => {
+  const players: IuiRoundPlayer[] = [];
   // TODO const firstPlayerInThePlay = getFirstPlayerInThePlay(round, play);
   // TODO const lastPlayerInThePlay = getLastPlayerInThePlay(round, play);
 
@@ -91,7 +101,7 @@ const getRoundPlayers = (myName: string, round: IRound, playIndex: number, showP
   return players;
 };
 
-const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerName: string): IRoundToPlayer => {
+const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerName: string): IuiRoundToPlayer => {
   const round = gameInDb.game.rounds[roundInd];
   const playIndex = getCurrentPlayIndex(round);
 
@@ -116,7 +126,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerName: str
       promisesByPlayers: [],
       rounds: [],
     }
-  } as IRoundToPlayer;
+  } as IuiRoundToPlayer;
 };
 
 /**
@@ -128,7 +138,7 @@ const getCurrentRound = (rounds: IRound[]): number | null => {
   return rounds.find(round => round.roundStatus === ROUND_STATUS.OnGoing)?.roundIndex ?? null;
 };
 
-const gameToGameInfo = (gameIdStr: string, gameInDb: IGameOptions): IGetGameInfoResponse => {
+const gameToGameInfo = (gameIdStr: string, gameInDb: IGameOptions): IuiGetGameInfoResponse => {
   return {
     gameId: gameIdStr,
     humanPlayersCount: gameInDb.humanPlayersCount,
@@ -139,8 +149,8 @@ const gameToGameInfo = (gameIdStr: string, gameInDb: IGameOptions): IGetGameInfo
         type: "human",
         playerStats: {
           playerAvgPointsInRounds: [], // TODO
-        } as IPlayerStats,
-      } as IParsedHumanPlayer;
+        } as IuiPlayerStats,
+      } as IuiParsedHumanPlayer;
     }), // TODO
     hasPassword: gameInDb.password.length > 0,
     currentRound: getCurrentRound(gameInDb.game.rounds),
@@ -148,5 +158,5 @@ const gameToGameInfo = (gameIdStr: string, gameInDb: IGameOptions): IGetGameInfo
     eventInfo: false, // TODO
     thisIsDemoGame: gameInDb.thisIsDemoGame,
     rules: rulesToRuleObj(gameInDb),
-  } as IGetGameInfoResponse;
+  } as IuiGetGameInfoResponse;
 };

@@ -12,11 +12,11 @@ import { getOpenGamesList } from "./backend/actions/getGameList";
 import { joinGame } from "./backend/actions/joinGame";
 import { leaveGame } from "./backend/actions/leaveGame";
 import { checkIfOngoingGame } from "./backend/actions/checkIfOngoingGame";
-import { CREATE_GAME_STATUS, ICreateGameRequest, ICreateGameResponse } from "./frontend/src/interfaces/IuiNewGame";
-import { IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IuiGameList";
-import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "./frontend/src/interfaces/IuiCheckIfOngoingGame";
-import { IChatObj } from "./frontend/src/interfaces/IuiChat";
-import { IGetGameInfoRequest, IGetGameInfoResponse, IGetRoundRequest, IGetRoundResponse } from "./frontend/src/interfaces/IPlayingGame";
+import { CREATE_GAME_STATUS, IuiCreateGameRequest, IuiCreateGameResponse } from "./frontend/src/interfaces/IuiNewGame";
+import { IuiGetGameListRequest, IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IuiGameList";
+import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "./frontend/src/interfaces/IuiCheckIfOngoingGame";
+import { IuiChatObj } from "./frontend/src/interfaces/IuiChat";
+import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse } from "./frontend/src/interfaces/IuiPlayingGame";
 import { getGameInfo, getRound } from "./backend/actions/playingGame";
 
 // Routes
@@ -56,8 +56,8 @@ connectDB().then(() => {
       console.warn("user disconnected", socket.id);
     });
 
-    socket.on("create game", async (createGameRequest: ICreateGameRequest, fn: (createGameResponse: ICreateGameResponse) => void) => {
-      const createGameResponse: ICreateGameResponse = await createGame(createGameRequest);
+    socket.on("create game", async (createGameRequest: IuiCreateGameRequest, fn: (createGameResponse: IuiCreateGameResponse) => void) => {
+      const createGameResponse: IuiCreateGameResponse = await createGame(createGameRequest);
       if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
         socket.join(createGameResponse.newGameId);
         io.emit("new game created", createGameResponse.newGameId);
@@ -65,14 +65,14 @@ connectDB().then(() => {
       fn(createGameResponse);
     });
 
-    socket.on("get games", async (getGameListRequest: IGetGameListRequest, fn: (getGameListResponse: IGetGameListResponse) => void) => {
-      const getGameListResponse: IGetGameListResponse = await getOpenGamesList(getGameListRequest);
+    socket.on("get games", async (getGameListRequest: IuiGetGameListRequest, fn: (getGameListResponse: IuiGetGameListResponse) => void) => {
+      const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(getGameListRequest);
       fn(getGameListResponse);
     });
 
-    socket.on("join game", async (joinGameRequest: IJoinLeaveGameRequest, fn: (joinResponse: IJoinLeaveGameResponse) => void) => {
+    socket.on("join game", async (joinGameRequest: IuiJoinLeaveGameRequest, fn: (joinResponse: IuiJoinLeaveGameResponse) => void) => {
       const gameIdStr = joinGameRequest.gameId;
-      const joinResponse: IJoinLeaveGameResponse = await joinGame(joinGameRequest);
+      const joinResponse: IuiJoinLeaveGameResponse = await joinGame(joinGameRequest);
       if (joinResponse.joinLeaveResult !== JOIN_LEAVE_RESULT.notOk) {
         socket.join(gameIdStr);
         // notify other users
@@ -85,8 +85,8 @@ connectDB().then(() => {
       fn(joinResponse);
     });
 
-    socket.on("leave game", async (leaveGameRequest: IJoinLeaveGameRequest, fn: (leaveResponse: IJoinLeaveGameResponse) => void) => {
-      const leaveResponse: IJoinLeaveGameResponse = await leaveGame(leaveGameRequest);
+    socket.on("leave game", async (leaveGameRequest: IuiJoinLeaveGameRequest, fn: (leaveResponse: IuiJoinLeaveGameResponse) => void) => {
+      const leaveResponse: IuiJoinLeaveGameResponse = await leaveGame(leaveGameRequest);
       if (leaveResponse.joinLeaveResult === JOIN_LEAVE_RESULT.ok) {
         socket.leave(leaveGameRequest.gameId);
         // notify other users
@@ -95,8 +95,8 @@ connectDB().then(() => {
       fn(leaveResponse);
     });
 
-    socket.on("check if ongoing game", async (checkIfOngoingGameRequest: ICheckIfOngoingGameRequest, fn: (checkResponse: ICheckIfOngoingGameResponse) => void) => {
-      const checkResponse: ICheckIfOngoingGameResponse = await checkIfOngoingGame(checkIfOngoingGameRequest);
+    socket.on("check if ongoing game", async (checkIfOngoingGameRequest: IuiCheckIfOngoingGameRequest, fn: (checkResponse: IuiCheckIfOngoingGameResponse) => void) => {
+      const checkResponse: IuiCheckIfOngoingGameResponse = await checkIfOngoingGame(checkIfOngoingGameRequest);
       switch (checkResponse.checkStatus) {
         case CHECK_GAME_STATUS.joinedGame:
         case CHECK_GAME_STATUS.onGoingGame:
@@ -114,12 +114,12 @@ connectDB().then(() => {
       fn(checkResponse);
     });
 
-    socket.on("check game", async (getGameInfoRequest: IGetGameInfoRequest, fn: (gameInfoResponse: IGetGameInfoResponse) => void) => {
+    socket.on("check game", async (getGameInfoRequest: IuiGetGameInfoRequest, fn: (gameInfoResponse: IuiGetGameInfoResponse) => void) => {
       console.log("check game", getGameInfoRequest);
       if (getGameInfoRequest.gameId === "" || getGameInfoRequest.myId === "") {
         return null;
       }
-      const gameInfoResponse: IGetGameInfoResponse | null = await getGameInfo(getGameInfoRequest);
+      const gameInfoResponse: IuiGetGameInfoResponse | null = await getGameInfo(getGameInfoRequest);
       console.log("gameInfoResponse", gameInfoResponse);
       if (gameInfoResponse === null) {
         return null;
@@ -128,12 +128,12 @@ connectDB().then(() => {
       fn(gameInfoResponse);
     });
 
-    socket.on("get round", async (getRoundObj: IGetRoundRequest, fn: (roundResponse: IGetRoundResponse) => void) => {
+    socket.on("get round", async (getRoundObj: IuiGetRoundRequest, fn: (roundResponse: IuiGetRoundResponse) => void) => {
       console.log("get round", getRoundObj);
       if (getRoundObj.gameId === "") {
         return null;
       }
-      const roundResponse: IGetRoundResponse | null = await getRound(getRoundObj);
+      const roundResponse: IuiGetRoundResponse | null = await getRound(getRoundObj);
       console.log("roundResponse", roundResponse);
       if (roundResponse === null) {
         return null;
@@ -142,7 +142,7 @@ connectDB().then(() => {
       fn(roundResponse);
     });
 
-    socket.on("write chat", async (chatObj: IChatObj ) => {
+    socket.on("write chat", async (chatObj: IuiChatObj ) => {
       const gameIdStr = chatObj.gameId;
       const chatLine = chatObj.myName + ": " + chatObj.chatLine;
       console.log("sending new chat line", chatLine, gameIdStr);

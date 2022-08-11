@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import HomeScreen from "./screens/HomeScreen";
 import GameTable from "./screens/GameTable";
 
-import { CHECK_GAME_STATUS, ICheckIfOngoingGameRequest, ICheckIfOngoingGameResponse } from "./interfaces/IuiCheckIfOngoingGame";
+import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "./interfaces/IuiCheckIfOngoingGame";
 
 interface IState {
   gameStatus: CHECK_GAME_STATUS,
@@ -28,11 +28,11 @@ class App extends React.Component<Record<string, never>, IState> {
       console.log("uUID set: ", uuid);
       window.localStorage.setItem("uUID", uuid);
     }
-    const checkGameRequest: ICheckIfOngoingGameRequest = {
+    const checkGameRequest: IuiCheckIfOngoingGameRequest = {
       myId: window.localStorage.getItem("uUID") ?? "",
     };
 
-    socket.emit("check if ongoing game", checkGameRequest, (response: ICheckIfOngoingGameResponse) => {
+    socket.emit("check if ongoing game", checkGameRequest, (response: IuiCheckIfOngoingGameResponse) => {
       console.log("check response", response);
       this.setState({gameStatus: response.checkStatus, gameId: response.gameId});
     });

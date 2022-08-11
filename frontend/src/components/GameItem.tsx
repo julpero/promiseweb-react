@@ -1,6 +1,6 @@
 import React from "react";
 import { HIDDEN_CARDS_MODE } from "../interfaces/IuiGameOptions";
-import { IGameListItem } from "../interfaces/IuiGameList";
+import { IuiGameListItem } from "../interfaces/IuiGameList";
 import { ruleToStr, hiddenCardsModeToStr } from "../common/enumFunctions";
 import { Card } from "react-bootstrap";
 import { Field } from "react-final-form";
@@ -13,7 +13,7 @@ interface IProps {
   joinedGameId: string,
 }
 
-class GameItem extends React.Component<IGameListItem & IProps> {
+class GameItem extends React.Component<IuiGameListItem & IProps> {
   dateFormatOptions: Intl.DateTimeFormatOptions = {
     year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric", hour12: false
   };

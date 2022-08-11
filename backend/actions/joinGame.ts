@@ -1,12 +1,12 @@
-import { IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "../../frontend/src/interfaces/IuiGameList";
+import { IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "../../frontend/src/interfaces/IuiGameList";
 import { ICheckLoginRequest  } from "../interfaces/IUser";
 import { checkLogin } from "../dbActions/users";
 import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
 import { joinOnGame } from "../dbActions/joinAndLeaveGame";
 
-export const joinGame = async (joinGameRequest: IJoinLeaveGameRequest): Promise<IJoinLeaveGameResponse> => {
+export const joinGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Promise<IuiJoinLeaveGameResponse> => {
   console.log("joinGameRequest", joinGameRequest);
-  const response: IJoinLeaveGameResponse = {
+  const response: IuiJoinLeaveGameResponse = {
     joinLeaveResult: JOIN_LEAVE_RESULT.notOk,
     loginStatus: LOGIN_RESPONSE.ok,
   };

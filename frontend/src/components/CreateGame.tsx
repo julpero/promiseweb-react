@@ -11,7 +11,7 @@ import SelectInput from "./FormComponents/SelectInput";
 import TextInput from "./FormComponents/TextInput";
 import CheckboxInput from "./FormComponents/CheckBoxInput";
 
-import { INewGameForm, initialNewGameValues, ICreateGameRequest, ICreateGameResponse, CREATE_GAME_STATUS } from "../interfaces/IuiNewGame";
+import { IuiNewGameForm, initialNewGameValues, IuiCreateGameRequest, IuiCreateGameResponse, CREATE_GAME_STATUS } from "../interfaces/IuiNewGame";
 import { LOGIN_RESPONSE } from "../interfaces/IuiUser";
 
 interface IFormValidationFields {
@@ -39,12 +39,12 @@ class CreateGame extends React.Component<IProps, IState> {
   };
 
   static socket = SocketContext;
-  initialValues: INewGameForm = initialNewGameValues;
+  initialValues: IuiNewGameForm = initialNewGameValues;
 
-  onSubmit = (values: INewGameForm) => {
+  onSubmit = (values: IuiNewGameForm) => {
     const playerId: string = window.localStorage.getItem("uUID") ?? "ERROR";
-    const newGameRequest: ICreateGameRequest = {...values, playerId };
-    socket.emit("create game", newGameRequest, (createGameResponse: ICreateGameResponse) => {
+    const newGameRequest: IuiCreateGameRequest = {...values, playerId };
+    socket.emit("create game", newGameRequest, (createGameResponse: IuiCreateGameResponse) => {
       this.setState({
         loginStatus: createGameResponse.loginStatus,
         createGameStatus: createGameResponse.responseStatus,
@@ -419,7 +419,7 @@ class CreateGame extends React.Component<IProps, IState> {
   }
 }
 
-const validateForm = (values: INewGameForm) => {
+const validateForm = (values: IuiNewGameForm) => {
   const errors: IFormValidationFields = {};
 
   const startRound = parseInt(values.newGameStartRound, 10);

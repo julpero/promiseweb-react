@@ -1,11 +1,11 @@
-import { IJoinLeaveGameRequest, JOIN_LEAVE_RESULT } from "../../frontend/src/interfaces/IuiGameList";
+import { IuiJoinLeaveGameRequest, JOIN_LEAVE_RESULT } from "../../frontend/src/interfaces/IuiGameList";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { IHumanPlayer } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
 import { getPlayerStats, getGameRoundCount } from "../common/common";
 import { startGame } from "../common/initGame";
 
-export const joinOnGame = async (joinGameRequest: IJoinLeaveGameRequest): Promise<JOIN_LEAVE_RESULT> => {
+export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Promise<JOIN_LEAVE_RESULT> => {
   const gameInDb = await GameOptions.findById(joinGameRequest.gameId);
   console.log("gameInDb", gameInDb);
   if (!gameInDb) return JOIN_LEAVE_RESULT.notOk;
@@ -59,7 +59,7 @@ export const joinOnGame = async (joinGameRequest: IJoinLeaveGameRequest): Promis
   }
 };
 
-export const leaveTheGame = async (leaveGameRequest: IJoinLeaveGameRequest): Promise<JOIN_LEAVE_RESULT> => {
+export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): Promise<JOIN_LEAVE_RESULT> => {
   const game = await GameOptions.findById(leaveGameRequest.gameId);
   console.log("game", game);
   if (!game) return JOIN_LEAVE_RESULT.notOk;

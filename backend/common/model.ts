@@ -1,6 +1,6 @@
 import { IGameOptions, IHumanPlayer } from "../interfaces/IGameOptions";
 import { RULE } from "../../frontend/src/interfaces/IuiGameOptions";
-import { IRules } from "../../frontend/src/interfaces/IuiGameList";
+import { IuiRules } from "../../frontend/src/interfaces/IuiGameList";
 
 export const playersToArr = (players: IHumanPlayer[]): string[] => {
   const playerArr: string[] = players.map(player => player.name);
@@ -24,7 +24,7 @@ const rulesToArr = (gameOptions: IGameOptions): RULE[] => {
   return rulesArr;
 };
 
-export const rulesToRuleObj = (gameOptions: IGameOptions): IRules => {
+export const rulesToRuleObj = (gameOptions: IGameOptions): IuiRules => {
   return {
     ruleList: rulesToArr(gameOptions),
     hiddenCardsMode: gameOptions.hiddenCardsMode,
@@ -33,7 +33,7 @@ export const rulesToRuleObj = (gameOptions: IGameOptions): IRules => {
       turnRound: gameOptions.turnRound,
       endRound: gameOptions.endRound,
     }
-  } as IRules;
+  } as IuiRules;
 };
 
 export const isRuleActive = (gameOptions: IGameOptions, rule: RULE): boolean => {

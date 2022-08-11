@@ -2,7 +2,7 @@ import { getGameReport } from "../common/reportFunctions";
 import GameOptions from "../models/GameOptions";
 import { IGameOptions } from "../interfaces/IGameOptions";
 import { GAME_STATUS, ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
-import { IGameReport } from "../../frontend/src/interfaces/IuiReports";
+import { IuiGameReport } from "../../frontend/src/interfaces/IuiReports";
 
 export interface ILastGameStatusResponse {
   gameId: string,
@@ -44,7 +44,7 @@ export const getLastGameByStatus = async (playerId: string, status: GAME_STATUS)
 };
 
 export const getPlayerAvgPoints = async (playerName: string, roundsInGame: number): Promise<number[]> => {
-  const gameStats: IGameReport[] = [];
+  const gameStats: IuiGameReport[] = [];
   const stats: number[] = [];
 
   const gamesInDb = await GameOptions.aggregate([

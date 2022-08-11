@@ -2,7 +2,14 @@ import React from "react";
 import { Form, Field } from "react-final-form";
 import { socket, SocketContext } from "../socket";
 import GameItem from "./GameItem";
-import { IGameListItem, IGetGameListRequest, IGetGameListResponse, IJoinLeaveGameRequest, IJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "../interfaces/IuiGameList";
+import {
+  IuiGameListItem,
+  IuiGetGameListRequest,
+  IuiGetGameListResponse,
+  IuiJoinLeaveGameRequest,
+  IuiJoinLeaveGameResponse,
+  JOIN_LEAVE_RESULT
+} from "../interfaces/IuiGameList";
 import TextInput from "./FormComponents/TextInput";
 import { Modal } from "react-bootstrap";
 import { FormApi } from "final-form";
@@ -26,7 +33,7 @@ interface IState {
   gameId: string,
   method: null | "join" | "leave",
   isFetching: boolean,
-  gameItemList: IGameListItem[],
+  gameItemList: IuiGameListItem[],
   loginStatus: LOGIN_RESPONSE | null,
   joinLeaveStatus: JOIN_LEAVE_RESULT | null,
 }
@@ -59,8 +66,8 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
 
   fetchGameItemList = () => {
     this.setState({ isFetching: true });
-    const gameListRequest: IGetGameListRequest = { myId: this.getMyId() };
-    socket.emit("get games", gameListRequest, (gameList: IGetGameListResponse) => {
+    const gameListRequest: IuiGetGameListRequest = { myId: this.getMyId() };
+    socket.emit("get games", gameListRequest, (gameList: IuiGetGameListResponse) => {
       console.log("gameList", gameList);
       this.setState({ gameItemList: gameList.games, isFetching: false });
     });
@@ -114,8 +121,8 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
     return "Error";
   };
 
-  joinGame = (joinGameRequest: IJoinLeaveGameRequest) => {
-    socket.emit("join game", joinGameRequest, (response: IJoinLeaveGameResponse) => {
+  joinGame = (joinGameRequest: IuiJoinLeaveGameRequest) => {
+    socket.emit("join game", joinGameRequest, (response: IuiJoinLeaveGameResponse) => {
       console.log("join response", response);
       this.setState({ loginStatus: response.loginStatus, joinLeaveStatus: response.joinLeaveResult });
       if (response.loginStatus !== LOGIN_RESPONSE.ok || response.joinLeaveResult === JOIN_LEAVE_RESULT.notOk) {
@@ -124,8 +131,8 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
     });
   };
 
-  leaveGame = (leaveGameRequest: IJoinLeaveGameRequest) => {
-    socket.emit("leave game", leaveGameRequest, (response: IJoinLeaveGameResponse) => {
+  leaveGame = (leaveGameRequest: IuiJoinLeaveGameRequest) => {
+    socket.emit("leave game", leaveGameRequest, (response: IuiJoinLeaveGameResponse) => {
       console.log("leave response", response);
       this.setState({ loginStatus: response.loginStatus, joinLeaveStatus: response.joinLeaveResult });
       if (response.loginStatus !== LOGIN_RESPONSE.ok || response.joinLeaveResult === JOIN_LEAVE_RESULT.notOk) {
@@ -138,7 +145,7 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
     if (this.state.gameItemList.length === 0) {
       return "No open games at the moment, why don't you just create one by your self?";
     }
-    return this.state.gameItemList.map(({created, id, rules, humanPlayers, imInTheGame, playerCount, gameHasPassword}: IGameListItem) => {
+    return this.state.gameItemList.map(({created, id, rules, humanPlayers, imInTheGame, playerCount, gameHasPassword}: IuiGameListItem) => {
       return(
         <GameItem
           key={id}
@@ -161,7 +168,7 @@ class OpenGamesList extends React.Component<Record<string, never>, IState> {
     const gameId = this.state.gameId;
     const method = this.state.method;
     if (gameId.length > 0 && method !== null) {
-      const request: IJoinLeaveGameRequest = {
+      const request: IuiJoinLeaveGameRequest = {
         myId: this.getMyId(),
         gameId: gameId,
         myName: values.myName,

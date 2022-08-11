@@ -2,7 +2,7 @@ import { insertNewGame, hasOngoingOrCreatedGame } from "../dbActions/promiseweb"
 import { checkLogin } from "../dbActions/users";
 import { getPlayerStats, getGameRoundCount } from "../common/common";
 import { IGameOptions} from "../interfaces/IGameOptions";
-import { ICreateGameRequest, ICreateGameResponse, CREATE_GAME_STATUS } from "../../frontend/src/interfaces/IuiNewGame";
+import { IuiCreateGameRequest, IuiCreateGameResponse, CREATE_GAME_STATUS } from "../../frontend/src/interfaces/IuiNewGame";
 import { GAME_STATUS, HIDDEN_CARDS_MODE } from "../../frontend/src/interfaces/IuiGameOptions";
 import { ICheckLoginRequest  } from "../interfaces/IUser";
 import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
@@ -17,7 +17,7 @@ const hiddenCardsModeToEnum = (selected: string): HIDDEN_CARDS_MODE => {
   }
 };
 
-const createGameOptions = (values: ICreateGameRequest): IGameOptions => {
+const createGameOptions = (values: IuiCreateGameRequest): IGameOptions => {
   return {
     humanPlayersCount: parseInt(values.newGameHumanPlayersCount, 10),
     botPlayersCount: 0,
@@ -43,8 +43,8 @@ const createGameOptions = (values: ICreateGameRequest): IGameOptions => {
   } as IGameOptions;
 };
 
-const createGame = async (createGameRequest: ICreateGameRequest): Promise<ICreateGameResponse> => {
-  const response: ICreateGameResponse = {
+const createGame = async (createGameRequest: IuiCreateGameRequest): Promise<IuiCreateGameResponse> => {
+  const response: IuiCreateGameResponse = {
     responseStatus: CREATE_GAME_STATUS.notOk,
     newGameId: "",
     loginStatus: LOGIN_RESPONSE.ok

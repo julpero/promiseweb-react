@@ -6,15 +6,15 @@ import Chat from "../components/Chat";
 import PromiseTable from "../components/PromiseTable";
 import ScoreBoard from "../components/ScoreBoard";
 
-import { IGetGameInfoRequest, IGetGameInfoResponse, IGetRoundRequest, IGetRoundResponse } from "../interfaces/IuiPlayingGame";
+import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse } from "../interfaces/IuiPlayingGame";
 
 interface IProps {
   gameId: string,
 }
 
 interface IState {
-  gameInfo: IGetGameInfoResponse | null,
-  roundInfo: IGetRoundResponse | null,
+  gameInfo: IuiGetGameInfoResponse | null,
+  roundInfo: IuiGetRoundResponse | null,
 }
 
 class GameTable extends React.Component<IProps, IState> {
@@ -25,20 +25,20 @@ class GameTable extends React.Component<IProps, IState> {
   componentDidMount() {
     console.log("gametable did mount, gameId", this.props.gameId);
     if (this.props.gameId !== "") {
-      const getGameInfoRequest: IGetGameInfoRequest = {
+      const getGameInfoRequest: IuiGetGameInfoRequest = {
         myId: this.getMyId(),
         gameId: this.props.gameId,
       };
-      socket.emit("check game", getGameInfoRequest, (gameInfo: IGetGameInfoResponse) => {
+      socket.emit("check game", getGameInfoRequest, (gameInfo: IuiGetGameInfoResponse) => {
         console.log("gameInfo", gameInfo);
 
-        const getRoundRequest: IGetRoundRequest = {
+        const getRoundRequest: IuiGetRoundRequest = {
           myId: this.getMyId(),
           gameId: this.props.gameId,
           round: gameInfo.currentRound ?? 0,
         };
 
-        socket.emit("get round", getRoundRequest, (roundResponse: IGetRoundResponse) => {
+        socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
           console.log("roundResponse", roundResponse);
           this.setState({gameInfo: gameInfo, roundInfo: roundResponse});
         });

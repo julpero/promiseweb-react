@@ -1,8 +1,8 @@
 import React from "react";
-import { IGetRoundResponse } from "../interfaces/IuiPlayingGame";
+import { IuiGetRoundResponse } from "../interfaces/IuiPlayingGame";
 
 interface IProps {
-  roundInfo: IGetRoundResponse | null,
+  roundInfo: IuiGetRoundResponse | null,
 }
 
 /**
