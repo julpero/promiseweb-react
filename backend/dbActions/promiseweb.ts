@@ -27,18 +27,23 @@ export const hasOngoingOrCreatedGame = async (playerId: string): Promise<boolean
 };
 
 export const getLastGameByStatus = async (playerId: string, status: GAME_STATUS): Promise<ILastGameStatusResponse | null> => {
-  const gamesInDb = await GameOptions.find({
-    gameStatus: { $eq: status },
-    "humanPlayers.playerId": { $eq: playerId },
-  });
-  if (gamesInDb && gamesInDb.length > 0) {
-    const gameInDb = gamesInDb.pop();
-    return {
-      gameId: gameInDb?._id.toString() ?? "",
-      asAPlayer: gameInDb?.humanPlayers.find(player => player.playerId === playerId)?.name ?? "",
-      currentRound: gameInDb?.game.rounds.find(round => round.roundStatus === ROUND_STATUS.OnGoing)?.roundIndex ?? -1,
-    } as ILastGameStatusResponse;
-  } else {
+  try {
+    const gamesInDb = await GameOptions.find({
+      gameStatus: { $eq: status },
+      "humanPlayers.playerId": { $eq: playerId },
+    });
+    if (gamesInDb && gamesInDb.length > 0) {
+      const gameInDb = gamesInDb.pop();
+      return {
+        gameId: gameInDb?._id.toString() ?? "",
+        asAPlayer: gameInDb?.humanPlayers.find(player => player.playerId === playerId)?.name ?? "",
+        currentRound: gameInDb?.game.rounds.find(round => round.roundStatus === ROUND_STATUS.OnGoing)?.roundIndex ?? -1,
+      } as ILastGameStatusResponse;
+    } else {
+      return null;
+    }
+  } catch (error: unknown) {
+    console.log(error);
     return null;
   }
 };

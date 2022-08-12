@@ -1,8 +1,20 @@
 import React from "react";
+import { IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
 
-class OtherPlayer extends React.Component {
+interface IProps {
+  player: IuiRoundPlayer,
+  colCount: number,
+}
+
+class OtherPlayer extends React.Component<IProps> {
+
   render() {
-    return <div>OtherPlayer</div>;
+    const { colCount } = this.props;
+    return (
+      <div className={`col-${colCount}`}>
+        OtherPlayer
+      </div>
+    );
   }
 }
 
