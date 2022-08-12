@@ -5,6 +5,8 @@ import {
   IuiGetGameInfoResponse,
   IuiGetRoundRequest,
   IuiGetRoundResponse,
+  IuiMakePromiseRequest,
+  IuiMakePromiseResponse,
   IuiParsedHumanPlayer,
   IuiPlayerPromise,
   IuiPlayerStats,
@@ -16,10 +18,10 @@ import {
 import { getPlayerNameById, getPlayerNameInPlayerOrder } from "../common/common";
 import { isRuleActive, rulesToRuleObj } from "../common/model";
 import { getGame, getGameWithPlayer } from "../dbActions/playingGame";
-import { ICardPlayed, IGameOptions, IRound } from "../interfaces/IGameOptions";
+import { ICardPlayed, IGameOptions, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 
 export const getRound = async (getRoundObj: IuiGetRoundRequest): Promise<IuiGetRoundResponse | null> => {
-  const {gameId, myId, round} = getRoundObj;
+  const {gameId, myId, roundInd} = getRoundObj;
   const gameInDb = await getGame(gameId);
 
   if (!gameInDb || !gameInDb.humanPlayers.find(player => player.playerId === myId)) {
@@ -30,9 +32,9 @@ export const getRound = async (getRoundObj: IuiGetRoundRequest): Promise<IuiGetR
 
   const roundResponse: IuiGetRoundResponse = {
     gameId: gameId,
-    roundInd: round,
+    roundInd: roundInd,
     myName: myName,
-    roundToPlayer: roundToPlayer(gameInDb, round, myName),
+    roundToPlayer: roundToPlayer(gameInDb, roundInd, myName),
   };
   return roundResponse;
 };
@@ -63,6 +65,7 @@ const getMyCards = (myName: string, round: IRound, speedPromise: boolean): IuiCa
       return {
         suite: card.suite,
         value: card.value,
+        rank: card.rank,
       } as IuiCard;
     }) ?? [];
   } else {
@@ -77,7 +80,7 @@ const getCurrentPlayIndex = (round: IRound): number => {
 const getPlayerPlayedCard = (playerName: string, cardsPlayed: ICardPlayed[], returnCard: boolean): IuiCard | null => {
   const cardPlayed = cardsPlayed.find(cardPlayed => cardPlayed.name === playerName);
   if (cardPlayed) {
-    return returnCard ? cardPlayed.card : { suite: "dummy", value: 0 } as IuiCard;
+    return returnCard ? cardPlayed.card : { suite: "dummy", value: 0, rank: "" } as IuiCard;
   }
   return null;
 };
@@ -94,7 +97,7 @@ const getRoundPlayers = (myName: string, round: IRound, playIndex: number, showP
       thisIsMe: thisIsMe,
       dealer: round.dealerPositionIndex === idx,
       name: player.name,
-      promise: showPromises || thisIsMe ? player.promise : (player.promise == null) ? null : -1,
+      promise: showPromises || thisIsMe ? player.promise : (player.promise === null) ? null : -1,
       keeps: player.keeps,
       cardPlayed: getPlayerPlayedCard(player.name, round.cardsPlayed[playIndex], returnCard),
       speedPromisePoints: player.speedPromisePoints,
@@ -141,6 +144,20 @@ const getPromiseTable = (gameInDb: IGameOptions): IuiPromiseTable => {
   } as IuiPromiseTable;
 };
 
+const isMyPromiseTurn = (myName: string, round: IRound): boolean => {
+  if (round.roundPlayers.some(player => player.promise === null)) {
+    const playerCount = round.roundPlayers.length;
+    const { starterPositionIndex } = round;
+    for (let i = starterPositionIndex; i < starterPositionIndex + playerCount; i++) {
+      const checkInd = i > playerCount ? i - playerCount : i;
+      if (round.roundPlayers[checkInd].promise === null) {
+        return round.roundPlayers[checkInd].name === myName;
+      }
+    }
+  }
+  return false;
+};
+
 const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerName: string): IuiRoundToPlayer => {
   const round = gameInDb.game.rounds[roundInd];
   const playIndex = getCurrentPlayIndex(round);
@@ -159,6 +176,8 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerName: str
     doReloadInit: false, // TODO
     newRound: false, // TODO
     gameOver: false, // TODO
+    isMyTurn: true, // TODO
+    isMyPromiseTurn: isMyPromiseTurn(playerName, round), // TODO
     handValues: null, // TODO getHandValues(thisGame, roundInd),
     obsGame: null, // TODO obsGameToRoundObj
     promiseTable: getPromiseTable(gameInDb),
@@ -193,4 +212,8 @@ const gameToGameInfo = (gameIdStr: string, gameInDb: IGameOptions): IuiGetGameIn
     thisIsDemoGame: gameInDb.thisIsDemoGame,
     rules: rulesToRuleObj(gameInDb),
   } as IuiGetGameInfoResponse;
+};
+
+export const makePromise = async (makePromiseRequest: IuiMakePromiseRequest): Promise<IuiMakePromiseResponse | null> => {
+  return null;
 };

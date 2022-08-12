@@ -16,8 +16,8 @@ import { CREATE_GAME_STATUS, IuiCreateGameRequest, IuiCreateGameResponse } from 
 import { IuiGetGameListRequest, IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IuiGameList";
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "./frontend/src/interfaces/IuiCheckIfOngoingGame";
 import { IuiChatObj } from "./frontend/src/interfaces/IuiChat";
-import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse } from "./frontend/src/interfaces/IuiPlayingGame";
-import { getGameInfo, getRound } from "./backend/actions/playingGame";
+import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse } from "./frontend/src/interfaces/IuiPlayingGame";
+import { getGameInfo, getRound, makePromise } from "./backend/actions/playingGame";
 
 // Routes
 // not defined
@@ -140,6 +140,18 @@ connectDB().then(() => {
       }
 
       fn(roundResponse);
+    });
+
+    socket.on("make promise", async (makePromiseRequest: IuiMakePromiseRequest, fn: (promiseResponse: IuiMakePromiseResponse) => void) => {
+      console.log("make promise", makePromiseRequest);
+      if (!makePromiseRequest.gameId || !makePromiseRequest.myId) {
+        return null;
+      }
+      const promiseResponse: IuiMakePromiseResponse | null = await makePromise(makePromiseRequest);
+      if (promiseResponse === null) {
+        return null;
+      }
+      fn(promiseResponse);
     });
 
     socket.on("write chat", async (chatObj: IuiChatObj ) => {

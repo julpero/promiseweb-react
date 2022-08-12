@@ -1,3 +1,4 @@
+import { IuiMakePromiseRequest, IuiMakePromiseResponse, PROMISE_RESPONSE } from "../../frontend/src/interfaces/IuiPlayingGame";
 import { IGameOptions } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
 
@@ -13,4 +14,16 @@ export const getGameWithPlayer = async (gameIdStr: string, playerId: string): Pr
   } else {
     return null;
   }
+};
+
+export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequest): Promise<IuiMakePromiseResponse> => {
+  const { gameId, myId } = makePromiseRequest;
+  const promiseResponse: IuiMakePromiseResponse = {
+    promiseResponse: PROMISE_RESPONSE.unknownError,
+  }
+  const gameIndDb = await getGameWithPlayer(gameId, myId);
+  if (gameIndDb) {
+    if (gameIndDb.game.rounds.)
+  }
+  return promiseResponse;
 };

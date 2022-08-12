@@ -6,10 +6,17 @@ export type CardValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 
 export type Suite = "hearts" | "spades" | "diamonds" | "clubs" | "dummy";
 export type PromiseValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
+export enum PROMISE_RESPONSE {
+  promiseOk,
+  notMyTurn,
+  noPromisePhase,
+  unknownError,
+}
+
 export interface IuiGetRoundRequest {
   gameId: string,
   myId: string,
-  round: number,
+  roundInd: number,
 }
 
 export interface IuiGetRoundResponse {
@@ -51,6 +58,7 @@ export interface IuiGetGameInfoResponse {
 export interface IuiCard {
   suite: Suite,
   value: CardValue,
+  rank: string,
 }
 
 export interface IuiRoundPlayer {
@@ -103,6 +111,20 @@ export interface IuiRoundToPlayer {
   doReloadInit: boolean,
   newRound: boolean,
   gameOver: boolean,
+  isMyTurn: boolean,
+  isMyPromiseTurn: boolean,
   handValues: null, // TODO getHandValues(thisGame, roundInd),
   obsGame: null, // TODO obsGameToRoundObj
+}
+
+export interface IuiMakePromiseRequest {
+  gameId: string,
+  roundInd: number,
+  myId: string,
+  promise: number,
+  isSpeedPromise: boolean,
+}
+
+export interface IuiMakePromiseResponse {
+  promiseResponse: PROMISE_RESPONSE,
 }

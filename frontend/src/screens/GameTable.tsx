@@ -35,7 +35,7 @@ class GameTable extends React.Component<IProps, IState> {
         const getRoundRequest: IuiGetRoundRequest = {
           myId: this.getMyId(),
           gameId: this.props.gameId,
-          round: gameInfo.currentRound ?? 0,
+          roundInd: gameInfo.currentRound ?? 0,
         };
 
         socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {

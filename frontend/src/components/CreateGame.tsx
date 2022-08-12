@@ -40,9 +40,10 @@ class CreateGame extends React.Component<IProps, IState> {
 
   static socket = SocketContext;
   initialValues: IuiNewGameForm = initialNewGameValues;
+  getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
 
   onSubmit = (values: IuiNewGameForm) => {
-    const playerId: string = window.localStorage.getItem("uUID") ?? "ERROR";
+    const playerId: string = this.getMyId();
     const newGameRequest: IuiCreateGameRequest = {...values, playerId };
     socket.emit("create game", newGameRequest, (createGameResponse: IuiCreateGameResponse) => {
       this.setState({
