@@ -10,11 +10,20 @@ interface IProps {
   myTurn: boolean,
 }
 
-class PromiseButtons extends React.Component<IProps> {
+interface IState {
+  clicked: boolean,
+}
+
+class PromiseButtons extends React.Component<IProps, IState> {
+  state: IState = {
+    clicked: false,
+  };
+
   static socket = SocketContext;
   getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
 
   doPromise = (promise: number) => {
+    this.setState({clicked: true});
     const promiseRequest: IuiMakePromiseRequest = {
       gameId: this.props.gameId,
       roundInd: this.props.roundInd,
@@ -24,15 +33,16 @@ class PromiseButtons extends React.Component<IProps> {
     };
     socket.emit("make promise", promiseRequest, (promiseResponse: IuiMakePromiseResponse) => {
       console.log("promiseResponse", promiseResponse);
+      this.setState({clicked: false});
     });
   };
 
   renderPromiseButtons = (): JSX.Element[] => {
     const {cardsInRound, myTurn} = this.props;
     const buttons: JSX.Element[] = [];
-    buttons.push(<div key={0} className="col"><Button onClick={() => this.doPromise(0)} disabled={!myTurn}>0</Button></div>);
+    buttons.push(<div key={0} className="col"><Button onClick={() => this.doPromise(0)} disabled={!myTurn || this.state.clicked}>0</Button></div>);
     for (let i = 1; i <= cardsInRound; i++) {
-      buttons.push(<div key={i} className="col"><Button onClick={() => this.doPromise(i)} disabled={!myTurn}>{i}</Button></div>);
+      buttons.push(<div key={i} className="col"><Button onClick={() => this.doPromise(i)} disabled={!myTurn || this.state.clicked}>{i}</Button></div>);
     }
     return buttons;
   };

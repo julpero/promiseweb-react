@@ -3,6 +3,7 @@ import GameOptions from "../models/GameOptions";
 import { IGameOptions } from "../interfaces/IGameOptions";
 import { GAME_STATUS, ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { IuiGameReport } from "../../frontend/src/interfaces/IuiReports";
+import { getCurrentRoundInd } from "../common/common";
 
 export interface ILastGameStatusResponse {
   gameId: string,
@@ -37,7 +38,7 @@ export const getLastGameByStatus = async (playerId: string, status: GAME_STATUS)
       return {
         gameId: gameInDb?._id.toString() ?? "",
         asAPlayer: gameInDb?.humanPlayers.find(player => player.playerId === playerId)?.name ?? "",
-        currentRound: gameInDb?.game.rounds.find(round => round.roundStatus === ROUND_STATUS.OnGoing)?.roundIndex ?? -1,
+        currentRound: gameInDb ? getCurrentRoundInd(gameInDb.game) : -1,
       } as ILastGameStatusResponse;
     } else {
       return null;

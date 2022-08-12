@@ -53,6 +53,7 @@ export interface IGame {
 // IPlayerOrderPlayer
 export interface IPlayer {
   name: string,
+  playerId: string,
   type: PlayerType,
 }
 
@@ -130,4 +131,8 @@ export interface ICardPlayed {
   card: ICard,
   playedTime: number,
   playStarted: number,
+}
+
+export interface IPromiser extends IPlayer {
+  index: number,
 }

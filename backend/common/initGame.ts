@@ -1,7 +1,7 @@
 import { knuthShuffle } from "knuth-shuffle";
 import { Card, DeckOfCards, Suite } from "card-games-typescript";
 import { ICardPlayed, IGameOptions, IGame, IPlayer, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
-import { getPlayerNameInPlayerOrder } from "./common";
+import { getPlayerIdInPlayerOrder, getPlayerNameInPlayerOrder } from "./common";
 import { GAME_STATUS, ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { startRound } from "./game";
 
@@ -72,6 +72,7 @@ const initRound = (roundIndex: number, cardsInRound: number, players: IPlayer[] 
     const sortedCards = sortCards(playerCards);
     roundPlayers.push({
       name: getPlayerNameInPlayerOrder(player),
+      playerId: getPlayerIdInPlayerOrder(player),
       cards: sortedCards,
       promise: null,
       promiseStarted: null,

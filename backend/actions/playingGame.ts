@@ -15,9 +15,9 @@ import {
   IuiRoundToPlayer,
   IuiRoundTotalPromise,
 } from "../../frontend/src/interfaces/IuiPlayingGame";
-import { getPlayerNameById, getPlayerNameInPlayerOrder } from "../common/common";
+import { getPlayerNameById, getPlayerNameInPlayerOrder, getPromiser } from "../common/common";
 import { isRuleActive, rulesToRuleObj } from "../common/model";
-import { getGame, getGameWithPlayer } from "../dbActions/playingGame";
+import { getGame, getGameWithPlayer, makePromiseToPlayer } from "../dbActions/playingGame";
 import { ICardPlayed, IGameOptions, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 
 export const getRound = async (getRoundObj: IuiGetRoundRequest): Promise<IuiGetRoundResponse | null> => {
@@ -145,17 +145,7 @@ const getPromiseTable = (gameInDb: IGameOptions): IuiPromiseTable => {
 };
 
 const isMyPromiseTurn = (myName: string, round: IRound): boolean => {
-  if (round.roundPlayers.some(player => player.promise === null)) {
-    const playerCount = round.roundPlayers.length;
-    const { starterPositionIndex } = round;
-    for (let i = starterPositionIndex; i < starterPositionIndex + playerCount; i++) {
-      const checkInd = i > playerCount ? i - playerCount : i;
-      if (round.roundPlayers[checkInd].promise === null) {
-        return round.roundPlayers[checkInd].name === myName;
-      }
-    }
-  }
-  return false;
+  return getPromiser(round)?.name === myName;
 };
 
 const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerName: string): IuiRoundToPlayer => {
@@ -215,5 +205,6 @@ const gameToGameInfo = (gameIdStr: string, gameInDb: IGameOptions): IuiGetGameIn
 };
 
 export const makePromise = async (makePromiseRequest: IuiMakePromiseRequest): Promise<IuiMakePromiseResponse | null> => {
-  return null;
+  const promiseResponse = await makePromiseToPlayer(makePromiseRequest);
+  return promiseResponse;
 };
