@@ -25,7 +25,11 @@ class CardBoard extends React.Component<IProps> {
         );
       }
       default: {
-        return <div>CardBoard</div>;
+        return (
+          <div>
+            CardBoard
+          </div>
+        );
       }
     }
   }
