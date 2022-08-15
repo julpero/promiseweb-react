@@ -38,7 +38,7 @@ function GameTable (props: IProps) {
         socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
           console.log("roundResponse", roundResponse);
           setGameInfo(gameInfo);
-          setRoundInfo(roundInfo);
+          setRoundInfo(roundResponse);
         });
       });
     }
