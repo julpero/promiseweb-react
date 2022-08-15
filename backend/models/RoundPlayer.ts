@@ -4,6 +4,7 @@ import cardSchema from "./Card";
 
 const roundPlayerSchema = new Schema<IRoundPlayer>({
   name: {type: String, required: true},
+  playerId: {type: String, required: false},
   cards: [cardSchema],
   promise: {type: Number, required: false},
   promiseStarted: {type: Number, required: false},
