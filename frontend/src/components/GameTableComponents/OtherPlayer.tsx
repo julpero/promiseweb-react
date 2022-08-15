@@ -1,6 +1,6 @@
 import React from "react";
 import { renderCardSlots } from "../../common/playingGame";
-import { IuiCard, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
+import { IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
 
 interface IProps {
   /** index goes clockwise, starting from you 0 and rest players from 1 to 5 */
@@ -16,7 +16,7 @@ class OtherPlayer extends React.Component<IProps> {
     if (index === 0) return null;
     return (
       <div className="row">
-        {renderCardSlots(maxCards)}
+        {renderCardSlots(maxCards, [])}
       </div>
     );
   };

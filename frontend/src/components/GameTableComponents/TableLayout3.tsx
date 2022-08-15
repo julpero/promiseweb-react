@@ -1,8 +1,7 @@
 import React from "react";
-import { renderCardSlots } from "../../common/playingGame";
 import { IuiGetGameInfoResponse, IuiGetRoundResponse, IuiRoundPlayer, IuiRoundToPlayer } from "../../interfaces/IuiPlayingGame";
 import OtherPlayer from "./OtherPlayer";
-import PromiseButtons from "./PromiseButtons";
+import OwnPlayer from "./OwnPlayer";
 import TrumpSlot from "./TrumpSlot";
 
 interface IProps {
@@ -61,17 +60,10 @@ class TableLayout3 extends React.Component<IProps> {
               />
             </div>
             <div className="col-9">
-              <div className="row">
-                {renderCardSlots(10)}
-              </div>
-              <div className="row">
-                <PromiseButtons
-                  gameId={roundInfo.gameId}
-                  roundInd={roundInfo.roundInd}
-                  cardsInRound={roundInfo.roundToPlayer.cardsInRound}
-                  myTurn={roundInfo.roundToPlayer.isMyPromiseTurn}
-                />
-              </div>
+              <OwnPlayer
+                gameInfo={gameInfo}
+                roundInfo={roundInfo}
+              />
             </div>
           </div>
         </div>
