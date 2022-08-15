@@ -62,7 +62,7 @@ function GameTable (props: IProps) {
           <Chat />
         </div>
         <div className="col-2">
-          buttons and menu
+          buttons and game menu
         </div>
       </div>
     </div>
