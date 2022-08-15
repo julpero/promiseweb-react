@@ -1,5 +1,5 @@
-import React from "react";
-import { socket, SocketContext } from "./socket";
+import React, { useEffect, useState } from "react";
+import { useSocket } from "./socket";
 
 import "./App.css";
 import { v4 as uuidv4 } from "uuid";
@@ -9,18 +9,14 @@ import GameTable from "./screens/GameTable";
 
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "./interfaces/IuiCheckIfOngoingGame";
 
-interface IState {
-  gameStatus: CHECK_GAME_STATUS,
-  gameId: string | null,
-}
+function App () {
+  const [gameStatus, setGameStatus] = useState(CHECK_GAME_STATUS.noGame);
+  const [gameId, setGameId] = useState("");
 
-class App extends React.Component<Record<string, never>, IState> {
-  state: IState = {
-    gameStatus: CHECK_GAME_STATUS.noGame,
-    gameId: null,
-  };
+  const { socket } = useSocket();
 
-  componentDidMount() {
+  useEffect(() => {
+
     if (window.localStorage.getItem("uUID")) {
       console.log("has uUid:", window.localStorage.getItem("uUID"));
     } else {
@@ -28,33 +24,31 @@ class App extends React.Component<Record<string, never>, IState> {
       console.log("uUID set: ", uuid);
       window.localStorage.setItem("uUID", uuid);
     }
+
     const checkGameRequest: IuiCheckIfOngoingGameRequest = {
       myId: window.localStorage.getItem("uUID") ?? "",
     };
-
     socket.emit("check if ongoing game", checkGameRequest, (response: IuiCheckIfOngoingGameResponse) => {
       console.log("check response", response);
-      this.setState({gameStatus: response.checkStatus, gameId: response.gameId});
+      setGameStatus(response.checkStatus);
+      setGameId(response.gameId ?? "");
     });
 
     socket.on("game begins", (gameId: string) => {
       console.log("game begins call");
       if (gameId !== "") {
-        this.setState({gameStatus: CHECK_GAME_STATUS.onGoingGame, gameId: gameId});
+        setGameStatus(CHECK_GAME_STATUS.onGoingGame);
+        setGameId(gameId);
       }
     });
-  }
+  }, []);
 
-  static socket = SocketContext;
+  console.log("render app...");
 
-  render(): React.ReactNode {
-    console.log("render app...");
-
-    if (this.state.gameStatus === CHECK_GAME_STATUS.onGoingGame && this.state.gameId !== "") {
-      return <GameTable gameId={this.state.gameId ?? ""} />;
-    } else {
-      return <HomeScreen />;
-    }
+  if (gameStatus === CHECK_GAME_STATUS.onGoingGame && gameId !== "") {
+    return <GameTable gameId={gameId ?? ""} />;
+  } else {
+    return <HomeScreen />;
   }
 }
 

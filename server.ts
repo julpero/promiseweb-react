@@ -6,6 +6,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import connectDB from "./backend/config/db";
+import { ClientToServerEvents, ServerToClientEvents } from "./frontend/src/socket/ISocket";
 
 import createGame from "./backend/actions/createGame";
 import { getOpenGamesList } from "./backend/actions/getGameList";
@@ -24,7 +25,7 @@ import { getGameInfo, getRound, makePromise } from "./backend/actions/playingGam
 
 const app: Application = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server<ClientToServerEvents, ServerToClientEvents>(server);
 
 dotenv.config();
 
