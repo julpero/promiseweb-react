@@ -10,82 +10,90 @@ import Button from "react-bootstrap/Button";
 interface IProps {
   onJoin: () => void,
   onLeave: () => void,
-  joinedGameId: string,
 }
 
-class GameItem extends React.Component<IuiGameListItem & IProps> {
-  dateFormatOptions: Intl.DateTimeFormatOptions = {
+function GameItem (props: IuiGameListItem & IProps) {
+  const joinGameClick = (): void => {
+    props.onJoin();
+  };
+
+  const leaveGameClick = (): void => {
+    props.onLeave();
+  };
+
+  const dateFormatOptions: Intl.DateTimeFormatOptions = {
     year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric", hour12: false
   };
 
-  renderDateStr = (dateAsStr: string): string => {
+  const renderDateStr = (dateAsStr: string): string => {
     const dateAsDate = new Date(dateAsStr);
-    return dateAsDate.toLocaleString("fi-FI", this.dateFormatOptions);
+    return dateAsDate.toLocaleString("fi-FI", dateFormatOptions);
   };
 
-  renderRuleList = () => {
-    return this.props.rules.ruleList.map((rule) => {
+  const renderRuleList = () => {
+    return props.rules.ruleList.map((rule) => {
       return (
         <li key={rule.toString()}>{ruleToStr(rule)}</li>
       );
     });
   };
 
-  renderHiddenCardsMode = () => {
-    if (this.props.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal) return null;
-    return <li>{hiddenCardsModeToStr(this.props.rules.hiddenCardsMode)}</li>;
+  // TODO
+  const renderHiddenCardsMode = () => {
+    if (props.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal) return null;
+    return <li>{hiddenCardsModeToStr(props.rules.hiddenCardsMode)}</li>;
   };
 
-  renderRules = () => {
-    if (this.props.rules.ruleList.length === 0 && this.props.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal) {
+  const renderRules = () => {
+    if (props.rules.ruleList.length === 0 && props.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal) {
       return null;
     } else {
       return(
         <ul>
-          {this.renderRuleList()}
+          {renderRuleList()}
         </ul>
       );
     }
   };
 
-  renderCreatedAndTurns = () => {
+  const renderCreatedAndTurns = () => {
     return (
       <React.Fragment>
         <div>
-          {this.renderDateStr(this.props.created.toString())}
+          {renderDateStr(props.created.toString())}
         </div>
         <div>
-          rounds: {this.props.rules.roundInfo.startRound.toString()}-{this.props.rules.roundInfo.turnRound.toString()}-{this.props.rules.roundInfo.endRound.toString()}
+          rounds: {props.rules.roundInfo.startRound.toString()}-{props.rules.roundInfo.turnRound.toString()}-{props.rules.roundInfo.endRound.toString()}
         </div>
       </React.Fragment>
     );
   };
 
-  renderEmptyPlayers = () => {
+  const renderEmptyPlayers = () => {
     const emptyPlayers: JSX.Element[] = [];
-    for (let i = this.props.humanPlayers.length; i < this.props.playerCount; i++) {
+    for (let i = props.humanPlayers.length; i < props.playerCount; i++) {
       emptyPlayers.push(<li key={i}>[ ]</li>);
     }
     return emptyPlayers;
   };
 
-  renderPlayerList = () => {
-    return this.props.humanPlayers.map(player => {
+  const renderPlayerList = () => {
+    return props.humanPlayers.map(player => {
       return <li key={player}>{player}</li>;
     });
   };
 
-  renderPlayers = () => {
+  const renderPlayers = () => {
     return (
       <ul>
-        {this.renderPlayerList()}
-        {this.renderEmptyPlayers()}
+        {renderPlayerList()}
+        {renderEmptyPlayers()}
       </ul>
     );
   };
 
-  renderPasswordField = () => {
-    if (this.props.gameHasPassword) {
+  const renderPasswordField = () => {
+    if (props.gameHasPassword) {
       return (
         <div>
           <Field<string>
@@ -93,7 +101,7 @@ class GameItem extends React.Component<IuiGameListItem & IProps> {
             component={TextInput}
             label="Enter game password"
             ispassword="true"
-            disabled={this.props.imInTheGame || this.props.joinedGameId.length > 0}
+            disabled={props.imInTheGame}
           />
           <hr />
         </div>
@@ -103,46 +111,44 @@ class GameItem extends React.Component<IuiGameListItem & IProps> {
     }
   };
 
-  renderButtons = () => {
+  const renderButtons = () => {
     return (
       <div className="d-grid gap-2">
         <Button
           variant="success"
-          onClick={this.props.onJoin}
-          disabled={this.props.imInTheGame || this.props.joinedGameId.length > 0}
+          onClick={joinGameClick}
+          disabled={props.imInTheGame}
         >JOIN GAME</Button>
         <Button
           variant="warning"
-          onClick={this.props.onLeave}
-          disabled={!this.props.imInTheGame}
+          onClick={leaveGameClick}
+          disabled={!props.imInTheGame}
         >LEAVE GAME</Button>
       </div>
     );
   };
 
-  render() {
-    return (
-      <Card>
-        <Card.Body>
-          <div className="row">
-            <div className="col-2">
-              {this.renderCreatedAndTurns()}
-            </div>
-            <div className="col-3">
-              {this.renderRules()}
-            </div>
-            <div className="col-2">
-              {this.renderPlayers()}
-            </div>
-            <div className="col-5">
-              {this.renderPasswordField()}
-              {this.renderButtons()}
-            </div>
+  return (
+    <Card>
+      <Card.Body>
+        <div className="row">
+          <div className="col-2">
+            {renderCreatedAndTurns()}
           </div>
-        </Card.Body>
-      </Card>
-    );
-  }
+          <div className="col-3">
+            {renderRules()}
+          </div>
+          <div className="col-2">
+            {renderPlayers()}
+          </div>
+          <div className="col-5">
+            {renderPasswordField()}
+            {renderButtons()}
+          </div>
+        </div>
+      </Card.Body>
+    </Card>
+  );
 }
 
 export default GameItem;

@@ -9,10 +9,10 @@ interface IProps {
   maxCards: number,
 }
 
-class OtherPlayer extends React.Component<IProps> {
+function OtherPlayer (props: IProps) {
 
-  renderCards = () => {
-    const { index, player, maxCards } = this.props;
+  const renderCards = () => {
+    const { index, player, maxCards } = props;
     if (index === 0) return null;
     return (
       <div className="row">
@@ -21,28 +21,26 @@ class OtherPlayer extends React.Component<IProps> {
     );
   };
 
-  render() {
-    const { index, player, maxCards } = this.props;
-    return (
-      <React.Fragment>
-        <div className="row">
-          <div className="col-3 nameCol playerNameCol">
-            {player.name}
-          </div>
-          <div className="col-3 playerInfoCol">
-            {player.promise}
-          </div>
-          <div className="col-2 playerInfoCol">
-            {player.keeps}
-          </div>
-          <div className="col-4 progressInfoCol">
-            {player.keeps}
-          </div>
+  const { index, player, maxCards } = props;
+  return (
+    <React.Fragment>
+      <div className="row">
+        <div className="col-3 nameCol playerNameCol">
+          {player.name}
         </div>
-        {this.renderCards()}
-      </React.Fragment>
-    );
-  }
+        <div className="col-3 playerInfoCol">
+          {player.promise}
+        </div>
+        <div className="col-2 playerInfoCol">
+          {player.keeps}
+        </div>
+        <div className="col-4 progressInfoCol">
+          {player.keeps}
+        </div>
+      </div>
+      {renderCards()}
+    </React.Fragment>
+  );
 }
 
 export default OtherPlayer;

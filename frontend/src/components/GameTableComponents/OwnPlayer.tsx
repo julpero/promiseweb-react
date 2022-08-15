@@ -8,25 +8,23 @@ interface IProps {
   roundInfo: IuiGetRoundResponse,
 }
 
-class OwnPlayer extends React.Component<IProps> {
-  render() {
-    const { gameInfo, roundInfo } = this.props;
-    return (
-      <React.Fragment>
-        <div className="row">
-          {renderCardSlots(10, roundInfo.roundToPlayer.myCards)}
-        </div>
-        <div className="row">
-          <PromiseButtons
-            gameId={roundInfo.gameId}
-            roundInd={roundInfo.roundInd}
-            cardsInRound={roundInfo.roundToPlayer.cardsInRound}
-            myTurn={roundInfo.roundToPlayer.isMyPromiseTurn}
-          />
-        </div>
-      </React.Fragment>
-    );
-  }
+function OwnPlayer (props: IProps) {
+  const { gameInfo, roundInfo } = props;
+  return (
+    <React.Fragment>
+      <div className="row">
+        {renderCardSlots(10, roundInfo.roundToPlayer.myCards)}
+      </div>
+      <div className="row">
+        <PromiseButtons
+          gameId={roundInfo.gameId}
+          roundInd={roundInfo.roundInd}
+          cardsInRound={roundInfo.roundToPlayer.cardsInRound}
+          myTurn={roundInfo.roundToPlayer.isMyPromiseTurn}
+        />
+      </div>
+    </React.Fragment>
+  );
 }
 
 export default OwnPlayer;

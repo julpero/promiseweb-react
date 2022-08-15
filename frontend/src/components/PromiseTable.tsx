@@ -9,51 +9,49 @@ interface IProps {
 /**
  * Promises made, table in bottom screen
  */
-class PromiseTable extends React.Component<IProps> {
-  renderPromiseTableHeader = () => {
-    if (!this.props.promiseTable) return null;
+function PromiseTable(props: IProps) {
+  const renderPromiseTableHeader = () => {
+    if (!props.promiseTable) return null;
     return (
-      this.props.promiseTable.rounds.map((round, idx) => {
+      props.promiseTable.rounds.map((round, idx) => {
         return <th key={idx}>{idx+1}</th>;
       })
     );
   };
 
-  renderPlayerPromises = (idx: number) => {
-    if (!this.props.promiseTable) return null;
+  const renderPlayerPromises = (idx: number) => {
+    if (!props.promiseTable) return null;
     return (
-      this.props.promiseTable.promisesByPlayers[idx].map((promise, idx) => {
+      props.promiseTable.promisesByPlayers[idx].map((promise, idx) => {
         return <td key={idx}>{promise.promise}</td>;
       })
     );
   };
 
-  renderPromiseTableBody = () => {
-    if (!this.props.promiseTable) return null;
+  const renderPromiseTableBody = () => {
+    if (!props.promiseTable) return null;
     return (
-      this.props.promiseTable.players.map((player, idx) => {
-        return <tr key={idx}><th>{player}</th>{this.renderPlayerPromises(idx)}</tr>;
+      props.promiseTable.players.map((player, idx) => {
+        return <tr key={idx}><th>{player}</th>{renderPlayerPromises(idx)}</tr>;
       })
     );
   };
 
-  render(): React.ReactNode {
-    return (
-      <div>
-        <Table>
-          <thead>
-            <tr>
-              <th />
-              {this.renderPromiseTableHeader()}
-            </tr>
-          </thead>
-          <tbody>
-            {this.renderPromiseTableBody()}
-          </tbody>
-        </Table>
-      </div>
-    );
-  }
+  return (
+    <div>
+      <Table>
+        <thead>
+          <tr>
+            <th />
+            {renderPromiseTableHeader()}
+          </tr>
+        </thead>
+        <tbody>
+          {renderPromiseTableBody()}
+        </tbody>
+      </Table>
+    </div>
+  );
 }
 
 export default PromiseTable;

@@ -1,42 +1,39 @@
-import React, { createRef } from "react";
-import { socket, SocketContext } from "../socket";
-
-interface IState {
-  textRows: string[],
-}
+import React, { createRef, useEffect, useState } from "react";
+import { useSocket } from "../socket";
 
 /**
  * Chat and log
  */
-class Chat extends React.Component<Record<string, never>, IState> {
-  state: IState = {
-    textRows: [],
-  };
+function Chat () {
+  const [textRows, setTextRows ] = useState<string[]>([]);
 
-  componentDidMount() {
+  useEffect(() => {
     socket.on("new chat line", (chatLine: string) => {
       console.log("got new chat line", chatLine);
-      this.setState({textRows: this.state.textRows.concat(chatLine)});
-      const scrollHeight = this.chatRef.current?.scrollHeight ?? 1;
-      if (this.chatRef.current) {
-        this.chatRef.current.scrollTop = scrollHeight;
+      setTextRows(textRows.concat(chatLine));
+      const scrollHeight =chatRef.current?.scrollHeight ?? 1;
+      if (chatRef.current) {
+        chatRef.current.scrollTop = scrollHeight;
       }
     });
-  }
+  }, []);
 
-  static socket = SocketContext;
+  const { socket } = useSocket();
 
-  private chatRef = createRef<HTMLTextAreaElement>();
+  const chatRef = createRef<HTMLTextAreaElement>();
 
-  renderChatLines = (): string => {
-    return this.state.textRows.join("\n")+"\n";
+  const renderChatLines = (): string => {
+    return textRows.join("\n")+"\n";
   };
 
-  render(): React.ReactNode {
-    return (
-      <textarea rows={5} ref={this.chatRef} readOnly value={this.renderChatLines()}></textarea>
-    );
-  }
+  return (
+    <textarea
+      rows={5}
+      ref={chatRef}
+      readOnly
+      value={renderChatLines()}
+    ></textarea>
+  );
 }
 
 export default Chat;

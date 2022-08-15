@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSocket } from "./socket";
 
 import "./App.css";
@@ -28,11 +28,7 @@ function App () {
     const checkGameRequest: IuiCheckIfOngoingGameRequest = {
       myId: window.localStorage.getItem("uUID") ?? "",
     };
-    socket.emit("check if ongoing game", checkGameRequest, (response: IuiCheckIfOngoingGameResponse) => {
-      console.log("check response", response);
-      setGameStatus(response.checkStatus);
-      setGameId(response.gameId ?? "");
-    });
+    socket.emit("check if ongoing game", checkGameRequest, handleOnGoingResponse);
 
     socket.on("game begins", (gameId: string) => {
       console.log("game begins call");
@@ -41,9 +37,19 @@ function App () {
         setGameId(gameId);
       }
     });
-  }, []);
+
+    // return () => {
+    //   socket.off("check if ongoing game", handleOnGoingResponse);
+    // };
+  }, [socket, gameId, gameStatus]);
 
   console.log("render app...");
+
+  const handleOnGoingResponse = useCallback((response: IuiCheckIfOngoingGameResponse) => {
+    console.log("check response", response);
+    setGameStatus(response.checkStatus);
+    setGameId(response.gameId ?? "");
+  }, [gameId, gameStatus]);
 
   if (gameStatus === CHECK_GAME_STATUS.onGoingGame && gameId !== "") {
     return <GameTable gameId={gameId ?? ""} />;

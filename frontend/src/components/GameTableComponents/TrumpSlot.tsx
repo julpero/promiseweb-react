@@ -6,14 +6,12 @@ interface IProps {
   trump: IuiCard | null
 }
 
-class TrumpSlot extends React.Component<IProps> {
-  render() {
-    const { trump } = this.props;
-    if (!trump) return null;
-    return (
-      <CardSlot card={trump} />
-    );
-  }
+function TrumpSlot (props: IProps) {
+  const { trump } = props;
+  if (!trump) return null;
+  return (
+    <CardSlot card={trump} />
+  );
 }
 
 export default TrumpSlot;
