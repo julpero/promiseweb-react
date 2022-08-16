@@ -14,6 +14,7 @@ import {
   IuiRoundPlayer,
   IuiRoundToPlayer,
   IuiRoundTotalPromise,
+  ROUND_PHASE,
 } from "../../frontend/src/interfaces/IuiPlayingGame";
 import { getPlayerNameById, getPlayerNameInPlayerOrder, getPromiser } from "../common/common";
 import { isRuleActive, rulesToRuleObj } from "../common/model";
@@ -148,6 +149,14 @@ const isMyPromiseTurn = (myName: string, round: IRound): boolean => {
   return getPromiser(round)?.name === myName;
 };
 
+const getRoundPhase = (round: IRound): ROUND_PHASE => {
+  const playerCount = round.roundPlayers.length;
+  if (round.cardsPlayed.length === playerCount) return ROUND_PHASE.played;
+  if (round.roundPlayers.filter(player => player.promise !== null).length === playerCount) return ROUND_PHASE.onPlay;
+  if (round.roundPlayers.filter(player => player.promise !== null).length !== playerCount) return ROUND_PHASE.onPromises;
+  return ROUND_PHASE.initial;
+};
+
 const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerName: string): IuiRoundToPlayer => {
   const round = gameInDb.game.rounds[roundInd];
   const playIndex = getCurrentPlayIndex(round);
@@ -171,6 +180,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerName: str
     handValues: null, // TODO getHandValues(thisGame, roundInd),
     obsGame: null, // TODO obsGameToRoundObj
     promiseTable: getPromiseTable(gameInDb),
+    roundPhase: getRoundPhase(round), // TODO do i really need this?
   } as IuiRoundToPlayer;
 };
 

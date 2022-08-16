@@ -14,6 +14,13 @@ export enum PROMISE_RESPONSE {
   unknownError,
 }
 
+export enum ROUND_PHASE {
+  initial,
+  onPromises,
+  onPlay,
+  played,
+}
+
 export interface IuiGetRoundRequest {
   gameId: string,
   myId: string,
@@ -116,6 +123,7 @@ export interface IuiRoundToPlayer {
   isMyPromiseTurn: boolean,
   handValues: null, // TODO getHandValues(thisGame, roundInd),
   obsGame: null, // TODO obsGameToRoundObj
+  roundPhase: ROUND_PHASE,
 }
 
 export interface IuiMakePromiseRequest {
