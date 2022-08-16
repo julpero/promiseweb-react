@@ -1,5 +1,5 @@
 import React from "react";
-import { IuiGetGameInfoResponse, IuiGetRoundResponse, IuiRoundPlayer, IuiRoundToPlayer } from "../../interfaces/IuiPlayingGame";
+import { IuiGetGameInfoResponse, IuiGetRoundResponse, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
 import OtherPlayer from "./OtherPlayer";
 import OwnPlayer from "./OwnPlayer";
 import TrumpSlot from "./TrumpSlot";
