@@ -31,7 +31,7 @@ interface IFormFields {
 
 type MethodType = null | "join" | "leave";
 
-function OpenGamesList () {
+const OpenGamesList = () => {
   const [ gameId, setGameId] = useState("");
   const [ method, setMethod] = useState<MethodType>(null);
   // const [ isFetching, setIsFetching ] = useState(false);
@@ -242,7 +242,7 @@ function OpenGamesList () {
       </Modal>
     </React.Fragment>
   );
-}
+};
 
 const validateForm = (values: IFormFields ) => {
   console.log("validating form");

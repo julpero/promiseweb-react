@@ -6,7 +6,7 @@ interface IProps {
   card?: IuiCard | null,
 }
 
-function CardSlot (props: IProps) {
+const CardSlot = (props: IProps) => {
   const { card } = props;
   if (card === undefined) {
     return <div className="col"></div>;
@@ -18,6 +18,6 @@ function CardSlot (props: IProps) {
       </div>
     );
   }
-}
+};
 
 export default CardSlot;

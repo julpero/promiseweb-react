@@ -9,7 +9,7 @@ interface IProps {
   roundInfo: IuiGetRoundResponse,
 }
 
-function TableLayout3 (props: IProps) {
+const TableLayout3 = (props: IProps) => {
   const getMyPosition = (): number => {
     return props.roundInfo.roundToPlayer.players.findIndex(player => player.thisIsMe);
   };
@@ -68,6 +68,6 @@ function TableLayout3 (props: IProps) {
       </div>
     </div>
   );
-}
+};
 
 export default TableLayout3;

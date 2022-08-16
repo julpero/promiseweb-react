@@ -27,7 +27,7 @@ interface IProps {
   onCreateGame: () => void,
 }
 
-function CreateGame(props: IProps) {
+const CreateGame = (props: IProps) => {
   const [ loginStatus, setLoginStatus ] = useState<LOGIN_RESPONSE | null>(null);
   const [ createGameStatus, setCreateGameStatus ] = useState<CREATE_GAME_STATUS | null>(null);
 
@@ -410,7 +410,7 @@ function CreateGame(props: IProps) {
       </Modal>
     </React.Fragment>
   );
-}
+};
 
 const validateForm = (values: IuiNewGameForm) => {
   const errors: IFormValidationFields = {};

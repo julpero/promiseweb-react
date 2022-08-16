@@ -9,7 +9,7 @@ interface IProps {
   maxCards: number,
 }
 
-function OtherPlayer (props: IProps) {
+const OtherPlayer = (props: IProps) => {
 
   const renderCards = () => {
     const { index, player, maxCards } = props;
@@ -41,6 +41,6 @@ function OtherPlayer (props: IProps) {
       {renderCards()}
     </React.Fragment>
   );
-}
+};
 
 export default OtherPlayer;

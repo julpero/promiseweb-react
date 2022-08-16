@@ -4,7 +4,7 @@ import { useSocket } from "../socket";
 /**
  * Chat and log
  */
-function Chat () {
+const Chat = () => {
   const [textRows, setTextRows ] = useState<string[]>([]);
 
   useEffect(() => {
@@ -34,6 +34,6 @@ function Chat () {
       value={renderChatLines()}
     ></textarea>
   );
-}
+};
 
 export default Chat;

@@ -12,7 +12,7 @@ interface IProps {
   onLeave: () => void,
 }
 
-function GameItem (props: IuiGameListItem & IProps) {
+const GameItem = (props: IuiGameListItem & IProps) => {
   const joinGameClick = (): void => {
     props.onJoin();
   };
@@ -149,6 +149,6 @@ function GameItem (props: IuiGameListItem & IProps) {
       </Card.Body>
     </Card>
   );
-}
+};
 
 export default GameItem;

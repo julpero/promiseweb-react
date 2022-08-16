@@ -8,7 +8,7 @@ interface IProps {
   roundInfo: IuiGetRoundResponse,
 }
 
-function OwnPlayer (props: IProps) {
+const OwnPlayer = (props: IProps) => {
   const { gameInfo, roundInfo } = props;
   return (
     <React.Fragment>
@@ -25,6 +25,6 @@ function OwnPlayer (props: IProps) {
       </div>
     </React.Fragment>
   );
-}
+};
 
 export default OwnPlayer;

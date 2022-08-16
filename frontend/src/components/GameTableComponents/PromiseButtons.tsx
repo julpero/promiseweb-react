@@ -10,7 +10,7 @@ interface IProps {
   myTurn: boolean,
 }
 
-function PromiseButtons (props: IProps) {
+const PromiseButtons = (props: IProps) => {
   const [clicked, setClicked] = useState(false);
 
   const { socket } = useSocket();
@@ -45,6 +45,6 @@ function PromiseButtons (props: IProps) {
       {renderPromiseButtons()}
     </div>
   );
-}
+};
 
 export default PromiseButtons;

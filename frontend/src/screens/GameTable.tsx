@@ -12,7 +12,7 @@ interface IProps {
   gameId: string,
 }
 
-function GameTable (props: IProps) {
+const GameTable = (props: IProps) => {
   const [gameInfo, setGameInfo] = useState<IuiGetGameInfoResponse | null>(null);
   const [roundInfo, setRoundInfo] = useState<IuiGetRoundResponse | null>(null);
 
@@ -67,6 +67,6 @@ function GameTable (props: IProps) {
       </div>
     </div>
   );
-}
+};
 
 export default GameTable;

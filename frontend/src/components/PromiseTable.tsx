@@ -9,7 +9,7 @@ interface IProps {
 /**
  * Promises made, table in bottom screen
  */
-function PromiseTable(props: IProps) {
+const PromiseTable = (props: IProps) => {
   const renderPromiseTableHeader = () => {
     if (!props.promiseTable) return null;
     return (
@@ -52,6 +52,6 @@ function PromiseTable(props: IProps) {
       </Table>
     </div>
   );
-}
+};
 
 export default PromiseTable;

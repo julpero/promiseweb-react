@@ -10,7 +10,7 @@ interface IProps {
 /**
  * Cardboard, where the all fun happens
  */
-function CardBoard(props: IProps) {
+const CardBoard = (props: IProps) => {
   const { gameInfo, roundInfo } = props;
   if (!gameInfo || !roundInfo) return null;
 
@@ -31,6 +31,6 @@ function CardBoard(props: IProps) {
       );
     }
   }
-}
+};
 
 export default CardBoard;

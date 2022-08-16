@@ -5,7 +5,7 @@ import Accordion from "react-bootstrap/Accordion";
 import OpenGamesList from "../components/OpenGamesList";
 import CreateGame from "../components/CreateGame";
 
-function HomeScreen () {
+const HomeScreen = () => {
   const [selectedAccordion, setSelectedAccordion] = useState("");
 
   const accRef = createRef<HTMLHeadingElement>();
@@ -35,6 +35,6 @@ function HomeScreen () {
       </Accordion>
     </div>
   );
-}
+};
 
 export default HomeScreen;

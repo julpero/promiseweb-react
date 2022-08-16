@@ -9,7 +9,7 @@ import GameTable from "./screens/GameTable";
 
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "./interfaces/IuiCheckIfOngoingGame";
 
-function App () {
+const App = () => {
   const [gameStatus, setGameStatus] = useState(CHECK_GAME_STATUS.noGame);
   const [gameId, setGameId] = useState("");
 
@@ -56,6 +56,6 @@ function App () {
   } else {
     return <HomeScreen />;
   }
-}
+};
 
 export default App;
