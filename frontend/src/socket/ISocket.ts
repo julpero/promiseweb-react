@@ -1,13 +1,14 @@
 import { IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "../interfaces/IuiCheckIfOngoingGame";
 import { IuiGetGameListRequest, IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse } from "../interfaces/IuiGameList";
 import { IuiCreateGameRequest, IuiCreateGameResponse } from "../interfaces/IuiNewGame";
-import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse } from "../interfaces/IuiPlayingGame";
+import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse, IuiPromiseMadeNotification } from "../interfaces/IuiPlayingGame";
 
 export interface ServerToClientEvents {
   "new game created": (newGameId: string) => void;
   "game list updated": () => void;
   "game begins": (gameIdStr: string) => void;
   "new chat line": (chatLine: string) => void;
+  "promise made": (promiseNotification: IuiPromiseMadeNotification) => void;
 }
 
 export interface ClientToServerEvents {

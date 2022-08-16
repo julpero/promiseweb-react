@@ -41,7 +41,7 @@ const App = () => {
     // return () => {
     //   socket.off("check if ongoing game", handleOnGoingResponse);
     // };
-  }, [socket, gameId, gameStatus]);
+  }, [socket]);
 
   console.log("render app...");
 

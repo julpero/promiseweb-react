@@ -128,4 +128,11 @@ export interface IuiMakePromiseRequest {
 
 export interface IuiMakePromiseResponse {
   promiseResponse: PROMISE_RESPONSE,
+  promise: number,
+  promiser: string,
+}
+
+export interface IuiPromiseMadeNotification {
+  playerName: string,
+  promise: number,
 }

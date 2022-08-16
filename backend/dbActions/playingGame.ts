@@ -23,6 +23,8 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
   const { gameId, myId, roundInd, promise } = makePromiseRequest;
   const promiseResponse: IuiMakePromiseResponse = {
     promiseResponse: PROMISE_RESPONSE.unknownError,
+    promise: promise,
+    promiser: "",
   };
 
   const query = GameOptions.where({
@@ -58,6 +60,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
       const gameAfter = await gameInDb.save();
       if (gameAfter) {
         promiseResponse.promiseResponse = PROMISE_RESPONSE.promiseOk;
+        promiseResponse.promiser = promiser.name;
       }
     }
   }

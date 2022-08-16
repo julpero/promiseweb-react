@@ -6,38 +6,57 @@ import Chat from "../components/Chat";
 import PromiseTable from "../components/PromiseTable";
 import ScoreBoard from "../components/ScoreBoard";
 
-import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse } from "../interfaces/IuiPlayingGame";
+import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiPromiseMadeNotification } from "../interfaces/IuiPlayingGame";
 
 interface IProps {
   gameId: string,
 }
 
-const GameTable = (props: IProps) => {
+const GameTable = ({gameId}: IProps) => {
   const [gameInfo, setGameInfo] = useState<IuiGetGameInfoResponse | null>(null);
   const [roundInfo, setRoundInfo] = useState<IuiGetRoundResponse | null>(null);
 
   const { socket } = useSocket();
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
 
+  let roundInd = -1;
+
   useEffect(() => {
-    console.log("gametable did mount, gameId", props.gameId);
-    if (props.gameId !== "") {
+    console.log("gametable did mount, gameId", gameId);
+    if (gameId !== "") {
       const getGameInfoRequest: IuiGetGameInfoRequest = {
         myId: getMyId(),
-        gameId: props.gameId,
+        gameId: gameId,
       };
       socket.emit("check game", getGameInfoRequest, (gameInfo: IuiGetGameInfoResponse) => {
         console.log("gameInfo", gameInfo);
 
+        roundInd = gameInfo.currentRound ?? 0;
+
         const getRoundRequest: IuiGetRoundRequest = {
           myId: getMyId(),
-          gameId: props.gameId,
-          roundInd: gameInfo.currentRound ?? 0,
+          gameId: gameId,
+          roundInd: roundInd,
         };
 
         socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
           console.log("roundResponse", roundResponse);
           setGameInfo(gameInfo);
+          setRoundInfo(roundResponse);
+        });
+      });
+
+      socket.on("promise made", (promiseNotification: IuiPromiseMadeNotification) => {
+        console.log("promise made", promiseNotification);
+
+        const getRoundRequest: IuiGetRoundRequest = {
+          myId: getMyId(),
+          gameId: gameId,
+          roundInd: roundInd,
+        };
+
+        socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
+          console.log("roundResponse after promise", roundResponse);
           setRoundInfo(roundResponse);
         });
       });

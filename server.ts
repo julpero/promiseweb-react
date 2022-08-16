@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import path from "path";
 import connectDB from "./backend/config/db";
 import { ClientToServerEvents, ServerToClientEvents } from "./frontend/src/socket/ISocket";
+import * as csm from "./backend/socket/clientSocketMapper";
 
 import createGame from "./backend/actions/createGame";
 import { getOpenGamesList } from "./backend/actions/getGameList";
@@ -17,7 +18,7 @@ import { CREATE_GAME_STATUS, IuiCreateGameRequest, IuiCreateGameResponse } from 
 import { IuiGetGameListRequest, IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IuiGameList";
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "./frontend/src/interfaces/IuiCheckIfOngoingGame";
 import { IuiChatObj } from "./frontend/src/interfaces/IuiChat";
-import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse } from "./frontend/src/interfaces/IuiPlayingGame";
+import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse, IuiPromiseMadeNotification, PROMISE_RESPONSE } from "./frontend/src/interfaces/IuiPlayingGame";
 import { getGameInfo, getRound, makePromise } from "./backend/actions/playingGame";
 
 // Routes
@@ -53,15 +54,30 @@ connectDB().then(() => {
 
   io.on("connection", (socket: Socket) => {
     console.log("connected!", socket.id);
+
     socket.on("disconnect", () => {
       console.warn("user disconnected", socket.id);
+      let gameIdStr: string | null = null;
+      const userName = csm.getUserNameFromMapBySocket(socket.id) ?? "unknown";
+      if (userName !== "unknown") {
+        gameIdStr = csm.getUserGamesFromMap(userName)?.values().next().value as string;
+        console.log("mapped gameIdStr", gameIdStr);
+      }
+      const chatLine = "player " + userName + " disconnected";
+      console.log("chat", chatLine);
+      if (gameIdStr !== null) {
+        io.to(gameIdStr).emit("new chat line", chatLine);
+      }
+      csm.removeUserFromMap(userName, socket.id, gameIdStr ?? "");
     });
 
     socket.on("create game", async (createGameRequest: IuiCreateGameRequest, fn: (createGameResponse: IuiCreateGameResponse) => void) => {
       const createGameResponse: IuiCreateGameResponse = await createGame(createGameRequest);
       if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
-        socket.join(createGameResponse.newGameId);
-        io.emit("new game created", createGameResponse.newGameId);
+        const gameIdStr = createGameResponse.newGameId;
+        socket.join(gameIdStr);
+        csm.addUserToMap(createGameRequest.newGameMyName, socket.id, gameIdStr);
+        io.emit("new game created", gameIdStr);
       }
       fn(createGameResponse);
     });
@@ -76,6 +92,7 @@ connectDB().then(() => {
       const joinResponse: IuiJoinLeaveGameResponse = await joinGame(joinGameRequest);
       if (joinResponse.joinLeaveResult !== JOIN_LEAVE_RESULT.notOk) {
         socket.join(gameIdStr);
+        csm.addUserToMap(joinGameRequest.myName, socket.id, gameIdStr);
         // notify other users
         io.emit("game list updated");
       }
@@ -105,6 +122,7 @@ connectDB().then(() => {
           const gameIdStr = checkResponse.gameId ?? "";
           const playerName = checkResponse.asAPlayer ?? "";
           socket.join(gameIdStr);
+          csm.addUserToMap(playerName, socket.id, gameIdStr);
           const chatLine = playerName + " joined game!";
           console.log("sending new chat line", chatLine, gameIdStr);
           io.to(gameIdStr).emit("new chat line", chatLine);
@@ -116,12 +134,12 @@ connectDB().then(() => {
     });
 
     socket.on("check game", async (getGameInfoRequest: IuiGetGameInfoRequest, fn: (gameInfoResponse: IuiGetGameInfoResponse) => void) => {
-      console.log("check game", getGameInfoRequest);
+      // console.log("check game", getGameInfoRequest);
       if (getGameInfoRequest.gameId === "" || getGameInfoRequest.myId === "") {
         return null;
       }
       const gameInfoResponse: IuiGetGameInfoResponse | null = await getGameInfo(getGameInfoRequest);
-      console.log("gameInfoResponse", gameInfoResponse);
+      // console.log("gameInfoResponse", gameInfoResponse);
       if (gameInfoResponse === null) {
         return null;
       }
@@ -130,12 +148,12 @@ connectDB().then(() => {
     });
 
     socket.on("get round", async (getRoundObj: IuiGetRoundRequest, fn: (roundResponse: IuiGetRoundResponse) => void) => {
-      console.log("get round", getRoundObj);
+      // console.log("get round", getRoundObj);
       if (getRoundObj.gameId === "") {
         return null;
       }
       const roundResponse: IuiGetRoundResponse | null = await getRound(getRoundObj);
-      console.log("roundResponse", roundResponse);
+      // console.log("roundResponse", roundResponse);
       if (roundResponse === null) {
         return null;
       }
@@ -145,12 +163,22 @@ connectDB().then(() => {
 
     socket.on("make promise", async (makePromiseRequest: IuiMakePromiseRequest, fn: (promiseResponse: IuiMakePromiseResponse) => void) => {
       console.log("make promise", makePromiseRequest);
-      if (!makePromiseRequest.gameId || !makePromiseRequest.myId) {
+      const gameIdStr = makePromiseRequest.gameId;
+      if (!gameIdStr || !makePromiseRequest.myId) {
         return null;
       }
       const promiseResponse: IuiMakePromiseResponse | null = await makePromise(makePromiseRequest);
       if (promiseResponse === null) {
         return null;
+      } else if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
+        const promiseNotification: IuiPromiseMadeNotification = {
+          playerName: promiseResponse.promiser,
+          promise: promiseResponse.promise,
+        };
+        io.to(gameIdStr).emit("promise made", promiseNotification);
+
+        const chatLine = `${promiseResponse.promiser} promised ${promiseResponse.promise}`;
+        io.to(gameIdStr).emit("new chat line", chatLine);
       }
       fn(promiseResponse);
     });
