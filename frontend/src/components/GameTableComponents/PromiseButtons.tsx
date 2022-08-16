@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSocket } from "../../socket";
 import { Button } from "react-bootstrap";
-import { IuiMakePromiseRequest, IuiMakePromiseResponse } from "../../interfaces/IuiPlayingGame";
+import { IuiMakePromiseRequest, IuiMakePromiseResponse, PROMISE_RESPONSE } from "../../interfaces/IuiPlayingGame";
 
 interface IProps {
   gameId: string,
@@ -28,7 +28,9 @@ const PromiseButtons = (props: IProps) => {
     };
     socket.emit("make promise", promiseRequest, (promiseResponse: IuiMakePromiseResponse) => {
       console.log("promiseResponse", promiseResponse);
-      setClicked(false);
+      if (promiseResponse.promiseResponse !== PROMISE_RESPONSE.promiseOk) {
+        setClicked(false);
+      }
     });
   };
 
