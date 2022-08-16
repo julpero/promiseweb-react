@@ -38,9 +38,9 @@ const App = () => {
       }
     });
 
-    // return () => {
-    //   socket.off("check if ongoing game", handleOnGoingResponse);
-    // };
+    return () => {
+      socket.off("game begins");
+    };
   }, [socket]);
 
   console.log("render app...");

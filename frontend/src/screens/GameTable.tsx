@@ -61,6 +61,10 @@ const GameTable = ({gameId}: IProps) => {
         });
       });
     }
+
+    return () => {
+      socket.off("promise made");
+    };
   }, []);
 
   return (

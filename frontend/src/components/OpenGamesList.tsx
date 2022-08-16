@@ -55,7 +55,12 @@ const OpenGamesList = () => {
     socket.on("game list updated", () => {
       fetchGameItemList();
     });
-  }, [socket]);
+
+    return () => {
+      socket.off("new game created");
+      socket.off("game list updated");
+    };
+  }, []);
 
   useEffect(() => {
     if (method !== null) {
