@@ -42,7 +42,7 @@ export const getPromiser = (round: IRound): IPromiser | null => {
     const playerCount = round.roundPlayers.length;
     const { starterPositionIndex } = round;
     for (let i = starterPositionIndex; i < starterPositionIndex + playerCount; i++) {
-      const checkInd = i > playerCount ? i - playerCount : i;
+      const checkInd = i >= playerCount ? i - playerCount : i;
       if (round.roundPlayers[checkInd].promise === null) {
         return {
           name: round.roundPlayers[checkInd].name,
