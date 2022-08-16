@@ -1,6 +1,7 @@
 import React from "react";
 import { IuiCard } from "../../interfaces/IuiPlayingGame";
-import { cardToString } from "../../common/commonFunctions";
+import { cardAsString, cardToString } from "../../common/commonFunctions";
+import getCardFace from "./Cards";
 
 interface IProps {
   card?: IuiCard | null,
@@ -13,9 +14,12 @@ const CardSlot = (props: IProps) => {
   } else {
     const renderCard = card ?? { rank: "0 d", suite: "dummy", value: 0 } as IuiCard;
     return (
-      <div className="col cardCol">
-        { cardToString(renderCard) }
-      </div>
+      <React.Fragment>
+        <div className="col cardCol">
+          { cardToString(renderCard) }
+        </div>
+        { getCardFace(cardAsString(renderCard)) }
+      </React.Fragment>
     );
   }
 };

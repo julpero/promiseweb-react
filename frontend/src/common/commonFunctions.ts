@@ -10,6 +10,20 @@ const suiteToUnicode = (suite: string) => {
   }
 };
 
+/**
+ *
+ * @param card
+ * @returns string having suite as unicode
+ */
 export const cardToString = (card: IuiCard): string => {
   return card.rank + " " + suiteToUnicode(card.suite);
+};
+
+/**
+ *
+ * @param card
+ * @returns string having suite as string
+ */
+export const cardAsString = (card: IuiCard): string => {
+  return card.suite + card.rank;
 };
