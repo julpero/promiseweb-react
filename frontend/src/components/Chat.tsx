@@ -5,25 +5,27 @@ import { useSocket } from "../socket";
  * Chat and log
  */
 const Chat = () => {
-  const [textRows, setTextRows ] = useState<string[]>([]);
+  const [textRows, setTextRows] = useState<string[]>([]);
+
+  const { socket } = useSocket();
 
   useEffect(() => {
     socket.on("new chat line", (chatLine: string) => {
-      console.log("got new chat line", chatLine);
-      setTextRows(textRows.concat(chatLine));
-      const scrollHeight =chatRef.current?.scrollHeight ?? 1;
-      if (chatRef.current) {
-        chatRef.current.scrollTop = scrollHeight;
-      }
+      setTextRows((prevState) => ([...prevState, chatLine]));
     });
   }, []);
 
-  const { socket } = useSocket();
+  useEffect(() => {
+    const scrollHeight = chatRef.current?.scrollHeight ?? 1;
+    if (chatRef.current) {
+      chatRef.current.scrollTop = scrollHeight;
+    }
+  }, [textRows]);
 
   const chatRef = createRef<HTMLTextAreaElement>();
 
   const renderChatLines = (): string => {
-    return textRows.join("\n")+"\n";
+    return textRows.join("\n");
   };
 
   return (
