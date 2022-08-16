@@ -10,8 +10,7 @@ export const getOpenGamesList = async (getGameListRequest: IuiGetGameListRequest
   };
   const openGames: (IGameOptions & {id: string})[] = await getGamesByStatus(GAME_STATUS.Created);
   openGames.forEach(openGame => {
-    console.log("openGame type", typeof openGame);
-    console.log("openGame", openGame);
+    // console.log("openGame", openGame);
     response.games.push({
       created: openGame.createDateTime,
       id: openGame.id,
@@ -22,6 +21,6 @@ export const getOpenGamesList = async (getGameListRequest: IuiGetGameListRequest
       gameHasPassword: openGame.password.length > 0,
     } as IuiGameListItem);
   });
-  console.log("response", response);
+  // console.log("response", response);
   return response;
 };
