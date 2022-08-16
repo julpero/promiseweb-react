@@ -14,7 +14,7 @@ const PromiseTable = (props: IProps) => {
     if (!props.promiseTable) return null;
     return (
       props.promiseTable.rounds.map((round, idx) => {
-        return <th key={idx}>{idx+1}</th>;
+        return <th key={idx}>{round.cardsInRound}</th>;
       })
     );
   };
