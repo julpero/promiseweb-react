@@ -19,7 +19,7 @@ import {
 import { getPlayerNameById, getPlayerNameInPlayerOrder, getPromiser } from "../common/common";
 import { isRuleActive, rulesToRuleObj } from "../common/model";
 import { getGame, getGameWithPlayer, makePromiseToPlayer } from "../dbActions/playingGame";
-import { ICardPlayed, IGameOptions, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
+import { ICardPlayed, IGameOptions, IRound } from "../interfaces/IGameOptions";
 
 export const getRound = async (getRoundObj: IuiGetRoundRequest): Promise<IuiGetRoundResponse | null> => {
   const {gameId, myId, roundInd} = getRoundObj;
