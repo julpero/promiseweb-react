@@ -9,20 +9,7 @@ interface IProps {
   roundInfo: IuiGetRoundResponse,
 }
 
-const TableLayout3 = (props: IProps) => {
-  const getMyPosition = (): number => {
-    return props.roundInfo.roundToPlayer.players.findIndex(player => player.thisIsMe);
-  };
-
-  const getPlayerToIndex = (ind: number): IuiRoundPlayer => {
-    const myPosition = getMyPosition();
-    const playerCount = props.gameInfo.humanPlayersCount;
-    let retIndex = myPosition + ind;
-    if (retIndex >= playerCount) retIndex = retIndex - playerCount;
-    return props.roundInfo.roundToPlayer.players[retIndex];
-  };
-
-  const { gameInfo, roundInfo } = props;
+const TableLayout3 = ({ gameInfo, roundInfo }: IProps) => {
   return (
     <div className="row">
       <div className="col">
@@ -30,7 +17,7 @@ const TableLayout3 = (props: IProps) => {
           <div className="col-5 playerTable">
             <OtherPlayer
               index={1}
-              player={getPlayerToIndex(1)}
+              roundInfo={roundInfo}
               maxCards={10}
               align="left"
             />
@@ -41,7 +28,7 @@ const TableLayout3 = (props: IProps) => {
           <div className="col-5 playerTable">
             <OtherPlayer
               index={2}
-              player={getPlayerToIndex(2)}
+              roundInfo={roundInfo}
               maxCards={10}
               align="right"
             />
@@ -56,7 +43,7 @@ const TableLayout3 = (props: IProps) => {
           <div className="col-3">
             <OtherPlayer
               index={0}
-              player={getPlayerToIndex(0)}
+              roundInfo={roundInfo}
               maxCards={10}
             />
           </div>

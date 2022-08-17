@@ -1,23 +1,36 @@
 import React from "react";
 import { renderCardSlots } from "../../common/playingGame";
-import { IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
+import { IuiGetRoundResponse, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
 
 type AlignType = "left" | "right";
 
 interface IProps {
   /** index goes clockwise, starting from you 0 and rest players from 1 to 5 */
   index: number,
-  player: IuiRoundPlayer,
+  roundInfo: IuiGetRoundResponse,
   maxCards: number,
   align?: AlignType,
 }
 
-const OtherPlayer = ({ index, player, maxCards, align }: IProps) => {
+const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
+  const getMyPosition = (): number => {
+    return roundInfo.roundToPlayer.players.findIndex(player => player.thisIsMe);
+  };
+
+  const playerFromIndex = (): IuiRoundPlayer => {
+    const myPosition = getMyPosition();
+    const playerCount = roundInfo.roundToPlayer.players.length;
+    let retIndex = myPosition + index;
+    if (retIndex >= playerCount) retIndex = retIndex - playerCount;
+    return roundInfo.roundToPlayer.players[retIndex];
+  };
+  const player = playerFromIndex();
+
   const renderCardsRow = () => {
     if (index === 0) return null;
     return (
       <div className="row">
-        {renderCardSlots(maxCards, [])}
+        {renderCardSlots(maxCards, roundInfo.roundToPlayer.cardsInRound, [])}
       </div>
     );
   };

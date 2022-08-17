@@ -29,3 +29,10 @@ body {
   padding-left: 1px;
   padding-right: 1px;
 }
+.backSide {
+  background-color: white;
+  border: black 1px solid;
+  max-width: 80px;
+  border-radius: 5%;
+  position: absolute;
+}
