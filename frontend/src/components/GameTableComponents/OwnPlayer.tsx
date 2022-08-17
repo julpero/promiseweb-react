@@ -1,5 +1,7 @@
 import React from "react";
+import { isRuleActive } from "../../common/commonFunctions";
 import { amILastPromiser, currentTotalPromise, renderCardSlots } from "../../common/playingGame";
+import { RULE } from "../../interfaces/IuiGameOptions";
 import { IuiGetGameInfoResponse, IuiGetRoundResponse } from "../../interfaces/IuiPlayingGame";
 import PromiseButtons from "./PromiseButtons";
 
@@ -13,7 +15,7 @@ const OwnPlayer = (props: IProps) => {
 
   const disableButton = (): number => {
     // this handles also hidden promise round rule because then total promise is negative
-    if (amILastPromiser(roundInfo.roundToPlayer.players)) {
+    if (isRuleActive(gameInfo.rules, RULE.noEvenPromisesAllowed) && amILastPromiser(roundInfo.roundToPlayer.players)) {
       const totalPromise = currentTotalPromise(roundInfo.roundToPlayer.players);
       return roundInfo.roundToPlayer.cardsInRound - totalPromise;
     }
