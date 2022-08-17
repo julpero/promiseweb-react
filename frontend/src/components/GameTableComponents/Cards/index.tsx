@@ -52,62 +52,81 @@ import { xxx as DiamondsJack } from "./3_11";
 import { xxx as DiamondsQueen } from "./3_12";
 import { xxx as DiamondsKing } from "./3_13";
 
+import backSide from "./back.png";
 
-const getCardFace = (cardStr: string) => {
-  console.log(cardStr);
+export enum CARD_PLAYABLE {
+  ok,
+  notMyTurn,
+  notAllowed,
+}
+
+const playableToClass = (playableStatus: CARD_PLAYABLE): string => {
+  switch (playableStatus) {
+    case CARD_PLAYABLE.notMyTurn: return "notMyTurn";
+    case CARD_PLAYABLE.notAllowed: return "notAllowed";
+    default: return "playOk";
+  }
+};
+
+const getCardFace = (cardStr: string, playableStatus: CARD_PLAYABLE) => {
+  // console.log(cardStr);
   switch (cardStr) {
-    case "spadesA": return <SpadesAce text="A" title="SpadesAce" suite="spades" />;
-    case "spades2": return <SpadesTwo text="2" title="SpadesTwo" suite="spades" />;
-    case "spades3": return <SpadesThree text="3" title="SpadesThree" suite="spades" />;
-    case "spades4": return <SpadesFour text="4" title="SpadesFour" suite="spades" />;
-    case "spades5": return <SpadesFive text="5" title="SpadesFive" suite="spades" />;
-    case "spades6": return <SpadesSix text="6" title="SpadesSix" suite="spades" />;
-    case "spades7": return <SpadesSeven text="7" title="SpadesSeven" suite="spades" />;
-    case "spades8": return <SpadesEight text="8" title="SpadesEight" suite="spades" />;
-    case "spades9": return <SpadesNine text="9" title="SpadesNine" suite="spades" />;
-    case "spades10": return <SpadesTen text="0" title="SpadesTen" suite="spades" />;
-    case "spadesJ": return <SpadesJack text="J" title="SpadesJack" suite="spades" />;
-    case "spadesQ": return <SpadesQueen text="Q" title="SpadesQueen" suite="spades" />;
-    case "spadesK": return <SpadesKing text="K" title="SpadesKing" suite="spades" />;
-    case "heartsA": return <HeartsAce text="A" title="HeartsAce" suite="hearts" />;
-    case "hearts2": return <HeartsTwo text="2" title="HeartsTwo" suite="hearts" />;
-    case "hearts3": return <HeartsThree text="3" title="HeartsThree" suite="hearts" />;
-    case "hearts4": return <HeartsFour text="4" title="HeartsFour" suite="hearts" />;
-    case "hearts5": return <HeartsFive text="5" title="HeartsFive" suite="hearts" />;
-    case "hearts6": return <HeartsSix text="6" title="HeartsSix" suite="hearts" />;
-    case "hearts7": return <HeartsSeven text="7" title="HeartsSeven" suite="hearts" />;
-    case "hearts8": return <HeartsEight text="8" title="HeartsEight" suite="hearts" />;
-    case "hearts9": return <HeartsNine text="9" title="HeartsNine" suite="hearts" />;
-    case "hearts10": return <HeartsTen text="0" title="HeartsTen" suite="hearts" />;
-    case "heartsJ": return <HeartsJack text="J" title="HeartsJack" suite="hearts" />;
-    case "heartsQ": return <HeartsQueen text="Q" title="HeartsQueen" suite="hearts" />;
-    case "heartsK": return <HeartsKing text="K" title="HeartsKing" suite="hearts" />;
-    case "clubsA": return <ClubsAce text="A" title="ClubsAce" suite="clubs" />;
-    case "clubs2": return <ClubsTwo text="2" title="ClubsTwo" suite="clubs" />;
-    case "clubs3": return <ClubsThree text="3" title="ClubsThree" suite="clubs" />;
-    case "clubs4": return <ClubsFour text="4" title="ClubsFour" suite="clubs" />;
-    case "clubs5": return <ClubsFive text="5" title="ClubsFive" suite="clubs" />;
-    case "clubs6": return <ClubsSix text="6" title="ClubsSix" suite="clubs" />;
-    case "clubs7": return <ClubsSeven text="7" title="ClubsSeven" suite="clubs" />;
-    case "clubs8": return <ClubsEight text="8" title="ClubsEight" suite="clubs" />;
-    case "clubs9": return <ClubsNine text="9" title="ClubsNine" suite="clubs" />;
-    case "clubs10": return <ClubsTen text="0" title="ClubsTen" suite="clubs" />;
-    case "clubsJ": return <ClubsJack text="J" title="ClubsJack" suite="clubs" />;
-    case "clubsQ": return <ClubsQueen text="Q" title="ClubsQueen" suite="clubs" />;
-    case "clubsK": return <ClubsKing text="K" title="ClubsKing" suite="clubs" />;
-    case "diamondsA": return <DiamondsAce text="A" title="DiamondsAce" suite="diamonds" />;
-    case "diamonds2": return <DiamondsTwo text="2" title="DiamondsTwo" suite="diamonds" />;
-    case "diamonds3": return <DiamondsThree text="3" title="DiamondsThree" suite="diamonds" />;
-    case "diamonds4": return <DiamondsFour text="4" title="DiamondsFour" suite="diamonds" />;
-    case "diamonds5": return <DiamondsFive text="5" title="DiamondsFive" suite="diamonds" />;
-    case "diamonds6": return <DiamondsSix text="6" title="DiamondsSix" suite="diamonds" />;
-    case "diamonds7": return <DiamondsSeven text="7" title="DiamondsSeven" suite="diamonds" />;
-    case "diamonds8": return <DiamondsEight text="8" title="DiamondsEight" suite="diamonds" />;
-    case "diamonds9": return <DiamondsNine text="9" title="DiamondsNine" suite="diamonds" />;
-    case "diamonds10": return <DiamondsTen text="0" title="DiamondsTen" suite="diamonds" />;
-    case "diamondsJ": return <DiamondsJack text="J" title="DiamondsJack" suite="diamonds" />;
-    case "diamondsQ": return <DiamondsQueen text="Q" title="DiamondsQueen" suite="diamonds" />;
-    case "diamondsK": return <DiamondsKing text="K" title="DiamondsKing" suite="diamonds" />;  }
+    case "spadesA": return <SpadesAce text="A" title="SpadesAce" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "spades2": return <SpadesTwo text="2" title="SpadesTwo" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "spades3": return <SpadesThree text="3" title="SpadesThree" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "spades4": return <SpadesFour text="4" title="SpadesFour" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "spades5": return <SpadesFive text="5" title="SpadesFive" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "spades6": return <SpadesSix text="6" title="SpadesSix" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "spades7": return <SpadesSeven text="7" title="SpadesSeven" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "spades8": return <SpadesEight text="8" title="SpadesEight" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "spades9": return <SpadesNine text="9" title="SpadesNine" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "spades10": return <SpadesTen text="0" title="SpadesTen" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "spadesJ": return <SpadesJack text="J" title="SpadesJack" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "spadesQ": return <SpadesQueen text="Q" title="SpadesQueen" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "spadesK": return <SpadesKing text="K" title="SpadesKing" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "heartsA": return <HeartsAce text="A" title="HeartsAce" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "hearts2": return <HeartsTwo text="2" title="HeartsTwo" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "hearts3": return <HeartsThree text="3" title="HeartsThree" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "hearts4": return <HeartsFour text="4" title="HeartsFour" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "hearts5": return <HeartsFive text="5" title="HeartsFive" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "hearts6": return <HeartsSix text="6" title="HeartsSix" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "hearts7": return <HeartsSeven text="7" title="HeartsSeven" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "hearts8": return <HeartsEight text="8" title="HeartsEight" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "hearts9": return <HeartsNine text="9" title="HeartsNine" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "hearts10": return <HeartsTen text="0" title="HeartsTen" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "heartsJ": return <HeartsJack text="J" title="HeartsJack" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "heartsQ": return <HeartsQueen text="Q" title="HeartsQueen" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "heartsK": return <HeartsKing text="K" title="HeartsKing" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "clubsA": return <ClubsAce text="A" title="ClubsAce" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "clubs2": return <ClubsTwo text="2" title="ClubsTwo" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "clubs3": return <ClubsThree text="3" title="ClubsThree" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "clubs4": return <ClubsFour text="4" title="ClubsFour" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "clubs5": return <ClubsFive text="5" title="ClubsFive" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "clubs6": return <ClubsSix text="6" title="ClubsSix" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "clubs7": return <ClubsSeven text="7" title="ClubsSeven" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "clubs8": return <ClubsEight text="8" title="ClubsEight" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "clubs9": return <ClubsNine text="9" title="ClubsNine" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "clubs10": return <ClubsTen text="0" title="ClubsTen" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "clubsJ": return <ClubsJack text="J" title="ClubsJack" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "clubsQ": return <ClubsQueen text="Q" title="ClubsQueen" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "clubsK": return <ClubsKing text="K" title="ClubsKing" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "diamondsA": return <DiamondsAce text="A" title="DiamondsAce" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "diamonds2": return <DiamondsTwo text="2" title="DiamondsTwo" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "diamonds3": return <DiamondsThree text="3" title="DiamondsThree" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "diamonds4": return <DiamondsFour text="4" title="DiamondsFour" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "diamonds5": return <DiamondsFive text="5" title="DiamondsFive" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "diamonds6": return <DiamondsSix text="6" title="DiamondsSix" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "diamonds7": return <DiamondsSeven text="7" title="DiamondsSeven" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "diamonds8": return <DiamondsEight text="8" title="DiamondsEight" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "diamonds9": return <DiamondsNine text="9" title="DiamondsNine" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "diamonds10": return <DiamondsTen text="0" title="DiamondsTen" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "diamondsJ": return <DiamondsJack text="J" title="DiamondsJack" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "diamondsQ": return <DiamondsQueen text="Q" title="DiamondsQueen" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "diamondsK": return <DiamondsKing text="K" title="DiamondsKing" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "backSide": return <img className="backSide" src={backSide} />;
+    case "dummy0": return <img className="backSide" src={backSide} />;
+    // case "dummy0": null;
+  }
   return null;
 };
 

@@ -5,11 +5,12 @@ interface IProps {
 	title: string,
 	text: string,
   suite: string,
+  playableClass?: string,
 }
 
-export const xxx = ({title, text, suite}: IProps) => {
+export const xxx = ({title, text, suite, playableClass}: IProps) => {
   return (
-    <svg className="svgBody" width="100%" height="100%" viewBox="0 0 227 315" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+    <svg className={`svgBody ${playableClass}`} width="100%" height="100%" viewBox="0 0 227 315" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
       <title>{title}</title>
       <text className={`noHover ${suite}`} transform="translate(5.000000, 46.000000)" fontSize={30}>{text}</text>
       <text className={`noHover ${suite}`} transform="translate(221.000000, 268.000000)" fontSize={30} rotate={180}>{text}</text>
