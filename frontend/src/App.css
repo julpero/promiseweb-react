@@ -13,3 +13,19 @@ body {
   padding: 0px;
   border: 1px solid black;
 }
+.trumpCardCol {
+  text-align: center;
+}
+.firstCardCol {
+  padding-left: 20px;
+}
+.playedCardCol {
+  padding-left: 30px;
+}
+.lastCardCol {
+  min-width: 85px;
+}
+.cardWonCol {
+  padding-left: 1px;
+  padding-right: 1px;
+}
