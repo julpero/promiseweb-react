@@ -29,7 +29,7 @@ const OtherPlayer = ({ index, player, maxCards, align }: IProps) => {
   const renderCardsWonCols = () => {
     const cols: JSX.Element[] = [];
     for (let i = 0; i < maxCards; i++) {
-      cols.push(<div className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}></div>);
+      cols.push(<div key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}></div>);
     }
     return cols;
   };
