@@ -30,7 +30,7 @@ const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
     if (index === 0) return null;
     return (
       <div className="row">
-        {renderCardSlots(maxCards, roundInfo.roundToPlayer.cardsInRound, [])}
+        {renderCardSlots(maxCards, roundInfo, [])}
       </div>
     );
   };

@@ -1,6 +1,6 @@
 import { ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { getPlayerAvgPoints } from "../dbActions/promiseweb";
-import { IGame, IGameOptions, IHumanPlayer, IPlayer, IPlayerStats, IPromiser, IRound } from "../interfaces/IGameOptions";
+import { IGame, IGameOptions, IHumanPlayer, IPlayer, IPlayerInTurn, IPlayerStats, IPromiser, IRound } from "../interfaces/IGameOptions";
 
 export const getPlayerStats = async (roundCount: number, playerName: string): Promise<IPlayerStats> => {
   const statsGamesObj = {
@@ -35,6 +35,23 @@ export const getPlayerNameById = (players: IHumanPlayer[], playerId: string): st
 
 export const getCurrentRoundInd = (game: IGame): number => {
   return game.rounds.find(round => round.roundStatus === ROUND_STATUS.OnGoing)?.roundIndex ?? -1;
+};
+
+const getCurrentPlayInd = (round: IRound): number => {
+  return round.cardsPlayed.length - 1;
+};
+
+export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
+  const currentPlayInd = getCurrentPlayInd(round);
+  if (currentPlayInd === 0 && round.cardsPlayed[0].length === 0) {
+    return {
+      name: round.roundPlayers[round.starterPositionIndex].name,
+      type: round.roundPlayers[round.starterPositionIndex].type,
+      playerId: round.roundPlayers[round.starterPositionIndex].playerId,
+      index: round.starterPositionIndex,
+    } as IPlayerInTurn;
+  }
+  return null;
 };
 
 export const getPromiser = (round: IRound): IPromiser | null => {

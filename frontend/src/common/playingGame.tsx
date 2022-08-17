@@ -1,13 +1,13 @@
 import React from "react";
 import { CARD_PLAYABLE } from "../components/GameTableComponents/Cards";
 import CardSlot from "../components/GameTableComponents/CardSlot";
-import { IuiCard, IuiRoundPlayer } from "../interfaces/IuiPlayingGame";
+import { IuiCard, IuiGetRoundResponse, IuiRoundPlayer } from "../interfaces/IuiPlayingGame";
 
-export const renderCardSlots = (slotCount: number, cardsInRound: number, cards: IuiCard[]): JSX.Element[] => {
+export const renderCardSlots = (slotCount: number, roundInfo: IuiGetRoundResponse, cards: IuiCard[]): JSX.Element[] => {
   console.log(cards);
   const slots: JSX.Element[] = [];
   for (let i = 0; i < slotCount; i++) {
-    const card = i >= cardsInRound ? undefined : cards[i] ?? null;
+    const card = i >= roundInfo.roundToPlayer.cardsInRound ? undefined : cards[i] ?? null;
     const classStrArr: string[] = [];
     if (i === 0) classStrArr.push("firstCardCol");
     if (i === slotCount-1) classStrArr.push("lastCardCol");

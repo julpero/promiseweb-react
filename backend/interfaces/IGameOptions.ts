@@ -133,6 +133,10 @@ export interface ICardPlayed {
   playStarted: number,
 }
 
+export interface IPlayerInTurn extends IPlayer {
+  index: number,
+}
+
 export interface IPromiser extends IPlayer {
   index: number,
 }

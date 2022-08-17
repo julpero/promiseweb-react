@@ -16,7 +16,7 @@ import {
   IuiRoundTotalPromise,
   ROUND_PHASE,
 } from "../../frontend/src/interfaces/IuiPlayingGame";
-import { getPlayerNameById, getPlayerNameInPlayerOrder, getPromiser } from "../common/common";
+import { getPlayerInTurn, getPlayerNameById, getPlayerNameInPlayerOrder, getPromiser } from "../common/common";
 import { isRuleActive, rulesToRuleObj } from "../common/model";
 import { getGame, getGameWithPlayer, makePromiseToPlayer } from "../dbActions/playingGame";
 import { ICardPlayed, IGameOptions, IRound } from "../interfaces/IGameOptions";
@@ -145,6 +145,10 @@ const getPromiseTable = (gameInDb: IGameOptions): IuiPromiseTable => {
   } as IuiPromiseTable;
 };
 
+const isMyTurn = (myName: string, round: IRound): boolean => {
+  return getPlayerInTurn(round)?.name === myName;
+};
+
 const isMyPromiseTurn = (myName: string, round: IRound): boolean => {
   return getPromiser(round)?.name === myName;
 };
@@ -175,7 +179,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerName: str
     doReloadInit: false, // TODO
     newRound: false, // TODO
     gameOver: false, // TODO
-    isMyTurn: true, // TODO
+    isMyTurn: isMyTurn(playerName, round), // TODO
     isMyPromiseTurn: isMyPromiseTurn(playerName, round), // TODO
     handValues: null, // TODO getHandValues(thisGame, roundInd),
     obsGame: null, // TODO obsGameToRoundObj

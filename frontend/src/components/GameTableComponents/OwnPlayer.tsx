@@ -25,7 +25,7 @@ const OwnPlayer = (props: IProps) => {
   return (
     <React.Fragment>
       <div className="row">
-        {renderCardSlots(10, roundInfo.roundToPlayer.cardsInRound, roundInfo.roundToPlayer.myCards)}
+        {renderCardSlots(10, roundInfo, roundInfo.roundToPlayer.myCards)}
       </div>
       <PromiseButtons
         gameId={roundInfo.gameId}
