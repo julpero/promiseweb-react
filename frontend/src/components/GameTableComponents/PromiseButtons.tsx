@@ -8,20 +8,21 @@ interface IProps {
   roundInd: number,
   cardsInRound: number,
   myTurn: boolean,
+  disableButton: number,
 }
 
-const PromiseButtons = (props: IProps) => {
+const PromiseButtons = ({gameId, roundInd, cardsInRound, myTurn, disableButton}: IProps) => {
   const [clicked, setClicked] = useState(false);
-  const {cardsInRound, myTurn} = props;
 
   const { socket } = useSocket();
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
 
   const doPromise = (promise: number) => {
+    if (promise === disableButton) return;
     setClicked(true);
     const promiseRequest: IuiMakePromiseRequest = {
-      gameId: props.gameId,
-      roundInd: props.roundInd,
+      gameId: gameId,
+      roundInd: roundInd,
       myId: getMyId(),
       promise: promise,
       isSpeedPromise: false,
@@ -37,7 +38,7 @@ const PromiseButtons = (props: IProps) => {
   const renderPromiseButtons = (): JSX.Element[] => {
     const buttons: JSX.Element[] = [];
     for (let i = 0; i <= cardsInRound; i++) {
-      buttons.push(<div key={i} className="col"><Button onClick={() => doPromise(i)} disabled={!myTurn || clicked}>{i}</Button></div>);
+      buttons.push(<div key={i} className="col"><Button onClick={() => doPromise(i)} disabled={!myTurn || clicked || disableButton === i}>{i}</Button></div>);
     }
     for (let i = cardsInRound + 1; i <= 10; i++) {
       buttons.push(<div key={i} className="col">&nbsp;</div>);

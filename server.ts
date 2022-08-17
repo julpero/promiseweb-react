@@ -170,6 +170,9 @@ connectDB().then(() => {
       const promiseResponse: IuiMakePromiseResponse | null = await makePromise(makePromiseRequest);
       if (promiseResponse === null) {
         return null;
+      } else if (promiseResponse.promiseResponse === PROMISE_RESPONSE.evenPromiseNotAllowed) {
+        const chatLine = "You can't promise " + promiseResponse.promise + " because even promises are not allowed!";
+        socket.emit("new chat line", chatLine);
       } else if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
         const promiseNotification: IuiPromiseMadeNotification = {
           playerName: promiseResponse.promiser,

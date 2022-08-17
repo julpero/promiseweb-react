@@ -1,6 +1,6 @@
 import React from "react";
 import CardSlot from "../components/GameTableComponents/CardSlot";
-import { IuiCard } from "../interfaces/IuiPlayingGame";
+import { IuiCard, IuiRoundPlayer } from "../interfaces/IuiPlayingGame";
 
 export const renderCardSlots = (slotCount: number, cards?: IuiCard[]): JSX.Element[] => {
   console.log(cards);
@@ -20,4 +20,14 @@ export const renderCardSlots = (slotCount: number, cards?: IuiCard[]): JSX.Eleme
     }
   }
   return slots;
+};
+
+export const amILastPromiser = (players: IuiRoundPlayer[]): boolean => {
+  return players.length - players.filter(player => player.promise !== null).length === 1;
+};
+
+export const currentTotalPromise = (players: IuiRoundPlayer[]): number => {
+  let total = 0;
+  players.map(player => total+= player.promise ?? 0);
+  return total;
 };

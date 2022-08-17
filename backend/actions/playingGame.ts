@@ -166,7 +166,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerName: str
     dealerPositionIndex: round.dealerPositionIndex,
     starterPositionIndex: round.starterPositionIndex,
     myCards: getMyCards(playerName, round, false), // TODO speed promise
-    players: getRoundPlayers(playerName, round, playIndex, isRuleActive(gameInDb, RULE.hiddenPromiseRound)), // TODO showPromisesNow
+    players: getRoundPlayers(playerName, round, playIndex, !isRuleActive(gameInDb, RULE.hiddenPromiseRound)), // TODO showPromisesNow
     trumpCard: round.trumpCard, // TODO
     playerInCharge: 0, // TODO
     cardInCharge: null, // TODO
