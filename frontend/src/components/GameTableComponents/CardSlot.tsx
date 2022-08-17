@@ -15,7 +15,7 @@ const CardSlot = (props: IProps) => {
     const renderCard = card ?? { rank: "0 d", suite: "dummy", value: 0 } as IuiCard;
     return (
       <React.Fragment>
-        <div className="col cardCol testi">
+        <div className="col cardCol">
           {/* { cardToString(renderCard) } */}
           { getCardFace(cardAsString(renderCard)) }
         </div>

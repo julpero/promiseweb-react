@@ -27,27 +27,29 @@ const TableLayout3 = (props: IProps) => {
     <div className="row">
       <div className="col">
         <div className="row">
-          <div className="col-5">
+          <div className="col-5 playerTable">
             <OtherPlayer
               index={1}
               player={getPlayerToIndex(1)}
               maxCards={10}
+              align="left"
             />
           </div>
           <div className="col-2">
             <TrumpSlot trump={roundInfo.roundToPlayer.trumpCard} />
           </div>
-          <div className="col-5">
+          <div className="col-5 playerTable">
             <OtherPlayer
               index={2}
               player={getPlayerToIndex(2)}
               maxCards={10}
+              align="right"
             />
           </div>
         </div>
         <div className="row">
           <div className="col-6"></div>
-          <div className="col-2 myPlayedCard">MyPlayedCard</div>
+          <div className="col-2 cardCol myPlayedCard">MyPlayedCard</div>
           <div className="col-4"></div>
         </div>
         <div className="row">
