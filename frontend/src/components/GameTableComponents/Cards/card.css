@@ -1,0 +1,27 @@
+.noHover:hover {
+  cursor: default;
+}
+
+.spades {
+  color: #000;
+  stroke: #000;
+  fill: #000;
+}
+
+.hearts {
+  color: #d40000;
+  stroke: #d40000;
+  fill: #d40000;
+}
+
+.diamonds {
+  color: #000080;
+  stroke: #000080;
+  fill: #000080;
+}
+
+.clubs {
+  color: #006400;
+  stroke: #006400;
+  fill: #006400;
+}
