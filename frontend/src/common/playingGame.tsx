@@ -17,7 +17,7 @@ export const renderCardSlots = (slotCount: number, roundInfo: IuiGetRoundRespons
   console.log(cards);
   const slots: JSX.Element[] = [];
   for (let i = 0; i < slotCount; i++) {
-    const card = i >= roundInfo.roundToPlayer.cardsInRound ? undefined : cards[i] ?? null;
+    const card = i >= roundInfo.roundToPlayer.cardsInRound || (i >= cards.length && cards.length > 0) ? undefined : cards[i] ?? null;
     const classStrArr: string[] = [];
     if (i === 0) classStrArr.push("firstCardCol");
     if (i === slotCount-1) classStrArr.push("lastCardCol");
