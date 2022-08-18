@@ -59,6 +59,17 @@ const GameTable = ({gameId}: IProps) => {
 
       socket.on("card played", (cardPlayedNotification: IuiCardPlayedNotification) => {
         console.log("cardPlayedNotification", cardPlayedNotification);
+
+        const getRoundRequest: IuiGetRoundRequest = {
+          myId: getMyId(),
+          gameId: gameId,
+          roundInd: gameInfo?.currentRound ?? 0,
+        };
+
+        socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
+          console.log("roundResponse after card hit", roundResponse);
+          setRoundInfo(roundResponse);
+        });
       });
     }
 

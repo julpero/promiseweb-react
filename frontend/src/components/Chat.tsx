@@ -34,6 +34,7 @@ const Chat = () => {
 
   return (
     <textarea
+      cols={40}
       rows={5}
       ref={chatRef}
       readOnly
