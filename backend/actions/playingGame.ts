@@ -1,6 +1,7 @@
 import { ROUND_STATUS, RULE } from "../../frontend/src/interfaces/IuiGameOptions";
 import {
   IuiCard,
+  IuiCardPlayed,
   IuiGetGameInfoRequest,
   IuiGetGameInfoResponse,
   IuiGetRoundRequest,
@@ -150,6 +151,17 @@ const getRoundPhase = (round: IRound): ROUND_PHASE => {
   return ROUND_PHASE.initial;
 };
 
+const getCardsPlayed = (round: IRound, playIndex: number): IuiCardPlayed[] => {
+  const playedCards: IuiCardPlayed[] = [];
+  round.cardsPlayed[playIndex].forEach(playedCard => {
+    playedCards.push({
+      card: ICardToIuiCard(playedCard.card),
+      name: playedCard.name,
+    } as IuiCardPlayed);
+  });
+  return playedCards;
+};
+
 const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: string): IuiRoundToPlayer => {
   const round = gameInDb.game.rounds[roundInd];
   const playIndex = getCurrentPlayIndex(round);
@@ -170,7 +182,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: strin
     playerInCharge: 0, // TODO
     cardInCharge: cardInCharge ? ICardToIuiCard(cardInCharge) : null, // TODO
     playerGoingToWinThisPlay: null, // TODO
-    cardsPlayed: [], // TODO
+    cardsPlayed: getCardsPlayed(round, playIndex), // TODO
     doReloadInit: false, // TODO
     newRound: false, // TODO
     gameOver: false, // TODO

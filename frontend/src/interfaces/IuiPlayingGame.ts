@@ -126,7 +126,8 @@ export interface IuiRoundToPlayer {
   promiseTable: IuiPromiseTable,
   cardInCharge: IuiCard | null,
   playerGoingToWinThisPlay: string | null,
-  cardsPlayed: IuiCardPlayed[][],
+  /** only current plays played cards */
+  cardsPlayed: IuiCardPlayed[],
   doReloadInit: boolean,
   newRound: boolean,
   gameOver: boolean,
