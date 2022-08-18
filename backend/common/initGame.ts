@@ -16,7 +16,7 @@ export const startGame = (gameInDb: IGameOptions): boolean => {
     initRounds(gameInDb);
 
     gameInDb.game.lastTimeStamp = Date.now();
-    gameInDb.gameStatus = GAME_STATUS.OnGoing;
+    gameInDb.gameStatus = GAME_STATUS.onGoing;
     gameInDb.gameStarted = new Date();
     startRound(gameInDb, 0);
   } catch (error: unknown) {

@@ -20,7 +20,7 @@ export const insertNewGame = async (gameModel: IGameOptions): Promise<string> =>
 
 export const hasOngoingOrCreatedGame = async (playerId: string): Promise<boolean> => {
   const onGoingOrCreatedGameCount = await GameOptions.countDocuments({
-    gameStatus: { $lte: GAME_STATUS.OnGoing },
+    gameStatus: { $lte: GAME_STATUS.onGoing },
     "humanPlayers.playerId": { $eq: playerId },
   });
   console.log("onGoingOrCreatedGameCount", onGoingOrCreatedGameCount);
@@ -57,7 +57,7 @@ export const getPlayerAvgPoints = async (playerName: string, roundsInGame: numbe
     {
       $match: {
         gameStatus: {
-          $eq: GAME_STATUS.Played
+          $eq: GAME_STATUS.played
         },
         "humanPlayers.name": {$eq: playerName}
       }

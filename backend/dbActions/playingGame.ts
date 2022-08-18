@@ -44,12 +44,13 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
     promiseResponse: PROMISE_RESPONSE.unknownError,
     promise: promise,
     promiser: "",
+    promiseTime: -1,
   };
 
   const query = GameOptions.where({
     _id: gameId,
     "humanPlayers.playerId": {$eq: myId},
-    gameStatus: GAME_STATUS.OnGoing,
+    gameStatus: GAME_STATUS.onGoing,
   });
   const gameInDb = await query.findOne();
   if (gameInDb) {
@@ -82,6 +83,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
     } else {
       round.totalPromise+= promise;
     }
+    const promiseTime = Date.now() - gameInDb.game.lastTimeStamp;
     round.roundPlayers[promiser.index].promiseStarted = gameInDb.game.lastTimeStamp;
     round.roundPlayers[promiser.index].promiseMade = Date.now();
     // TODO Speed promise points
@@ -91,6 +93,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
     if (gameAfter) {
       promiseResponse.promiseResponse = PROMISE_RESPONSE.promiseOk;
       promiseResponse.promiser = promiser.name;
+      promiseResponse.promiseTime = promiseTime;
     } else {
       console.error("promising, error while saving game");
     }
@@ -102,8 +105,10 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
   const { card, gameId, roundInd, myId } = playCardRequest;
   const response: IuiPlayCardResponse = {
     playResponse: PLAY_CARD_RESPONSE.notOk,
+    playerName: "",
     card: card,
     cardIndex: -1,
+    playTime: -1,
   };
 
   const query = GameOptions.where({
@@ -139,9 +144,11 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
 
     // All checks made, let's play card
     const myIndexInRound = getPlayerIndexFromRoundById(round.roundPlayers, myId);
+    const myName = getPlayerNameById(gameInDb.humanPlayers, myId);
+    const playTime = Date.now() - gameInDb.game.lastTimeStamp;
     round.cardsPlayed[playIndex].push({
       playerId: myId,
-      name: getPlayerNameById(gameInDb.humanPlayers, myId),
+      name: myName,
       card: {
         value: card.value,
         suite: card.suite,
@@ -165,11 +172,17 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
 
       if (round.cardsPlayed.length === round.cardsInRound) {
         // this whole round is now played
-        response.roundStatusAfterPlay = ROUND_STATUS.Played;
+        response.roundStatusAfterPlay = ROUND_STATUS.played;
       }
+    } else {
+      // same play continues
+      response.roundStatusAfterPlay = ROUND_STATUS.onGoing;
+      response.gameStatusAfterPlay = GAME_STATUS.onGoing;
     }
     const gameAfter = await gameInDb.save();
     if (gameAfter) {
+      response.playerName = myName;
+      response.playTime = playTime;
       response.playResponse = PLAY_CARD_RESPONSE.playOk;
       return response;
     } else {

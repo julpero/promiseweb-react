@@ -37,7 +37,7 @@ export const getPlayerNameById = (players: IHumanPlayer[], playerId: string): st
 };
 
 export const getCurrentRoundInd = (game: IGame): number => {
-  return game.rounds.find(round => round.roundStatus === ROUND_STATUS.OnGoing)?.roundIndex ?? -1;
+  return game.rounds.find(round => round.roundStatus === ROUND_STATUS.onGoing)?.roundIndex ?? -1;
 };
 
 const getCurrentPlayInd = (round: IRound): number => {

@@ -187,7 +187,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: strin
  * @returns index of ongoing round or null
  */
 const getCurrentRound = (rounds: IRound[]): number | null => {
-  return rounds.find(round => round.roundStatus === ROUND_STATUS.OnGoing)?.roundIndex ?? null;
+  return rounds.find(round => round.roundStatus === ROUND_STATUS.onGoing)?.roundIndex ?? null;
 };
 
 const gameToGameInfo = (gameIdStr: string, gameInDb: IGameOptions): IuiGetGameInfoResponse => {

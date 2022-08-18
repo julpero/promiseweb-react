@@ -8,7 +8,7 @@ export const getOpenGamesList = async (getGameListRequest: IuiGetGameListRequest
   const response: IuiGetGameListResponse = {
     games: [],
   };
-  const openGames: (IGameOptions & {id: string})[] = await getGamesByStatus(GAME_STATUS.Created);
+  const openGames: (IGameOptions & {id: string})[] = await getGamesByStatus(GAME_STATUS.created);
   openGames.forEach(openGame => {
     // console.log("openGame", openGame);
     response.games.push({

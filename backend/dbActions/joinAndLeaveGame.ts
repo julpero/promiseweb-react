@@ -10,7 +10,7 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
   console.log("gameInDb", gameInDb);
   if (!gameInDb) return JOIN_LEAVE_RESULT.notOk;
 
-  if (gameInDb.gameStatus !== GAME_STATUS.Created) {
+  if (gameInDb.gameStatus !== GAME_STATUS.created) {
     console.log("wrong game status", gameInDb.gameStatus);
     return JOIN_LEAVE_RESULT.notOk;
   }
@@ -64,7 +64,7 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
   console.log("game", game);
   if (!game) return JOIN_LEAVE_RESULT.notOk;
 
-  if (game.gameStatus !== GAME_STATUS.Created) {
+  if (game.gameStatus !== GAME_STATUS.created) {
     console.log("wrong game status", game.gameStatus);
     return JOIN_LEAVE_RESULT.notOk;
   }
@@ -83,7 +83,7 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
 
   if (game.humanPlayers.length === 0) {
     // this was last player in the game -> set game dismissed
-    game.gameStatus = GAME_STATUS.Dismissed;
+    game.gameStatus = GAME_STATUS.dismissed;
   }
 
   const gameAfter = await game.save();

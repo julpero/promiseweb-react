@@ -148,6 +148,7 @@ export interface IuiMakePromiseResponse {
   promiseResponse: PROMISE_RESPONSE,
   promise: number,
   promiser: string,
+  promiseTime: number,
 }
 
 export interface IuiPromiseMadeNotification {
@@ -165,6 +166,8 @@ export interface IuiPlayCardRequest {
 
 export interface IuiPlayCardResponse {
   playResponse: PLAY_CARD_RESPONSE,
+  playerName: string,
+  playTime: number,
   card: IuiCard,
   cardIndex: number,
   gameStatusAfterPlay?: GAME_STATUS,
@@ -173,5 +176,6 @@ export interface IuiPlayCardResponse {
 
 export interface IuiCardPlayedNotification {
   playerName: string,
-  card: IuiCard,
+  gameStatusAfterPlay?: GAME_STATUS,
+  roundStatusAfterPlay?: ROUND_STATUS,
 }

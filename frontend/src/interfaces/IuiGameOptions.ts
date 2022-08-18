@@ -1,14 +1,14 @@
 export enum GAME_STATUS {
-  Created = 0,
-  OnGoing = 1,
-  Played = 2,
-  Dismissed = 99,
+  created = 0,
+  onGoing = 1,
+  played = 2,
+  dismissed = 99,
 }
 
 export enum ROUND_STATUS {
   Initialized = 0,
-  OnGoing = 1,
-  Played = 2,
+  onGoing = 1,
+  played = 2,
 }
 
 export enum HIDDEN_CARDS_MODE {

@@ -6,7 +6,7 @@ import Chat from "../components/Chat";
 import PromiseTable from "../components/PromiseTable";
 import ScoreBoard from "../components/ScoreBoard";
 
-import { IuiCard, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification } from "../interfaces/IuiPlayingGame";
+import { IuiCard, IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification } from "../interfaces/IuiPlayingGame";
 
 interface IProps {
   gameId: string,
@@ -55,6 +55,10 @@ const GameTable = ({gameId}: IProps) => {
           console.log("roundResponse after promise", roundResponse);
           setRoundInfo(roundResponse);
         });
+      });
+
+      socket.on("card played", (cardPlayedNotification: IuiCardPlayedNotification) => {
+        console.log("cardPlayedNotification", cardPlayedNotification);
       });
     }
 

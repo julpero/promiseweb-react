@@ -13,7 +13,7 @@ export const checkIfOngoingGame = async (checkRequest: IuiCheckIfOngoingGameRequ
     currentRound: null,
   };
 
-  const ongoingGameResponse: ILastGameStatusResponse | null = await getLastGameByStatus(playerId, GAME_STATUS.OnGoing);
+  const ongoingGameResponse: ILastGameStatusResponse | null = await getLastGameByStatus(playerId, GAME_STATUS.onGoing);
   if (ongoingGameResponse) {
     response.checkStatus = CHECK_GAME_STATUS.onGoingGame;
     response.gameId = ongoingGameResponse.gameId;
@@ -21,7 +21,7 @@ export const checkIfOngoingGame = async (checkRequest: IuiCheckIfOngoingGameRequ
     response.currentRound = ongoingGameResponse.currentRound;
     return response;
   }
-  const joinedGameResponse: ILastGameStatusResponse | null= await getLastGameByStatus(playerId, GAME_STATUS.Created);
+  const joinedGameResponse: ILastGameStatusResponse | null= await getLastGameByStatus(playerId, GAME_STATUS.created);
   if (joinedGameResponse) {
     response.checkStatus = CHECK_GAME_STATUS.joinedGame;
     response.gameId = joinedGameResponse.gameId;
