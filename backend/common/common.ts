@@ -46,12 +46,24 @@ const getCurrentPlayInd = (round: IRound): number => {
 
 export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
   const currentPlayInd = getCurrentPlayInd(round);
+  const playerCount = round.roundPlayers.length;
   if (currentPlayInd === 0 && round.cardsPlayed[0].length === 0) {
+    // first card of the round -> starter
     return {
       name: round.roundPlayers[round.starterPositionIndex].name,
       type: round.roundPlayers[round.starterPositionIndex].type,
       playerId: round.roundPlayers[round.starterPositionIndex].playerId,
       index: round.starterPositionIndex,
+    } as IPlayerInTurn;
+  } else if (round.cardsPlayed[currentPlayInd].length < playerCount) {
+    // all players haven't hit the card
+    let checkInd = round.starterPositionIndex + round.cardsPlayed[currentPlayInd].length;
+    if (checkInd >= playerCount) checkInd-= playerCount;
+    return {
+      name: round.roundPlayers[checkInd].name,
+      type: round.roundPlayers[checkInd].type,
+      playerId: round.roundPlayers[checkInd].playerId,
+      index: checkInd,
     } as IPlayerInTurn;
   }
   return null;
@@ -113,6 +125,7 @@ export const getMyCards = (myId: string, round: IRound, speedPromise: boolean): 
  */
 export const getPlayableCardIndexes = (myCards: IuiCard[], round: IRound, playIndex: number): number[] => {
   if (round.cardsPlayed[playIndex].length === 0) {
+    // I started this turn so I can hit any card I like
     return Array.from(myCards.keys());
   }
   return [];

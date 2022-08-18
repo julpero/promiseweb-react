@@ -169,7 +169,6 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
         round.roundPlayers[winnerIndexInRound].keeps++;
       }
 
-
       if (round.cardsPlayed.length === round.cardsInRound) {
         // this whole round is now played
         response.roundStatusAfterPlay = ROUND_STATUS.played;
