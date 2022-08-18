@@ -1,6 +1,9 @@
+import { Suite } from "card-games-typescript";
 import { ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
+import { IuiCard } from "../../frontend/src/interfaces/IuiPlayingGame";
 import { getPlayerAvgPoints } from "../dbActions/promiseweb";
-import { IGame, IGameOptions, IHumanPlayer, IPlayer, IPlayerInTurn, IPlayerStats, IPromiser, IRound } from "../interfaces/IGameOptions";
+import { ICard, ICardPlayed, IGame, IGameOptions, IHumanPlayer, IPlayer, IPlayerInTurn, IPlayerStats, IPromiser, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
+import { ICardToIuiCard } from "./model";
 
 export const getPlayerStats = async (roundCount: number, playerName: string): Promise<IPlayerStats> => {
   const statsGamesObj = {
@@ -81,4 +84,78 @@ export const getCurrentPromiseTotal = (round: IRound): number => {
   let totalPromise = 0;
   round.roundPlayers.map(player => totalPromise+=(player.promise ?? 0));
   return totalPromise;
+};
+
+export const getCurrentPlayIndex = (round: IRound): number => {
+  return round.cardsPlayed.length - 1;
+};
+
+const showSpeedPromiseCards = (): boolean => {
+  return true;
+};
+
+export const getMyCards = (myId: string, round: IRound, speedPromise: boolean): IuiCard[] => {
+  if (!speedPromise || showSpeedPromiseCards()) {
+    return round.roundPlayers.find(player => player.playerId === myId)?.cards.map(card => {
+      return ICardToIuiCard(card);
+    }) ?? [];
+  } else {
+    return [];
+  }
+};
+
+/**
+ * This is called only if it is players turn.
+ * Frontend can trust this mapping, no need for logic there.
+ * @param myCards
+ * @param round
+ * @param playIndex
+ */
+export const getPlayableCardIndexes = (myCards: IuiCard[], round: IRound, playIndex: number): number[] => {
+  if (round.cardsPlayed[playIndex].length === 0) {
+    return Array.from(myCards.keys());
+  }
+  return [];
+};
+
+export const winnerOfPlay = (cardsPlayed: ICardPlayed[], trumpSuit: Suite): IPlayer | null=> {
+  if (cardsPlayed.length === 0) return null;
+
+  let winner = {
+    name:  cardsPlayed[0].name,
+    playerId:  cardsPlayed[0].playerId,
+  } as IPlayer;
+  let winningCard = cardsPlayed[0].card;
+  for (let i = 1; i < cardsPlayed.length; i++) {
+    let thisWins = false;
+    const thisCard = cardsPlayed[i].card;
+    if (winningCard.suite === trumpSuit) {
+      // has to be bigger trump to win
+      thisWins = thisCard.value > winningCard.value;
+    } else if (thisCard.suite === trumpSuit) {
+      // wins with any trump
+      thisWins = true;
+    } else {
+      // wins if greater rank of same suit
+      thisWins = thisCard.suite === winningCard.suite && thisCard.value > winningCard.value;
+    }
+    if (thisWins) {
+      winner = {
+        name:  cardsPlayed[i].name,
+        playerId:  cardsPlayed[i].playerId,
+      } as IPlayer;
+      winningCard = thisCard;
+    }
+  }
+  return winner;
+};
+
+export const getCurrentCardInCharge = (cardsPlayed: ICardPlayed[][]): ICard | null => {
+  if (!cardsPlayed[cardsPlayed.length - 1][0]) return null;
+  return cardsPlayed[cardsPlayed.length - 1][0].card;
+};
+
+export const getPlayerIndexFromRoundById = (roundPlayers: IRoundPlayer[], id: string | null): number => {
+  if (!id) return -1;
+  return roundPlayers.findIndex(player => player.playerId === id);
 };

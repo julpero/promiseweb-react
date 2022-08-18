@@ -3,7 +3,17 @@ import { CARD_PLAYABLE } from "../components/GameTableComponents/Cards";
 import CardSlot from "../components/GameTableComponents/CardSlot";
 import { IuiCard, IuiGetRoundResponse, IuiRoundPlayer } from "../interfaces/IuiPlayingGame";
 
-export const renderCardSlots = (slotCount: number, roundInfo: IuiGetRoundResponse, cards: IuiCard[]): JSX.Element[] => {
+const cardPlayable = (i: number, roundInfo: IuiGetRoundResponse): CARD_PLAYABLE => {
+  if (roundInfo.roundToPlayer.isMyTurn) {
+    return roundInfo.roundToPlayer.playableCards.some(ind => ind === i)
+      ? CARD_PLAYABLE.ok
+      : CARD_PLAYABLE.notAllowed;
+  } else {
+    return CARD_PLAYABLE.notMyTurn;
+  }
+};
+
+export const renderCardSlots = (slotCount: number, roundInfo: IuiGetRoundResponse, cards: IuiCard[], onPlayCard?: (card: IuiCard) => void): JSX.Element[] => {
   console.log(cards);
   const slots: JSX.Element[] = [];
   for (let i = 0; i < slotCount; i++) {
@@ -17,7 +27,15 @@ export const renderCardSlots = (slotCount: number, roundInfo: IuiGetRoundRespons
       slots.push(<CardSlot key={i} classStr={classStrArr.join(" ")} />);
     } else {
       // correct card or null
-      slots.push(<CardSlot key={i} cardPlayStatus={CARD_PLAYABLE.ok} classStr={classStrArr.join(" ")} card={card} />);
+      slots.push(
+        <CardSlot
+          key={i}
+          cardPlayStatus={cardPlayable(i, roundInfo)}
+          classStr={classStrArr.join(" ")}
+          card={card}
+          onPlayCard={onPlayCard}
+        />
+      );
     }
   }
   return slots;

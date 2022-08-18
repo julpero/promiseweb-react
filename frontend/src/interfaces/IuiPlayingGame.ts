@@ -1,10 +1,18 @@
 import { IuiRules } from "./IuiGameList";
+import { GAME_STATUS, ROUND_STATUS } from "./IuiGameOptions";
 
 // import Card from "deck-of-cards";
 // in frontend we have also a dummy card with value of 0
 export type CardValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 0;
 export type Suite = "hearts" | "spades" | "diamonds" | "clubs" | "dummy";
 export type PromiseValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+
+export enum PLAY_CARD_RESPONSE {
+  playOk,
+  notMyTurn,
+  invalidCard,
+  notOk,
+}
 
 export enum PROMISE_RESPONSE {
   promiseOk,
@@ -109,6 +117,8 @@ export interface IuiRoundToPlayer {
   dealerPositionIndex: number,
   starterPositionIndex: number,
   myCards: IuiCard[],
+  /** this contains indexes for playable cards of myCards array */
+  playableCards: number[],
   players: IuiRoundPlayer[],
   trumpCard: IuiCard | null,
   playerInCharge: number,
@@ -143,4 +153,25 @@ export interface IuiMakePromiseResponse {
 export interface IuiPromiseMadeNotification {
   playerName: string,
   promise: number,
+}
+
+export interface IuiPlayCardRequest {
+  gameId: string,
+  roundInd: number,
+  myId: string,
+  card: IuiCard,
+  isSpeedPlay: boolean,
+}
+
+export interface IuiPlayCardResponse {
+  playResponse: PLAY_CARD_RESPONSE,
+  card: IuiCard,
+  cardIndex: number,
+  gameStatusAfterPlay?: GAME_STATUS,
+  roundStatusAfterPlay?: ROUND_STATUS,
+}
+
+export interface IuiCardPlayedNotification {
+  playerName: string,
+  card: IuiCard,
 }

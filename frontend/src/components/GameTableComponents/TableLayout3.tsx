@@ -1,5 +1,5 @@
 import React from "react";
-import { IuiGetGameInfoResponse, IuiGetRoundResponse } from "../../interfaces/IuiPlayingGame";
+import { IuiCard, IuiGetGameInfoResponse, IuiGetRoundResponse } from "../../interfaces/IuiPlayingGame";
 import OtherPlayer from "./OtherPlayer";
 import OwnPlayer from "./OwnPlayer";
 import TrumpSlot from "./TrumpSlot";
@@ -7,9 +7,10 @@ import TrumpSlot from "./TrumpSlot";
 interface IProps {
   gameInfo: IuiGetGameInfoResponse,
   roundInfo: IuiGetRoundResponse,
+  onPlayCard: (card: IuiCard) => void,
 }
 
-const TableLayout3 = ({ gameInfo, roundInfo }: IProps) => {
+const TableLayout3 = ({ gameInfo, roundInfo, onPlayCard }: IProps) => {
   return (
     <div className="row">
       <div className="col">
@@ -51,6 +52,7 @@ const TableLayout3 = ({ gameInfo, roundInfo }: IProps) => {
             <OwnPlayer
               gameInfo={gameInfo}
               roundInfo={roundInfo}
+              onPlayCard={onPlayCard}
             />
           </div>
         </div>

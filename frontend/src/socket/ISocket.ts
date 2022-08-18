@@ -1,7 +1,18 @@
 import { IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "../interfaces/IuiCheckIfOngoingGame";
 import { IuiGetGameListRequest, IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse } from "../interfaces/IuiGameList";
 import { IuiCreateGameRequest, IuiCreateGameResponse } from "../interfaces/IuiNewGame";
-import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse, IuiPromiseMadeNotification } from "../interfaces/IuiPlayingGame";
+import {
+  IuiCardPlayedNotification,
+  IuiGetGameInfoRequest,
+  IuiGetGameInfoResponse,
+  IuiGetRoundRequest,
+  IuiGetRoundResponse,
+  IuiMakePromiseRequest,
+  IuiMakePromiseResponse,
+  IuiPlayCardRequest,
+  IuiPlayCardResponse,
+  IuiPromiseMadeNotification,
+} from "../interfaces/IuiPlayingGame";
 
 export interface ServerToClientEvents {
   "new game created": (newGameId: string) => void;
@@ -9,6 +20,7 @@ export interface ServerToClientEvents {
   "game begins": (gameIdStr: string) => void;
   "new chat line": (chatLine: string) => void;
   "promise made": (promiseNotification: IuiPromiseMadeNotification) => void;
+  "card played": (cardPlayedNotification: IuiCardPlayedNotification) => void;
 }
 
 export interface ClientToServerEvents {
@@ -20,4 +32,5 @@ export interface ClientToServerEvents {
   "leave game": (leaveGameRequest: IuiJoinLeaveGameRequest, fn: (response: IuiJoinLeaveGameResponse) => void) => void;
   "check game": (getGameInfoRequest: IuiGetGameInfoRequest, fn: (gameInfo: IuiGetGameInfoResponse) => void) => void;
   "get round": (getRoundRequest: IuiGetRoundRequest, fn: (roundResponse: IuiGetRoundResponse) => void) => void;
+  "play card": (playCardRequest: IuiPlayCardRequest, fn: (playCardResponse: IuiPlayCardResponse) => void) => void;
 }

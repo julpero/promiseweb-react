@@ -8,6 +8,8 @@ import {
   IuiMakePromiseRequest,
   IuiMakePromiseResponse,
   IuiParsedHumanPlayer,
+  IuiPlayCardRequest,
+  IuiPlayCardResponse,
   IuiPlayerPromise,
   IuiPlayerStats,
   IuiPromiseTable,
@@ -16,9 +18,18 @@ import {
   IuiRoundTotalPromise,
   ROUND_PHASE,
 } from "../../frontend/src/interfaces/IuiPlayingGame";
-import { getPlayerInTurn, getPlayerNameById, getPlayerNameInPlayerOrder, getPromiser } from "../common/common";
-import { isRuleActive, rulesToRuleObj } from "../common/model";
-import { getGame, getGameWithPlayer, makePromiseToPlayer } from "../dbActions/playingGame";
+import {
+  getCurrentCardInCharge,
+  getCurrentPlayIndex,
+  getMyCards,
+  getPlayableCardIndexes,
+  getPlayerInTurn,
+  getPlayerNameById,
+  getPlayerNameInPlayerOrder,
+  getPromiser,
+} from "../common/common";
+import { ICardToIuiCard, isRuleActive, rulesToRuleObj } from "../common/model";
+import { getGame, getGameWithPlayer, makePromiseToPlayer, playerPlaysCard } from "../dbActions/playingGame";
 import { ICardPlayed, IGameOptions, IRound } from "../interfaces/IGameOptions";
 
 export const getRound = async (getRoundObj: IuiGetRoundRequest): Promise<IuiGetRoundResponse | null> => {
@@ -35,7 +46,7 @@ export const getRound = async (getRoundObj: IuiGetRoundRequest): Promise<IuiGetR
     gameId: gameId,
     roundInd: roundInd,
     myName: myName,
-    roundToPlayer: roundToPlayer(gameInDb, roundInd, myName),
+    roundToPlayer: roundToPlayer(gameInDb, roundInd, myId),
   };
   return roundResponse;
 };
@@ -56,43 +67,21 @@ const parsePlayerStats = (gameInDb: IGameOptions, playerName: string): IuiPlayer
   } as IuiPlayerStats;
 };
 
-const showSpeedPromiseCards = (): boolean => {
-  return true;
-};
-
-const getMyCards = (myName: string, round: IRound, speedPromise: boolean): IuiCard[] => {
-  if (!speedPromise || showSpeedPromiseCards()) {
-    return round.roundPlayers.find(player => player.name === myName)?.cards.map(card => {
-      return {
-        suite: card.suite,
-        value: card.value,
-        rank: card.rank,
-      } as IuiCard;
-    }) ?? [];
-  } else {
-    return [];
-  }
-};
-
-const getCurrentPlayIndex = (round: IRound): number => {
-  return round.cardsPlayed.length - 1;
-};
-
-const getPlayerPlayedCard = (playerName: string, cardsPlayed: ICardPlayed[], returnCard: boolean): IuiCard | null => {
-  const cardPlayed = cardsPlayed.find(cardPlayed => cardPlayed.name === playerName);
+const getPlayerPlayedCard = (playerId: string, cardsPlayed: ICardPlayed[], returnCard: boolean): IuiCard | null => {
+  const cardPlayed = cardsPlayed.find(cardPlayed => cardPlayed.playerId === playerId);
   if (cardPlayed) {
     return returnCard ? cardPlayed.card : { suite: "dummy", value: 0, rank: "" } as IuiCard;
   }
   return null;
 };
 
-const getRoundPlayers = (myName: string, round: IRound, playIndex: number, showPromises: boolean): IuiRoundPlayer[] => {
+const getRoundPlayers = (myId: string, round: IRound, playIndex: number, showPromises: boolean): IuiRoundPlayer[] => {
   const players: IuiRoundPlayer[] = [];
   // TODO const firstPlayerInThePlay = getFirstPlayerInThePlay(round, play);
   // TODO const lastPlayerInThePlay = getLastPlayerInThePlay(round, play);
 
   round.roundPlayers.forEach((player, idx) => {
-    const thisIsMe = player.name == myName;
+    const thisIsMe = player.playerId == myId;
     const returnCard = thisIsMe || true; // TODO || module.exports.okToReturnCard(hiddenCardsMode, player.name == firstPlayerInThePlay, player.name == lastPlayerInThePlay, player.name == playerGoingToWinThisPlay);
     players.push({
       thisIsMe: thisIsMe,
@@ -100,7 +89,7 @@ const getRoundPlayers = (myName: string, round: IRound, playIndex: number, showP
       name: player.name,
       promise: showPromises || thisIsMe ? player.promise : (player.promise === null) ? null : -1,
       keeps: player.keeps,
-      cardPlayed: getPlayerPlayedCard(player.name, round.cardsPlayed[playIndex], returnCard),
+      cardPlayed: getPlayerPlayedCard(player.playerId, round.cardsPlayed[playIndex], returnCard),
       speedPromisePoints: player.speedPromisePoints,
       speedPromiseTotal: player.speedPromiseTotal,
     });
@@ -145,12 +134,12 @@ const getPromiseTable = (gameInDb: IGameOptions): IuiPromiseTable => {
   } as IuiPromiseTable;
 };
 
-const isMyTurn = (myName: string, round: IRound): boolean => {
-  return getPlayerInTurn(round)?.name === myName;
+const isMyTurn = (myId: string, round: IRound): boolean => {
+  return getPlayerInTurn(round)?.playerId === myId;
 };
 
-const isMyPromiseTurn = (myName: string, round: IRound): boolean => {
-  return getPromiser(round)?.name === myName;
+const isMyPromiseTurn = (myId: string, round: IRound): boolean => {
+  return getPromiser(round)?.playerId === myId;
 };
 
 const getRoundPhase = (round: IRound): ROUND_PHASE => {
@@ -161,26 +150,30 @@ const getRoundPhase = (round: IRound): ROUND_PHASE => {
   return ROUND_PHASE.initial;
 };
 
-const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerName: string): IuiRoundToPlayer => {
+const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: string): IuiRoundToPlayer => {
   const round = gameInDb.game.rounds[roundInd];
   const playIndex = getCurrentPlayIndex(round);
+  const isNowMyTurn = isMyTurn(playerId, round);
+  const myCards = getMyCards(playerId, round, false);
+  const cardInCharge = getCurrentCardInCharge(round.cardsPlayed);
 
   return {
     cardsInRound: round.cardsInRound,
     dealerPositionIndex: round.dealerPositionIndex,
     starterPositionIndex: round.starterPositionIndex,
-    myCards: getMyCards(playerName, round, false), // TODO speed promise
-    players: getRoundPlayers(playerName, round, playIndex, !isRuleActive(gameInDb, RULE.hiddenPromiseRound)), // TODO showPromisesNow
-    trumpCard: round.trumpCard, // TODO
+    myCards: myCards, // TODO speed promise
+    playableCards: isNowMyTurn ? getPlayableCardIndexes(myCards, round, playIndex) : [],
+    players: getRoundPlayers(playerId, round, playIndex, !isRuleActive(gameInDb, RULE.hiddenPromiseRound)), // TODO showPromisesNow
+    trumpCard: ICardToIuiCard(round.trumpCard), // TODO
     playerInCharge: 0, // TODO
-    cardInCharge: null, // TODO
+    cardInCharge: cardInCharge ? ICardToIuiCard(cardInCharge) : null, // TODO
     playerGoingToWinThisPlay: null, // TODO
     cardsPlayed: [], // TODO
     doReloadInit: false, // TODO
     newRound: false, // TODO
     gameOver: false, // TODO
-    isMyTurn: isMyTurn(playerName, round), // TODO
-    isMyPromiseTurn: isMyPromiseTurn(playerName, round), // TODO
+    isMyTurn: isNowMyTurn, // TODO
+    isMyPromiseTurn: isMyPromiseTurn(playerId, round), // TODO
     handValues: null, // TODO getHandValues(thisGame, roundInd),
     obsGame: null, // TODO obsGameToRoundObj
     promiseTable: getPromiseTable(gameInDb),
@@ -218,7 +211,12 @@ const gameToGameInfo = (gameIdStr: string, gameInDb: IGameOptions): IuiGetGameIn
   } as IuiGetGameInfoResponse;
 };
 
-export const makePromise = async (makePromiseRequest: IuiMakePromiseRequest): Promise<IuiMakePromiseResponse | null> => {
+export const makePromise = async (makePromiseRequest: IuiMakePromiseRequest): Promise<IuiMakePromiseResponse> => {
   const promiseResponse = await makePromiseToPlayer(makePromiseRequest);
   return promiseResponse;
+};
+
+export const playCard = async (playCardRequest: IuiPlayCardRequest): Promise<IuiPlayCardResponse> => {
+  const playCardResponse = await playerPlaysCard(playCardRequest);
+  return playCardResponse;
 };

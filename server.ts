@@ -18,8 +18,8 @@ import { CREATE_GAME_STATUS, IuiCreateGameRequest, IuiCreateGameResponse } from 
 import { IuiGetGameListRequest, IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IuiGameList";
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "./frontend/src/interfaces/IuiCheckIfOngoingGame";
 import { IuiChatObj } from "./frontend/src/interfaces/IuiChat";
-import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse, IuiPromiseMadeNotification, PROMISE_RESPONSE } from "./frontend/src/interfaces/IuiPlayingGame";
-import { getGameInfo, getRound, makePromise } from "./backend/actions/playingGame";
+import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, PROMISE_RESPONSE } from "./frontend/src/interfaces/IuiPlayingGame";
+import { getGameInfo, getRound, makePromise, playCard } from "./backend/actions/playingGame";
 
 // Routes
 // not defined
@@ -167,10 +167,8 @@ connectDB().then(() => {
       if (!gameIdStr || !makePromiseRequest.myId) {
         return null;
       }
-      const promiseResponse: IuiMakePromiseResponse | null = await makePromise(makePromiseRequest);
-      if (promiseResponse === null) {
-        return null;
-      } else if (promiseResponse.promiseResponse === PROMISE_RESPONSE.evenPromiseNotAllowed) {
+      const promiseResponse: IuiMakePromiseResponse = await makePromise(makePromiseRequest);
+      if (promiseResponse.promiseResponse === PROMISE_RESPONSE.evenPromiseNotAllowed) {
         const chatLine = "You can't promise " + promiseResponse.promise + " because even promises are not allowed!";
         socket.emit("new chat line", chatLine);
       } else if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
@@ -184,6 +182,17 @@ connectDB().then(() => {
         io.to(gameIdStr).emit("new chat line", chatLine);
       }
       fn(promiseResponse);
+    });
+
+    socket.on("play card", async (playCardRequest: IuiPlayCardRequest, fn: (playCardResponse: IuiPlayCardResponse) => void) => {
+      console.log("play card", playCardRequest);
+      const gameIdStr = playCardRequest.gameId;
+      if (!gameIdStr || !playCardRequest.myId) {
+        return null;
+      }
+      const playCardResponse = await playCard(playCardRequest);
+
+      fn(playCardResponse);
     });
 
     socket.on("write chat", async (chatObj: IuiChatObj ) => {

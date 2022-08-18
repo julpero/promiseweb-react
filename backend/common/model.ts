@@ -1,6 +1,7 @@
-import { IGameOptions, IHumanPlayer } from "../interfaces/IGameOptions";
+import { ICard, IGameOptions, IHumanPlayer } from "../interfaces/IGameOptions";
 import { RULE } from "../../frontend/src/interfaces/IuiGameOptions";
 import { IuiRules } from "../../frontend/src/interfaces/IuiGameList";
+import { IuiCard } from "../../frontend/src/interfaces/IuiPlayingGame";
 
 export const playersToArr = (players: IHumanPlayer[]): string[] => {
   const playerArr: string[] = players.map(player => player.name);
@@ -67,6 +68,14 @@ export const isRuleActive = (gameOptions: IGameOptions, rule: RULE): boolean => 
     }
     default: return false;
   }
+};
+
+export const ICardToIuiCard = (card: ICard): IuiCard => {
+  return {
+    suite: card.suite,
+    rank: card.rank,
+    value: card.value,
+  } as IuiCard;
 };
 
 /*

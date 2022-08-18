@@ -54,7 +54,7 @@ export interface IGame {
 export interface IPlayer {
   name: string,
   playerId: string,
-  type: PlayerType,
+  type?: PlayerType,
 }
 
 export interface IGameStatistics {
@@ -127,6 +127,7 @@ export interface IRoundPlayer extends IPlayer {
 }
 
 export interface ICardPlayed {
+  playerId: string,
   name: string,
   card: ICard,
   playedTime: number,

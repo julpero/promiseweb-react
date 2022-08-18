@@ -6,7 +6,7 @@ import Chat from "../components/Chat";
 import PromiseTable from "../components/PromiseTable";
 import ScoreBoard from "../components/ScoreBoard";
 
-import { IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiPromiseMadeNotification } from "../interfaces/IuiPlayingGame";
+import { IuiCard, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification } from "../interfaces/IuiPlayingGame";
 
 interface IProps {
   gameId: string,
@@ -19,8 +19,6 @@ const GameTable = ({gameId}: IProps) => {
   const { socket } = useSocket();
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
 
-  let roundInd = -1;
-
   useEffect(() => {
     console.log("gametable did mount, gameId", gameId);
     if (gameId !== "") {
@@ -28,20 +26,18 @@ const GameTable = ({gameId}: IProps) => {
         myId: getMyId(),
         gameId: gameId,
       };
-      socket.emit("check game", getGameInfoRequest, (gameInfo: IuiGetGameInfoResponse) => {
-        console.log("gameInfo", gameInfo);
-
-        roundInd = gameInfo.currentRound ?? 0;
+      socket.emit("check game", getGameInfoRequest, (gameInfoResponse: IuiGetGameInfoResponse) => {
+        console.log("gameInfoResponse", gameInfoResponse);
 
         const getRoundRequest: IuiGetRoundRequest = {
           myId: getMyId(),
           gameId: gameId,
-          roundInd: roundInd,
+          roundInd: gameInfoResponse.currentRound ?? 0,
         };
 
         socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
           console.log("roundResponse", roundResponse);
-          setGameInfo(gameInfo);
+          setGameInfo(gameInfoResponse);
           setRoundInfo(roundResponse);
         });
       });
@@ -52,7 +48,7 @@ const GameTable = ({gameId}: IProps) => {
         const getRoundRequest: IuiGetRoundRequest = {
           myId: getMyId(),
           gameId: gameId,
-          roundInd: roundInd,
+          roundInd: gameInfo?.currentRound ?? 0,
         };
 
         socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
@@ -67,11 +63,25 @@ const GameTable = ({gameId}: IProps) => {
     };
   }, []);
 
+  const onPlayCard = (card: IuiCard) => {
+    console.log("onPlayCard in GAMETABLE", card);
+    const playCardRequest: IuiPlayCardRequest = {
+      myId: getMyId(),
+      gameId: gameId,
+      roundInd: gameInfo?.currentRound ?? 0,
+      card: card,
+      isSpeedPlay: false,
+    };
+    socket.emit("play card", playCardRequest, (playCardResponse: IuiPlayCardResponse) => {
+      console.log("playCardResponse", playCardResponse);
+    });
+  };
+
   return (
     <div className="container-fluid" style={{width: "100vw", height: "100vh"}}>
       <div className="row">
         <div className="col-10">
-          <CardBoard gameInfo={gameInfo} roundInfo={roundInfo} />
+          <CardBoard gameInfo={gameInfo} roundInfo={roundInfo} onPlayCard={onPlayCard} />
         </div>
         <div className="col-2">
           <ScoreBoard />

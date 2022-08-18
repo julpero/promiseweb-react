@@ -2,16 +2,16 @@ import React from "react";
 import { isRuleActive } from "../../common/commonFunctions";
 import { amILastPromiser, currentTotalPromise, renderCardSlots } from "../../common/playingGame";
 import { RULE } from "../../interfaces/IuiGameOptions";
-import { IuiGetGameInfoResponse, IuiGetRoundResponse } from "../../interfaces/IuiPlayingGame";
+import { IuiCard, IuiGetGameInfoResponse, IuiGetRoundResponse } from "../../interfaces/IuiPlayingGame";
 import PromiseButtons from "./PromiseButtons";
 
 interface IProps {
   gameInfo: IuiGetGameInfoResponse,
   roundInfo: IuiGetRoundResponse,
+  onPlayCard: (card: IuiCard) => void,
 }
 
-const OwnPlayer = (props: IProps) => {
-  const { gameInfo, roundInfo } = props;
+const OwnPlayer = ({ gameInfo, roundInfo, onPlayCard }: IProps) => {
 
   const disableButton = (): number => {
     // this handles also hidden promise round rule because then total promise is negative
@@ -25,7 +25,7 @@ const OwnPlayer = (props: IProps) => {
   return (
     <React.Fragment>
       <div className="row">
-        {renderCardSlots(10, roundInfo, roundInfo.roundToPlayer.myCards)}
+        {renderCardSlots(10, roundInfo, roundInfo.roundToPlayer.myCards, onPlayCard)}
       </div>
       <PromiseButtons
         gameId={roundInfo.gameId}

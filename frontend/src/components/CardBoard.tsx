@@ -1,17 +1,17 @@
 import React from "react";
-import { IuiGetGameInfoResponse, IuiGetRoundResponse } from "../interfaces/IuiPlayingGame";
+import { IuiCard, IuiGetGameInfoResponse, IuiGetRoundResponse } from "../interfaces/IuiPlayingGame";
 import TableLayout3 from "./GameTableComponents/TableLayout3";
 
 interface IProps {
   gameInfo: IuiGetGameInfoResponse | null,
   roundInfo: IuiGetRoundResponse | null,
+  onPlayCard: (card: IuiCard) => void,
 }
 
 /**
  * Cardboard, where the all fun happens
  */
-const CardBoard = (props: IProps) => {
-  const { gameInfo, roundInfo } = props;
+const CardBoard = ({ gameInfo, roundInfo, onPlayCard }: IProps) => {
   if (!gameInfo || !roundInfo) return null;
 
   switch (gameInfo.humanPlayersCount) {
@@ -20,6 +20,7 @@ const CardBoard = (props: IProps) => {
         <TableLayout3
           roundInfo={roundInfo}
           gameInfo={gameInfo}
+          onPlayCard={onPlayCard}
         />
       );
     }
