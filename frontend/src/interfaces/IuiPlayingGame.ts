@@ -121,6 +121,7 @@ export interface IuiRoundToPlayer {
   playableCards: number[],
   players: IuiRoundPlayer[],
   trumpCard: IuiCard | null,
+  myPlayedCard: IuiCard | null,
   playerInCharge: number,
   promiseTable: IuiPromiseTable,
   cardInCharge: IuiCard | null,

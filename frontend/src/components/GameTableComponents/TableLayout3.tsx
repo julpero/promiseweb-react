@@ -1,5 +1,6 @@
 import React from "react";
 import { IuiCard, IuiGetGameInfoResponse, IuiGetRoundResponse } from "../../interfaces/IuiPlayingGame";
+import CardSlot from "./CardSlot";
 import OtherPlayer from "./OtherPlayer";
 import OwnPlayer from "./OwnPlayer";
 import TrumpSlot from "./TrumpSlot";
@@ -37,7 +38,11 @@ const TableLayout3 = ({ gameInfo, roundInfo, onPlayCard }: IProps) => {
         </div>
         <div className="row">
           <div className="col-6"></div>
-          <div className="col-2 cardCol myPlayedCard">MyPlayedCard</div>
+          <div className="col-2 cardCol myPlayedCard">
+            <CardSlot
+              card={roundInfo.roundToPlayer.myPlayedCard ?? undefined}
+            />
+          </div>
           <div className="col-4"></div>
         </div>
         <div className="row">

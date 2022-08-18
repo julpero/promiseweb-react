@@ -156,6 +156,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: strin
   const isNowMyTurn = isMyTurn(playerId, round);
   const myCards = getMyCards(playerId, round, false);
   const cardInCharge = getCurrentCardInCharge(round.cardsPlayed);
+  const myPlayedCard = round.cardsPlayed[playIndex].find(playedCard => playedCard.playerId === playerId)?.card;
 
   return {
     cardsInRound: round.cardsInRound,
@@ -165,6 +166,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: strin
     playableCards: isNowMyTurn ? getPlayableCardIndexes(myCards, round, playIndex) : [],
     players: getRoundPlayers(playerId, round, playIndex, !isRuleActive(gameInDb, RULE.hiddenPromiseRound)), // TODO showPromisesNow
     trumpCard: ICardToIuiCard(round.trumpCard), // TODO
+    myPlayedCard: myPlayedCard ? ICardToIuiCard(myPlayedCard) : null,
     playerInCharge: 0, // TODO
     cardInCharge: cardInCharge ? ICardToIuiCard(cardInCharge) : null, // TODO
     playerGoingToWinThisPlay: null, // TODO
