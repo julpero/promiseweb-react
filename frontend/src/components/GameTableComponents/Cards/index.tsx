@@ -80,7 +80,7 @@ const getCardFace = (cardStr: string, playableStatus: CARD_PLAYABLE) => {
     case "spades7": return <SpadesSeven text="7" title="SpadesSeven" playableClass={playableToClass(playableStatus)} suite="spades" />;
     case "spades8": return <SpadesEight text="8" title="SpadesEight" playableClass={playableToClass(playableStatus)} suite="spades" />;
     case "spades9": return <SpadesNine text="9" title="SpadesNine" playableClass={playableToClass(playableStatus)} suite="spades" />;
-    case "spades10": return <SpadesTen text="0" title="SpadesTen" playableClass={playableToClass(playableStatus)} suite="spades" />;
+    case "spades10": return <SpadesTen text="10" title="SpadesTen" playableClass={playableToClass(playableStatus)} suite="spades" />;
     case "spadesJ": return <SpadesJack text="J" title="SpadesJack" playableClass={playableToClass(playableStatus)} suite="spades" />;
     case "spadesQ": return <SpadesQueen text="Q" title="SpadesQueen" playableClass={playableToClass(playableStatus)} suite="spades" />;
     case "spadesK": return <SpadesKing text="K" title="SpadesKing" playableClass={playableToClass(playableStatus)} suite="spades" />;
@@ -93,7 +93,7 @@ const getCardFace = (cardStr: string, playableStatus: CARD_PLAYABLE) => {
     case "hearts7": return <HeartsSeven text="7" title="HeartsSeven" playableClass={playableToClass(playableStatus)} suite="hearts" />;
     case "hearts8": return <HeartsEight text="8" title="HeartsEight" playableClass={playableToClass(playableStatus)} suite="hearts" />;
     case "hearts9": return <HeartsNine text="9" title="HeartsNine" playableClass={playableToClass(playableStatus)} suite="hearts" />;
-    case "hearts10": return <HeartsTen text="0" title="HeartsTen" playableClass={playableToClass(playableStatus)} suite="hearts" />;
+    case "hearts10": return <HeartsTen text="10" title="HeartsTen" playableClass={playableToClass(playableStatus)} suite="hearts" />;
     case "heartsJ": return <HeartsJack text="J" title="HeartsJack" playableClass={playableToClass(playableStatus)} suite="hearts" />;
     case "heartsQ": return <HeartsQueen text="Q" title="HeartsQueen" playableClass={playableToClass(playableStatus)} suite="hearts" />;
     case "heartsK": return <HeartsKing text="K" title="HeartsKing" playableClass={playableToClass(playableStatus)} suite="hearts" />;
@@ -106,7 +106,7 @@ const getCardFace = (cardStr: string, playableStatus: CARD_PLAYABLE) => {
     case "clubs7": return <ClubsSeven text="7" title="ClubsSeven" playableClass={playableToClass(playableStatus)} suite="clubs" />;
     case "clubs8": return <ClubsEight text="8" title="ClubsEight" playableClass={playableToClass(playableStatus)} suite="clubs" />;
     case "clubs9": return <ClubsNine text="9" title="ClubsNine" playableClass={playableToClass(playableStatus)} suite="clubs" />;
-    case "clubs10": return <ClubsTen text="0" title="ClubsTen" playableClass={playableToClass(playableStatus)} suite="clubs" />;
+    case "clubs10": return <ClubsTen text="10" title="ClubsTen" playableClass={playableToClass(playableStatus)} suite="clubs" />;
     case "clubsJ": return <ClubsJack text="J" title="ClubsJack" playableClass={playableToClass(playableStatus)} suite="clubs" />;
     case "clubsQ": return <ClubsQueen text="Q" title="ClubsQueen" playableClass={playableToClass(playableStatus)} suite="clubs" />;
     case "clubsK": return <ClubsKing text="K" title="ClubsKing" playableClass={playableToClass(playableStatus)} suite="clubs" />;
@@ -119,7 +119,7 @@ const getCardFace = (cardStr: string, playableStatus: CARD_PLAYABLE) => {
     case "diamonds7": return <DiamondsSeven text="7" title="DiamondsSeven" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
     case "diamonds8": return <DiamondsEight text="8" title="DiamondsEight" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
     case "diamonds9": return <DiamondsNine text="9" title="DiamondsNine" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
-    case "diamonds10": return <DiamondsTen text="0" title="DiamondsTen" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
+    case "diamonds10": return <DiamondsTen text="10" title="DiamondsTen" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
     case "diamondsJ": return <DiamondsJack text="J" title="DiamondsJack" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
     case "diamondsQ": return <DiamondsQueen text="Q" title="DiamondsQueen" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
     case "diamondsK": return <DiamondsKing text="K" title="DiamondsKing" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
