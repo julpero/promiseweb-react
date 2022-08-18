@@ -127,8 +127,21 @@ export const getPlayableCardIndexes = (myCards: IuiCard[], round: IRound, playIn
   if (round.cardsPlayed[playIndex].length === 0) {
     // I started this turn so I can hit any card I like
     return Array.from(myCards.keys());
+  } else {
+    const suiteInCharge = round.cardsPlayed[playIndex][0].card.suite;
+    // const playableCardIndexes = Array.from(myCards.keys(card => card.suite === suiteInCharge));
+    const playableCardIndexes: number[] = [];
+    myCards.forEach((card, idx) => {
+      if (card.suite === suiteInCharge) playableCardIndexes.push(idx);
+    });
+
+    // if there is one or more suitable cards in hand then play with them
+    if (playableCardIndexes.length > 0) return playableCardIndexes;
+
+    // TODO must play trump
+    // else return all indexes
+    return Array.from(myCards.keys());
   }
-  return [];
 };
 
 export const winnerOfPlay = (cardsPlayed: ICardPlayed[], trumpSuit: Suite): IPlayer | null=> {
