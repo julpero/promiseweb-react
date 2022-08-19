@@ -1,4 +1,5 @@
 import React from "react";
+import { ProgressBar } from "react-bootstrap";
 import { renderCardSlots } from "../../common/playingGame";
 import { IuiGetRoundResponse, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
 import CardSlot from "./CardSlot";
@@ -45,7 +46,30 @@ const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
   };
 
   const renderKeepProgress = () => {
-    return player.promise ? player.promise - player.keeps : null;
+    const max = maxCards;
+    const keeps = player.keeps;
+    const promise = player.promise ?? 0;
+    if (keeps === promise) {
+      return (
+        <ProgressBar>
+          <ProgressBar variant="success" now={keeps} max={max} />
+        </ProgressBar>
+      );
+    } else if (keeps < promise) {
+      return (
+        <ProgressBar>
+          <ProgressBar variant="success" now={keeps} max={max} key={1} />
+          <ProgressBar variant="warning" now={promise - keeps} max={max} key={2} />
+        </ProgressBar>
+      );
+    } else {
+      return (
+        <ProgressBar>
+          <ProgressBar variant="success" now={promise} max={max} key={1} />
+          <ProgressBar variant="danger" now={keeps - promise} max={max} key={2} />
+        </ProgressBar>
+      );
+    }
   };
 
   const renderCardsWonCols = () => {
@@ -164,7 +188,7 @@ const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
           k: {player.keeps}
         </div>
         <div className="col-4 progressInfoCol">
-          p: {renderKeepProgress()}
+          {renderKeepProgress()}
         </div>
       </div>
     );
