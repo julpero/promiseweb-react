@@ -48,7 +48,7 @@ const GameTable = ({gameId}: IProps) => {
         const getRoundRequest: IuiGetRoundRequest = {
           myId: getMyId(),
           gameId: gameId,
-          roundInd: gameInfo?.currentRound ?? 0,
+          roundInd: roundInfo?.roundInd ?? 0,
         };
 
         socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
@@ -63,7 +63,7 @@ const GameTable = ({gameId}: IProps) => {
         const getRoundRequest: IuiGetRoundRequest = {
           myId: getMyId(),
           gameId: gameId,
-          roundInd: gameInfo?.currentRound ?? 0,
+          roundInd: roundInfo?.roundInd ?? 0,
         };
 
         socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
