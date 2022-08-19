@@ -46,3 +46,8 @@ export const isRuleActive = (rules: IuiRules, checkRule: RULE): boolean => {
     default: return false;
   }
 };
+
+
+export const randomNegToPos = (max: number): number => {
+  return Math.floor(Math.random() * (2*max)) - max;
+};
