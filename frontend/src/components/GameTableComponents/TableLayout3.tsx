@@ -51,6 +51,7 @@ const TableLayout3 = ({ gameInfo, roundInfo, onPlayCard }: IProps) => {
               index={0}
               roundInfo={roundInfo}
               maxCards={10}
+              align="left"
             />
           </div>
           <div className="col-9">

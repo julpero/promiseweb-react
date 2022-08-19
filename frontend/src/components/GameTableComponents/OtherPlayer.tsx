@@ -40,10 +40,22 @@ const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
     return (player.promise && player.promise >= 0) ? player.promise : "";
   };
 
+  const renderKeepProgress = () => {
+    return player.promise ? player.promise - player.keeps : null;
+  };
+
   const renderCardsWonCols = () => {
     const cols: JSX.Element[] = [];
     for (let i = 0; i < maxCards; i++) {
-      cols.push(<div key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}></div>);
+      if (i + 1 <= player.keeps) {
+        cols.push(
+          <div key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}>
+            <CardSlot card={null} />
+          </div>
+        );
+      } else {
+        cols.push(<div key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}></div>);
+      }
     }
     return cols;
   };
@@ -145,10 +157,10 @@ const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
           {renderPromise()}
         </div>
         <div className="col-2 playerInfoCol">
-          {player.keeps}
+          k: {player.keeps}
         </div>
         <div className="col-4 progressInfoCol">
-          {player.keeps}
+          p: {renderKeepProgress()}
         </div>
       </div>
     );
