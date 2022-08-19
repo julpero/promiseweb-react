@@ -13,24 +13,31 @@ const cardPlayable = (i: number, roundInfo: IuiGetRoundResponse): CARD_PLAYABLE 
   }
 };
 
-export const renderCardSlots = (slotCount: number, roundInfo: IuiGetRoundResponse, cards: IuiCard[], cardsPlayedCount: number, onPlayCard?: (card: IuiCard) => void): JSX.Element[] => {
+export const renderCardSlots = (index: number, slotCount: number, roundInfo: IuiGetRoundResponse, cards: IuiCard[], cardsRemainingCount: number, onPlayCard?: (card: IuiCard) => void): JSX.Element[] => {
   console.log(cards);
   const slots: JSX.Element[] = [];
   for (let i = 0; i < slotCount; i++) {
     // const card = i >= roundInfo.roundToPlayer.cardsInRound || (i >= cards.length && cards.length > 0) ? undefined : cards[i] ?? null;
     const openFaceCard = cards.find(card => card.originalIndex === i);
-    const cardToRender = openFaceCard ?? (cards.length == 0 && i < cardsPlayedCount ? null : undefined);
+    const cardToRender = openFaceCard ?? (cards.length == 0 && i < cardsRemainingCount ? null : undefined);
     const classStrArr: string[] = [];
     if (i === 0) classStrArr.push("firstCardCol");
     if (i === slotCount-1) classStrArr.push("lastCardCol");
 
     if (cardToRender === undefined) {
       // just empty slot
-      slots.push(<CardSlot key={i} classStr={classStrArr.join(" ")} />);
+      slots.push(
+        <CardSlot
+          containerId={`cardsToPlaySlots${index}X${i}`}
+          key={i}
+          classStr={classStrArr.join(" ")}
+        />
+      );
     } else {
       // correct card or null
       slots.push(
         <CardSlot
+          containerId={`cardsToPlaySlots${index}X${i}`}
           key={i}
           cardPlayStatus={cardPlayable(i, roundInfo)}
           classStr={classStrArr.join(" ")}

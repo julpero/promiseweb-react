@@ -148,7 +148,7 @@ connectDB().then(() => {
     });
 
     socket.on("get round", async (getRoundObj: IuiGetRoundRequest, fn: (roundResponse: IuiGetRoundResponse) => void) => {
-      // console.log("get round", getRoundObj);
+      console.log("get round", getRoundObj);
       if (getRoundObj.gameId === "") {
         return null;
       }
@@ -163,7 +163,7 @@ connectDB().then(() => {
 
     socket.on("make promise", async (makePromiseRequest: IuiMakePromiseRequest, fn: (promiseResponse: IuiMakePromiseResponse) => void) => {
       console.log("make promise", makePromiseRequest);
-      const gameIdStr = makePromiseRequest.gameId;
+      const { gameId: gameIdStr, roundInd } = makePromiseRequest;
       if (!gameIdStr || !makePromiseRequest.myId) {
         return null;
       }
@@ -177,6 +177,7 @@ connectDB().then(() => {
         const promiseNotification: IuiPromiseMadeNotification = {
           playerName: promiser,
           promise: promise,
+          currentRoundIndex: roundInd,
         };
         io.to(gameIdStr).emit("promise made", promiseNotification);
 
@@ -188,7 +189,7 @@ connectDB().then(() => {
 
     socket.on("play card", async (playCardRequest: IuiPlayCardRequest, fn: (playCardResponse: IuiPlayCardResponse) => void) => {
       console.log("play card", playCardRequest);
-      const gameIdStr = playCardRequest.gameId;
+      const { gameId: gameIdStr, roundInd } = playCardRequest;
       if (!gameIdStr || !playCardRequest.myId) {
         return null;
       }
@@ -200,6 +201,7 @@ connectDB().then(() => {
         io.to(gameIdStr).emit("new chat line", chatLine);
         const cardPlayedNotification: IuiCardPlayedNotification = {
           playerName: playerName,
+          currentRoundIndex: roundInd,
           newPlayAfterHit: newPlayAfterHit,
           gameStatusAfterPlay: gameStatusAfterPlay,
           roundStatusAfterPlay: roundStatusAfterPlay,

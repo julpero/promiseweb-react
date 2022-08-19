@@ -27,16 +27,16 @@ const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
     return roundInfo.roundToPlayer.players[retIndex];
   };
   const player = playerFromIndex();
-  const playedRoundCount = roundInfo.roundToPlayer.players.reduce((count, player) => {
+  const playedHitsCount = roundInfo.roundToPlayer.players.reduce((count, player) => {
     return count + player.keeps;
   }, 0);
-  const cardsPlayedCount = roundInfo.roundToPlayer.cardsInRound - playedRoundCount - (player.cardPlayed ? 1 : 0);
+  const cardsRemainingCount = roundInfo.roundToPlayer.cardsInRound - playedHitsCount - (player.cardPlayed ? 1 : 0);
 
   const renderCardsRow = () => {
     if (index === 0) return null;
     return (
       <div className="row">
-        {renderCardSlots(maxCards, roundInfo, [], cardsPlayedCount)}
+        {renderCardSlots(index, maxCards, roundInfo, [], cardsRemainingCount)}
       </div>
     );
   };
@@ -78,11 +78,11 @@ const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
       if (i + 1 <= player.keeps) {
         cols.push(
           <div key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}>
-            <CardSlot card={null} />
+            <CardSlot containerId={`cardsWonSlots${index}X${i}`} card={null} />
           </div>
         );
       } else {
-        cols.push(<div key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}></div>);
+        cols.push(<div id={`cardsWonSlots${index}X${i}`} key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}></div>);
       }
     }
     return cols;
@@ -98,12 +98,30 @@ const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
 
   const renderCardPlayedCol = () => {
     if (index === 0 || index === 5) return null;
+    let springObject = null;
+    if (player.cardPlayed) {
+      console.log("roundInfo.roundToPlayer.cardsInRound", roundInfo.roundToPlayer.cardsInRound);
+      console.log("playedHitsCount", playedHitsCount);
+      console.log("cardsRemainingCount", cardsRemainingCount);
+      console.log(`cardsToPlaySlots${index}X${roundInfo.roundToPlayer.cardsInRound-playedHitsCount}`);
+      const playedFrom = document.getElementById(`cardsToPlaySlots${index}X${roundInfo.roundToPlayer.cardsInRound-playedHitsCount}`)?.getBoundingClientRect();
+      const playedTo = document.getElementById(`cardPlayedDiv${index}`)?.getBoundingClientRect();
+      console.log("playedFrom", playedFrom);
+      console.log("playedTo", playedTo);
+      // in refresh these are undefined so no animations and that's ok
+      if (playedFrom && playedTo) {
+        const fromX = playedFrom.left - playedTo.left;
+        const fromY = playedFrom.top - playedTo.top;
+        springObject = {from: {x: fromX, y: fromY}};
+      }
+    }
     return (
-      <div className="col cardCol playedCardCol">
-        <div>
-          <CardSlot card={player.cardPlayed ?? undefined} />
-        </div>
-      </div>
+      <CardSlot
+        containerId={`cardPlayedDiv${index}`}
+        card={player.cardPlayed ?? undefined}
+        classStr="playedCardCol"
+        springObject={springObject}
+      />
     );
   };
 

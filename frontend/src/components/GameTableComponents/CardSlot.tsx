@@ -5,21 +5,22 @@ import { cardAsString, cardToString, randomNegToPos } from "../../common/commonF
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 
 interface IProps {
+  containerId: string,
   card?: IuiCard | null,
   cardPlayStatus?: CARD_PLAYABLE,
   classStr?: string,
   isTrump?: boolean,
   onPlayCard?: (card: IuiCard) => void,
+  springObject?: any,
 }
 
-const CardSlot = ({card, cardPlayStatus, classStr, isTrump, onPlayCard}: IProps) => {
+const CardSlot = ({containerId, card, cardPlayStatus, classStr, isTrump, onPlayCard, springObject}: IProps) => {
   if (card === undefined) {
-    return <div className="col cardCol"></div>;
+    return <div id={containerId} className="col cardCol"></div>;
   } else {
-    const props = useSpring({
-      to: { x: randomNegToPos(2), y: randomNegToPos(2), rotate: randomNegToPos(5) },
-      // from: { x: 0, y: 0, rotate: 0 },
-    });
+    const springs = { ...springObject, to: { x: randomNegToPos(2), y: randomNegToPos(2), rotate: randomNegToPos(5) }};
+    console.log(springs);
+    const props = useSpring(springs);
     // const { x, y } = useSpring({ x: 0, y: 0 })
 
     if (card === null || isTrump) {
@@ -27,7 +28,7 @@ const CardSlot = ({card, cardPlayStatus, classStr, isTrump, onPlayCard}: IProps)
       // these are card back sides
       return (
         <React.Fragment>
-          <div className={`col cardCol ${classStr}`}>
+          <div id={containerId} className={`col cardCol ${classStr ?? ""}`}>
             <animated.div style={props}>
               { getCardFace(cardAsString(renderCard), CARD_PLAYABLE.ok) }
             </animated.div>
@@ -39,7 +40,7 @@ const CardSlot = ({card, cardPlayStatus, classStr, isTrump, onPlayCard}: IProps)
       if (cardPlayStatus === CARD_PLAYABLE.ok && onPlayCard !== undefined) {
         return (
           <React.Fragment>
-            <div className={`col cardCol ${classStr}`}>
+            <div id={containerId} className={`col cardCol ${classStr ?? ""}`}>
               <animated.div style={props} onClick={() => onPlayCard(card)}>
                 { getCardFace(cardAsString(card), CARD_PLAYABLE.ok) }
               </animated.div>
@@ -50,7 +51,7 @@ const CardSlot = ({card, cardPlayStatus, classStr, isTrump, onPlayCard}: IProps)
       } else {
         return (
           <React.Fragment>
-            <div className={`col cardCol ${classStr}`}>
+            <div id={containerId} className={`col cardCol ${classStr ?? ""}`}>
               <animated.div style={props}>
                 { getCardFace(cardAsString(card), cardPlayStatus ?? CARD_PLAYABLE.ok) }
               </animated.div>

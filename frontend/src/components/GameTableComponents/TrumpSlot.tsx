@@ -10,7 +10,12 @@ const TrumpSlot = (props: IProps) => {
   const { trump } = props;
   if (!trump) return null;
   return (
-    <CardSlot card={trump} classStr="trumpCardCol" isTrump={true} />
+    <CardSlot
+      containerId="trumpCardDiv"
+      card={trump}
+      classStr="trumpCardCol"
+      isTrump={true}
+    />
   );
 };
 

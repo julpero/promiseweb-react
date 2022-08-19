@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { isRuleActive } from "../../common/commonFunctions";
 import { amILastPromiser, currentTotalPromise, renderCardSlots } from "../../common/playingGame";
 import { RULE } from "../../interfaces/IuiGameOptions";
@@ -12,6 +12,9 @@ interface IProps {
 }
 
 const OwnPlayer = ({ gameInfo, roundInfo, onPlayCard }: IProps) => {
+  useEffect(() => {
+    console.log("in ownplayer, roundinfo", roundInfo);
+  }, [roundInfo]);
 
   const disableButton = (): number => {
     // this handles also hidden promise round rule because then total promise is negative
@@ -25,7 +28,7 @@ const OwnPlayer = ({ gameInfo, roundInfo, onPlayCard }: IProps) => {
   return (
     <React.Fragment>
       <div className="row">
-        {renderCardSlots(10, roundInfo, roundInfo.roundToPlayer.myCards, 0, onPlayCard)}
+        {renderCardSlots(0, 10, roundInfo, roundInfo.roundToPlayer.myCards, 0, onPlayCard)}
       </div>
       <PromiseButtons
         gameId={roundInfo.gameId}

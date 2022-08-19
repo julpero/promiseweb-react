@@ -159,6 +159,7 @@ export interface IuiMakePromiseResponse {
 export interface IuiPromiseMadeNotification {
   playerName: string,
   promise: number,
+  currentRoundIndex: number,
 }
 
 export interface IuiPlayCardRequest {
@@ -182,6 +183,8 @@ export interface IuiPlayCardResponse {
 
 export interface IuiCardPlayedNotification {
   playerName: string,
+  /** this index points to round where card is played, notice that if after that starts new round */
+  currentRoundIndex: number,
   newPlayAfterHit: boolean,
   gameStatusAfterPlay: GAME_STATUS,
   roundStatusAfterPlay: ROUND_STATUS,

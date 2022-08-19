@@ -38,11 +38,11 @@ const TableLayout3 = ({ gameInfo, roundInfo, onPlayCard }: IProps) => {
         </div>
         <div className="row">
           <div className="col-6"></div>
-          <div className="col-2 cardCol myPlayedCard">
-            <CardSlot
-              card={roundInfo.roundToPlayer.myPlayedCard ?? undefined}
-            />
-          </div>
+          <CardSlot
+            containerId="myPlayedCardDiv"
+            classStr="col-2 myPlayedCard"
+            card={roundInfo.roundToPlayer.myPlayedCard ?? undefined}
+          />
           <div className="col-4"></div>
         </div>
         <div className="row">
