@@ -26,12 +26,16 @@ const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
     return roundInfo.roundToPlayer.players[retIndex];
   };
   const player = playerFromIndex();
+  const playedRoundCount = roundInfo.roundToPlayer.players.reduce((count, player) => {
+    return count + player.keeps;
+  }, 0);
+  const cardsPlayedCount = roundInfo.roundToPlayer.cardsInRound - playedRoundCount - (player.cardPlayed ? 1 : 0);
 
   const renderCardsRow = () => {
     if (index === 0) return null;
     return (
       <div className="row">
-        {renderCardSlots(maxCards, roundInfo, [])}
+        {renderCardSlots(maxCards, roundInfo, [], cardsPlayedCount)}
       </div>
     );
   };

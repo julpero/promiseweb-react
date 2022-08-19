@@ -75,6 +75,7 @@ export interface IuiCard {
   suite: Suite,
   value: CardValue,
   rank: string,
+  originalIndex?: number,
 }
 
 export interface IuiRoundPlayer {

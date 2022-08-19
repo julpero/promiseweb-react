@@ -108,8 +108,11 @@ const showSpeedPromiseCards = (): boolean => {
 
 export const getMyCards = (myId: string, round: IRound, speedPromise: boolean): IuiCard[] => {
   if (!speedPromise || showSpeedPromiseCards()) {
-    return round.roundPlayers.find(player => player.playerId === myId)?.cards.map(card => {
-      return ICardToIuiCard(card);
+    const player = round.roundPlayers.find(player => player.playerId === myId);
+    return player?.cards.map(card => {
+      const uiCard = ICardToIuiCard(card);
+      uiCard.originalIndex = player.cardsToDebug.findIndex(dCard => dCard.value === card.value && dCard.suite === card.suite);
+      return uiCard;
     }) ?? [];
   } else {
     return [];
