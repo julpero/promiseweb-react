@@ -47,17 +47,29 @@ const getCurrentPlayInd = (round: IRound): number => {
 export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
   const currentPlayInd = getCurrentPlayInd(round);
   const playerCount = round.roundPlayers.length;
+  console.log("getPlayerInTurn currentPlayInd", currentPlayInd);
+
   if (currentPlayInd === 0 && round.cardsPlayed[0].length === 0) {
     // first card of the round -> starter
+    console.log("getPlayerInTurn starter");
     return {
       name: round.roundPlayers[round.starterPositionIndex].name,
       type: round.roundPlayers[round.starterPositionIndex].type,
       playerId: round.roundPlayers[round.starterPositionIndex].playerId,
       index: round.starterPositionIndex,
     } as IPlayerInTurn;
-  } else if (round.cardsPlayed[currentPlayInd].length < playerCount) {
-    // all players haven't hit the card
-    let checkInd = round.starterPositionIndex + round.cardsPlayed[currentPlayInd].length;
+  } else if (round.cardsPlayed[currentPlayInd].length < playerCount && round.cardsPlayed[currentPlayInd].length > 0) {
+    // all players haven't hit the card -> next player who hasn't hit the card
+    console.log("getPlayerInTurn in play");
+    let starterIndex = round.starterPositionIndex;
+    if (currentPlayInd !== 0) {
+      // starter was last play winner
+      const prevWinner = winnerOfPlay(round.cardsPlayed[currentPlayInd-1], round.trumpCard.suite);
+      if (prevWinner) {
+        starterIndex = round.roundPlayers.findIndex(player => player.playerId === prevWinner.playerId);
+      }
+    }
+    let checkInd = starterIndex + round.cardsPlayed[currentPlayInd].length;
     if (checkInd >= playerCount) checkInd-= playerCount;
     return {
       name: round.roundPlayers[checkInd].name,
@@ -65,6 +77,19 @@ export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
       playerId: round.roundPlayers[checkInd].playerId,
       index: checkInd,
     } as IPlayerInTurn;
+  } else {
+    // play is complete, take winner of the previous play
+    console.log("getPlayerInTurn play complete");
+    const prevWinner = winnerOfPlay(round.cardsPlayed[currentPlayInd-1], round.trumpCard.suite);
+    if (prevWinner) {
+      const winnerIndex = round.roundPlayers.findIndex(player => player.playerId === prevWinner.playerId);
+      return {
+        name: round.roundPlayers[winnerIndex].name,
+        type: round.roundPlayers[winnerIndex].type,
+        playerId: round.roundPlayers[winnerIndex].playerId,
+        index: winnerIndex,
+      } as IPlayerInTurn;
+    }
   }
   return null;
 };

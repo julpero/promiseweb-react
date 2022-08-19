@@ -115,7 +115,9 @@ export interface IuiPromiseTable {
 
 export interface IuiRoundToPlayer {
   cardsInRound: number,
+  /** for the first play of the round */
   dealerPositionIndex: number,
+  /** for the first play of the round */
   starterPositionIndex: number,
   myCards: IuiCard[],
   /** this contains indexes for playable cards of myCards array */
