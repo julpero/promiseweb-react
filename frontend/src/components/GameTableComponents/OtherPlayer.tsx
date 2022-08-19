@@ -1,6 +1,7 @@
 import React from "react";
 import { renderCardSlots } from "../../common/playingGame";
 import { IuiGetRoundResponse, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
+import CardSlot from "./CardSlot";
 
 type AlignType = "left" | "right";
 
@@ -58,7 +59,11 @@ const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
   const renderCardPlayedCol = () => {
     if (index === 0 || index === 5) return null;
     return (
-      <div className="col cardCol playedCardCol">&nbsp;</div>
+      <div className="col cardCol playedCardCol">
+        <div>
+          <CardSlot card={player.cardPlayed ?? undefined} />
+        </div>
+      </div>
     );
   };
 
