@@ -20,6 +20,7 @@ import {
   isRoundsLastPromiser,
   winnerOfPlay,
 } from "../common/common";
+import { startRound } from "../common/game";
 import { isRuleActive } from "../common/model";
 import { ICard, ICardPlayed, IGameOptions, IPromiser, PromiseValue } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
@@ -109,6 +110,9 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     card: card,
     cardIndex: -1,
     playTime: -1,
+    newPlayAfterHit: false,
+    roundStatusAfterPlay: ROUND_STATUS.onGoing,
+    gameStatusAfterPlay: GAME_STATUS.onGoing,
   };
 
   const query = GameOptions.where({
@@ -162,6 +166,8 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
 
     if (round.cardsPlayed[playIndex].length === round.roundPlayers.length) {
       // this was the last card of the play
+      response.newPlayAfterHit = true;
+
       // let's see who wins this play and will be starter of the next play
       const winner = winnerOfPlay(round.cardsPlayed[playIndex], round.trumpCard.suite);
       if (winner) {
@@ -172,12 +178,24 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
       if (round.cardsPlayed.length === round.cardsInRound) {
         // this whole round is now played
         response.roundStatusAfterPlay = ROUND_STATUS.played;
+
+        round.roundStatus = ROUND_STATUS.played;
+
+        if (currentRoundInd === gameInDb.game.rounds.length - 1) {
+          // this was the last round in the game so now game ends
+          response.gameStatusAfterPlay = GAME_STATUS.played;
+        } else {
+          // there are more rounds to play so let's start the next one
+          startRound(gameInDb, currentRoundInd + 1);
+        }
+      } else {
+        // new hit round
+        round.cardsPlayed.push([]);
       }
     } else {
-      // same play continues
-      response.roundStatusAfterPlay = ROUND_STATUS.onGoing;
-      response.gameStatusAfterPlay = GAME_STATUS.onGoing;
+      // the same play, round and game continues
     }
+
     const gameAfter = await gameInDb.save();
     if (gameAfter) {
       response.playerName = myName;

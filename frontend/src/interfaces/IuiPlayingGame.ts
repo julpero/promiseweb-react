@@ -172,12 +172,14 @@ export interface IuiPlayCardResponse {
   playTime: number,
   card: IuiCard,
   cardIndex: number,
-  gameStatusAfterPlay?: GAME_STATUS,
-  roundStatusAfterPlay?: ROUND_STATUS,
+  newPlayAfterHit: boolean,
+  gameStatusAfterPlay: GAME_STATUS,
+  roundStatusAfterPlay: ROUND_STATUS,
 }
 
 export interface IuiCardPlayedNotification {
   playerName: string,
-  gameStatusAfterPlay?: GAME_STATUS,
-  roundStatusAfterPlay?: ROUND_STATUS,
+  newPlayAfterHit: boolean,
+  gameStatusAfterPlay: GAME_STATUS,
+  roundStatusAfterPlay: ROUND_STATUS,
 }

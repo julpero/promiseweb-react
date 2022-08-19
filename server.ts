@@ -167,6 +167,7 @@ connectDB().then(() => {
       if (!gameIdStr || !makePromiseRequest.myId) {
         return null;
       }
+
       const promiseResponse: IuiMakePromiseResponse = await makePromise(makePromiseRequest);
       if (promiseResponse.promiseResponse === PROMISE_RESPONSE.evenPromiseNotAllowed) {
         const chatLine = "You can't promise " + promiseResponse.promise + " because even promises are not allowed!";
@@ -191,17 +192,19 @@ connectDB().then(() => {
       if (!gameIdStr || !playCardRequest.myId) {
         return null;
       }
+
       const playCardResponse = await playCard(playCardRequest);
       if (playCardResponse.playResponse === PLAY_CARD_RESPONSE.playOk) {
-        const { playerName, gameStatusAfterPlay, roundStatusAfterPlay, playTime } = playCardResponse;
+        const { playerName, newPlayAfterHit, gameStatusAfterPlay, roundStatusAfterPlay, playTime } = playCardResponse;
         const chatLine = `${playerName} hit card in ${(playTime/1000).toFixed(1)} seconds`;
         io.to(gameIdStr).emit("new chat line", chatLine);
-        const playCardNotification: IuiCardPlayedNotification = {
+        const cardPlayedNotification: IuiCardPlayedNotification = {
           playerName: playerName,
+          newPlayAfterHit: newPlayAfterHit,
           gameStatusAfterPlay: gameStatusAfterPlay,
           roundStatusAfterPlay: roundStatusAfterPlay,
         };
-        io.to(gameIdStr).emit("card played", playCardNotification);
+        io.to(gameIdStr).emit("card played", cardPlayedNotification);
       }
 
       fn(playCardResponse);
