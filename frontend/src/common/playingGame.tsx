@@ -5,7 +5,7 @@ import { IuiCard, IuiGetRoundResponse, IuiRoundPlayer } from "../interfaces/IuiP
 
 const cardPlayable = (i: number, roundInfo: IuiGetRoundResponse): CARD_PLAYABLE => {
   if (roundInfo.roundToPlayer.isMyTurn) {
-    return roundInfo.roundToPlayer.playableCards.some(ind => ind === i)
+    return roundInfo.roundToPlayer.playableCards.some(ind => ind === roundInfo.roundToPlayer.myCards.findIndex(card => card.originalIndex === i))
       ? CARD_PLAYABLE.ok
       : CARD_PLAYABLE.notAllowed;
   } else {
