@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSocket } from "../socket";
 
+import { useSelector, useDispatch } from "react-redux";
+import {
+  getCurrentRound,
+  setGameInfo,
+} from "../store/gameInfoSlice";
+
 import CardBoard from "../components/CardBoard";
 import Chat from "../components/Chat";
 import PromiseTable from "../components/PromiseTable";
@@ -14,7 +20,10 @@ interface IProps {
 }
 
 const GameTable = ({gameId}: IProps) => {
-  const [gameInfo, setGameInfo] = useState<IuiGetGameInfoResponse | null>(null);
+  const currentRoundIndex = useSelector(getCurrentRound);
+  const dispatch = useDispatch();
+
+  const [gameInfo, setGameInfoX] = useState<IuiGetGameInfoResponse | null>(null);
   const [roundInfo, setRoundInfo] = useState<IuiGetRoundResponse | null>(null);
   const [roundInd, setRoundInd] = useState(-1);
 
@@ -33,7 +42,8 @@ const GameTable = ({gameId}: IProps) => {
     socket.emit("check game", getGameInfoRequest, (gameInfoResponse: IuiGetGameInfoResponse) => {
       console.log("gameInfoResponse", gameInfoResponse);
       initialRender.current = false;
-      setGameInfo(gameInfoResponse);
+      dispatch(setGameInfo(gameInfoResponse));
+      setGameInfoX(gameInfoResponse);
       setRoundInd(gameInfoResponse.currentRound ?? 0);
     });
 
@@ -143,6 +153,7 @@ const GameTable = ({gameId}: IProps) => {
         </div>
         <div className="col-2">
           buttons and game menu
+          I: {currentRoundIndex}
         </div>
       </div>
     </div>

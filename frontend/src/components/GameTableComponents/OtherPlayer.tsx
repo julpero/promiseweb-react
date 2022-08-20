@@ -1,5 +1,13 @@
 import React from "react";
 import { ProgressBar } from "react-bootstrap";
+
+import { useSelector } from "react-redux";
+import {
+  getCurrentRound,
+  setGameInfo,
+} from "../../store/gameInfoSlice";
+
+
 import { renderCardSlots } from "../../common/playingGame";
 import { IuiGetRoundResponse, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
 import CardSlot from "./CardSlot";
@@ -15,6 +23,8 @@ interface IProps {
 }
 
 const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
+  const currentRoundIndex = useSelector(getCurrentRound);
+
   const getMyPosition = (): number => {
     return roundInfo.roundToPlayer.players.findIndex(player => player.thisIsMe);
   };
@@ -140,7 +150,7 @@ const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
         </div>
         <div className="row statsRow3">
           <div className="col statsCol3">
-            S2
+            S2: {currentRoundIndex}
           </div>
         </div>
       </div>
