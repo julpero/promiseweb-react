@@ -16,6 +16,9 @@ body {
 .myPlayedCard {
   text-align: center;
 }
+.playableCard {
+  cursor: pointer;
+}
 .trumpCardCol {
   text-align: center;
 }

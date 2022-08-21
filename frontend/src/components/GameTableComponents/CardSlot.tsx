@@ -40,11 +40,11 @@ const CardSlot = ({containerId, card, cardPlayStatus, classStr, isTrump, onPlayC
       if (cardPlayStatus === CARD_PLAYABLE.ok && onPlayCard !== undefined) {
         return (
           <React.Fragment>
-            <div id={containerId} className={`col cardCol ${classStr ?? ""}`}>
+            <div id={containerId} className={`col cardCol playableCard ${classStr ?? ""}`}>
               <animated.div style={props} onClick={() => onPlayCard(card)}>
                 { getCardFace(cardAsString(card), CARD_PLAYABLE.ok) }
               </animated.div>
-              {/* { cardToString(renderCard) } */}
+              {/* { cardToString(card) } */}
             </div>
           </React.Fragment>
         );
@@ -55,7 +55,7 @@ const CardSlot = ({containerId, card, cardPlayStatus, classStr, isTrump, onPlayC
               <animated.div style={props}>
                 { getCardFace(cardAsString(card), cardPlayStatus ?? CARD_PLAYABLE.ok) }
               </animated.div>
-              {/* { cardToString(renderCard) } */}
+              {/* { cardToString(card) } */}
             </div>
           </React.Fragment>
         );
