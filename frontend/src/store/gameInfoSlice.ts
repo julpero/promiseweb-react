@@ -41,6 +41,6 @@ export const gameInfoSlice = createSlice({
 
 export const { setGameInfo } = gameInfoSlice.actions;
 
-export const getCurrentRound = (state: RootState) => state.value.currentRound;
+export const getCurrentGameInfo = (state: RootState) => state.gameInfoReducer.value;
 
 export default gameInfoSlice.reducer;

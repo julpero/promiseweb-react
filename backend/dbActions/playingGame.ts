@@ -107,6 +107,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
   const response: IuiPlayCardResponse = {
     playResponse: PLAY_CARD_RESPONSE.notOk,
     playerName: "",
+    playedFromSlot: -1,
     card: card,
     cardIndex: -1,
     playTime: -1,
@@ -163,6 +164,8 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     } as ICardPlayed);
     round.roundPlayers[myIndexInRound].cards.splice(playedCardIndex, 1);
     gameInDb.game.lastTimeStamp = Date.now();
+
+    response.playedFromSlot = round.cardsInRound - round.cardsPlayed[playIndex].length;
 
     if (round.cardsPlayed[playIndex].length === round.roundPlayers.length) {
       // this was the last card of the play

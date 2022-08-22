@@ -2,10 +2,10 @@ import React from "react";
 import { ProgressBar } from "react-bootstrap";
 
 import { useSelector } from "react-redux";
+import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 import {
-  getCurrentRound,
-  setGameInfo,
-} from "../../store/gameInfoSlice";
+  getAnimateCard,
+} from "../../store/animateCardSlice";
 
 
 import { renderCardSlots } from "../../common/playingGame";
@@ -22,31 +22,34 @@ interface IProps {
   align?: AlignType,
 }
 
-const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
-  const currentRoundIndex = useSelector(getCurrentRound);
+const OtherPlayer = ({ index, maxCards, align }: IProps) => {
+  const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  const animateCard = useSelector(getAnimateCard);
+  if (!currentRoundInfo.gameId) return null;
+  console.log(currentRoundInfo);
 
   const getMyPosition = (): number => {
-    return roundInfo.roundToPlayer.players.findIndex(player => player.thisIsMe);
+    return currentRoundInfo.roundToPlayer.players.findIndex(player => player.thisIsMe);
   };
 
   const playerFromIndex = (): IuiRoundPlayer => {
     const myPosition = getMyPosition();
-    const playerCount = roundInfo.roundToPlayer.players.length;
+    const playerCount = currentRoundInfo.roundToPlayer.players.length;
     let retIndex = myPosition + index;
     if (retIndex >= playerCount) retIndex = retIndex - playerCount;
-    return roundInfo.roundToPlayer.players[retIndex];
+    return currentRoundInfo.roundToPlayer.players[retIndex];
   };
   const player = playerFromIndex();
-  const playedHitsCount = roundInfo.roundToPlayer.players.reduce((count, player) => {
+  const playedHitsCount = currentRoundInfo.roundToPlayer.players.reduce((count, player) => {
     return count + player.keeps;
   }, 0);
-  const cardsRemainingCount = roundInfo.roundToPlayer.cardsInRound - playedHitsCount - (player.cardPlayed ? 1 : 0);
+  const cardsRemainingCount = currentRoundInfo.roundToPlayer.cardsInRound - playedHitsCount - (player.cardPlayed ? 1 : 0);
 
   const renderCardsRow = () => {
     if (index === 0) return null;
     return (
       <div className="row">
-        {renderCardSlots(index, maxCards, roundInfo, [], cardsRemainingCount)}
+        {renderCardSlots(player.name, maxCards, currentRoundInfo, [], cardsRemainingCount)}
       </div>
     );
   };
@@ -109,25 +112,20 @@ const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
   const renderCardPlayedCol = () => {
     if (index === 0 || index === 5) return null;
     let springObject = null;
-    if (player.cardPlayed) {
-      console.log("roundInfo.roundToPlayer.cardsInRound", roundInfo.roundToPlayer.cardsInRound);
-      console.log("playedHitsCount", playedHitsCount);
-      console.log("cardsRemainingCount", cardsRemainingCount);
-      console.log(`cardsToPlaySlots${index}X${roundInfo.roundToPlayer.cardsInRound-playedHitsCount}`);
-      const playedFrom = document.getElementById(`cardsToPlaySlots${index}X${roundInfo.roundToPlayer.cardsInRound-playedHitsCount}`)?.getBoundingClientRect();
-      const playedTo = document.getElementById(`cardPlayedDiv${index}`)?.getBoundingClientRect();
-      console.log("playedFrom", playedFrom);
-      console.log("playedTo", playedTo);
+    if (player.cardPlayed && animateCard) {
+      const playedFrom = document.getElementById(`cardsToPlaySlotsX${player.name}X${currentRoundInfo.roundToPlayer.cardsInRound-playedHitsCount}`)?.getBoundingClientRect();
+      const playedTo = document.getElementById(`cardPlayedDivX${player.name}`)?.getBoundingClientRect();
       // in refresh these are undefined so no animations and that's ok
-      if (playedFrom && playedTo) {
+      if (animateCard && playedFrom && playedTo) {
         const fromX = playedFrom.left - playedTo.left;
         const fromY = playedFrom.top - playedTo.top;
-        springObject = {from: {x: fromX, y: fromY}};
+        springObject = {from: {x: fromX, y: fromY}, duration: 3000};
+        console.log("springObject", springObject);
       }
     }
     return (
       <CardSlot
-        containerId={`cardPlayedDiv${index}`}
+        containerId={`cardPlayedDivX${player.name}`}
         card={player.cardPlayed ?? undefined}
         classStr="playedCardCol"
         springObject={springObject}
@@ -150,7 +148,7 @@ const OtherPlayer = ({ index, roundInfo, maxCards, align }: IProps) => {
         </div>
         <div className="row statsRow3">
           <div className="col statsCol3">
-            S2: {currentRoundIndex}
+            S2
           </div>
         </div>
       </div>
