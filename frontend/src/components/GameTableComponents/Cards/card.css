@@ -6,6 +6,7 @@
   border: black 1px solid;
   max-width: 80px;
   border-radius: 5%;
+  image-rendering: crisp-edges;
 }
 .playOk {
   background-color: #ffffff;
