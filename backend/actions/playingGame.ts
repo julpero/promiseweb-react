@@ -71,7 +71,7 @@ const parsePlayerStats = (gameInDb: IGameOptions, playerName: string): IuiPlayer
 const getPlayerPlayedCard = (playerId: string, cardsPlayed: ICardPlayed[], returnCard: boolean): IuiCard | null => {
   const cardPlayed = cardsPlayed.find(cardPlayed => cardPlayed.playerId === playerId);
   if (cardPlayed) {
-    return returnCard ? cardPlayed.card : { suite: "dummy", value: 0, rank: "" } as IuiCard;
+    return returnCard ? ICardToIuiCard(cardPlayed.card) : { suite: "dummy", value: 0, rank: "" } as IuiCard;
   }
   return null;
 };

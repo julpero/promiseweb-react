@@ -196,18 +196,31 @@ connectDB().then(() => {
 
       const playCardResponse = await playCard(playCardRequest);
       if (playCardResponse.playResponse === PLAY_CARD_RESPONSE.playOk) {
-        const { playerName, playedFromSlot, newPlayAfterHit, gameStatusAfterPlay, roundStatusAfterPlay, playTime } = playCardResponse;
+        const { playerName, playedFromSlot, card, newPlayAfterHit, gameStatusAfterPlay, roundStatusAfterPlay, playTime } = playCardResponse;
         const chatLine = `${playerName} hit card in ${(playTime/1000).toFixed(1)} seconds`;
         io.to(gameIdStr).emit("new chat line", chatLine);
+
         const cardPlayedNotification: IuiCardPlayedNotification = {
           playerName: playerName,
           playedFromSlot: playedFromSlot,
+          playedCard: card,
           currentRoundIndex: roundInd,
           newPlayAfterHit: newPlayAfterHit,
           gameStatusAfterPlay: gameStatusAfterPlay,
           roundStatusAfterPlay: roundStatusAfterPlay,
         };
-        io.to(gameIdStr).emit("card played", cardPlayedNotification);
+        socket.to(gameIdStr).emit("card played", cardPlayedNotification);
+
+        const cardPlayedNotificationToMySelf: IuiCardPlayedNotification = {
+          playerName: playerName,
+          playedFromSlot: playCardRequest.card.originalIndex ?? 0,
+          playedCard: card,
+          currentRoundIndex: roundInd,
+          newPlayAfterHit: newPlayAfterHit,
+          gameStatusAfterPlay: gameStatusAfterPlay,
+          roundStatusAfterPlay: roundStatusAfterPlay,
+        };
+        socket.emit("card played", cardPlayedNotificationToMySelf);
       }
 
       fn(playCardResponse);

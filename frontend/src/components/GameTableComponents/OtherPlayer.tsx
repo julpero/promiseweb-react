@@ -1,23 +1,27 @@
 import React from "react";
 import { ProgressBar } from "react-bootstrap";
 
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 import {
+  setAnimateCard,
   getAnimateCard,
 } from "../../store/animateCardSlice";
-
+import {
+  setGetRoundInfo,
+} from "../../store/getRoundInfoSlice";
 
 import { renderCardSlots } from "../../common/playingGame";
-import { IuiGetRoundResponse, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
+import { IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
 import CardSlot from "./CardSlot";
+import { easings } from "react-spring";
+import { randomNegToPos } from "../../common/commonFunctions";
 
 type AlignType = "left" | "right";
 
 interface IProps {
   /** index goes clockwise, starting from you 0 and rest players from 1 to 5 */
   index: number,
-  roundInfo: IuiGetRoundResponse,
   maxCards: number,
   align?: AlignType,
 }
@@ -25,8 +29,7 @@ interface IProps {
 const OtherPlayer = ({ index, maxCards, align }: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const animateCard = useSelector(getAnimateCard);
-  if (!currentRoundInfo.gameId) return null;
-  console.log(currentRoundInfo);
+  const dispatch = useDispatch();
 
   const getMyPosition = (): number => {
     return currentRoundInfo.roundToPlayer.players.findIndex(player => player.thisIsMe);
@@ -40,10 +43,17 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
     return currentRoundInfo.roundToPlayer.players[retIndex];
   };
   const player = playerFromIndex();
+  console.log("currentRoundInfo, player", player);
+
+  if (!currentRoundInfo.gameId) return null;
+
   const playedHitsCount = currentRoundInfo.roundToPlayer.players.reduce((count, player) => {
     return count + player.keeps;
   }, 0);
-  const cardsRemainingCount = currentRoundInfo.roundToPlayer.cardsInRound - playedHitsCount - (player.cardPlayed ? 1 : 0);
+
+  let cardsRemainingCount = currentRoundInfo.roundToPlayer.cardsInRound - playedHitsCount;
+  if (player.cardPlayed) cardsRemainingCount--;
+  if (animateCard && animateCard.fromPlayer === player.name) cardsRemainingCount--;
 
   const renderCardsRow = () => {
     if (index === 0) return null;
@@ -112,21 +122,46 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
   const renderCardPlayedCol = () => {
     if (index === 0 || index === 5) return null;
     let springObject = null;
-    if (player.cardPlayed && animateCard) {
+    const cardPlayedCard = player.cardPlayed ?? ((animateCard && animateCard.fromPlayer === player.name) ? animateCard?.cardFace : undefined);
+
+    if (player.cardPlayed || (animateCard && animateCard.fromPlayer === player.name)) {
       const playedFrom = document.getElementById(`cardsToPlaySlotsX${player.name}X${currentRoundInfo.roundToPlayer.cardsInRound-playedHitsCount}`)?.getBoundingClientRect();
       const playedTo = document.getElementById(`cardPlayedDivX${player.name}`)?.getBoundingClientRect();
+
       // in refresh these are undefined so no animations and that's ok
-      if (animateCard && playedFrom && playedTo) {
+      if (animateCard && animateCard.fromPlayer === player.name && playedFrom && playedTo) {
+        console.log("ANIMATE ME!", animateCard, cardPlayedCard);
+
         const fromX = playedFrom.left - playedTo.left;
         const fromY = playedFrom.top - playedTo.top;
-        springObject = {from: {x: fromX, y: fromY}, duration: 3000};
+
+        console.log("CardSlot playedFrom", playedFrom);
+        console.log("CardSlot playedTo", playedTo);
+
+        const roundRequestAfterAnimation = { ...animateCard.getRoundRequest };
+        console.log("roundRequestAfterAnimation", roundRequestAfterAnimation);
+        springObject = {
+          from: { x: fromX, y: fromY },
+          config: { duration: 1000, easing: easings.easeOutQuint },
+          delay: 300,
+          to: [{
+            x: randomNegToPos(2),
+            y: randomNegToPos(2),
+            rotate: randomNegToPos(5),
+            onRest: () => {
+              dispatch(setAnimateCard(null));
+              dispatch(setGetRoundInfo(animateCard.getRoundRequest));
+              console.log("onRest");
+            }
+          }],
+        };
         console.log("springObject", springObject);
       }
     }
     return (
       <CardSlot
         containerId={`cardPlayedDivX${player.name}`}
-        card={player.cardPlayed ?? undefined}
+        card={cardPlayedCard}
         classStr="playedCardCol"
         springObject={springObject}
       />

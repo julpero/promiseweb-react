@@ -78,6 +78,14 @@ export const ICardToIuiCard = (card: ICard): IuiCard => {
   } as IuiCard;
 };
 
+export const IuiCardToICard = (card: IuiCard): ICard => {
+  return {
+    suite: card.suite,
+    rank: card.rank,
+    value: card.value,
+  } as ICard;
+};
+
 /*
 export const rulesToArr = (gameOptions: IGameOptions): string[] => {
   const rulesArr: string[] = [];

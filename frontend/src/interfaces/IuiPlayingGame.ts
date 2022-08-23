@@ -185,6 +185,7 @@ export interface IuiPlayCardResponse {
 export interface IuiCardPlayedNotification {
   playerName: string,
   playedFromSlot: number,
+  playedCard: IuiCard | null,
   /** this index points to round where card is played, notice that if after that starts new round */
   currentRoundIndex: number,
   newPlayAfterHit: boolean,

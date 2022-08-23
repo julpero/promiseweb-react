@@ -23,7 +23,6 @@ import {
 } from "../store/playCardSlice";
 
 import {
-  getAnimateCard,
   setAnimateCard,
   AnimateCard,
 } from "../store/animateCardSlice";
@@ -77,12 +76,11 @@ const GameTable = ({gameId}: IProps) => {
 
     const onCardPlayedNotification = (cardPlayedNotification: IuiCardPlayedNotification) => {
       console.log("cardPlayedNotification", cardPlayedNotification);
-      // console.log("roundInfo after card played", roundInfo);
 
       // animate played card
       dispatch(setActionsAvailable(false));
       const animatedCard: AnimateCard = {
-        cardFace: null,
+        cardFace: cardPlayedNotification.playedCard,
         fromPlayer: cardPlayedNotification.playerName,
         fromSlot: cardPlayedNotification.playedFromSlot,
         getRoundRequest: {
@@ -92,35 +90,24 @@ const GameTable = ({gameId}: IProps) => {
         },
       };
       dispatch(setAnimateCard(animatedCard));
-
-      // if (cardPlayedNotification.roundStatusAfterPlay === ROUND_STATUS.played) {
-      //   setRoundInd(cardPlayedNotification.currentRoundIndex + 1);
-      // } else {
-      //   const getRoundRequest: IuiGetRoundRequest =
-      //   console.log("getRoundRequest after card hit", getRoundRequest);
-
-      //   socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
-      //     console.log("roundResponse after card hit", roundResponse);
-      //     // setRoundInfo(roundResponse);
-      //   });
-      // }
     };
 
-    const getGameInfoRequest: IuiGetGameInfoRequest = {
-      myId: getMyId(),
-      gameId: gameId,
-    };
-    // console.log("getGameInfoRequest", getGameInfoRequest);
-    socket.emit("check game", getGameInfoRequest, (gameInfoResponse: IuiGetGameInfoResponse) => {
-      console.log("gameInfoResponse", gameInfoResponse);
+    if (gameId !== "" && initialRender.current) {
       initialRender.current = false;
-      dispatch(setGameInfo(gameInfoResponse));
-      // setGameInfoX(gameInfoResponse);
-      // setRoundInd(gameInfoResponse.currentRound ?? 0);
-    });
 
-    socket.on("promise made", onPromiseMadeNotification);
-    socket.on("card played", onCardPlayedNotification);
+      const getGameInfoRequest: IuiGetGameInfoRequest = {
+        myId: getMyId(),
+        gameId: gameId,
+      };
+      // console.log("getGameInfoRequest", getGameInfoRequest);
+      socket.emit("check game", getGameInfoRequest, (gameInfoResponse: IuiGetGameInfoResponse) => {
+        console.log("gameInfoResponse", gameInfoResponse);
+        dispatch(setGameInfo(gameInfoResponse));
+      });
+
+      socket.on("promise made", onPromiseMadeNotification);
+      socket.on("card played", onCardPlayedNotification);
+    }
 
     return () => {
       socket.off("promise made");
@@ -131,12 +118,15 @@ const GameTable = ({gameId}: IProps) => {
   useEffect(() => {
     console.log("getRoundInfoRequest", getRoundInfoRequest);
     if (getRoundInfoRequest) {
-      console.log("use effect, getRoundRequest", getRoundInfoRequest);
+      const getRoundRequest = { ...getRoundInfoRequest };
+      console.log("use effect, getRoundRequest", getRoundRequest);
+      dispatch(setGetRoundInfo(null));
+      // dispatch(setAnimateCard(null));
 
-      socket.emit("get round", getRoundInfoRequest, (roundResponse: IuiGetRoundResponse) => {
+      socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
         console.log("roundResponse", roundResponse);
-        dispatch(setGetRoundInfo(null));
         dispatch(setRoundInfo(roundResponse));
+        dispatch(setActionsAvailable(roundResponse.roundToPlayer.isMyPromiseTurn || roundResponse.roundToPlayer.isMyTurn));
         // setRoundInfo(roundResponse);
       });
 
@@ -153,6 +143,7 @@ const GameTable = ({gameId}: IProps) => {
         card: playedCard,
         isSpeedPlay: false,
       };
+      console.log("playedCard useEffect (store) playCardRequest", playCardRequest);
       socket.emit("play card", playCardRequest, (playCardResponse: IuiPlayCardResponse) => {
         dispatch(setPlayedCard(null));
         dispatch(setActionsAvailable(true));
@@ -169,8 +160,8 @@ const GameTable = ({gameId}: IProps) => {
         gameId: currentGameInfo.gameId,
         roundInd: currentGameInfo.currentRound,
       };
-      dispatch(setGetRoundInfo(getRoundRequest));
       console.log("getRoundRequest A", getRoundRequest);
+      dispatch(setGetRoundInfo(getRoundRequest));
 
       // socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
       //   console.log("roundResponse after round change", roundResponse);
@@ -202,8 +193,6 @@ const GameTable = ({gameId}: IProps) => {
       <div className="row">
         <div className="col-10">
           <CardBoard
-            gameInfo={currentGameInfo}
-            roundInfo={currentRoundInfo}
             onPlayCard={onPlayCard}
           />
         </div>
@@ -213,7 +202,7 @@ const GameTable = ({gameId}: IProps) => {
       </div>
       <div className="row fixed-bottom" style={{height: "150px", margin: "0px 0px"}}>
         <div className="col-6">
-          <PromiseTable promiseTable={currentRoundInfo?.roundToPlayer.promiseTable ?? null} />
+          <PromiseTable />
         </div>
         <div className="col-4">
           <Chat />

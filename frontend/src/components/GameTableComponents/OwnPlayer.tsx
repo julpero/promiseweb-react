@@ -1,26 +1,30 @@
-import React, { useEffect } from "react";
+import React from "react";
+
+import { useSelector } from "react-redux";
+import { getCurrentGameInfo } from "../../store/gameInfoSlice";
+import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
+import { getAnimateCard } from "../../store/animateCardSlice";
+
 import { isRuleActive } from "../../common/commonFunctions";
 import { amILastPromiser, currentTotalPromise, renderCardSlots } from "../../common/playingGame";
 import { RULE } from "../../interfaces/IuiGameOptions";
-import { IuiCard, IuiGetGameInfoResponse, IuiGetRoundResponse } from "../../interfaces/IuiPlayingGame";
+import { IuiCard } from "../../interfaces/IuiPlayingGame";
 import PromiseButtons from "./PromiseButtons";
 
 interface IProps {
-  gameInfo: IuiGetGameInfoResponse,
-  roundInfo: IuiGetRoundResponse,
   onPlayCard: (card: IuiCard) => void,
 }
 
-const OwnPlayer = ({ gameInfo, roundInfo, onPlayCard }: IProps) => {
-  useEffect(() => {
-    console.log("in ownplayer, roundinfo", roundInfo);
-  }, [roundInfo]);
+const OwnPlayer = ({ onPlayCard }: IProps) => {
+  const currentGameInfo = useSelector(getCurrentGameInfo);
+  const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  const animateCard = useSelector(getAnimateCard);
 
   const disableButton = (): number => {
     // this handles also hidden promise round rule because then total promise is negative
-    if (isRuleActive(gameInfo.rules, RULE.noEvenPromisesAllowed) && amILastPromiser(roundInfo.roundToPlayer.players)) {
-      const totalPromise = currentTotalPromise(roundInfo.roundToPlayer.players);
-      return roundInfo.roundToPlayer.cardsInRound - totalPromise;
+    if (isRuleActive(currentGameInfo.rules, RULE.noEvenPromisesAllowed) && amILastPromiser(currentRoundInfo.roundToPlayer.players)) {
+      const totalPromise = currentTotalPromise(currentRoundInfo.roundToPlayer.players);
+      return currentRoundInfo.roundToPlayer.cardsInRound - totalPromise;
     }
     return -1;
   };
@@ -28,13 +32,13 @@ const OwnPlayer = ({ gameInfo, roundInfo, onPlayCard }: IProps) => {
   return (
     <React.Fragment>
       <div className="row">
-        {renderCardSlots(roundInfo.myName, 10, roundInfo, roundInfo.roundToPlayer.myCards, 0, onPlayCard)}
+        {renderCardSlots(currentRoundInfo.myName, 10, currentRoundInfo, currentRoundInfo.roundToPlayer.myCards, 0, onPlayCard, (animateCard?.fromPlayer === currentRoundInfo.myName) ? animateCard.fromSlot : -1)}
       </div>
       <PromiseButtons
-        gameId={roundInfo.gameId}
-        roundInd={roundInfo.roundInd}
-        cardsInRound={roundInfo.roundToPlayer.cardsInRound}
-        myTurn={roundInfo.roundToPlayer.isMyPromiseTurn}
+        gameId={currentRoundInfo.gameId}
+        roundInd={currentRoundInfo.roundInd}
+        cardsInRound={currentRoundInfo.roundToPlayer.cardsInRound}
+        myTurn={currentRoundInfo.roundToPlayer.isMyPromiseTurn}
         disableButton={disableButton()}
       />
     </React.Fragment>

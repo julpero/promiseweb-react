@@ -1,37 +1,40 @@
 import React from "react";
-import { Table } from "react-bootstrap";
-import { IuiPromiseTable } from "../interfaces/IuiPlayingGame";
 
-interface IProps {
-  promiseTable: IuiPromiseTable | null | undefined,
-}
+import { useSelector } from "react-redux";
+import { getCurrentRoundInfo } from "../store/roundInfoSlice";
+
+import { Table } from "react-bootstrap";
 
 /**
  * Promises made, table in bottom screen
  */
-const PromiseTable = (props: IProps) => {
+const PromiseTable = () => {
+  const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  // if (!currentRoundInfo) return null;
+  const promiseTable = currentRoundInfo.roundToPlayer.promiseTable;
+
   const renderPromiseTableHeader = () => {
-    if (!props.promiseTable) return null;
+    if (!promiseTable) return null;
     return (
-      props.promiseTable.rounds.map((round, idx) => {
+      promiseTable.rounds.map((round, idx) => {
         return <th key={idx}>{round.cardsInRound}</th>;
       })
     );
   };
 
   const renderPlayerPromises = (idx: number) => {
-    if (!props.promiseTable) return null;
+    if (!promiseTable) return null;
     return (
-      props.promiseTable.promisesByPlayers[idx].map((promise, idx) => {
+      promiseTable.promisesByPlayers[idx].map((promise, idx) => {
         return <td key={idx}>{promise.promise}</td>;
       })
     );
   };
 
   const renderPromiseTableBody = () => {
-    if (!props.promiseTable) return null;
+    if (!promiseTable) return null;
     return (
-      props.promiseTable.players.map((player, idx) => {
+      promiseTable.players.map((player, idx) => {
         return <tr key={idx}><th>{player}</th>{renderPlayerPromises(idx)}</tr>;
       })
     );

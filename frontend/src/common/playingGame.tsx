@@ -13,12 +13,11 @@ const cardPlayable = (i: number, roundInfo: IuiGetRoundResponse): CARD_PLAYABLE 
   }
 };
 
-export const renderCardSlots = (name: string, slotCount: number, roundInfo: IuiGetRoundResponse, cards: IuiCard[], cardsRemainingCount: number, onPlayCard?: (card: IuiCard) => void): JSX.Element[] => {
+export const renderCardSlots = (name: string, slotCount: number, roundInfo: IuiGetRoundResponse, cards: IuiCard[], cardsRemainingCount: number, onPlayCard?: (card: IuiCard) => void, playedSlot?: number): JSX.Element[] => {
   // console.log(cards);
   const slots: JSX.Element[] = [];
   for (let i = 0; i < slotCount; i++) {
-    // const card = i >= roundInfo.roundToPlayer.cardsInRound || (i >= cards.length && cards.length > 0) ? undefined : cards[i] ?? null;
-    const openFaceCard = cards.find(card => card.originalIndex === i);
+    const openFaceCard = cards.find(card => card.originalIndex === i && card.originalIndex !== playedSlot);
     const cardToRender = openFaceCard ?? (cards.length == 0 && i < cardsRemainingCount ? null : undefined);
     const classStrArr: string[] = [];
     if (i === 0) classStrArr.push("firstCardCol");

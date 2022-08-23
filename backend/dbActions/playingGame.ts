@@ -21,7 +21,7 @@ import {
   winnerOfPlay,
 } from "../common/common";
 import { startRound } from "../common/game";
-import { isRuleActive } from "../common/model";
+import { ICardToIuiCard, isRuleActive, IuiCardToICard } from "../common/model";
 import { ICard, ICardPlayed, IGameOptions, IPromiser, PromiseValue } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
 
@@ -154,11 +154,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     round.cardsPlayed[playIndex].push({
       playerId: myId,
       name: myName,
-      card: {
-        value: card.value,
-        suite: card.suite,
-        rank: card.rank,
-      } as ICard,
+      card: IuiCardToICard(card),
       playedTime: Date.now(),
       playStarted: gameInDb.game.lastTimeStamp,
     } as ICardPlayed);
