@@ -124,10 +124,9 @@ const getCardFace = (cardStr: string, playableStatus: CARD_PLAYABLE) => {
     case "diamondsQ": return <DiamondsQueen text="Q" title="DiamondsQueen" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
     case "diamondsK": return <DiamondsKing text="K" title="DiamondsKing" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
     case "backSide": return <img className="backSide" src={backSide} />;
-    case "dummy0": return <img className="backSide" src={backSide} />;
+    default: return <img className="backSide" src={backSide} />;
     // case "dummy0": null;
   }
-  return null;
 };
 
 export default getCardFace;

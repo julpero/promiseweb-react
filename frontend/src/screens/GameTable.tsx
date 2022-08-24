@@ -76,17 +76,40 @@ const GameTable = ({gameId}: IProps) => {
 
     const onCardPlayedNotification = (cardPlayedNotification: IuiCardPlayedNotification) => {
       console.log("cardPlayedNotification", cardPlayedNotification);
+      const { playerName, playedFromSlot, playedCard, roundStatusAfterPlay, currentRoundIndex } = cardPlayedNotification;
+
+      //
+      // const cardFromContainer = document.getElementById(`cardsToPlaySlotsX${playerName}X${playedFromSlot}`);
+      // console.log("cardFromContainer", cardFromContainer);
+      // if (cardFromContainer) {
+      //   // played card will always move to the played card container
+      //   const cardPlayedToContainer = playerName === currentRoundInfo.myName
+      //     ? document.getElementById("myPlayedCardDiv")
+      //     : document.getElementById(`cardPlayedDivX${playerName}`);
+      //   if (cardPlayedToContainer) {
+      //     console.log("do the animation, cardPlayedToContainer", cardPlayedToContainer);
+      //     const playedFrom = cardFromContainer.getBoundingClientRect();
+      //     const playedTo = cardPlayedToContainer.getBoundingClientRect();
+      //     console.log("playedFrom", playedFrom);
+      //     console.log("playedTo", playedTo);
+      //     const playedFromChild = cardFromContainer.children;
+      //     const playedToChild = cardPlayedToContainer.children;
+      //     console.log("playedFromChild", playedFromChild);
+      //     console.log("playedToChild", playedToChild);
+      //   }
+      // }
+      //
 
       // animate played card
       dispatch(setActionsAvailable(false));
       const animatedCard: AnimateCard = {
-        cardFace: cardPlayedNotification.playedCard,
-        fromPlayer: cardPlayedNotification.playerName,
-        fromSlot: cardPlayedNotification.playedFromSlot,
+        cardFace: playedCard,
+        fromPlayer: playerName,
+        fromSlot: playedFromSlot,
         getRoundRequest: {
           myId: getMyId(),
           gameId: gameId,
-          roundInd: cardPlayedNotification.roundStatusAfterPlay === ROUND_STATUS.played ? cardPlayedNotification.currentRoundIndex + 1 : cardPlayedNotification.currentRoundIndex,
+          roundInd: roundStatusAfterPlay === ROUND_STATUS.played ? currentRoundIndex + 1 : currentRoundIndex,
         },
       };
       dispatch(setAnimateCard(animatedCard));
@@ -192,9 +215,7 @@ const GameTable = ({gameId}: IProps) => {
     <div className="container-fluid" style={{width: "100vw", height: "100vh"}}>
       <div className="row">
         <div className="col-10">
-          <CardBoard
-            onPlayCard={onPlayCard}
-          />
+          <CardBoard />
         </div>
         <div className="col-2">
           <ScoreBoard />

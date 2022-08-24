@@ -46,40 +46,34 @@ const CardSlot = ({containerId, card, cardPlayStatus, classStr, isTrump, onPlayC
       const renderCard = card ?? { rank: "0", suite: "dummy", value: 0 } as IuiCard;
       // these are card back sides
       return (
-        <React.Fragment>
-          <div id={containerId} className={`col cardCol ${classStr ?? ""}`}>
-            <animated.div style={props}>
-              { getCardFace(cardAsString(renderCard), CARD_PLAYABLE.ok) }
-            </animated.div>
-            {/* { cardToString(renderCard) } */}
-          </div>
-        </React.Fragment>
+        <div id={containerId} className={`col cardCol ${classStr ?? ""}`}>
+          <animated.div style={props}>
+            { getCardFace(cardAsString(renderCard), CARD_PLAYABLE.ok) }
+          </animated.div>
+          {/* { cardToString(renderCard) } */}
+        </div>
       );
     } else {
       if (cardPlayStatus === CARD_PLAYABLE.ok && onPlayCard !== undefined && actionsAvailable) {
         return (
-          <React.Fragment>
-            <div id={containerId} className={`col cardCol playableCard ${classStr ?? ""}`}>
-              <animated.div style={props} onClick={() => playCard(card)}>
-                { getCardFace(cardAsString(card), CARD_PLAYABLE.ok) }
-              </animated.div>
-              {/* { cardToString(card) } */}
-            </div>
-          </React.Fragment>
+          <div id={containerId} className={`col cardCol playableCard ${classStr ?? ""}`}>
+            <animated.div style={props} onClick={() => playCard(card)}>
+              { getCardFace(cardAsString(card), CARD_PLAYABLE.ok) }
+            </animated.div>
+            {/* { cardToString(card) } */}
+          </div>
         );
       } else {
         return (
-          <React.Fragment>
-            <div id={containerId} className={`col cardCol ${classStr ?? ""}`}>
-              <animated.div
-                style={props}
+          <div id={containerId} className={`col cardCol ${classStr ?? ""}`}>
+            <animated.div
+              style={props}
 
-              >
-                { getCardFace(cardAsString(card), cardPlayStatus ?? CARD_PLAYABLE.ok) }
-              </animated.div>
-              {/* { cardToString(card) } */}
-            </div>
-          </React.Fragment>
+            >
+              { getCardFace(cardAsString(card), cardPlayStatus ?? CARD_PLAYABLE.ok) }
+            </animated.div>
+            {/* { cardToString(card) } */}
+          </div>
         );
       }
     }

@@ -1,21 +1,24 @@
 import React from "react";
-import { IuiCard } from "../../interfaces/IuiPlayingGame";
-import CardSlot from "./CardSlot";
+import { useSelector } from "react-redux";
+import { cardAsString, commonAnimationObject } from "../../common/commonFunctions";
+import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
+import AnimatedCardSlot from "./AnimatedCardSlot";
+import getCardFace, { CARD_PLAYABLE } from "./Cards";
 
-interface IProps {
-  trump: IuiCard | null
-}
-
-const TrumpSlot = (props: IProps) => {
-  const { trump } = props;
-  if (!trump) return null;
+const TrumpSlot = () => {
+  const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  if (!currentRoundInfo) return null;
+  const trump = currentRoundInfo.roundToPlayer.trumpCard;
+  const cardFace = trump ? getCardFace(cardAsString(trump), CARD_PLAYABLE.ok) : undefined;
+  const animationObject = cardFace ? commonAnimationObject() : null;
   return (
-    <CardSlot
+    <AnimatedCardSlot
       containerId="trumpCardDiv"
-      card={trump}
       classStr="trumpCardCol"
-      isTrump={true}
-    />
+      animationObject={animationObject}
+    >
+      {cardFace}
+    </AnimatedCardSlot>
   );
 };
 
