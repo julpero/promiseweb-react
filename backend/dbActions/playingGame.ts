@@ -161,7 +161,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     round.roundPlayers[myIndexInRound].cards.splice(playedCardIndex, 1);
     gameInDb.game.lastTimeStamp = Date.now();
 
-    response.playedFromSlot = round.cardsInRound - round.cardsPlayed[playIndex].length;
+    response.playedFromSlot = round.cardsInRound - round.cardsPlayed.length; // cardsPlayed array has always at least one element
 
     if (round.cardsPlayed[playIndex].length === round.roundPlayers.length) {
       // this was the last card of the play
@@ -172,6 +172,8 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
       if (winner) {
         const winnerIndexInRound = getPlayerIndexFromRoundById(round.roundPlayers, winner.playerId);
         round.roundPlayers[winnerIndexInRound].keeps++;
+        response.winnerOfPlay = winner.name;
+        response.winCount = round.roundPlayers[winnerIndexInRound].keeps;
       }
 
       if (round.cardsPlayed.length === round.cardsInRound) {

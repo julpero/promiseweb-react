@@ -7,14 +7,14 @@ import {
   setGetRoundInfo,
 } from "../../store/getRoundInfoSlice";
 
-// import { renderCardSlots } from "../../common/playingGame";
 import { IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
 import CardSlot from "./CardSlot";
 import { easings } from "react-spring";
-import { cardAsString, commonAnimationObject, randomNegToPos } from "../../common/commonFunctions";
+import { cardAsString, randomNegToPos } from "../../common/commonFunctions";
 import CardSlots from "./CardSlots";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
+import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 
 type AlignType = "left" | "right";
 
@@ -63,7 +63,6 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
           cards={[]}
           cardsRemainingCount={cardsRemainingCount}
         />
-        {/* {renderCardSlots(player.name, maxCards, currentRoundInfo, [], cardsRemainingCount)} */}
       </div>
     );
   };
@@ -105,11 +104,11 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
       if (i + 1 <= player.keeps) {
         cols.push(
           <div key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}>
-            <CardSlot containerId={`cardsWonSlots${index}X${i}`} card={null} />
+            <CardSlot containerId={`cardsWonSlotsX${player.name}X${i}`} card={null} />
           </div>
         );
       } else {
-        cols.push(<div id={`cardsWonSlots${index}X${i}`} key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}></div>);
+        cols.push(<div id={`cardsWonSlotsX${player.name}X${i}`} key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}></div>);
       }
     }
     return cols;
@@ -123,59 +122,12 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
     );
   };
 
-  const renderCardPlayedCol = () => {
-    if (index === 0 || index === 5) return null;
-    // const cardPlayedCard = player.cardPlayed ?? ((animateCard && animateCard.fromPlayer === player.name) ? animateCard?.cardFace : undefined);
-
-    // if (player.cardPlayed || (animateCard && animateCard.fromPlayer === player.name)) {
-    //   const playedFrom = document.getElementById(`cardsToPlaySlotsX${player.name}X${currentRoundInfo.roundToPlayer.cardsInRound-playedHitsCount}`)?.getBoundingClientRect();
-    //   const playedTo = document.getElementById(`cardPlayedDivX${player.name}`)?.getBoundingClientRect();
-
-    //   // in refresh these are undefined so no animations and that's ok
-    //   if (animateCard && animateCard.fromPlayer === player.name && playedFrom && playedTo) {
-    //     console.log("ANIMATE ME!", animateCard, cardPlayedCard);
-
-    //     const fromX = playedFrom.left - playedTo.left;
-    //     const fromY = playedFrom.top - playedTo.top;
-
-    //     console.log("CardSlot playedFrom", playedFrom);
-    //     console.log("CardSlot playedTo", playedTo);
-
-    //     const roundRequestAfterAnimation = { ...animateCard.getRoundRequest };
-    //     console.log("roundRequestAfterAnimation", roundRequestAfterAnimation);
-    //     springObject = {
-    //       from: { x: fromX, y: fromY },
-    //       config: { duration: 1000, easing: easings.easeOutQuint },
-    //       delay: 300,
-    //       to: [{
-    //         x: randomNegToPos(2),
-    //         y: randomNegToPos(2),
-    //         rotate: randomNegToPos(5),
-    //         onRest: () => {
-    //           dispatch(setAnimateCard(null));
-    //           dispatch(setGetRoundInfo(animateCard.getRoundRequest));
-    //           console.log("onRest");
-    //         }
-    //       }],
-    //     };
-    //     console.log("springObject", springObject);
-    //   }
-    // }
-    // return (
-    //   <CardSlot
-    //     containerId={`cardPlayedDivX${player.name}`}
-    //     card={cardPlayedCard}
-    //     classStr="playedCardCol"
-    //     springObject={springObject}
-    //   />
-    // );
-  };
-
   const renderAnimatedCardPlayedSlot = () => {
     if (index === 0 || index === 5) return null;
     const cardPlayedCard = player.cardPlayed ?? undefined;
     const cardFace = cardPlayedCard ? getCardFace(cardAsString(cardPlayedCard), CARD_PLAYABLE.ok) : undefined;
-    const animationObject = cardFace ? commonAnimationObject() : null;
+    // const animationObject = cardFace ? commonAnimationObject() : plainAnimationObject;
+    const animationObject = commonAnimationObject();
     return (
       <AnimatedCardSlot
         containerId={`cardPlayedDivX${player.name}`}

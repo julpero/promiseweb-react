@@ -13,14 +13,17 @@ import OwnPlayer from "./OwnPlayer";
 import TrumpSlot from "./TrumpSlot";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
-import { cardAsString, commonAnimationObject } from "../../common/commonFunctions";
+import { cardAsString } from "../../common/commonFunctions";
+import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 
 const TableLayout3 = () => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const myPlayedCard = currentRoundInfo.roundToPlayer.myPlayedCard ?? undefined;
   const cardFace = myPlayedCard ? getCardFace(cardAsString(myPlayedCard), CARD_PLAYABLE.ok) : undefined;
-  const animationObject = cardFace ? commonAnimationObject() : null;
+  const animationObject = commonAnimationObject();
+  // const animationObject = cardFace ? commonAnimationObject() : plainAnimationObject;
 
+  if (!currentRoundInfo || !currentRoundInfo.gameId) return null;
   return (
     <div className="row">
       <div className="col">
@@ -46,7 +49,7 @@ const TableLayout3 = () => {
         <div className="row">
           <div className="col-6"></div>
           <AnimatedCardSlot
-            containerId="myPlayedCardDiv"
+            containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
             classStr="col-2 myPlayedCard"
             animationObject={animationObject}
           >

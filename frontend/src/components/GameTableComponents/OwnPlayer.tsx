@@ -18,7 +18,6 @@ const OwnPlayer = () => {
           cards={currentRoundInfo.roundToPlayer.myCards}
           cardsRemainingCount={0}
         />
-        {/* {renderCardSlots(currentRoundInfo.myName, 10, currentRoundInfo, currentRoundInfo.roundToPlayer.myCards, 0, onPlayCard, (animateCard?.fromPlayer === currentRoundInfo.myName) ? animateCard.fromSlot : -1)} */}
       </div>
       <PromiseButtons />
     </React.Fragment>

@@ -185,12 +185,12 @@ export const winnerOfPlay = (cardsPlayed: ICardPlayed[], trumpSuit: Suite): IPla
     const thisCard = cardsPlayed[i].card;
     if (winningCard.suite === trumpSuit) {
       // has to be bigger trump to win
-      thisWins = thisCard.value > winningCard.value;
+      thisWins = thisCard.suite === trumpSuit && thisCard.value > winningCard.value;
     } else if (thisCard.suite === trumpSuit) {
       // wins with any trump
       thisWins = true;
     } else {
-      // wins if greater rank of same suit
+      // wins if greater value of same suit
       thisWins = thisCard.suite === winningCard.suite && thisCard.value > winningCard.value;
     }
     if (thisWins) {

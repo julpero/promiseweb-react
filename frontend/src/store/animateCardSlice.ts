@@ -1,12 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IuiCard, IuiGetRoundRequest } from "../interfaces/IuiPlayingGame";
+import { CollectCards } from "./collectAnimatedCardsSlice";
 import { RootState } from "./store";
 
 export interface AnimateCard {
   cardFace: IuiCard | null,
   fromPlayer: string,
   fromSlot: number,
-  getRoundRequest: IuiGetRoundRequest,
+  getRoundRequest: IuiGetRoundRequest | null,
+  collectCards: CollectCards | null,
 }
 
 export interface AnimateCardState {

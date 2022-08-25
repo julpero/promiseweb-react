@@ -180,6 +180,8 @@ export interface IuiPlayCardResponse {
   newPlayAfterHit: boolean,
   gameStatusAfterPlay: GAME_STATUS,
   roundStatusAfterPlay: ROUND_STATUS,
+  winnerOfPlay?: string,
+  winCount?: number,
 }
 
 export interface IuiCardPlayedNotification {
@@ -191,4 +193,6 @@ export interface IuiCardPlayedNotification {
   newPlayAfterHit: boolean,
   gameStatusAfterPlay: GAME_STATUS,
   roundStatusAfterPlay: ROUND_STATUS,
+  winnerOfPlay?: string,
+  winCount?: number,
 }

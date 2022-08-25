@@ -2,42 +2,105 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { getAnimateCard, setAnimateCard } from "../../store/animateCardSlice";
-
-import { useSpring, animated, useSpringRef, easings } from "react-spring";
+import { getEmptySlot, setEmptySlot } from "../../store/emptyAnimatedCardSlotSlice";
+import { getCollectCards, setCollectCards } from "../../store/collectAnimatedCardsSlice";
 import { setGetRoundInfo } from "../../store/getRoundInfoSlice";
+
+import { useSpring, animated, easings } from "react-spring";
 import { cardAsString, randomNegToPos } from "../../common/commonFunctions";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
+import { IuiSpringObject } from "../../interfaces/IuiAnimation";
 
 interface IProps {
   containerId: string,
   children?: JSX.Element,
   classStr?: string,
-  animationObject?: any,
+  animationObject: IuiSpringObject,
   onPlayCard?: () => void,
 }
 
 const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onPlayCard}: IProps) => {
-  const [child, setChild] = useState(children);
-  const [animation, setAnimation] = useState<any|null>(null);
+  const [child, setChild] = useState<JSX.Element | undefined>(undefined);
+  const prevChild = useRef<JSX.Element | undefined>(undefined);
 
-  const thisDiv = useRef<HTMLDivElement>(null);
+  const [animation, setAnimation] = useState<IuiSpringObject|null>(null);
+
   const [props, api] = useSpring(() => animationObject);
-  // const propsRef = useSpringRef();
-  // const referredAnimationObject = {
-  //   ref: propsRef,
-  //   ...animationObject,
-  // };
-  // const props = useSpring(referredAnimationObject);
 
   const animateCard = useSelector(getAnimateCard);
+  const emptySlot = useSelector(getEmptySlot);
+  const collectCards = useSelector(getCollectCards);
   const dispatch = useDispatch();
 
+  // const initialRender = useRef(true);
   useEffect(() => {
-    // console.log("useEffect A");
+    // if (initialRender.current) {
+    //   initialRender.current = false;
+    //   prevChild.current = children;
+    //   setChild(children);
+    // }
+    setChild(children);
+  }, [children]);
+
+  useEffect(() => {
+    if (collectCards && containerId.startsWith("cardPlayedDivX")) {
+      console.log("collectCards", collectCards);
+      const fromContainer = document.getElementById(containerId);
+      const toContainer = document.getElementById(`cardsWonSlotsX${collectCards.winner}X${collectCards.winCount-1}`);
+      if (fromContainer && toContainer) {
+        const playedFrom = fromContainer.getBoundingClientRect();
+        const playedTo = toContainer.getBoundingClientRect();
+        console.log("collect from", playedFrom);
+        console.log("collect to", playedTo);
+        const fromX = playedTo.left - playedFrom.left;
+        const fromY = playedTo.top- playedFrom.top;
+        const springObject = {
+          from: { },
+          config: { duration: 1200, easing: easings.easeOutQuint },
+          delay: 400,
+          to: [{
+            x: fromX,
+            y: fromY,
+            rotate: randomNegToPos(5),
+            onStart: () => {
+              console.log("started to animate");
+              // setChild(cardFace);
+              // dispatch(setEmptySlot(containerId));
+            },
+            onRest: () => {
+              // set this only once, easiest handle with winner containerId
+              if (containerId === `cardPlayedDivX${collectCards.winner}`) {
+                dispatch(setGetRoundInfo(collectCards.getRoundRequest));
+              }
+              setAnimation(null);
+              setChild(undefined);
+              console.log("onRest");
+            }
+          }],
+        } as IuiSpringObject;
+        setAnimation(springObject);
+      }
+    }
+  }, [collectCards, containerId, dispatch]);
+
+  useEffect(() => {
+    if (emptySlot && emptySlot === containerId) {
+      console.log("emptySlot", emptySlot);
+      const fromContainer = document.getElementById(emptySlot);
+      fromContainer?.classList.remove("playableCard");
+      setChild(undefined);
+      dispatch(setEmptySlot(null));
+    }
+  }, [emptySlot, containerId, dispatch]);
+
+  useEffect(() => {
+    // console.log("useEffect A", containerId);
     if (animateCard && containerId === `cardsToPlaySlotsX${animateCard.fromPlayer}X${animateCard.fromSlot}`) {
       // this is the slot where card is played from, so it should be empty for now on
-      console.log("animateCard, empty this slot", animateCard);
-      setChild(undefined);
+      // console.log("animateCard, empty this slot", animateCard);
+      // const fromContainer = document.getElementById(`cardsToPlaySlotsX${animateCard.fromPlayer}X${animateCard.fromSlot}`);
+      // fromContainer?.classList.remove("playableCard");
+      // setChild(undefined);
     } else if (animateCard && containerId === `cardPlayedDivX${animateCard.fromPlayer}`) {
       // this is the slot where card is played to, so it should handle the animation
       console.log("animateCard, to slot, set children", animateCard);
@@ -45,23 +108,15 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
       const cardFace = getCardFace(cardAsString(newChildren ?? { rank: "0", suite: "dummy", value: 0 }), CARD_PLAYABLE.ok);
       console.log("animateCard, to slot, new card face", cardFace);
       console.log(`A: ${Date.now()}`);
-      setChild(cardFace);
-      console.log(`B: ${Date.now()}`);
-    } else {
-      setChild(children);
-    }
+      // setChild(cardFace);
+      //
 
-  }, [children, animateCard, containerId]);
-
-  useEffect(() => {
-    // animation must be done after child is set
-    // console.log("useEffect B");
-    if (child && animateCard && containerId === `cardPlayedDivX${animateCard.fromPlayer}`) {
       console.log(`C: ${Date.now()}`);
       console.log("animateCard, to slot", animateCard);
 
-      const fromContainer = document.getElementById(`cardsToPlaySlotsX${animateCard.fromPlayer}X${animateCard.fromSlot}`);
-      const toContainer = thisDiv.current;
+      const fromContainerStr = `cardsToPlaySlotsX${animateCard.fromPlayer}X${animateCard.fromSlot}`;
+      const fromContainer = document.getElementById(fromContainerStr);
+      const toContainer = document.getElementById(`cardPlayedDivX${animateCard.fromPlayer}`);
       if (fromContainer && toContainer) {
         const playedFrom = fromContainer.getBoundingClientRect();
         const playedTo = toContainer.getBoundingClientRect();
@@ -75,39 +130,92 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
           config: { duration: 2000, easing: easings.easeOutQuint },
           delay: 500,
           to: [{
-            x: randomNegToPos(20),
-            y: randomNegToPos(20),
-            rotate: randomNegToPos(50),
+            x: randomNegToPos(2),
+            y: randomNegToPos(2),
+            rotate: randomNegToPos(5),
             onStart: () => {
               console.log("started to animate");
+              setChild(cardFace);
+              dispatch(setEmptySlot(fromContainerStr));
             },
             onRest: () => {
-              // dispatch(setAnimateCard(null));
-              // dispatch(setGetRoundInfo(animateCard.getRoundRequest));
+              dispatch(setAnimateCard(null));
+              if (animateCard.getRoundRequest) {
+                dispatch(setGetRoundInfo(animateCard.getRoundRequest));
+              }
+              if (animateCard.collectCards) {
+                dispatch(setCollectCards(animateCard.collectCards));
+              }
               setAnimation(null);
               console.log("onRest");
             }
           }],
-        };
+        } as IuiSpringObject;
+        console.log("springObject", springObject);
+        setAnimation(springObject);
+      }
+
+      //
+      console.log(`B: ${Date.now()}`);
+    }
+  }, [ animateCard, containerId, dispatch]);
+
+  /*
+  useEffect(() => {
+    // animation must be done after child is set
+    // console.log("useEffect B", containerId);
+    if (child && animateCard && containerId === `cardPlayedDivX${animateCard.fromPlayer}`) {
+      console.log(`C: ${Date.now()}`);
+      console.log("animateCard, to slot", animateCard);
+
+      const fromContainerStr = `cardsToPlaySlotsX${animateCard.fromPlayer}X${animateCard.fromSlot}`;
+      const fromContainer = document.getElementById(fromContainerStr);
+      const toContainer = document.getElementById(`cardPlayedDivX${animateCard.fromPlayer}`);
+      if (fromContainer && toContainer) {
+        const playedFrom = fromContainer.getBoundingClientRect();
+        const playedTo = toContainer.getBoundingClientRect();
+        console.log("playedFrom", playedFrom);
+        console.log("playedTo", playedTo);
+        const fromX = playedFrom.left - playedTo.left;
+        const fromY = playedFrom.top - playedTo.top;
+
+        const springObject = {
+          from: { x: fromX, y: fromY },
+          config: { duration: 2000, easing: easings.easeOutQuint },
+          delay: 500,
+          to: [{
+            x: randomNegToPos(2),
+            y: randomNegToPos(2),
+            rotate: randomNegToPos(5),
+            onStart: () => {
+              console.log("started to animate");
+              dispatch(setEmptySlot(fromContainerStr));
+            },
+            onRest: () => {
+              dispatch(setAnimateCard(null));
+              dispatch(setGetRoundInfo(animateCard.getRoundRequest));
+              setAnimation(null);
+              console.log("onRest");
+            }
+          }],
+        } as IuiSpringObject;
         console.log("springObject", springObject);
         setAnimation(springObject);
       }
     }
   }, [child, containerId, animateCard, dispatch]);
+  */
 
   useEffect(() => {
     if (api && animation) {
       console.log("animating", animation);
-      console.log("api.current", api.current);
       api.update(animation);
       api.start();
-      console.log("api.current", api.current);
-      // propsRef.start(animation);
     }
   }, [animation, api]);
 
   return (
-    <div ref={thisDiv} onClick={onPlayCard} id={containerId} className={`col cardCol ${classStr ?? ""}`}>
+    <div onClick={onPlayCard} id={containerId} className={`col cardCol ${classStr ?? ""}`}>
       <animated.div style={props}>
         {child}
       </animated.div>

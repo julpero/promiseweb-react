@@ -5,12 +5,13 @@ import {
   getCurrentRoundInfo,
 } from "../../store/roundInfoSlice";
 
-import { cardAsString, commonAnimationObject, randomNegToPos } from "../../common/commonFunctions";
+import { cardAsString, randomNegToPos } from "../../common/commonFunctions";
 import { IuiCard, IuiGetRoundResponse } from "../../interfaces/IuiPlayingGame";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { setPlayedCard } from "../../store/playCardSlice";
 import { setActionsAvailable } from "../../store/actionsAvailableSlice";
+import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 
 interface IProps {
   name: string,
@@ -57,6 +58,7 @@ const CardSlots = ({name, slotCount, cards, cardsRemainingCount, playedSlot}: IP
           key={i}
           containerId={`cardsToPlaySlotsX${name}X${i}`}
           classStr={classStrArr.join(" ")}
+          animationObject={commonAnimationObject()}
         />
       );
     } else {

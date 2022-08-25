@@ -196,7 +196,7 @@ connectDB().then(() => {
 
       const playCardResponse = await playCard(playCardRequest);
       if (playCardResponse.playResponse === PLAY_CARD_RESPONSE.playOk) {
-        const { playerName, playedFromSlot, card, newPlayAfterHit, gameStatusAfterPlay, roundStatusAfterPlay, playTime } = playCardResponse;
+        const { playerName, playedFromSlot, card, newPlayAfterHit, gameStatusAfterPlay, roundStatusAfterPlay, playTime, winnerOfPlay, winCount } = playCardResponse;
         const chatLine = `${playerName} hit card in ${(playTime/1000).toFixed(1)} seconds`;
         io.to(gameIdStr).emit("new chat line", chatLine);
 
@@ -208,6 +208,8 @@ connectDB().then(() => {
           newPlayAfterHit: newPlayAfterHit,
           gameStatusAfterPlay: gameStatusAfterPlay,
           roundStatusAfterPlay: roundStatusAfterPlay,
+          winnerOfPlay: winnerOfPlay,
+          winCount: winCount,
         };
         socket.to(gameIdStr).emit("card played", cardPlayedNotification);
 
@@ -219,6 +221,8 @@ connectDB().then(() => {
           newPlayAfterHit: newPlayAfterHit,
           gameStatusAfterPlay: gameStatusAfterPlay,
           roundStatusAfterPlay: roundStatusAfterPlay,
+          winnerOfPlay: winnerOfPlay,
+          winCount: winCount,
         };
         socket.emit("card played", cardPlayedNotificationToMySelf);
       }

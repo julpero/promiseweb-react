@@ -76,29 +76,7 @@ const GameTable = ({gameId}: IProps) => {
 
     const onCardPlayedNotification = (cardPlayedNotification: IuiCardPlayedNotification) => {
       console.log("cardPlayedNotification", cardPlayedNotification);
-      const { playerName, playedFromSlot, playedCard, roundStatusAfterPlay, currentRoundIndex } = cardPlayedNotification;
-
-      //
-      // const cardFromContainer = document.getElementById(`cardsToPlaySlotsX${playerName}X${playedFromSlot}`);
-      // console.log("cardFromContainer", cardFromContainer);
-      // if (cardFromContainer) {
-      //   // played card will always move to the played card container
-      //   const cardPlayedToContainer = playerName === currentRoundInfo.myName
-      //     ? document.getElementById("myPlayedCardDiv")
-      //     : document.getElementById(`cardPlayedDivX${playerName}`);
-      //   if (cardPlayedToContainer) {
-      //     console.log("do the animation, cardPlayedToContainer", cardPlayedToContainer);
-      //     const playedFrom = cardFromContainer.getBoundingClientRect();
-      //     const playedTo = cardPlayedToContainer.getBoundingClientRect();
-      //     console.log("playedFrom", playedFrom);
-      //     console.log("playedTo", playedTo);
-      //     const playedFromChild = cardFromContainer.children;
-      //     const playedToChild = cardPlayedToContainer.children;
-      //     console.log("playedFromChild", playedFromChild);
-      //     console.log("playedToChild", playedToChild);
-      //   }
-      // }
-      //
+      const { playerName, playedFromSlot, playedCard, roundStatusAfterPlay, currentRoundIndex, winnerOfPlay, winCount, newPlayAfterHit } = cardPlayedNotification;
 
       // animate played card
       dispatch(setActionsAvailable(false));
@@ -106,11 +84,20 @@ const GameTable = ({gameId}: IProps) => {
         cardFace: playedCard,
         fromPlayer: playerName,
         fromSlot: playedFromSlot,
-        getRoundRequest: {
+        getRoundRequest: !newPlayAfterHit && roundStatusAfterPlay === ROUND_STATUS.onGoing ? {
           myId: getMyId(),
           gameId: gameId,
-          roundInd: roundStatusAfterPlay === ROUND_STATUS.played ? currentRoundIndex + 1 : currentRoundIndex,
-        },
+          roundInd: currentRoundIndex,
+        } : null,
+        collectCards: newPlayAfterHit ? {
+          winner: winnerOfPlay ?? "",
+          winCount: winCount ?? 0,
+          getRoundRequest: {
+            myId: getMyId(),
+            gameId: gameId,
+            roundInd: (roundStatusAfterPlay === ROUND_STATUS.played) ? currentRoundIndex + 1 : currentRoundIndex,
+          }
+        } : null,
       };
       dispatch(setAnimateCard(animatedCard));
     };

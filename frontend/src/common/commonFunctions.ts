@@ -50,13 +50,3 @@ export const isRuleActive = (rules: IuiRules, checkRule: RULE): boolean => {
 export const randomNegToPos = (max: number): number => {
   return Math.floor(Math.random() * (2*max)) - max;
 };
-
-export const commonAnimationObject = () =>  {
-  return {
-    to: {
-      x: randomNegToPos(2),
-      y: randomNegToPos(2),
-      rotate: randomNegToPos(5),
-    }
-  };
-};
