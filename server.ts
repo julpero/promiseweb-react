@@ -225,6 +225,11 @@ connectDB().then(() => {
           winCount: winCount,
         };
         socket.emit("card played", cardPlayedNotificationToMySelf);
+
+        if (newPlayAfterHit) {
+          const chatLine = `${winnerOfPlay} won this play`;
+          io.to(gameIdStr).emit("new chat line", chatLine);
+        }
       }
 
       fn(playCardResponse);

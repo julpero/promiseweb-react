@@ -213,3 +213,18 @@ export const getPlayerIndexFromRoundById = (roundPlayers: IRoundPlayer[], id: st
   if (!id) return -1;
   return roundPlayers.findIndex(player => player.playerId === id);
 };
+
+export const countRoundPoints = (roundPlayers: IRoundPlayer[], bigRound: boolean): void => {
+  for (let i = 0; i < roundPlayers.length; i++) {
+    const player = roundPlayers[i];
+    if (player.promise === player.keeps) {
+      if (player.promise === 0) {
+        player.points = bigRound ? 15 : 5;
+      } else {
+        player.points = 10 + player.promise;
+      }
+    } else {
+      player.points = 0;
+    }
+  }
+};

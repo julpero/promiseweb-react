@@ -8,6 +8,7 @@ import {
   PROMISE_RESPONSE,
 } from "../../frontend/src/interfaces/IuiPlayingGame";
 import {
+  countRoundPoints,
   getCurrentPlayIndex,
   getCurrentPromiseTotal,
   getCurrentRoundInd,
@@ -181,6 +182,9 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
         response.roundStatusAfterPlay = ROUND_STATUS.played;
 
         round.roundStatus = ROUND_STATUS.played;
+
+        // let's count points for this round
+        countRoundPoints(round.roundPlayers, round.cardsInRound > 5);
 
         if (currentRoundInd === gameInDb.game.rounds.length - 1) {
           // this was the last round in the game so now game ends
