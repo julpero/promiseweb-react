@@ -36,6 +36,10 @@ export const getPlayerNameById = (players: IHumanPlayer[], playerId: string): st
   return players.find(player => player.playerId == playerId)?.name ?? "";
 };
 
+export const getDealerNameForRound = (round: IRound): string => {
+  return round.roundPlayers[round.dealerPositionIndex].name;
+};
+
 export const getCurrentRoundInd = (game: IGame): number => {
   return game.rounds.find(round => round.roundStatus === ROUND_STATUS.onGoing)?.roundIndex ?? -1;
 };

@@ -182,6 +182,7 @@ export interface IuiPlayCardResponse {
   roundStatusAfterPlay: ROUND_STATUS,
   winnerOfPlay?: string,
   winCount?: number,
+  newDealer?: string,
 }
 
 export interface IuiCardPlayedNotification {
@@ -195,4 +196,5 @@ export interface IuiCardPlayedNotification {
   roundStatusAfterPlay: ROUND_STATUS,
   winnerOfPlay?: string,
   winCount?: number,
+  newDealer?: string,
 }

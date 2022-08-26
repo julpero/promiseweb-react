@@ -20,6 +20,7 @@ import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameR
 import { IuiChatObj } from "./frontend/src/interfaces/IuiChat";
 import { IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, PLAY_CARD_RESPONSE, PROMISE_RESPONSE } from "./frontend/src/interfaces/IuiPlayingGame";
 import { getGameInfo, getRound, makePromise, playCard } from "./backend/actions/playingGame";
+import { GAME_STATUS, ROUND_STATUS } from "./frontend/src/interfaces/IuiGameOptions";
 
 // Routes
 // not defined
@@ -196,7 +197,18 @@ connectDB().then(() => {
 
       const playCardResponse = await playCard(playCardRequest);
       if (playCardResponse.playResponse === PLAY_CARD_RESPONSE.playOk) {
-        const { playerName, playedFromSlot, card, newPlayAfterHit, gameStatusAfterPlay, roundStatusAfterPlay, playTime, winnerOfPlay, winCount } = playCardResponse;
+        const {
+          playerName,
+          playedFromSlot,
+          card,
+          newPlayAfterHit,
+          gameStatusAfterPlay,
+          roundStatusAfterPlay,
+          playTime,
+          winnerOfPlay,
+          winCount,
+          newDealer,
+        } = playCardResponse;
         const chatLine = `${playerName} hit card in ${(playTime/1000).toFixed(1)} seconds`;
         io.to(gameIdStr).emit("new chat line", chatLine);
 
@@ -229,6 +241,13 @@ connectDB().then(() => {
         if (newPlayAfterHit) {
           const chatLine = `${winnerOfPlay} won this play`;
           io.to(gameIdStr).emit("new chat line", chatLine);
+        }
+
+        if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.onGoing) {
+          const chatLine = `Round ${roundInd + 2} starts...`;
+          io.to(gameIdStr).emit("new chat line", chatLine);
+          const chatLine2 = `... and ${newDealer} is a dealer!`;
+          io.to(gameIdStr).emit("new chat line", chatLine2);
         }
       }
 

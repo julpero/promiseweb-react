@@ -12,6 +12,7 @@ import {
   getCurrentPlayIndex,
   getCurrentPromiseTotal,
   getCurrentRoundInd,
+  getDealerNameForRound,
   getMyCards,
   getPlayableCardIndexes,
   getPlayerIndexFromRoundById,
@@ -186,12 +187,16 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
         // let's count points for this round
         countRoundPoints(round.roundPlayers, round.cardsInRound > 5);
 
+        // TODO stats
+
         if (currentRoundInd === gameInDb.game.rounds.length - 1) {
           // this was the last round in the game so now game ends
           response.gameStatusAfterPlay = GAME_STATUS.played;
         } else {
           // there are more rounds to play so let's start the next one
-          startRound(gameInDb, currentRoundInd + 1);
+          const newRoundInd = currentRoundInd + 1;
+          startRound(gameInDb, newRoundInd);
+          response.newDealer = getDealerNameForRound(gameInDb.game.rounds[newRoundInd]);
         }
       } else {
         // new hit round
