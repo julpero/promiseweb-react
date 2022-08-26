@@ -14,7 +14,7 @@ import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 const TableLayout3 = () => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const myPlayedCard = currentRoundInfo.roundToPlayer.myPlayedCard ?? undefined;
-  const cardFace = myPlayedCard ? getCardFace(cardAsString(myPlayedCard), CARD_PLAYABLE.ok) : undefined;
+  const cardFace = myPlayedCard ? getCardFace(cardAsString(myPlayedCard), CARD_PLAYABLE.played) : undefined;
   const animationObject = commonAnimationObject();
   console.log("TableLayout3");
   // const animationObject = cardFace ? commonAnimationObject() : plainAnimationObject;

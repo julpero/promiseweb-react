@@ -81,7 +81,7 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
   const renderAnimatedCardPlayedSlot = () => {
     if (index === 0 || index === 5) return null;
     const cardPlayedCard = player.cardPlayed ?? undefined;
-    const cardFace = cardPlayedCard ? getCardFace(cardAsString(cardPlayedCard), CARD_PLAYABLE.ok) : undefined;
+    const cardFace = cardPlayedCard ? getCardFace(cardAsString(cardPlayedCard), CARD_PLAYABLE.played) : undefined;
     // const animationObject = cardFace ? commonAnimationObject() : plainAnimationObject;
     const animationObject = commonAnimationObject();
     return (

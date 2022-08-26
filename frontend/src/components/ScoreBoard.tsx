@@ -41,9 +41,16 @@ const ScoreBoard = () => {
       const keep = promiseTable.promisesByPlayers[i][rowInd].keep;
       const currentRoundPoints = promiseTable.promisesByPlayers[i][rowInd].points;
       const playersCumulativePointsInRound = cumulativePointsInRound(i, rowInd);
-      colArr.push(
-        <td key={i}>{pointsStr(playersCumulativePointsInRound, currentRoundPoints, currentRoundPoints === null || currentPromise === null)}</td>
-      );
+      const str = pointsStr(playersCumulativePointsInRound, currentRoundPoints, currentRoundPoints === null || currentPromise === null);
+      if (str) {
+        colArr.push(
+          <td key={i}>{str}</td>
+        );
+      } else {
+        colArr.push(
+          <td key={i}>&nbsp;</td>
+        );
+      }
     }
     return colArr;
   };

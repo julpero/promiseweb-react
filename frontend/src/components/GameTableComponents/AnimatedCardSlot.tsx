@@ -111,7 +111,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
       // this is the slot where card is played to, so it should handle the animation
       console.log("animateCard, to slot, set children", animateCard);
       const newChildren = animateCard.cardFace;
-      const cardFace = getCardFace(cardAsString(newChildren ?? { rank: "0", suite: "dummy", value: 0 }), CARD_PLAYABLE.ok);
+      const cardFace = getCardFace(cardAsString(newChildren ?? { rank: "0", suite: "dummy", value: 0 }), CARD_PLAYABLE.played);
       console.log("animateCard, to slot, new card face", cardFace);
       console.log(`A: ${Date.now()}`);
       // setChild(cardFace);
@@ -165,52 +165,6 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
       console.log(`B: ${Date.now()}`);
     }
   }, [ animateCard, containerId, dispatch]);
-
-  /*
-  useEffect(() => {
-    // animation must be done after child is set
-    // console.log("useEffect B", containerId);
-    if (child && animateCard && containerId === `cardPlayedDivX${animateCard.fromPlayer}`) {
-      console.log(`C: ${Date.now()}`);
-      console.log("animateCard, to slot", animateCard);
-
-      const fromContainerStr = `cardsToPlaySlotsX${animateCard.fromPlayer}X${animateCard.fromSlot}`;
-      const fromContainer = document.getElementById(fromContainerStr);
-      const toContainer = document.getElementById(`cardPlayedDivX${animateCard.fromPlayer}`);
-      if (fromContainer && toContainer) {
-        const playedFrom = fromContainer.getBoundingClientRect();
-        const playedTo = toContainer.getBoundingClientRect();
-        console.log("playedFrom", playedFrom);
-        console.log("playedTo", playedTo);
-        const fromX = playedFrom.left - playedTo.left;
-        const fromY = playedFrom.top - playedTo.top;
-
-        const springObject = {
-          from: { x: fromX, y: fromY },
-          config: { duration: 2000, easing: easings.easeOutQuint },
-          delay: 500,
-          to: [{
-            x: randomNegToPos(2),
-            y: randomNegToPos(2),
-            rotate: randomNegToPos(5),
-            onStart: () => {
-              console.log("started to animate");
-              dispatch(setEmptySlot(fromContainerStr));
-            },
-            onRest: () => {
-              dispatch(setAnimateCard(null));
-              dispatch(setGetRoundInfo(animateCard.getRoundRequest));
-              setAnimation(null);
-              console.log("onRest");
-            }
-          }],
-        } as IuiSpringObject;
-        console.log("springObject", springObject);
-        setAnimation(springObject);
-      }
-    }
-  }, [child, containerId, animateCard, dispatch]);
-  */
 
   useEffect(() => {
     if (api && animation) {

@@ -56,6 +56,7 @@ import backSide from "./back.png";
 
 export enum CARD_PLAYABLE {
   ok,
+  played,
   notMyTurn,
   notAllowed,
 }
@@ -64,6 +65,7 @@ const playableToClass = (playableStatus: CARD_PLAYABLE): string => {
   switch (playableStatus) {
     case CARD_PLAYABLE.notMyTurn: return "notMyTurn";
     case CARD_PLAYABLE.notAllowed: return "notAllowed";
+    case CARD_PLAYABLE.played: return "played";
     default: return "playOk";
   }
 };
