@@ -1,23 +1,21 @@
 import React from "react";
-import AnimatedCardSlot from "../components/GameTableComponents/AnimatedCardSlot";
-import getCardFace, { CARD_PLAYABLE } from "../components/GameTableComponents/Cards";
-import CardSlot from "../components/GameTableComponents/CardSlot";
-import { IuiCard, IuiGetRoundResponse, IuiRoundPlayer } from "../interfaces/IuiPlayingGame";
-import { cardAsString, randomNegToPos } from "../common/commonFunctions";
-import { commonAnimationObject } from "../interfaces/IuiAnimation";
-
-const cardPlayable = (i: number, roundInfo: IuiGetRoundResponse): CARD_PLAYABLE => {
-  if (roundInfo.roundToPlayer.isMyTurn) {
-    return roundInfo.roundToPlayer.playableCards.some(ind => ind === roundInfo.roundToPlayer.myCards.findIndex(card => card.originalIndex === i))
-      ? CARD_PLAYABLE.ok
-      : CARD_PLAYABLE.notAllowed;
-  } else {
-    return CARD_PLAYABLE.notMyTurn;
-  }
-};
+import { CARD_PLAYABLE } from "../components/GameTableComponents/Cards";
+import { IuiGetRoundResponse, IuiRoundPlayer } from "../interfaces/IuiPlayingGame";
 
 export const currentTotalPromise = (players: IuiRoundPlayer[]): number => {
   let total = 0;
   players.map(player => total+= player.promise ?? 0);
   return total;
+};
+
+const getMyPosition = (round: IuiGetRoundResponse): number => {
+  return round.roundToPlayer.players.findIndex(player => player.thisIsMe);
+};
+
+export const playerFromIndex = (round: IuiGetRoundResponse, index: number): IuiRoundPlayer => {
+  const myPosition = getMyPosition(round);
+  const playerCount = round.roundToPlayer.players.length;
+  let retIndex = myPosition + index;
+  if (retIndex >= playerCount) retIndex = retIndex - playerCount;
+  return round.roundToPlayer.players[retIndex];
 };

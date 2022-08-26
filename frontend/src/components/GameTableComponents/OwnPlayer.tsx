@@ -8,15 +8,18 @@ import CardSlots from "./CardSlots";
 
 const OwnPlayer = () => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  if (!currentRoundInfo.gameId) return null;
+
+  const me = currentRoundInfo.roundToPlayer.players.find(player => player.thisIsMe);
+  if (!me) return null;
 
   return (
     <React.Fragment>
       <div className="row">
         <CardSlots
-          name={currentRoundInfo.myName}
+          player={me}
           slotCount={10}
           cards={currentRoundInfo.roundToPlayer.myCards}
-          cardsRemainingCount={0}
         />
       </div>
       <PromiseButtons />

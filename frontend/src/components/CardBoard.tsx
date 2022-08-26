@@ -13,6 +13,7 @@ const CardBoard = () => {
   const currentGameInfo = useSelector(getCurrentGameInfo);
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   if (!currentGameInfo || !currentRoundInfo) return null;
+  console.log("CardBoard");
 
   switch (currentGameInfo.humanPlayersCount) {
     case 3: {

@@ -21,7 +21,9 @@ interface IProps {
 
 const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onPlayCard}: IProps) => {
   const [child, setChild] = useState<JSX.Element | undefined>(undefined);
-  const prevChild = useRef<JSX.Element | undefined>(undefined);
+  const initialChildren = useRef<JSX.Element | undefined>(children);
+  const initialEffect = useRef(true);
+  // console.log("Initial children", containerId, children, initialChildren.current);
 
   const [animation, setAnimation] = useState<IuiSpringObject|null>(null);
 
@@ -39,8 +41,12 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
     //   prevChild.current = children;
     //   setChild(children);
     // }
-    setChild(children);
-  }, [children]);
+    if (children !== initialChildren.current || initialEffect.current) {
+      console.log("initial set children", containerId);
+      initialEffect.current = false;
+      setChild(children);
+    }
+  }, [children, containerId]);
 
   useEffect(() => {
     if (collectCards && containerId.startsWith("cardPlayedDivX")) {

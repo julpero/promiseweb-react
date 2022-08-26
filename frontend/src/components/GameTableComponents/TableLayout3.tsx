@@ -1,13 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { useSelector } from "react-redux";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
-import {
-  setGetRoundInfo,
-} from "../../store/getRoundInfoSlice";
 
-import { IuiCard } from "../../interfaces/IuiPlayingGame";
-import CardSlot from "./CardSlot";
 import OtherPlayer from "./OtherPlayer";
 import OwnPlayer from "./OwnPlayer";
 import TrumpSlot from "./TrumpSlot";
@@ -21,6 +16,7 @@ const TableLayout3 = () => {
   const myPlayedCard = currentRoundInfo.roundToPlayer.myPlayedCard ?? undefined;
   const cardFace = myPlayedCard ? getCardFace(cardAsString(myPlayedCard), CARD_PLAYABLE.ok) : undefined;
   const animationObject = commonAnimationObject();
+  console.log("TableLayout3");
   // const animationObject = cardFace ? commonAnimationObject() : plainAnimationObject;
 
   if (!currentRoundInfo || !currentRoundInfo.gameId) return null;

@@ -6,7 +6,7 @@ import {
 } from "../../store/roundInfoSlice";
 
 import { cardAsString, randomNegToPos } from "../../common/commonFunctions";
-import { IuiCard, IuiGetRoundResponse } from "../../interfaces/IuiPlayingGame";
+import { IuiCard, IuiGetRoundResponse, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { setPlayedCard } from "../../store/playCardSlice";
@@ -14,16 +14,27 @@ import { setActionsAvailable } from "../../store/actionsAvailableSlice";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 
 interface IProps {
-  name: string,
+  player: IuiRoundPlayer,
   slotCount: number,
   cards: IuiCard[],
-  cardsRemainingCount: number,
+  // cardsRemainingCount: number,
   playedSlot?: number,
 }
 
-const CardSlots = ({name, slotCount, cards, cardsRemainingCount, playedSlot}: IProps) => {
+const CardSlots = ({player, slotCount, cards, playedSlot}: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const dispatch = useDispatch();
+
+  if (!currentRoundInfo.gameId) return null;
+
+  const name = player.name;
+
+  const playedHitsCount = currentRoundInfo.roundToPlayer.players.reduce((count, player) => {
+    return count + player.keeps;
+  }, 0);
+
+  let cardsRemainingCount = player.thisIsMe ? 0 : currentRoundInfo.roundToPlayer.cardsInRound - playedHitsCount;
+  if (player.cardPlayed) cardsRemainingCount--;
 
   const cardPlayable = (i: number, roundInfo: IuiGetRoundResponse): CARD_PLAYABLE => {
     if (roundInfo.roundToPlayer.isMyTurn) {

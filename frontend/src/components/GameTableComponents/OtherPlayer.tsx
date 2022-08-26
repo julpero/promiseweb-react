@@ -1,20 +1,16 @@
 import React from "react";
-import { ProgressBar } from "react-bootstrap";
 
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
-import {
-  setGetRoundInfo,
-} from "../../store/getRoundInfoSlice";
 
 import { IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
-import CardSlot from "./CardSlot";
-import { easings } from "react-spring";
-import { cardAsString, randomNegToPos } from "../../common/commonFunctions";
+import { cardAsString } from "../../common/commonFunctions";
 import CardSlots from "./CardSlots";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
+import { playerFromIndex } from "../../common/playingGame";
+import PlayerInfo from "./PlayerInfo";
 
 type AlignType = "left" | "right";
 
@@ -27,30 +23,12 @@ interface IProps {
 
 const OtherPlayer = ({ index, maxCards, align }: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
-  const dispatch = useDispatch();
-
-  const getMyPosition = (): number => {
-    return currentRoundInfo.roundToPlayer.players.findIndex(player => player.thisIsMe);
-  };
-
-  const playerFromIndex = (): IuiRoundPlayer => {
-    const myPosition = getMyPosition();
-    const playerCount = currentRoundInfo.roundToPlayer.players.length;
-    let retIndex = myPosition + index;
-    if (retIndex >= playerCount) retIndex = retIndex - playerCount;
-    return currentRoundInfo.roundToPlayer.players[retIndex];
-  };
-  const player = playerFromIndex();
-  console.log("currentRoundInfo, player", player);
-
   if (!currentRoundInfo.gameId) return null;
 
-  const playedHitsCount = currentRoundInfo.roundToPlayer.players.reduce((count, player) => {
-    return count + player.keeps;
-  }, 0);
+  const player: IuiRoundPlayer = playerFromIndex(currentRoundInfo, index);
+  console.log("currentRoundInfo, player", player);
 
-  let cardsRemainingCount = currentRoundInfo.roundToPlayer.cardsInRound - playedHitsCount;
-  if (player.cardPlayed) cardsRemainingCount--;
+
   // if (animateCard && animateCard.fromPlayer === player.name) cardsRemainingCount--;
 
   const renderCardsRow = () => {
@@ -58,57 +36,35 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
     return (
       <div className="row">
         <CardSlots
-          name={player.name}
+          player={player}
           slotCount={maxCards}
           cards={[]}
-          cardsRemainingCount={cardsRemainingCount}
         />
       </div>
     );
   };
 
-  const renderPromise = () => {
-    return (player.promise && player.promise >= 0) ? player.promise : "";
-  };
-
-  const renderKeepProgress = () => {
-    const max = maxCards;
-    const keeps = player.keeps;
-    const promise = player.promise ?? 0;
-    if (keeps === promise) {
-      return (
-        <ProgressBar>
-          <ProgressBar variant="success" now={keeps} max={max} />
-        </ProgressBar>
-      );
-    } else if (keeps < promise) {
-      return (
-        <ProgressBar>
-          <ProgressBar variant="success" now={keeps} max={max} key={1} />
-          <ProgressBar variant="warning" now={promise - keeps} max={max} key={2} />
-        </ProgressBar>
-      );
-    } else {
-      return (
-        <ProgressBar>
-          <ProgressBar variant="success" now={promise} max={max} key={1} />
-          <ProgressBar variant="danger" now={keeps - promise} max={max} key={2} />
-        </ProgressBar>
-      );
-    }
-  };
 
   const renderCardsWonCols = () => {
     const cols: JSX.Element[] = [];
     for (let i = 0; i < maxCards; i++) {
       if (i + 1 <= player.keeps) {
+        const cardFace = getCardFace("backSide", CARD_PLAYABLE.ok);
+        const animationObject = commonAnimationObject();
         cols.push(
           <div key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}>
-            <CardSlot containerId={`cardsWonSlotsX${player.name}X${i}`} card={null} />
+            <AnimatedCardSlot
+              containerId={`cardsWonSlotsX${player.name}X${i}`}
+              animationObject={animationObject}
+            >
+              {cardFace}
+            </AnimatedCardSlot>
           </div>
         );
       } else {
-        cols.push(<div id={`cardsWonSlotsX${player.name}X${i}`} key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}></div>);
+        cols.push(
+          <div id={`cardsWonSlotsX${player.name}X${i}`} key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}></div>
+        );
       }
     }
     return cols;
@@ -207,28 +163,9 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
     }
   };
 
-  const renderPlayerInfoRow = () => {
-    return (
-      <div className="row playerInfoRow">
-        <div className="col-3 nameCol playerNameCol">
-          {player.name}
-        </div>
-        <div className="col-3 playerInfoCol">
-          {renderPromise()}
-        </div>
-        <div className="col-2 playerInfoCol">
-          k: {player.keeps}
-        </div>
-        <div className="col-4 progressInfoCol">
-          {renderKeepProgress()}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <React.Fragment>
-      {renderPlayerInfoRow()}
+      <PlayerInfo index={index} maxCards={maxCards} />
       {renderCardsRow()}
       {renderStatsAndCardPlayedAndWonRow()}
     </React.Fragment>
