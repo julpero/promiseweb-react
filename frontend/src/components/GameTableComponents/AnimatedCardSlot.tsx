@@ -34,13 +34,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
   const collectCards = useSelector(getCollectCards);
   const dispatch = useDispatch();
 
-  // const initialRender = useRef(true);
   useEffect(() => {
-    // if (initialRender.current) {
-    //   initialRender.current = false;
-    //   prevChild.current = children;
-    //   setChild(children);
-    // }
     if (children !== initialChildren.current || initialEffect.current) {
       console.log("initial set children", containerId);
       initialEffect.current = false;
@@ -70,13 +64,12 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
             rotate: randomNegToPos(5),
             onStart: () => {
               console.log("started to animate");
-              // setChild(cardFace);
-              // dispatch(setEmptySlot(containerId));
             },
             onRest: () => {
               // set this only once, easiest handle with winner containerId
               if (containerId === `cardPlayedDivX${collectCards.winner}`) {
                 dispatch(setGetRoundInfo(collectCards.getRoundRequest));
+                dispatch(setCollectCards(null));
               }
               setAnimation(null);
               setChild(undefined);
@@ -102,23 +95,14 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
   useEffect(() => {
     // console.log("useEffect A", containerId);
     if (animateCard && containerId === `cardsToPlaySlotsX${animateCard.fromPlayer}X${animateCard.fromSlot}`) {
-      // this is the slot where card is played from, so it should be empty for now on
+      // this is the slot where card is played from, it will be set empty when played to animation starts
       // console.log("animateCard, empty this slot", animateCard);
-      // const fromContainer = document.getElementById(`cardsToPlaySlotsX${animateCard.fromPlayer}X${animateCard.fromSlot}`);
-      // fromContainer?.classList.remove("playableCard");
-      // setChild(undefined);
     } else if (animateCard && containerId === `cardPlayedDivX${animateCard.fromPlayer}`) {
       // this is the slot where card is played to, so it should handle the animation
       console.log("animateCard, to slot, set children", animateCard);
       const newChildren = animateCard.cardFace;
       const cardFace = getCardFace(cardAsString(newChildren ?? { rank: "0", suite: "dummy", value: 0 }), CARD_PLAYABLE.played);
       console.log("animateCard, to slot, new card face", cardFace);
-      console.log(`A: ${Date.now()}`);
-      // setChild(cardFace);
-      //
-
-      console.log(`C: ${Date.now()}`);
-      console.log("animateCard, to slot", animateCard);
 
       const fromContainerStr = `cardsToPlaySlotsX${animateCard.fromPlayer}X${animateCard.fromSlot}`;
       const fromContainer = document.getElementById(fromContainerStr);
@@ -160,9 +144,6 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
         console.log("springObject", springObject);
         setAnimation(springObject);
       }
-
-      //
-      console.log(`B: ${Date.now()}`);
     }
   }, [ animateCard, containerId, dispatch]);
 
@@ -174,8 +155,16 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
     }
   }, [animation, api]);
 
+  const handleClick = () => {
+    console.log("ON CLICK");
+    if (onPlayCard !== undefined && !animateCard && !collectCards && !emptySlot) {
+      console.log("ON CLICK ACTION");
+      onPlayCard();
+    }
+  };
+
   return (
-    <div onClick={onPlayCard} id={containerId} className={`col cardCol ${classStr ?? ""}`}>
+    <div onClick={() => handleClick()} id={containerId} className={`col cardCol ${classStr ?? ""}`}>
       <animated.div style={props}>
         {child}
       </animated.div>

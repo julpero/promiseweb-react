@@ -3,7 +3,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { getCurrentRoundInfo } from "../store/roundInfoSlice";
 
-import { Table } from "react-bootstrap";
+import { OverlayTrigger, Table, Tooltip } from "react-bootstrap";
 import { IuiPlayerPromise } from "../interfaces/IuiPlayingGame";
 
 /**
@@ -14,8 +14,16 @@ const PromiseTable = () => {
   if (!currentRoundInfo.gameId) return null;
   const promiseTable = currentRoundInfo.roundToPlayer.promiseTable;
 
+  const renderThTooltip = (props: any) => {
+    return (
+      <Tooltip id="thTooltip" { ...props }>
+        Testi
+      </Tooltip>
+    );
+  };
+
   const promiseHeaderClass = (roundInd: number): string => {
-    const classArr: string[] = ["promiseHeading"];
+    const classArr: string[] = ["tableHeading"];
     const {cardsInRound, totalPromise} = promiseTable.rounds[roundInd];
     if (totalPromise !== null) {
       if (cardsInRound > totalPromise) classArr.push("underPromised");
@@ -26,7 +34,7 @@ const PromiseTable = () => {
   };
 
   const playerPromiseClass = (promise: IuiPlayerPromise): string => {
-    const classArr: string[] = ["promiseValue"];
+    const classArr: string[] = ["tableCell"];
     const {promise: promised, keep} = promise;
     if (promised !== null) {
       if (promised > keep) classArr.push("underKept");
@@ -40,7 +48,13 @@ const PromiseTable = () => {
     if (!promiseTable) return null;
     return (
       promiseTable.rounds.map((round, idx) => {
-        return <th key={idx} className={promiseHeaderClass(idx)}>{round.cardsInRound}</th>;
+        return (
+          <th key={idx} className={promiseHeaderClass(idx)}>
+            <OverlayTrigger placement="bottom" delay={{show: 100, hide: 200}} overlay={renderThTooltip}>
+              <span>{round.cardsInRound}</span>
+            </OverlayTrigger>
+          </th>
+        );
       })
     );
   };

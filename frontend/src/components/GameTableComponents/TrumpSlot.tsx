@@ -18,7 +18,7 @@ const TrumpSlot = () => {
   }, [currentRoundInfo]);
   useEffect(() => {
     if (trump) {
-      setCardFace(getCardFace(cardAsString(trump), CARD_PLAYABLE.ok));
+      setCardFace(getCardFace(cardAsString(trump), CARD_PLAYABLE.played));
     }
   }, [trump]);
   useEffect(() => {

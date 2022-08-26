@@ -8,6 +8,10 @@ body {
   background-color: azure;
 }
 
+.playerTable {
+  border: 1px solid black;
+}
+
 .cardCol {
   height: 112px;
   padding: 0px;
@@ -42,28 +46,28 @@ body {
   position: absolute;
 }
 
-.promiseHeading {
+.tableHeading {
   text-align: center;
 }
 .evenPromised {
-  background-image: linear-gradient(90deg, rgba(0, 255, 0, 0), rgba(0, 255, 0, 1), rgba(0, 255, 0, 0));
+  background-image: radial-gradient(circle, rgba(0, 255, 0, 0) 20%, rgba(0, 255, 0, 0.8) 50%, rgba(0, 255, 0, 0) 30%);
 }
 .underPromised {
-  background-image: linear-gradient(90deg, rgba(255, 255, 0, 0), rgba(255, 255, 0, 1), rgba(255, 255, 0, 0));
+  background-image: radial-gradient(circle, rgba(255, 255, 0, 0) 20%, rgba(255, 255, 0, 0.8) 50%, rgba(255, 255, 0, 0) 30%);
 }
 .overPromised {
-  background-image: linear-gradient(90deg, rgba(255, 0, 0, 0), rgba(255, 0, 0, 1), rgba(255, 0, 0, 0));
+  background-image: radial-gradient(circle, rgba(255, 0, 0, 0) 20%, rgba(255, 0, 0, 0.8) 50%, rgba(255, 0, 0, 0) 30%);
 }
 
-.promiseValue {
+.tableCell {
   text-align: center;
 }
 .evenKept {
-  background-image: linear-gradient(90deg, rgba(0, 255, 0, 0), rgba(0, 255, 0, 0.3), rgba(0, 255, 0, 0));
+  background-image: radial-gradient(circle, rgba(0, 255, 0, 0) 20%, rgba(0, 255, 0, 0.3) 50%, rgba(0, 255, 0, 0) 30%);
 }
 .underKept {
-  background-image: linear-gradient(90deg, rgba(255, 255, 0, 0), rgba(255, 255, 0, 0.3), rgba(255, 255, 0, 0));
+  background-image: radial-gradient(circle, rgba(255, 255, 0, 0) 20%, rgba(255, 255, 0, 0.5) 50%, rgba(255, 255, 0, 0) 30%);
 }
 .overKept {
-  background-image: linear-gradient(90deg, rgba(255, 0, 0, 0), rgba(255, 0, 0, 0.3), rgba(255, 0, 0, 0));
+  background-image: radial-gradient(circle, rgba(255, 0, 0, 0) 20%, rgba(255, 0, 0, 0.3) 50%, rgba(255, 0, 0, 0) 30%);
 }

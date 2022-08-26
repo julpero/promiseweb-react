@@ -6,7 +6,7 @@ import {
 } from "../../store/roundInfoSlice";
 
 import { cardAsString, randomNegToPos } from "../../common/commonFunctions";
-import { IuiCard, IuiGetRoundResponse, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
+import { IuiCard, IuiGetRoundResponse, IuiRoundPlayer, ROUND_PHASE } from "../../interfaces/IuiPlayingGame";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { setPlayedCard } from "../../store/playCardSlice";
@@ -83,7 +83,9 @@ const CardSlots = ({player, slotCount, cards, playedSlot}: IProps) => {
           containerId={`cardsToPlaySlotsX${name}X${i}`}
           classStr={classStrArr.join(" ")}
           animationObject={commonAnimationObject()}
-          onPlayCard={() => playCard(canPlayThisCard === CARD_PLAYABLE.ok ? cardToRender : null)}
+          onPlayCard={
+            () => playCard(canPlayThisCard === CARD_PLAYABLE.ok ? cardToRender : null)
+          }
         >
           {cardFace}
         </AnimatedCardSlot>

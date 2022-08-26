@@ -16,7 +16,7 @@ const ScoreBoard = () => {
   const renderScoreBoardHeader = () => {
     return (
       promiseTable.players.map((playerName, idx) => {
-        return <td key={idx}>{playerName.substring(0, 3)}</td>;
+        return <td className="tableHeading" key={idx}>{playerName.substring(0, 3)}</td>;
       })
     );
   };
@@ -44,11 +44,11 @@ const ScoreBoard = () => {
       const str = pointsStr(playersCumulativePointsInRound, currentRoundPoints, currentRoundPoints === null || currentPromise === null);
       if (str) {
         colArr.push(
-          <td key={i}>{str}</td>
+          <td className="tableCell" key={i}>{str}</td>
         );
       } else {
         colArr.push(
-          <td key={i}>&nbsp;</td>
+          <td className="tableCell" key={i}>&nbsp;</td>
         );
       }
     }
