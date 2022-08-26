@@ -2,6 +2,7 @@ import React from "react";
 import { ProgressBar } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { playerFromIndex } from "../../common/playingGame";
+import { IuiGetRoundResponse } from "../../interfaces/IuiPlayingGame";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 
 interface IProps {
@@ -11,16 +12,36 @@ interface IProps {
 }
 
 const PlayerInfo = ({index, maxCards}: IProps) => {
-  const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  const currentRoundInfo: IuiGetRoundResponse = useSelector(getCurrentRoundInfo);
   if (!currentRoundInfo.gameId) return null;
 
   const player = playerFromIndex(currentRoundInfo, index);
+
+  const isThisPromiseTurn = (): boolean => {
+    if (!currentRoundInfo.roundToPlayer.players.some(player => player.promise === null)) {
+      // all players have promised
+      return false;
+    }
+    for (let i = currentRoundInfo.roundToPlayer.starterPositionIndex; i < currentRoundInfo.roundToPlayer.starterPositionIndex + currentRoundInfo.roundToPlayer.players.length; i++) {
+      const checkInd = i >= currentRoundInfo.roundToPlayer.players.length ? i - currentRoundInfo.roundToPlayer.players.length : i;
+      if (currentRoundInfo.roundToPlayer.players[checkInd].promise === null) {
+        return currentRoundInfo.roundToPlayer.players[checkInd].name === player.name;
+      }
+    }
+    return false;
+  };
 
   const renderPromise = () => {
     return (player.promise && player.promise >= 0) ? player.promise : "";
   };
 
   const renderKeepProgress = () => {
+    if (isThisPromiseTurn()) {
+      return (
+        <ProgressBar striped animated variant="info" now={1} max={1} />
+      );
+    }
+
     const max = maxCards;
     const keeps = player.keeps;
     const promise = player.promise ?? 0;
