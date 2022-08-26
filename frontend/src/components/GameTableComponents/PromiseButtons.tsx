@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useSelector } from "react-redux";
 import { getCurrentGameInfo } from "../../store/gameInfoSlice";
@@ -18,6 +18,14 @@ const PromiseButtons = () => {
   const { gameId, roundInd } = currentRoundInfo;
   const { cardsInRound, isMyPromiseTurn } = currentRoundInfo.roundToPlayer;
 
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    setClicked(false);
+  }, [currentRoundInfo]);
+
+  if (!currentRoundInfo.gameId) return null;
+
   const amILastPromiser = (players: IuiRoundPlayer[]): boolean => {
     return players.length - players.filter(player => player.promise !== null).length === 1;
   };
@@ -34,7 +42,6 @@ const PromiseButtons = () => {
 
   const disabledButton = disableButton();
 
-  const { socket } = useSocket();
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
 
   const doPromise = (promise: number) => {
@@ -58,7 +65,13 @@ const PromiseButtons = () => {
   const renderPromiseButtons = (): JSX.Element[] => {
     const buttons: JSX.Element[] = [];
     for (let i = 0; i <= cardsInRound; i++) {
-      buttons.push(<div key={i} className="col"><Button onClick={() => doPromise(i)} disabled={!isMyPromiseTurn || clicked || disabledButton === i}>{i}</Button></div>);
+      buttons.push(
+        <div key={i} className="col">
+          <Button onClick={() => doPromise(i)} disabled={!isMyPromiseTurn || clicked || disabledButton === i}>
+            {i}
+          </Button>
+        </div>
+      );
     }
     for (let i = cardsInRound + 1; i <= 10; i++) {
       buttons.push(<div key={i} className="col">&nbsp;</div>);
