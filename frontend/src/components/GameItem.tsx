@@ -46,7 +46,7 @@ const GameItem = (props: IuiGameListItem & IProps) => {
 
   const renderRules = () => {
     if (props.rules.ruleList.length === 0 && props.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal) {
-      return null;
+      return "vanilla game";
     } else {
       return(
         <ul>

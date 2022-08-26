@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Form, Field } from "react-final-form";
 import { useSocket } from "../socket";
 import GameItem from "./GameItem";
@@ -34,7 +34,6 @@ type MethodType = null | "join" | "leave";
 const OpenGamesList = () => {
   const [ gameId, setGameId] = useState("");
   const [ method, setMethod] = useState<MethodType>(null);
-  // const [ isFetching, setIsFetching ] = useState(false);
   const [ gameItemList, setGameItemList ] = useState<IuiGameListItem[]>([]);
   const [ loginStatus, setLoginStatus ] = useState<LOGIN_RESPONSE | null>(null);
   const [ joinLeaveStatus, setJoinLeaveStatus ] = useState<JOIN_LEAVE_RESULT | null>(null);
@@ -44,6 +43,14 @@ const OpenGamesList = () => {
   const callBackList = useRef<(() => void)[]>([]);
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
+
+  const fetchGameItemList = useCallback(() => {
+    const gameListRequest: IuiGetGameListRequest = { myId: getMyId() };
+    socket.emit("get games", gameListRequest, (gameList: IuiGetGameListResponse) => {
+      console.log("gameList", gameList);
+      setGameItemList(gameList.games);
+    });
+  }, [socket]);
 
   useEffect(() => {
     fetchGameItemList();
@@ -60,7 +67,7 @@ const OpenGamesList = () => {
       socket.off("new game created");
       socket.off("game list updated");
     };
-  }, []);
+  }, [socket, fetchGameItemList]);
 
   useEffect(() => {
     if (method !== null) {
@@ -69,14 +76,6 @@ const OpenGamesList = () => {
       callBackList.current = [];
     }
   }, [method]);
-
-  const fetchGameItemList = () => {
-    const gameListRequest: IuiGetGameListRequest = { myId: getMyId() };
-    socket.emit("get games", gameListRequest, (gameList: IuiGetGameListResponse) => {
-      console.log("gameList", gameList);
-      setGameItemList(gameList.games);
-    });
-  };
 
   const joinGameMethod = (gameId: string, form: FormApi<IFormFields, Partial<IFormFields>>) => {
     callBackList.current.push(form.submit);
@@ -231,7 +230,6 @@ const OpenGamesList = () => {
           </form>
         )}
       />
-      <div>gameItemList { JSON.stringify(gameItemList) }</div>
       <Modal
         show={((loginStatus || (joinLeaveStatus !== null && joinLeaveStatus === JOIN_LEAVE_RESULT.notOk))) as boolean }
         onHide={handleErrorClose}

@@ -10,7 +10,7 @@ import { Table } from "react-bootstrap";
  */
 const PromiseTable = () => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
-  // if (!currentRoundInfo) return null;
+  if (!currentRoundInfo.gameId) return null;
   const promiseTable = currentRoundInfo.roundToPlayer.promiseTable;
 
   const renderPromiseTableHeader = () => {
@@ -42,7 +42,7 @@ const PromiseTable = () => {
 
   return (
     <div>
-      <Table>
+      <Table size="sm">
         <thead>
           <tr>
             <th />
