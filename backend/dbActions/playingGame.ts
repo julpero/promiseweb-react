@@ -25,9 +25,10 @@ import {
   winnerOfPlay,
 } from "../common/common";
 import { startRound } from "../common/game";
-import { ICardToIuiCard, isRuleActive, IuiCardToICard } from "../common/model";
-import { ICard, ICardPlayed, IGameOptions, IPromiser, PromiseValue } from "../interfaces/IGameOptions";
+import { isRuleActive, IuiCardToICard } from "../common/model";
+import { ICardPlayed, IGameOptions, IPromiser, PromiseValue } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
+import { generateRoundStats } from "./generateStats";
 
 export const getGame = async (gameIdStr: string): Promise<IGameOptions | null> => {
   const gameInDb = await GameOptions.findById(gameIdStr);
@@ -203,11 +204,14 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
         // let's count points for this round
         countRoundPoints(round.roundPlayers, round.cardsInRound > 5);
 
-        // TODO stats
+        if (!generateRoundStats(gameId, round)) {
+          console.warn("round stats generation failed!");
+        }
 
         if (currentRoundInd === gameInDb.game.rounds.length - 1) {
           // this was the last round in the game so now game ends
           response.gameStatusAfterPlay = GAME_STATUS.played;
+          response.newPlayAfterHit = false;
         } else {
           // there are more rounds to play so let's start the next one
           const newRoundInd = currentRoundInd + 1;
