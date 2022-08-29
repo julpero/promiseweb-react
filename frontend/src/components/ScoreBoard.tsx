@@ -59,7 +59,7 @@ const ScoreBoard = () => {
     const rowArr: JSX.Element[] = [];
     for (let i = 0; i < promiseTable.promisesByPlayers[0].length; i++) {
       rowArr.push(
-        <tr>
+        <tr key={i}>
           {renderScoreBoardCols(i)}
         </tr>
       );

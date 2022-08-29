@@ -46,12 +46,12 @@ const TableLayout3 = () => {
           <div className="col-6"></div>
           <AnimatedCardSlot
             containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
-            classStr="col-2 myPlayedCard"
+            classStr="col-1 myPlayedCard"
             animationObject={animationObject}
           >
             {cardFace}
           </AnimatedCardSlot>
-          <div className="col-4"></div>
+          <div className="col-5"></div>
         </div>
         <div className="row">
           <div className="col-3">
