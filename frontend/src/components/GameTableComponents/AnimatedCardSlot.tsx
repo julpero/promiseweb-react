@@ -156,9 +156,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
   }, [animation, api]);
 
   const handleClick = () => {
-    console.log("ON CLICK");
     if (onPlayCard !== undefined && !animateCard && !collectCards && !emptySlot) {
-      console.log("ON CLICK ACTION");
       onPlayCard();
     }
   };

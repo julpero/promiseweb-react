@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ROUND_STATUS } from "../interfaces/IuiGameOptions";
-import { IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification } from "../interfaces/IuiPlayingGame";
+import { IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, ROUND_PHASE } from "../interfaces/IuiPlayingGame";
 import { useSocket } from "../socket";
 import { setActionsAvailable } from "../store/actionsAvailableSlice";
 import { AnimateCard, setAnimateCard } from "../store/animateCardSlice";
@@ -109,7 +109,7 @@ const EffectHandler = ({gameId}: IProps) => {
 
   useEffect(() => {
     console.log("playedCard useEffect (store)", playedCard);
-    if (playedCard) {
+    if (playedCard && currentRoundInfo.roundToPlayer.isMyTurn && currentRoundInfo.roundToPlayer.roundPhase === ROUND_PHASE.onPlay) {
       const playCardRequest: IuiPlayCardRequest = {
         myId: getMyId(),
         gameId: gameId,
@@ -123,6 +123,8 @@ const EffectHandler = ({gameId}: IProps) => {
         dispatch(setActionsAvailable(true));
         console.log("playCardResponse (store)", playCardResponse);
       });
+    } else {
+      dispatch(setPlayedCard(null));
     }
   }, [gameId, currentRoundInfo, playedCard, socket, dispatch]);
 

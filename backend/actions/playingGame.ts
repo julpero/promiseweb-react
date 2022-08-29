@@ -143,7 +143,7 @@ const isMyPromiseTurn = (myId: string, round: IRound): boolean => {
   return getPromiser(round)?.playerId === myId;
 };
 
-const getRoundPhase = (round: IRound): ROUND_PHASE => {
+export const getRoundPhase = (round: IRound): ROUND_PHASE => {
   const playerCount = round.roundPlayers.length;
   if (round.cardsPlayed.length === playerCount) return ROUND_PHASE.played;
   if (round.roundPlayers.filter(player => player.promise !== null).length === playerCount) return ROUND_PHASE.onPlay;

@@ -6,7 +6,9 @@ import {
   IuiPlayCardResponse,
   PLAY_CARD_RESPONSE,
   PROMISE_RESPONSE,
+  ROUND_PHASE,
 } from "../../frontend/src/interfaces/IuiPlayingGame";
+import { getRoundPhase } from "../actions/playingGame";
 import {
   countRoundPoints,
   getCurrentPlayIndex,
@@ -63,6 +65,13 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
       return promiseResponse;
     }
     const round = gameInDb.game.rounds[currentRoundInd];
+    const roundPhase = getRoundPhase(round);
+    if (roundPhase !== ROUND_PHASE.onPromises) {
+      console.warn("promising, round not in onPromises phase");
+      promiseResponse.promiseResponse = PROMISE_RESPONSE.noPromisePhase;
+      return promiseResponse;
+    }
+
     const promiser: IPromiser | null = getPromiser(round);
     if (!promiser) {
       console.warn("promising, possible not promising phase");
@@ -130,6 +139,13 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
       return response;
     }
     const round = gameInDb.game.rounds[currentRoundInd];
+    const roundPhase = getRoundPhase(round);
+    if (roundPhase !== ROUND_PHASE.onPlay) {
+      console.warn("playing card, round not in onPlay phase");
+      response.playResponse = PLAY_CARD_RESPONSE.notMyTurn;
+      return response;
+    }
+
     const playerInTurn = getPlayerInTurn(round);
     if (playerInTurn?.playerId !== myId) {
       console.warn("playing card, not my turn");
