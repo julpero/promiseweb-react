@@ -11,6 +11,15 @@ body {
 .playerTable {
   border: 1px solid black;
 }
+.playerInfoRow {
+  margin: 5px;
+}
+.otherPlayerCardSlots {
+  margin: 5px 0px;
+}
+.otherPlayerWonRow {
+  margin: 5px 0px;
+}
 
 .cardCol {
   height: 112px;

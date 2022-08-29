@@ -34,7 +34,7 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
   const renderCardsRow = () => {
     if (index === 0) return null;
     return (
-      <div className="row">
+      <div className="row otherPlayerCardSlots">
         <CardSlots
           player={player}
           slotCount={maxCards}
@@ -139,7 +139,7 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
   const renderStatsAndCardPlayedAndWonRow = () => {
     if (align === "left") {
       return (
-        <div className="row">
+        <div className="row otherPlayerWonRow">
           <div className="col">
             {renderCardsWonRow()}
           </div>
@@ -151,7 +151,7 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
     }
     if (align === "right") {
       return (
-        <div className="row">
+        <div className="row otherPlayerWonRow">
           <div className="col">
             {renderCardPlayedRow()}
           </div>

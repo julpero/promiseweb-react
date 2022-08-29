@@ -1,6 +1,7 @@
 import React from "react";
 import { ProgressBar } from "react-bootstrap";
 import { useSelector } from "react-redux";
+import { colorize } from "../../common/commonFunctions";
 import { playerFromIndex } from "../../common/playingGame";
 import { IuiGetRoundResponse } from "../../interfaces/IuiPlayingGame";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
@@ -68,9 +69,11 @@ const PlayerInfo = ({index, maxCards}: IProps) => {
     }
   };
 
+  const bgColor = window.getComputedStyle(document.body, null).getPropertyValue("background-color");
+
   return (
     <div className="row playerInfoRow">
-      <div className="col-3 nameCol playerNameCol">
+      <div className="col-3 nameCol playerNameCol" style={{"backgroundImage": `linear-gradient(90deg, ${colorize(player.name)}, ${bgColor})`}}>
         {player.name}
       </div>
       <div className="col-3 playerInfoCol">
