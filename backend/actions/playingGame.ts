@@ -144,8 +144,9 @@ const isMyPromiseTurn = (myId: string, round: IRound): boolean => {
 };
 
 export const getRoundPhase = (round: IRound): ROUND_PHASE => {
+  const cardsInRound = round.cardsInRound;
   const playerCount = round.roundPlayers.length;
-  if (round.cardsPlayed.length === playerCount) return ROUND_PHASE.played;
+  if (round.cardsPlayed.filter(play => play.length === playerCount).length === cardsInRound) return ROUND_PHASE.played;
   if (round.roundPlayers.filter(player => player.promise !== null).length === playerCount) return ROUND_PHASE.onPlay;
   if (round.roundPlayers.filter(player => player.promise !== null).length !== playerCount) return ROUND_PHASE.onPromises;
   return ROUND_PHASE.initial;
@@ -191,7 +192,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: strin
     handValues: null, // TODO getHandValues(thisGame, roundInd),
     obsGame: null, // TODO obsGameToRoundObj
     promiseTable: getPromiseTable(gameInDb),
-    roundPhase: getRoundPhase(round), // TODO do i really need this?
+    roundPhase: getRoundPhase(round),
   } as IuiRoundToPlayer;
 };
 
