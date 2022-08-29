@@ -219,6 +219,7 @@ export const getPlayerIndexFromRoundById = (roundPlayers: IRoundPlayer[], id: st
 };
 
 export const countRoundPoints = (roundPlayers: IRoundPlayer[], bigRound: boolean): void => {
+  // TODO speed play points
   for (let i = 0; i < roundPlayers.length; i++) {
     const player = roundPlayers[i];
     if (player.promise === player.keeps) {

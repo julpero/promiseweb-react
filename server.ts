@@ -249,6 +249,11 @@ connectDB().then(() => {
           const chatLine2 = `... and ${newDealer} is a dealer!`;
           io.to(gameIdStr).emit("new chat line", chatLine2);
         }
+
+        if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.played) {
+          const chatLine = "GAME OVER!";
+          io.to(gameIdStr).emit("new chat line", chatLine);
+        }
       }
 
       fn(playCardResponse);

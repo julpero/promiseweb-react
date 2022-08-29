@@ -175,18 +175,18 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: strin
     myCards: myCards, // TODO speed promise
     playableCards: isNowMyTurn ? getPlayableCardIndexes(myCards, round, playIndex) : [],
     players: getRoundPlayers(playerId, round, playIndex, !isRuleActive(gameInDb, RULE.hiddenPromiseRound)), // TODO showPromisesNow
-    trumpCard: ICardToIuiCard(round.trumpCard), // TODO
+    trumpCard: ICardToIuiCard(round.trumpCard), // TODO hidden trump mode
     myPlayedCard: myPlayedCard ? ICardToIuiCard(myPlayedCard) : null,
-    playerInCharge: 0, // TODO
-    cardInCharge: cardInCharge ? ICardToIuiCard(cardInCharge) : null, // TODO
+    playerInCharge: 0, // TODO hidden cards
+    cardInCharge: cardInCharge ? ICardToIuiCard(cardInCharge) : null, // TODO hidden cards
     playerGoingToWinThisPlay: null, // TODO
-    cardsPlayed: getCardsPlayed(round, playIndex), // TODO
-    doReloadInit: false, // TODO
-    newRound: false, // TODO
-    gameOver: false, // TODO
+    cardsPlayed: getCardsPlayed(round, playIndex), // TODO hidden cards
+    doReloadInit: false, // TODO possible not needed anymore
+    newRound: false, // TODO possible not needed anymore
+    gameOver: false, // TODO possible not needed anymore
     whoseTurn: playerInTurn?.name ?? "",
     isMyTurn: isNowMyTurn, // TODO
-    isMyPromiseTurn: isMyPromiseTurn(playerId, round), // TODO
+    isMyPromiseTurn: isMyPromiseTurn(playerId, round), // TODO ?
     handValues: null, // TODO getHandValues(thisGame, roundInd),
     obsGame: null, // TODO obsGameToRoundObj
     promiseTable: getPromiseTable(gameInDb),
