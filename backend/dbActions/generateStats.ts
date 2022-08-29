@@ -1,6 +1,7 @@
-import { ICardPlayed, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
+import { ICardPlayed, IGame, IGameOptions, IPlayerStatistic, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 import StatsToPlayer from "../models/RoundStats";
 import { IRoundOfPlayerStats } from "../interfaces/IStats";
+import { getPlayerNameInPlayerOrder } from "../common/common";
 
 const countPlayTime = (cardsPlayed: ICardPlayed[][], playerInRound: string): number => {
   let playTime = 0;
