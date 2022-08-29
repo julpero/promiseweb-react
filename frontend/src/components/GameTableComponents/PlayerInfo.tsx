@@ -1,10 +1,13 @@
 import React from "react";
 import { ProgressBar } from "react-bootstrap";
 import { useSelector } from "react-redux";
+import { config, useSpring, animated  } from "react-spring";
+
 import { colorize } from "../../common/commonFunctions";
 import { playerFromIndex } from "../../common/playingGame";
 import { IuiGetRoundResponse } from "../../interfaces/IuiPlayingGame";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
+import AnimatedProgressBar from "./AnimatedProgressBar";
 
 interface IProps {
   /** index goes clockwise, starting from you 0 and rest players from 1 to 5 */
@@ -33,14 +36,16 @@ const PlayerInfo = ({index, maxCards}: IProps) => {
   };
 
   const renderPromise = () => {
-    return (player.promise && player.promise >= 0) ? player.promise : "";
+    return (player.promise !== null && player.promise >= 0) ? player.promise : "-";
+  };
+
+  const renderKeeps = () => {
+    return (player.promise !== null && player.keeps !== null && player.keeps >= 0) ? player.keeps : "-";
   };
 
   const renderKeepProgress = () => {
     if (isThisPromiseTurn()) {
-      return (
-        <ProgressBar striped animated variant="info" now={1} max={1} />
-      );
+      return <AnimatedProgressBar />;
     }
 
     const max = maxCards;
@@ -48,20 +53,20 @@ const PlayerInfo = ({index, maxCards}: IProps) => {
     const promise = player.promise ?? 0;
     if (keeps === promise) {
       return (
-        <ProgressBar>
+        <ProgressBar style={{"border": "solid 1px green"}}>
           <ProgressBar variant="success" now={keeps} max={max} />
         </ProgressBar>
       );
     } else if (keeps < promise) {
       return (
-        <ProgressBar>
+        <ProgressBar style={{"border": "solid 1px orange"}}>
           <ProgressBar variant="success" now={keeps} max={max} key={1} />
           <ProgressBar variant="warning" now={promise - keeps} max={max} key={2} />
         </ProgressBar>
       );
     } else {
       return (
-        <ProgressBar>
+        <ProgressBar style={{"border": "solid 1px red"}}>
           <ProgressBar variant="success" now={promise} max={max} key={1} />
           <ProgressBar variant="danger" now={keeps - promise} max={max} key={2} />
         </ProgressBar>
@@ -76,11 +81,11 @@ const PlayerInfo = ({index, maxCards}: IProps) => {
       <div className="col-3 nameCol playerNameCol" style={{"backgroundImage": `linear-gradient(90deg, ${colorize(player.name)}, ${bgColor})`}}>
         {player.name}
       </div>
-      <div className="col-3 playerInfoCol">
+      <div className="col-5 playerInfoCol">
+        keeps/pr:&nbsp;
+        {renderKeeps()}
+        /
         {renderPromise()}
-      </div>
-      <div className="col-2 playerInfoCol">
-        k: {player.keeps}
       </div>
       <div className="col-4 progressInfoCol">
         {renderKeepProgress()}

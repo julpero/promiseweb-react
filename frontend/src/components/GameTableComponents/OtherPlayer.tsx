@@ -28,9 +28,6 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
   const player: IuiRoundPlayer = playerFromIndex(currentRoundInfo, index);
   console.log("currentRoundInfo, player", player);
 
-
-  // if (animateCard && animateCard.fromPlayer === player.name) cardsRemainingCount--;
-
   const renderCardsRow = () => {
     if (index === 0) return null;
     return (
@@ -43,7 +40,6 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
       </div>
     );
   };
-
 
   const renderCardsWonCols = () => {
     const cols: JSX.Element[] = [];

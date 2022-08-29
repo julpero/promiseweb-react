@@ -24,6 +24,7 @@ const PromiseTable = () => {
 
   const promiseHeaderClass = (roundInd: number): string => {
     const classArr: string[] = ["tableHeading"];
+    if (roundInd === currentRoundInfo.roundInd) classArr.push("currentRound");
     const {cardsInRound, totalPromise} = promiseTable.rounds[roundInd];
     if (totalPromise !== null) {
       if (cardsInRound > totalPromise) classArr.push("underPromised");
@@ -33,8 +34,9 @@ const PromiseTable = () => {
     return classArr.join(" ");
   };
 
-  const playerPromiseClass = (promise: IuiPlayerPromise): string => {
+  const playerPromiseClass = (roundInd: number, promise: IuiPlayerPromise): string => {
     const classArr: string[] = ["tableCell"];
+    if (roundInd === currentRoundInfo.roundInd) classArr.push("currentRound");
     const {promise: promised, keep} = promise;
     if (promised !== null) {
       if (promised > keep) classArr.push("underKept");
@@ -63,7 +65,7 @@ const PromiseTable = () => {
     if (!promiseTable) return null;
     return (
       promiseTable.promisesByPlayers[idx].map((promise, idx) => {
-        return <td key={idx} className={playerPromiseClass(promise)}>{promise.promise}</td>;
+        return <td key={idx} className={playerPromiseClass(idx, promise)}>{promise.promise}</td>;
       })
     );
   };

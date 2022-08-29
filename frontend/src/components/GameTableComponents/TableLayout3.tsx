@@ -42,7 +42,7 @@ const TableLayout3 = () => {
             />
           </div>
         </div>
-        <div className="row">
+        <div className="row ownPlayedCardRow">
           <div className="col-6"></div>
           <AnimatedCardSlot
             containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
