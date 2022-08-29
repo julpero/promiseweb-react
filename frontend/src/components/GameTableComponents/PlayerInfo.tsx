@@ -5,7 +5,7 @@ import { config, useSpring, animated  } from "react-spring";
 
 import { colorize } from "../../common/commonFunctions";
 import { playerFromIndex } from "../../common/playingGame";
-import { IuiGetRoundResponse } from "../../interfaces/IuiPlayingGame";
+import { IuiGetRoundResponse, ROUND_PHASE } from "../../interfaces/IuiPlayingGame";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 import AnimatedProgressBar from "./AnimatedProgressBar";
 
@@ -20,6 +20,7 @@ const PlayerInfo = ({index, maxCards}: IProps) => {
   if (!currentRoundInfo.gameId) return null;
 
   const player = playerFromIndex(currentRoundInfo, index);
+  const max = currentRoundInfo.roundToPlayer.cardsInRound;
 
   const isThisPromiseTurn = (): boolean => {
     if (!currentRoundInfo.roundToPlayer.players.some(player => player.promise === null)) {
@@ -35,6 +36,17 @@ const PlayerInfo = ({index, maxCards}: IProps) => {
     return false;
   };
 
+  const isThisPlayingTurn = () => {
+    return currentRoundInfo.roundToPlayer.whoseTurn === player.name && currentRoundInfo.roundToPlayer.roundPhase === ROUND_PHASE.onPlay;
+  };
+
+  const renderShowMyTurn = (key: number, min: number) => {
+    if (!isThisPlayingTurn()) return null;
+    return (
+      <AnimatedProgressBar initialX={max-min} min={0} max={max} key={key} variant="dark" />
+    );
+  };
+
   const renderPromise = () => {
     return (player.promise !== null && player.promise >= 0) ? player.promise : "-";
   };
@@ -44,17 +56,19 @@ const PlayerInfo = ({index, maxCards}: IProps) => {
   };
 
   const renderKeepProgress = () => {
+
+
     if (isThisPromiseTurn()) {
-      return <AnimatedProgressBar />;
+      return <AnimatedProgressBar key={1} initialX={max} min={0} max={max} isChild={false} />;
     }
 
-    const max = maxCards;
     const keeps = player.keeps;
     const promise = player.promise ?? 0;
     if (keeps === promise) {
       return (
         <ProgressBar style={{"border": "solid 1px green"}}>
-          <ProgressBar variant="success" now={keeps} max={max} />
+          <ProgressBar variant="success" now={keeps} max={max} key={1} />
+          {renderShowMyTurn(2, keeps)}
         </ProgressBar>
       );
     } else if (keeps < promise) {
@@ -62,6 +76,7 @@ const PlayerInfo = ({index, maxCards}: IProps) => {
         <ProgressBar style={{"border": "solid 1px orange"}}>
           <ProgressBar variant="success" now={keeps} max={max} key={1} />
           <ProgressBar variant="warning" now={promise - keeps} max={max} key={2} />
+          {renderShowMyTurn(3, promise)}
         </ProgressBar>
       );
     } else {
@@ -69,6 +84,7 @@ const PlayerInfo = ({index, maxCards}: IProps) => {
         <ProgressBar style={{"border": "solid 1px red"}}>
           <ProgressBar variant="success" now={promise} max={max} key={1} />
           <ProgressBar variant="danger" now={keeps - promise} max={max} key={2} />
+          {renderShowMyTurn(3, keeps)}
         </ProgressBar>
       );
     }

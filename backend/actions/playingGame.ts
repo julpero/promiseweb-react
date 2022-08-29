@@ -135,10 +135,6 @@ const getPromiseTable = (gameInDb: IGameOptions): IuiPromiseTable => {
   } as IuiPromiseTable;
 };
 
-const isMyTurn = (myId: string, round: IRound): boolean => {
-  return getPlayerInTurn(round)?.playerId === myId;
-};
-
 const isMyPromiseTurn = (myId: string, round: IRound): boolean => {
   return getPromiser(round)?.playerId === myId;
 };
@@ -166,7 +162,8 @@ const getCardsPlayed = (round: IRound, playIndex: number): IuiCardPlayed[] => {
 const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: string): IuiRoundToPlayer => {
   const round = gameInDb.game.rounds[roundInd];
   const playIndex = getCurrentPlayIndex(round);
-  const isNowMyTurn = isMyTurn(playerId, round);
+  const playerInTurn = getPlayerInTurn(round);
+  const isNowMyTurn = playerInTurn?.playerId === playerId;
   const myCards = getMyCards(playerId, round, false);
   const cardInCharge = getCurrentCardInCharge(round.cardsPlayed);
   const myPlayedCard = round.cardsPlayed[playIndex].find(playedCard => playedCard.playerId === playerId)?.card;
@@ -187,6 +184,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: strin
     doReloadInit: false, // TODO
     newRound: false, // TODO
     gameOver: false, // TODO
+    whoseTurn: playerInTurn?.name ?? "",
     isMyTurn: isNowMyTurn, // TODO
     isMyPromiseTurn: isMyPromiseTurn(playerId, round), // TODO
     handValues: null, // TODO getHandValues(thisGame, roundInd),

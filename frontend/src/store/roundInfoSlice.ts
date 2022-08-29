@@ -32,6 +32,7 @@ const initialState: RoundInfoState = {
       doReloadInit: false,
       newRound: false,
       gameOver: false,
+      whoseTurn: "",
       isMyTurn: false,
       isMyPromiseTurn: false,
       handValues: null, // TODO getHandValues(thisGame, roundInd),

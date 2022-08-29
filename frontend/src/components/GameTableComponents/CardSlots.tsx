@@ -5,8 +5,8 @@ import {
   getCurrentRoundInfo,
 } from "../../store/roundInfoSlice";
 
-import { cardAsString, randomNegToPos } from "../../common/commonFunctions";
-import { IuiCard, IuiGetRoundResponse, IuiRoundPlayer, ROUND_PHASE } from "../../interfaces/IuiPlayingGame";
+import { cardAsString } from "../../common/commonFunctions";
+import { IuiCard, IuiGetRoundResponse, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { setPlayedCard } from "../../store/playCardSlice";
@@ -22,8 +22,9 @@ interface IProps {
 }
 
 const CardSlots = ({player, slotCount, cards, playedSlot}: IProps) => {
-  const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  const currentRoundInfo: IuiGetRoundResponse = useSelector(getCurrentRoundInfo);
   const dispatch = useDispatch();
+  console.log("CardSlots");
 
   if (!currentRoundInfo.gameId) return null;
 
@@ -75,7 +76,8 @@ const CardSlots = ({player, slotCount, cards, playedSlot}: IProps) => {
     } else {
       // correct card or null
       const canPlayThisCard = cardPlayable(i, currentRoundInfo);
-      const cardFace = getCardFace(cardAsString(cardToRender ?? { rank: "0", suite: "dummy", value: 0 }), canPlayThisCard);
+      const cardAsStr = cardAsString(cardToRender ?? { rank: "0", suite: "dummy", value: 0 });
+      const cardFace = getCardFace(cardAsStr, canPlayThisCard);
       if (canPlayThisCard === CARD_PLAYABLE.ok) classStrArr.push("playableCard");
       slots.push(
         <AnimatedCardSlot

@@ -134,6 +134,7 @@ export interface IuiRoundToPlayer {
   doReloadInit: boolean,
   newRound: boolean,
   gameOver: boolean,
+  whoseTurn: string,
   isMyTurn: boolean,
   isMyPromiseTurn: boolean,
   handValues: null, // TODO getHandValues(thisGame, roundInd),

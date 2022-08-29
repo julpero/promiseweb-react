@@ -117,8 +117,8 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
 
         const springObject = {
           from: { x: fromX, y: fromY },
-          config: { duration: 2000, easing: easings.easeOutQuint },
-          delay: 500,
+          config: { duration: 1500, easing: easings.easeOutQuint },
+          delay: 100,
           to: [{
             x: randomNegToPos(2),
             y: randomNegToPos(2),
