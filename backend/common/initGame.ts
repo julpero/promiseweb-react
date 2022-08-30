@@ -104,7 +104,7 @@ const initRound = (roundIndex: number, cardsInRound: number, players: IPlayer[] 
     trumpCard: deck.drawCard(),
     totalPromise: null,
     cardsPlayed: cardsPlayed,
-    roundStatus: ROUND_STATUS.Initialized,
+    roundStatus: ROUND_STATUS.initialized,
   } as IRound;
 };
 

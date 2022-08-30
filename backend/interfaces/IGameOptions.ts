@@ -30,7 +30,6 @@ export interface IGameOptions {
   game: IGame,
   gameStarted: Date,
   gameStatistics: IGameStatistics,
-  lastUpdate: Date, // obsolete
 }
 
 export interface IHumanPlayer {
@@ -69,9 +68,7 @@ export interface IGameStatistics {
   spurtAndMelt: ISpurtAndMelt
 }
 
-export interface IPlayerStatistic {
-  playerName: string,
-  totalPoints: number,
+export interface IGameInfoForStats {
   totalKeeps: number,
   bigPointsByZero: number,
   bigZeroKeepPromisesCount: number,
@@ -79,21 +76,30 @@ export interface IPlayerStatistic {
   smallPointsNotZero: number,
   smallNotZeroKeepPromisesCount: number,
   smallNotZeroFailPromisesCount: number,
-  pointsPerKeeps: number,
-  position: number,
-  scorePoints: number,
+}
+
+export interface IGameHandCardsForStats {
   trumpsInGame: number,
   bigsCardsInGame: number,
   smallCardsInGame: number,
   otherCardsInGame: number,
 }
 
+export interface IPlayerStatistic extends IGameInfoForStats, IGameHandCardsForStats {
+  playerName: string,
+  totalPoints: number,
+  pointsPerKeeps: number,
+  position: number,
+  scorePoints: number,
+  playTime: number,
+}
+
 export interface ISpurtAndMelt {
-  spurtGap: number,
-  spurtFrom: number,
-  meltGap: number,
-  meltFrom: number,
-  melter: string,
+  spurtGap: number | null,
+  spurtFrom: number | null,
+  meltGap: number | null,
+  meltFrom: number | null,
+  melter: string | null,
 }
 
 export interface IRound {

@@ -30,7 +30,6 @@ const gameOptionsSchema: Schema = new Schema({
   game: {type: gameSchema, required: false},
   gameStarted: {type: Date, required: false},
   gameStatistics: [],
-  lastUpdate: {type: Date, required: false},
 }, {
   collection: PROMISEWEB_COLLECTION,
   timestamps: true,

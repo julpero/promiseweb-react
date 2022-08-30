@@ -26,6 +26,7 @@ import {
 } from "../common/common";
 import { startRound } from "../common/game";
 import { isRuleActive, IuiCardToICard } from "../common/model";
+import { generateGameStats } from "../common/statsFunctions";
 import { ICardPlayed, IGameOptions, IPromiser, PromiseValue } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
 import { generateRoundStats } from "./generateStats";
@@ -225,6 +226,9 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     } else {
       // the same play, round and game continues
     }
+
+    // let's update game statistics after every card hit
+    gameInDb.gameStatistics = generateGameStats(gameInDb.game, response.gameStatusAfterPlay === GAME_STATUS.played);
 
     const gameAfter = await gameInDb.save();
     if (gameAfter) {

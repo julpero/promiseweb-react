@@ -1,9 +1,8 @@
-import { ICardPlayed, IGame, IGameOptions, IPlayerStatistic, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
+import { ICardPlayed, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 import StatsToPlayer from "../models/RoundStats";
 import { IRoundOfPlayerStats } from "../interfaces/IStats";
-import { getPlayerNameInPlayerOrder } from "../common/common";
 
-const countPlayTime = (cardsPlayed: ICardPlayed[][], playerInRound: string): number => {
+export const countPlayTime = (cardsPlayed: ICardPlayed[][], playerInRound: string): number => {
   let playTime = 0;
   cardsPlayed.forEach(play => {
     play.filter(playByName => playByName.name === playerInRound).forEach(playersPlay => {

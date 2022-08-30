@@ -18,6 +18,7 @@ const playerStatisticSchema: Schema = new Schema({
   bigsCardsInGame: {type: Number, required: true},
   smallCardsInGame: {type: Number, required: true},
   otherCardsInGame: {type: Number, required: true},
+  playTime: {type: Number, required: false},
 });
 
 export default model<IPlayerStatistic>("PlayerStatistic", playerStatisticSchema);

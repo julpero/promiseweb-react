@@ -6,7 +6,7 @@ export enum GAME_STATUS {
 }
 
 export enum ROUND_STATUS {
-  Initialized = 0,
+  initialized = 0,
   onGoing = 1,
   played = 2,
 }
