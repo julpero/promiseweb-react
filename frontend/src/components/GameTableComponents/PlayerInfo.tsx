@@ -1,7 +1,6 @@
 import React from "react";
 import { ProgressBar } from "react-bootstrap";
 import { useSelector } from "react-redux";
-import { config, useSpring, animated  } from "react-spring";
 
 import { colorize } from "../../common/commonFunctions";
 import { playerFromIndex } from "../../common/playingGame";
@@ -12,10 +11,9 @@ import AnimatedProgressBar from "./AnimatedProgressBar";
 interface IProps {
   /** index goes clockwise, starting from you 0 and rest players from 1 to 5 */
   index: number,
-  maxCards: number,
 }
 
-const PlayerInfo = ({index, maxCards}: IProps) => {
+const PlayerInfo = ({index}: IProps) => {
   const currentRoundInfo: IuiGetRoundResponse = useSelector(getCurrentRoundInfo);
   if (!currentRoundInfo.gameId) return null;
 
@@ -95,7 +93,7 @@ const PlayerInfo = ({index, maxCards}: IProps) => {
   return (
     <div className="row playerInfoRow">
       <div className="col-3 nameCol playerNameCol" style={{"backgroundImage": `linear-gradient(90deg, ${colorize(player.name)}, ${bgColor})`}}>
-        {player.name}
+        <strong>{player.name}</strong>
       </div>
       <div className="col-5 playerInfoCol">
         keeps/pr:&nbsp;

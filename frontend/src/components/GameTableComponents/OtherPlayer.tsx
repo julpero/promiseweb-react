@@ -161,7 +161,7 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
 
   return (
     <React.Fragment>
-      <PlayerInfo index={index} maxCards={maxCards} />
+      <PlayerInfo index={index} />
       {renderCardsRow()}
       {renderStatsAndCardPlayedAndWonRow()}
     </React.Fragment>
