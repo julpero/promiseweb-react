@@ -5,6 +5,7 @@ import { getCurrentRoundInfo } from "../store/roundInfoSlice";
 
 import { OverlayTrigger, Table, Tooltip } from "react-bootstrap";
 import { IuiPlayerPromise } from "../interfaces/IuiPlayingGame";
+import { TooltipProps } from "react-bootstrap";
 
 /**
  * Promises made, table in bottom screen
@@ -14,10 +15,30 @@ const PromiseTable = () => {
   if (!currentRoundInfo.gameId) return null;
   const promiseTable = currentRoundInfo.roundToPlayer.promiseTable;
 
-  const renderThTooltip = (props: any) => {
+  const renderThTooltip = (props: TooltipProps, roundInd: number) => {
+    const {cardsInRound, totalPromise} = promiseTable.rounds[roundInd];
+    const promiseState = cardsInRound - (totalPromise ?? 0);
+    let promiseStateString = "Even promised";
+    if (promiseState > 0) promiseStateString = "Under promised";
+    if (promiseState < 0) promiseStateString = "Over promised";
+
     return (
       <Tooltip id="thTooltip" { ...props }>
-        Testi
+        {promiseStateString} {totalPromise ?? 0} / {cardsInRound}
+      </Tooltip>
+    );
+  };
+
+  const renderPlayerPromiseTooltip = (props: TooltipProps, promise: IuiPlayerPromise) => {
+    const {promise: promised, keep} = promise;
+    const promiseState = keep - (promised ?? 0);
+    let promiseStateString = "Kept";
+    if (promiseState > 0) promiseStateString = "Over";
+    if (promiseState < 0) promiseStateString = "Under";
+
+    return (
+      <Tooltip id="thTooltip" { ...props }>
+        {promiseStateString} {keep} / {promised ?? 0}
       </Tooltip>
     );
   };
@@ -50,13 +71,21 @@ const PromiseTable = () => {
     if (!promiseTable) return null;
     return (
       promiseTable.rounds.map((round, idx) => {
-        return (
-          <th key={idx} className={promiseHeaderClass(idx)}>
-            <OverlayTrigger placement="bottom" delay={{show: 100, hide: 200}} overlay={renderThTooltip}>
+        if (round.totalPromise === null) {
+          return (
+            <th key={idx} className={promiseHeaderClass(idx)}>
               <span>{round.cardsInRound}</span>
-            </OverlayTrigger>
-          </th>
-        );
+            </th>
+          );
+        } else {
+          return (
+            <th key={idx} className={promiseHeaderClass(idx)}>
+              <OverlayTrigger delay={{show: 100, hide: 200}} overlay={renderThTooltip({placement: "top"}, idx)}>
+                <span>{round.cardsInRound}</span>
+              </OverlayTrigger>
+            </th>
+          );
+        }
       })
     );
   };
@@ -65,7 +94,21 @@ const PromiseTable = () => {
     if (!promiseTable) return null;
     return (
       promiseTable.promisesByPlayers[idx].map((promise, idx) => {
-        return <td key={idx} className={playerPromiseClass(idx, promise)}>{promise.promise}</td>;
+        if (promise.promise === null) {
+          return (
+            <td key={idx} className={playerPromiseClass(idx, promise)}>
+              <span>{promise.promise}</span>
+            </td>
+          );
+        } else {
+          return (
+            <td key={idx} className={playerPromiseClass(idx, promise)}>
+              <OverlayTrigger delay={{show: 100, hide: 200}} overlay={renderPlayerPromiseTooltip({placement: "top"}, promise)}>
+                <span>{promise.promise}</span>
+              </OverlayTrigger>
+            </td>
+          );
+        }
       })
     );
   };
