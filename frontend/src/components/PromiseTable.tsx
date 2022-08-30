@@ -30,7 +30,8 @@ const PromiseTable = () => {
   };
 
   const renderPlayerPromiseTooltip = (props: TooltipProps, promise: IuiPlayerPromise) => {
-    const {promise: promised, keep} = promise;
+
+    const {promise: promised, keep, points} = promise;
     const promiseState = keep - (promised ?? 0);
     let promiseStateString = "Kept";
     if (promiseState > 0) promiseStateString = "Over";
@@ -39,6 +40,8 @@ const PromiseTable = () => {
     return (
       <Tooltip id="thTooltip" { ...props }>
         {promiseStateString} {keep} / {promised ?? 0}
+        <br />
+        {points} points
       </Tooltip>
     );
   };
@@ -74,16 +77,16 @@ const PromiseTable = () => {
         if (round.totalPromise === null) {
           return (
             <th key={idx} className={promiseHeaderClass(idx)}>
-              <span>{round.cardsInRound}</span>
+              {round.cardsInRound}
             </th>
           );
         } else {
           return (
-            <th key={idx} className={promiseHeaderClass(idx)}>
-              <OverlayTrigger delay={{show: 100, hide: 200}} overlay={renderThTooltip({placement: "top"}, idx)}>
-                <span>{round.cardsInRound}</span>
-              </OverlayTrigger>
-            </th>
+            <OverlayTrigger key={idx} delay={{show: 200, hide: 200}} overlay={renderThTooltip({placement: "top"}, idx)}>
+              <th className={promiseHeaderClass(idx)}>
+                {round.cardsInRound}
+              </th>
+            </OverlayTrigger>
           );
         }
       })
@@ -102,11 +105,11 @@ const PromiseTable = () => {
           );
         } else {
           return (
-            <td key={idx} className={playerPromiseClass(idx, promise)}>
-              <OverlayTrigger delay={{show: 100, hide: 200}} overlay={renderPlayerPromiseTooltip({placement: "top"}, promise)}>
-                <span>{promise.promise}</span>
-              </OverlayTrigger>
-            </td>
+            <OverlayTrigger key={idx} delay={{show: 200, hide: 200}} overlay={renderPlayerPromiseTooltip({placement: "top"}, promise)}>
+              <td className={playerPromiseClass(idx, promise)}>
+                {promise.promise}
+              </td>
+            </OverlayTrigger>
           );
         }
       })
