@@ -67,7 +67,6 @@ export interface IuiGetGameInfoResponse {
   /** index of rounds array */
   currentRound: number | null,
   reloaded: boolean,
-  eventInfo?: any, // TODO
   thisIsDemoGame: boolean,
 }
 

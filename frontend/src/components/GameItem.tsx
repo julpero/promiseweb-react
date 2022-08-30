@@ -39,6 +39,7 @@ const GameItem = (props: IuiGameListItem & IProps) => {
   };
 
   // TODO
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const renderHiddenCardsMode = () => {
     if (props.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal) return null;
     return <li>{hiddenCardsModeToStr(props.rules.hiddenCardsMode)}</li>;

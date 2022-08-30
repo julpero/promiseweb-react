@@ -38,7 +38,7 @@ const ScoreBoard = () => {
     const colArr: JSX.Element[] = [];
     for (let i = 0; i < promiseTable.promisesByPlayers.length; i++) {
       const currentPromise = promiseTable.promisesByPlayers[i][rowInd].promise;
-      const keep = promiseTable.promisesByPlayers[i][rowInd].keep;
+      // const keep = promiseTable.promisesByPlayers[i][rowInd].keep;
       const currentRoundPoints = promiseTable.promisesByPlayers[i][rowInd].points;
       const playersCumulativePointsInRound = cumulativePointsInRound(i, rowInd);
       const str = pointsStr(playersCumulativePointsInRound, currentRoundPoints, currentRoundPoints === null || currentPromise === null);

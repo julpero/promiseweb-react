@@ -1,5 +1,3 @@
-import React from "react";
-import { CARD_PLAYABLE } from "../components/GameTableComponents/Cards";
 import { IuiGetRoundResponse, IuiRoundPlayer } from "../interfaces/IuiPlayingGame";
 
 export const currentTotalPromise = (players: IuiRoundPlayer[]): number => {
