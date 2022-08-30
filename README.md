@@ -1,6 +1,6 @@
 # PromiseWeb
 
-PromiseWeb Card Game App Using The MERN Stack With TypeScript & Redux 🤩
+PromiseWeb Card Game App Using The MERN Stack With TypeScript & Redux and Socket.io 🤩
 
 
 ## Technology Stack:
@@ -8,15 +8,15 @@ PromiseWeb Card Game App Using The MERN Stack With TypeScript & Redux 🤩
 - TypeScript
 - Node js
 - Express Js
-- MongoDB
+- MongoDB (Mongoose)
 - React
 - React Bootstrap
 - Redux
-- React Paypal Button V2
+- Socket.io
 
 ## Usage
 
-### Env Variables
+### Env Variables in development
 
 Create a .env file in then root and add the following
 
@@ -24,6 +24,18 @@ Create a .env file in then root and add the following
 NODE_ENV = development
 PORT = 5000
 MONGO_URI = your mongodb uri
+BCRYPT_SECRET = some secret
+BCRYPT_SALT_ROUNDS = number
+
+```
+### Env Variables in production
+
+Create a .env file in then root and add the following
+
+```
+MONGO_URI = your mongodb uri
+BCRYPT_SECRET = some secret
+BCRYPT_SALT_ROUNDS = number
 ```
 
 ## Install Dependencies
@@ -44,7 +56,6 @@ npm run client
 npm run server
 ```
 
-- Version: 0.0.1
+- Version: 0.1.0
 - License: MIT
 - Author: Juha Korhonen
-

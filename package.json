@@ -1,6 +1,6 @@
 {
   "name": "promiseweb-react",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "PromiseWeb Card Game App Using MERN Stack With TypeScript & Redux",
   "main": "server.ts",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "keywords": [],
   "author": "Juha Korhonen",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.12",
