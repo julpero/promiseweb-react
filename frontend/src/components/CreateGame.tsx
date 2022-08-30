@@ -429,8 +429,8 @@ const validateForm = (values: IuiNewGameForm) => {
     errors.password1 = "Password must be at least four characters long";
   }
 
-  if (values.newGameMyName.length < 4) {
-    errors.newGameMyName = "Your (nick)name must be at least four characters long";
+  if (values.newGameMyName.length < 3) {
+    errors.newGameMyName = "Your (nick)name must be at least three characters long";
   }
 
   if (parseInt(values.newGameHumanPlayersCount, 10) > 5 && (startRound > 8 || endRound > 8)) {
