@@ -255,8 +255,8 @@ const validateForm = (values: IFormFields ) => {
     errors.password1 = "Password must be at least four characters long";
   }
 
-  if (!values.myName || values.myName.length < 4) {
-    errors.myName = "Your (nick)name must be at least four characters long";
+  if (!values.myName || values.myName.length < 3) {
+    errors.myName = "Your (nick)name must be at least three characters long";
   }
 
   if (values.password2?.length > 0 && values.password1 !== values.password2) {
