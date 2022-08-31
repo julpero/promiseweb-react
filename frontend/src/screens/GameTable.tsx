@@ -6,6 +6,7 @@ import PromiseTable from "../components/PromiseTable";
 import ScoreBoard from "../components/ScoreBoard";
 
 import EffectHandler from "../components/EffectHandler";
+import GameMenu from "../components/GameMenu";
 
 interface IProps {
   gameId: string,
@@ -32,7 +33,7 @@ const GameTable = ({gameId}: IProps) => {
           <Chat />
         </div>
         <div className="col-2">
-          buttons and game menu
+          <GameMenu />
         </div>
       </div>
       <EffectHandler gameId={gameId} />

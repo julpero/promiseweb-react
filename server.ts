@@ -21,6 +21,8 @@ import { IuiChatObj } from "./frontend/src/interfaces/IuiChat";
 import { IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, PLAY_CARD_RESPONSE, PROMISE_RESPONSE } from "./frontend/src/interfaces/IuiPlayingGame";
 import { getGameInfo, getRound, makePromise, playCard } from "./backend/actions/playingGame";
 import { GAME_STATUS, ROUND_STATUS } from "./frontend/src/interfaces/IuiGameOptions";
+import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse } from "./frontend/src/interfaces/IuiLeaveOngoingGame";
+import { leaveOngoingGame } from "./backend/actions/leaveOngoingGame";
 
 // Routes
 // not defined
@@ -264,6 +266,16 @@ connectDB().then(() => {
       const chatLine = chatObj.myName + ": " + chatObj.chatLine;
       console.log("sending new chat line", chatLine, gameIdStr);
       io.to(gameIdStr).emit("new chat line", chatLine);
+    });
+
+    socket.on("leave ongoing game", async (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest, fn: (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => void) => {
+      console.log("leaveOngoingGameRequest", leaveOngoingGameRequest);
+      if (leaveOngoingGameRequest.gameId === "" || leaveOngoingGameRequest.myId === "") {
+        return null;
+      }
+
+      const leaveOngoingGameResponse = await leaveOngoingGame(leaveOngoingGameRequest);
+      fn(leaveOngoingGameResponse);
     });
   });
 });

@@ -1,11 +1,12 @@
 import React from "react";
 import { HIDDEN_CARDS_MODE } from "../interfaces/IuiGameOptions";
 import { IuiGameListItem } from "../interfaces/IuiGameList";
-import { ruleToStr, hiddenCardsModeToStr } from "../common/enumFunctions";
+import { hiddenCardsModeToStr } from "../common/enumFunctions";
 import { Card } from "react-bootstrap";
 import { Field } from "react-final-form";
 import TextInput from "./FormComponents/TextInput";
 import Button from "react-bootstrap/Button";
+import RuleList from "./RuleList";
 
 interface IProps {
   onJoin: () => void,
@@ -30,31 +31,11 @@ const GameItem = (props: IuiGameListItem & IProps) => {
     return dateAsDate.toLocaleString("fi-FI", dateFormatOptions);
   };
 
-  const renderRuleList = () => {
-    return props.rules.ruleList.map((rule) => {
-      return (
-        <li key={rule.toString()}>{ruleToStr(rule)}</li>
-      );
-    });
-  };
-
   // TODO
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const renderHiddenCardsMode = () => {
     if (props.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal) return null;
     return <li>{hiddenCardsModeToStr(props.rules.hiddenCardsMode)}</li>;
-  };
-
-  const renderRules = () => {
-    if (props.rules.ruleList.length === 0 && props.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal) {
-      return "vanilla game";
-    } else {
-      return(
-        <ul>
-          {renderRuleList()}
-        </ul>
-      );
-    }
   };
 
   const renderCreatedAndTurns = () => {
@@ -137,7 +118,7 @@ const GameItem = (props: IuiGameListItem & IProps) => {
             {renderCreatedAndTurns()}
           </div>
           <div className="col-3">
-            {renderRules()}
+            <RuleList rules={props.rules} />
           </div>
           <div className="col-2">
             {renderPlayers()}

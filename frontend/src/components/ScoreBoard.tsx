@@ -1,13 +1,16 @@
 import React from "react";
 import { Table } from "react-bootstrap";
 import { useSelector } from "react-redux";
-import { IuiGetRoundResponse } from "../interfaces/IuiPlayingGame";
+import { IuiGetGameInfoResponse, IuiGetRoundResponse } from "../interfaces/IuiPlayingGame";
+import { getCurrentGameInfo } from "../store/gameInfoSlice";
 import { getCurrentRoundInfo } from "../store/roundInfoSlice";
+import RuleList from "./RuleList";
 
 /**
  * Scoreboard, table in right side screen
  */
 const ScoreBoard = () => {
+  const currentGameInfo: IuiGetGameInfoResponse = useSelector(getCurrentGameInfo);
   const currentRoundInfo: IuiGetRoundResponse = useSelector(getCurrentRoundInfo);
   if (!currentRoundInfo.gameId) return null;
 
@@ -75,16 +78,19 @@ const ScoreBoard = () => {
   };
 
   return (
-    <Table size="sm">
-      <thead>
-        <tr>
-          {renderScoreBoardHeader()}
-        </tr>
-      </thead>
-      <tbody className="scoreBoardTableBody">
-        {renderScoreBoardRows()}
-      </tbody>
-    </Table>
+    <React.Fragment>
+      <Table size="sm">
+        <thead>
+          <tr>
+            {renderScoreBoardHeader()}
+          </tr>
+        </thead>
+        <tbody className="scoreBoardTableBody">
+          {renderScoreBoardRows()}
+        </tbody>
+      </Table>
+      <RuleList rules={currentGameInfo.rules} classStr="smallList" />
+    </React.Fragment>
   );
 };
 

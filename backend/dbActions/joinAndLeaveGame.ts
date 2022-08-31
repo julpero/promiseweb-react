@@ -4,6 +4,7 @@ import { IHumanPlayer } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
 import { getPlayerStats, getGameRoundCount } from "../common/common";
 import { startGame } from "../common/initGame";
+import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "../../frontend/src/interfaces/IuiLeaveOngoingGame";
 
 export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Promise<JOIN_LEAVE_RESULT> => {
   const gameInDb = await GameOptions.findById(joinGameRequest.gameId);
@@ -88,4 +89,15 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
 
   const gameAfter = await game.save();
   return gameAfter !== null ? JOIN_LEAVE_RESULT.ok : JOIN_LEAVE_RESULT.notOk;
+};
+
+export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest): Promise<IuiLeaveOngoingGameResponse> => {
+  const leaveOngoingGameResponse: IuiLeaveOngoingGameResponse = {
+    gameId: "",
+    myId: "",
+    leaveStatus: LEAVE_ONGOING_GAME_RESULT.notOk,
+  };
+
+  return leaveOngoingGameResponse;
+
 };
