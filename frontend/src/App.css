@@ -28,11 +28,20 @@ body {
   height: 112px;
   padding: 0px;
 }
+.stackedCards {
+  position: absolute;
+  left: 50%;
+  width: 80px;
+  transform: translate(-50%, 0);
+}
 .myPlayedCard {
   text-align: center;
 }
 .playableCard {
   cursor: pointer;
+}
+.trumpSlotDiv {
+  position: relative;
 }
 .trumpCardCol {
   text-align: center;

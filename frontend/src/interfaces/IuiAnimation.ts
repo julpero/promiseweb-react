@@ -24,15 +24,15 @@ export interface IuiSpringObject {
   delay: number,
 }
 
-export const commonAnimationObject = (): IuiSpringObject => {
+export const commonAnimationObject = (isTrump?: boolean): IuiSpringObject => {
   return {
     from: { x: 0, y: 0, rotate: 0},
     config: { duration: 500, easing: easings.easeOutQuint },
     delay: 0,
     to: [{
-      x: randomNegToPos(2),
-      y: randomNegToPos(2),
-      rotate: randomNegToPos(5),
+      x: randomNegToPos(isTrump ? 5 : 2),
+      y: randomNegToPos(isTrump ? 5 : 2),
+      rotate: randomNegToPos(isTrump ? 20 : 5),
       onStart: () => { return; },
       onRest: () => { return; },
     }],

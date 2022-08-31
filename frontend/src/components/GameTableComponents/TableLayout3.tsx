@@ -17,7 +17,6 @@ const TableLayout3 = () => {
   const cardFace = myPlayedCard ? getCardFace(cardAsString(myPlayedCard), CARD_PLAYABLE.played) : undefined;
   const animationObject = commonAnimationObject();
   console.log("TableLayout3");
-  // const animationObject = cardFace ? commonAnimationObject() : plainAnimationObject;
 
   if (!currentRoundInfo || !currentRoundInfo.gameId) return null;
   return (
@@ -31,7 +30,7 @@ const TableLayout3 = () => {
               align="left"
             />
           </div>
-          <div className="col-2">
+          <div className="col-2 trumpSlotDiv">
             <TrumpSlot />
           </div>
           <div className="col-5 playerTable">
