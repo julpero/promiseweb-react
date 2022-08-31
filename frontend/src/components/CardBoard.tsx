@@ -5,6 +5,9 @@ import { getCurrentGameInfo } from "../store/gameInfoSlice";
 import { getCurrentRoundInfo } from "../store/roundInfoSlice";
 
 import TableLayout3 from "./GameTableComponents/TableLayout3";
+import TableLayout4 from "./GameTableComponents/TableLayout4";
+import TableLayout5 from "./GameTableComponents/TableLayout5";
+import TableLayout6 from "./GameTableComponents/TableLayout6";
 
 /**
  * Cardboard, where the all fun happens
@@ -19,6 +22,21 @@ const CardBoard = () => {
     case 3: {
       return (
         <TableLayout3 />
+      );
+    }
+    case 4: {
+      return (
+        <TableLayout4 />
+      );
+    }
+    case 5: {
+      return (
+        <TableLayout5 />
+      );
+    }
+    case 6: {
+      return (
+        <TableLayout6 />
       );
     }
     default: {
