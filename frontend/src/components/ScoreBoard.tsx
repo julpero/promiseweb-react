@@ -16,7 +16,7 @@ const ScoreBoard = () => {
   const renderScoreBoardHeader = () => {
     return (
       promiseTable.players.map((playerName, idx) => {
-        return <td className="tableHeading" key={idx}>{playerName.substring(0, 3)}</td>;
+        return <td className="tableHeading truncate" key={idx}>{playerName}</td>;
       })
     );
   };
@@ -34,6 +34,12 @@ const ScoreBoard = () => {
     }
   };
 
+  const playerScoreClass = (pointStr: string): string => {
+    if (pointStr === "") return "";
+    if (pointStr === "-") return "noPoints";
+    return "gotPoints";
+  };
+
   const renderScoreBoardCols = (rowInd: number) => {
     const colArr: JSX.Element[] = [];
     for (let i = 0; i < promiseTable.promisesByPlayers.length; i++) {
@@ -42,13 +48,14 @@ const ScoreBoard = () => {
       const currentRoundPoints = promiseTable.promisesByPlayers[i][rowInd].points;
       const playersCumulativePointsInRound = cumulativePointsInRound(i, rowInd);
       const str = pointsStr(playersCumulativePointsInRound, currentRoundPoints, currentRoundPoints === null || currentPromise === null);
+      const classStr = "tableCell " + playerScoreClass(str);
       if (str) {
         colArr.push(
-          <td className="tableCell" key={i}>{str}</td>
+          <td className={classStr} key={i}>{str}</td>
         );
       } else {
         colArr.push(
-          <td className="tableCell" key={i}>&nbsp;</td>
+          <td className={classStr} key={i}>&nbsp;</td>
         );
       }
     }
@@ -74,7 +81,7 @@ const ScoreBoard = () => {
           {renderScoreBoardHeader()}
         </tr>
       </thead>
-      <tbody>
+      <tbody className="scoreBoardTableBody">
         {renderScoreBoardRows()}
       </tbody>
     </Table>

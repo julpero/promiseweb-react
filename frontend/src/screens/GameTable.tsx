@@ -16,7 +16,7 @@ const GameTable = ({gameId}: IProps) => {
 
   return (
     <div className="container-fluid" style={{width: "100vw", height: "100vh"}}>
-      <div className="row" style={{paddingTop: "5px"}}>
+      <div className="row cardBoardTopRow">
         <div className="col-10">
           <CardBoard />
         </div>

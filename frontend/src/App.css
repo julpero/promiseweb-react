@@ -8,6 +8,16 @@ body {
   background-color: azure;
 }
 
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardBoardTopRow{
+  padding: 5px;
+}
+
 .playerTable {
   border: 1px solid black;
 }
@@ -88,6 +98,7 @@ body {
 .tableCell {
   text-align: center;
   cursor: default;
+  padding: 0.25em !important;
 }
 .evenKept {
   background-image: radial-gradient(circle, rgba(0, 255, 0, 0) 20%, rgba(0, 255, 0, 0.3) 50%, rgba(0, 255, 0, 0) 30%);
@@ -97,6 +108,13 @@ body {
 }
 .overKept {
   background-image: radial-gradient(circle, rgba(255, 0, 0, 0) 20%, rgba(255, 0, 0, 0.3) 50%, rgba(255, 0, 0, 0) 30%);
+}
+
+.gotPoints {
+  background-image: radial-gradient(farthest-side circle, rgba(0, 255, 0, 0) 20%, rgba(0, 255, 0, 0.2) 50%, rgba(0, 255, 0, 0) 30%);
+}
+.noPoints {
+  background-image: radial-gradient(farthest-side circle, rgba(255, 0, 0, 0) 20%, rgba(255, 0, 0, 0.2) 50%, rgba(255, 0, 0, 0) 30%);
 }
 
 .tooltip {
