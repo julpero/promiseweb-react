@@ -24,7 +24,6 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
   const [child, setChild] = useState<JSX.Element | undefined>(undefined);
   const initialChildren = useRef<JSX.Element | undefined>(children);
   const initialEffect = useRef(true);
-  // console.log("Initial children", containerId, children, initialChildren.current);
 
   const [animation, setAnimation] = useState<IuiSpringObject|null>(null);
 
@@ -37,7 +36,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
 
   useEffect(() => {
     if (children !== initialChildren.current || initialEffect.current) {
-      console.log("initial set children", containerId);
+      // console.log("initial set children", containerId);
       initialEffect.current = false;
       setChild(children);
     }
@@ -51,8 +50,8 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
       if (fromContainer && toContainer) {
         const playedFrom = fromContainer.getBoundingClientRect();
         const playedTo = toContainer.getBoundingClientRect();
-        console.log("collect from", playedFrom);
-        console.log("collect to", playedTo);
+        // console.log("collect from", playedFrom);
+        // console.log("collect to", playedTo);
         const fromX = playedTo.left - playedFrom.left;
         const fromY = playedTo.top- playedFrom.top;
         const springObject = {
@@ -85,7 +84,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
 
   useEffect(() => {
     if (emptySlot && emptySlot === containerId) {
-      console.log("emptySlot", emptySlot);
+      // console.log("emptySlot", emptySlot);
       const fromContainer = document.getElementById(emptySlot);
       fromContainer?.classList.remove("playableCard");
       setChild(undefined);
@@ -100,10 +99,10 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
       // console.log("animateCard, empty this slot", animateCard);
     } else if (animateCard && containerId === `cardPlayedDivX${animateCard.fromPlayer}`) {
       // this is the slot where card is played to, so it should handle the animation
-      console.log("animateCard, to slot, set children", animateCard);
+      // console.log("animateCard, to slot, set children", animateCard);
       const newChildren = animateCard.cardFace;
       const cardFace = getCardFace(cardAsString(newChildren ?? { rank: "0", suite: "dummy", value: 0 }), CARD_PLAYABLE.played);
-      console.log("animateCard, to slot, new card face", cardFace);
+      // console.log("animateCard, to slot, new card face", cardFace);
 
       const fromContainerStr = `cardsToPlaySlotsX${animateCard.fromPlayer}X${animateCard.fromSlot}`;
       const fromContainer = document.getElementById(fromContainerStr);
@@ -111,8 +110,8 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
       if (fromContainer && toContainer) {
         const playedFrom = fromContainer.getBoundingClientRect();
         const playedTo = toContainer.getBoundingClientRect();
-        console.log("playedFrom", playedFrom);
-        console.log("playedTo", playedTo);
+        // console.log("playedFrom", playedFrom);
+        // console.log("playedTo", playedTo);
         const fromX = playedFrom.left - playedTo.left;
         const fromY = playedFrom.top - playedTo.top;
 
@@ -142,7 +141,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
             }
           }],
         } as IuiSpringObject;
-        console.log("springObject", springObject);
+        // console.log("springObject", springObject);
         setAnimation(springObject);
       }
     }
