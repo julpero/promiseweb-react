@@ -3,7 +3,7 @@ import { ProgressBar } from "react-bootstrap";
 import { config, useSpring } from "react-spring";
 
 interface IProps {
-  key: number,
+  pbKey: number,
   min: number,
   max: number,
   initialX: number,
@@ -11,7 +11,7 @@ interface IProps {
   isChild?: boolean,
 }
 
-const AnimatedProgressBar = ({key, min, max, initialX, variant, isChild}: IProps) => {
+const AnimatedProgressBar = ({pbKey, min, max, initialX, variant, isChild}: IProps) => {
   const [flip, setFlip] = useState(false);
   const { x } = useSpring({
     reset: true,
@@ -23,7 +23,16 @@ const AnimatedProgressBar = ({key, min, max, initialX, variant, isChild}: IProps
     onRest: () => setFlip(!flip),
   });
   return (
-    <ProgressBar isChild={isChild} striped animated variant={variant ?? "info"} min={min} now={x.get()} max={max} key={key} />
+    <ProgressBar
+      isChild={isChild}
+      striped
+      animated
+      variant={variant ?? "info"}
+      min={min}
+      now={x.get()}
+      max={max}
+      key={pbKey}
+    />
   );
 
 };

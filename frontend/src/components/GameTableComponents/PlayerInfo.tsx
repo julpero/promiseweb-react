@@ -41,7 +41,7 @@ const PlayerInfo = ({index}: IProps) => {
   const renderShowMyTurn = (key: number, min: number) => {
     if (!isThisPlayingTurn()) return null;
     return (
-      <AnimatedProgressBar initialX={max-min} min={0} max={max} key={key} variant="dark" />
+      <AnimatedProgressBar initialX={max-min} min={0} max={max} pbKey={key} variant="dark" />
     );
   };
 
@@ -57,7 +57,7 @@ const PlayerInfo = ({index}: IProps) => {
 
 
     if (isThisPromiseTurn()) {
-      return <AnimatedProgressBar key={1} initialX={max} min={0} max={max} isChild={false} />;
+      return <AnimatedProgressBar pbKey={1} initialX={max} min={0} max={max} isChild={false} />;
     }
 
     const keeps = player.keeps;
