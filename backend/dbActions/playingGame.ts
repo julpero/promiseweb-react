@@ -132,6 +132,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
   const query = GameOptions.where({
     _id: gameId,
     "humanPlayers.playerId": {$eq: myId},
+    gameStatus: GAME_STATUS.onGoing,
   });
   const gameInDb = await query.findOne();
   if (gameInDb) {
@@ -213,6 +214,8 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
           // this was the last round in the game so now game ends
           response.gameStatusAfterPlay = GAME_STATUS.played;
           response.newPlayAfterHit = false;
+
+          gameInDb.gameStatus = GAME_STATUS.played;
         } else {
           // there are more rounds to play so let's start the next one
           const newRoundInd = currentRoundInd + 1;
