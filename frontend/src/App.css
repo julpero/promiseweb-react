@@ -13,6 +13,9 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.scrollBars {
+  overflow: auto;
+}
 
 .smallList {
   font-size: 0.75em;
@@ -36,6 +39,11 @@ body {
 }
 .ownPlayedCardRow {
   margin: 5px 0px;
+}
+
+.chatBox {
+  height: 140px;
+  border: 1px black solid;
 }
 
 .cardCol {

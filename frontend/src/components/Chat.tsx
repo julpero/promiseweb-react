@@ -8,10 +8,11 @@ const Chat = () => {
   const [textRows, setTextRows] = useState<string[]>([]);
 
   const { socket } = useSocket();
-  const chatRef = createRef<HTMLTextAreaElement>();
+  const divChatRef = createRef<HTMLDivElement>();
 
   useEffect(() => {
     socket.on("new chat line", (chatLine: string) => {
+      console.log("new chat line", chatLine);
       setTextRows((prevState) => ([...prevState, chatLine]));
     });
 
@@ -21,24 +22,25 @@ const Chat = () => {
   }, [socket]);
 
   useEffect(() => {
-    const scrollHeight = chatRef.current?.scrollHeight ?? 1;
-    if (chatRef.current) {
-      chatRef.current.scrollTop = scrollHeight;
+    const scrollHeight = divChatRef.current?.scrollHeight ?? 1;
+    if (divChatRef.current) {
+      divChatRef.current.scrollTop = scrollHeight;
     }
-  }, [chatRef]);
+  }, [divChatRef]);
 
-  const renderChatLines = (): string => {
-    return textRows.join("\n");
+  const renderChatLines = () => {
+    return textRows.map((row, i) => {
+      return <React.Fragment key={i}>{row}<br /></React.Fragment>;
+    });
   };
 
   return (
-    <textarea
-      cols={40}
-      rows={5}
-      ref={chatRef}
-      readOnly
-      value={renderChatLines()}
-    ></textarea>
+    <div className="chatBox scrollBars"
+      ref={divChatRef}
+      contentEditable
+    >
+      {renderChatLines()}
+    </div>
   );
 };
 
