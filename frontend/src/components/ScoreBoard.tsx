@@ -1,4 +1,6 @@
 import React from "react";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { TooltipProps } from "react-bootstrap";
 import { Table } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { IuiGetGameInfoResponse, IuiGetRoundResponse } from "../interfaces/IuiPlayingGame";
@@ -16,10 +18,24 @@ const ScoreBoard = () => {
 
   const { promiseTable } = currentRoundInfo.roundToPlayer;
 
+  const renderThTooltip = (props: TooltipProps, playerName: string) => {
+    return (
+      <Tooltip { ...props } id="thTooltip">
+        {playerName}
+      </Tooltip>
+    );
+  };
+
   const renderScoreBoardHeader = () => {
     return (
       promiseTable.players.map((playerName, idx) => {
-        return <td className="tableHeading truncate" key={idx}>{playerName}</td>;
+        return (
+          <OverlayTrigger placement="left" key={idx} delay={{show: 200, hide: 200}} overlay={renderThTooltip({}, playerName)}>
+            <td className="tableHeading" key={idx}>
+              {playerName.substring(0, 3)}
+            </td>
+          </OverlayTrigger>
+        );
       })
     );
   };

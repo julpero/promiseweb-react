@@ -82,7 +82,7 @@ const PromiseTable = () => {
           );
         } else {
           return (
-            <OverlayTrigger key={idx} delay={{show: 200, hide: 200}} overlay={renderThTooltip({placement: "top"}, idx)}>
+            <OverlayTrigger placement="top" key={idx} delay={{show: 200, hide: 200}} overlay={renderThTooltip({}, idx)}>
               <th className={promiseHeaderClass(idx)}>
                 {round.cardsInRound}
               </th>
@@ -105,7 +105,7 @@ const PromiseTable = () => {
           );
         } else {
           return (
-            <OverlayTrigger key={idx} delay={{show: 200, hide: 200}} overlay={renderPlayerPromiseTooltip({placement: "top"}, promise)}>
+            <OverlayTrigger placement="top" key={idx} delay={{show: 200, hide: 200}} overlay={renderPlayerPromiseTooltip({}, promise)}>
               <td className={playerPromiseClass(idx, promise)}>
                 {promise.promise}
               </td>
@@ -120,7 +120,7 @@ const PromiseTable = () => {
     if (!promiseTable) return null;
     return (
       promiseTable.players.map((player, idx) => {
-        return <tr key={idx}><th className="tableCell truncate tableHeading">{player}</th>{renderPlayerPromises(idx)}</tr>;
+        return <tr key={idx}><th className="tableCell tableHeading">{player.substring(0, 10)}</th>{renderPlayerPromises(idx)}</tr>;
       })
     );
   };

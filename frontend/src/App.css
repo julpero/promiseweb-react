@@ -8,11 +8,6 @@ body {
   background-color: azure;
 }
 
-.truncate {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 .scrollBars {
   overflow: auto;
 }
