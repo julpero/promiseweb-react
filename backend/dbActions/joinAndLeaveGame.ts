@@ -92,12 +92,36 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
 };
 
 export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest): Promise<IuiLeaveOngoingGameResponse> => {
+  const {gameId, myId} = leaveOngoingGameRequest;
   const leaveOngoingGameResponse: IuiLeaveOngoingGameResponse = {
     gameId: "",
     myId: "",
+    leaverName: "",
     leaveStatus: LEAVE_ONGOING_GAME_RESULT.notOk,
   };
+  const query = GameOptions.where({
+    _id: gameId,
+    "humanPlayers.playerId": {$eq: myId},
+    gameStatus: GAME_STATUS.onGoing,
+  });
+  const gameInDb = await query.findOne();
+  if (gameInDb) {
+    const leaver = gameInDb.humanPlayers.find(player => player.playerId === myId);
+    if (leaver) {
+      leaveOngoingGameResponse.leaverName = leaver.name;
+      leaver.active = false;
 
+      if (!gameInDb.humanPlayers.some(player => player.active)) {
+        // all players have left the game -> dismiss it
+        gameInDb.gameStatus = GAME_STATUS.dismissed;
+        leaveOngoingGameResponse.leaveStatus = LEAVE_ONGOING_GAME_RESULT.gameDismissed;
+      }
+    }
+
+    const gameAfter = await gameInDb.save();
+    if (!gameAfter) {
+      leaveOngoingGameResponse.leaveStatus = LEAVE_ONGOING_GAME_RESULT.notOk;
+    }
+  }
   return leaveOngoingGameResponse;
-
 };

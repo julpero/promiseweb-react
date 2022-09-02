@@ -1,11 +1,8 @@
-import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "../../frontend/src/interfaces/IuiLeaveOngoingGame";
+import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse } from "../../frontend/src/interfaces/IuiLeaveOngoingGame";
+import { leaveTheOngoingGame } from "../dbActions/joinAndLeaveGame";
 
 export const leaveOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest): Promise<IuiLeaveOngoingGameResponse> => {
-  const leaveOngoingGameResponse: IuiLeaveOngoingGameResponse = {
-    gameId: "",
-    myId: "",
-    leaveStatus: LEAVE_ONGOING_GAME_RESULT.notOk,
-  };
+  const leaveOngoingGameResponse: IuiLeaveOngoingGameResponse = await leaveTheOngoingGame(leaveOngoingGameRequest);
 
   return leaveOngoingGameResponse;
 };

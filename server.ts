@@ -21,7 +21,7 @@ import { IuiChatObj } from "./frontend/src/interfaces/IuiChat";
 import { IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, PLAY_CARD_RESPONSE, PROMISE_RESPONSE } from "./frontend/src/interfaces/IuiPlayingGame";
 import { getGameInfo, getRound, makePromise, playCard } from "./backend/actions/playingGame";
 import { GAME_STATUS, ROUND_STATUS } from "./frontend/src/interfaces/IuiGameOptions";
-import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse } from "./frontend/src/interfaces/IuiLeaveOngoingGame";
+import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "./frontend/src/interfaces/IuiLeaveOngoingGame";
 import { leaveOngoingGame } from "./backend/actions/leaveOngoingGame";
 
 // Routes
@@ -269,12 +269,30 @@ connectDB().then(() => {
     });
 
     socket.on("leave ongoing game", async (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest, fn: (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => void) => {
+      const {gameId: gameIdStr, myId} = leaveOngoingGameRequest;
+
       console.log("leaveOngoingGameRequest", leaveOngoingGameRequest);
       if (leaveOngoingGameRequest.gameId === "" || leaveOngoingGameRequest.myId === "") {
         return null;
       }
 
       const leaveOngoingGameResponse = await leaveOngoingGame(leaveOngoingGameRequest);
+      const { leaveStatus, leaverName } = leaveOngoingGameResponse;
+      if (leaveStatus !== LEAVE_ONGOING_GAME_RESULT.notOk) {
+        if (leaveStatus !== LEAVE_ONGOING_GAME_RESULT.gameDismissed) {
+          let chatLine = `${leaverName} has left the game!`;
+          io.to(gameIdStr).emit("new chat line", chatLine);
+          chatLine = `You can invite a new player to continue ${leaverName}'s game with these id's:`;
+          io.to(gameIdStr).emit("new chat line", chatLine);
+          chatLine = `GameId: ${gameIdStr}`;
+          io.to(gameIdStr).emit("new chat line", chatLine);
+          chatLine = `PlayerId: ${myId}`;
+          io.to(gameIdStr).emit("new chat line", chatLine);
+        }
+
+        socket.leave(gameIdStr);
+        csm.removeUserFromMap(leaverName, socket.id, gameIdStr);
+      }
       fn(leaveOngoingGameResponse);
     });
   });
