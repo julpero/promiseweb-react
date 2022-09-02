@@ -91,55 +91,63 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
     );
   };
 
-  const renderStatsCol = () => {
+  // const renderStatsCol = () => {
+  //   return (
+  //     <div className="col playerStatsCol">
+  //       <div className="row handValueRow">
+  //         <div className="col handValueCol">
+  //           HV
+  //         </div>
+  //       </div>
+  //       <div className="row statsRow2">
+  //         <div className="col statsCol2">
+  //           S1
+  //         </div>
+  //       </div>
+  //       <div className="row statsRow3">
+  //         <div className="col statsCol3">
+  //           S2
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // };
+
+  const renderCardPlayedRow = () => {
     return (
-      <div className="col playerStatsCol">
-        <div className="row handValueRow">
-          <div className="col handValueCol">
-            HV
-          </div>
-        </div>
-        <div className="row statsRoe2">
-          <div className="col statsCol2">
-            S1
-          </div>
-        </div>
-        <div className="row statsRow3">
-          <div className="col statsCol3">
-            S2
-          </div>
-        </div>
+      <div className="row">
+        {renderAnimatedCardPlayedSlot()}
       </div>
     );
   };
 
-  const renderCardPlayedRow = () => {
-    if (align === "left") {
-      return (
-        <div className="row">
-          {renderStatsCol()}
-          {renderAnimatedCardPlayedSlot()}
-        </div>
-      );
-    }
-    if (align === "right") {
-      return (
-        <div className="row">
-          {renderAnimatedCardPlayedSlot()}
-          {renderStatsCol()}
-        </div>
-      );
-    }
-  };
+  // const renderCardPlayedRow = () => {
+  //   if (align === "left") {
+  //     return (
+  //       <div className="row">
+  //         {renderStatsCol()}
+  //         {renderAnimatedCardPlayedSlot()}
+  //       </div>
+  //     );
+  //   }
+  //   if (align === "right") {
+  //     return (
+  //       <div className="row">
+  //         {renderAnimatedCardPlayedSlot()}
+  //         {renderStatsCol()}
+  //       </div>
+  //     );
+  //   }
+  // };
 
   const renderStatsAndCardPlayedAndWonRow = () => {
     if (align === "left") {
       return (
         <div className="row otherPlayerWonRow">
-          <div className="col">
+          <div className="col-8">
             {renderCardsWonRow()}
           </div>
-          <div className="col">
+          <div className="col-4">
             {renderCardPlayedRow()}
           </div>
         </div>
@@ -148,10 +156,10 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
     if (align === "right") {
       return (
         <div className="row otherPlayerWonRow">
-          <div className="col">
+          <div className="col-4">
             {renderCardPlayedRow()}
           </div>
-          <div className="col">
+          <div className="col-8">
             {renderCardsWonRow()}
           </div>
         </div>
