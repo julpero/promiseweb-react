@@ -121,7 +121,6 @@ const CreateGame = (props: IProps) => {
 
   return (
     <React.Fragment>
-      <Button onClick={() => props.onCreateGame()}>CLICK</Button>
       <Form
         onSubmit={onSubmit}
         initialValues={initialValues}
