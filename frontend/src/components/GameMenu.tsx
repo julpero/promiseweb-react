@@ -66,7 +66,8 @@ const GameMenu = () => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure that you really, really want to leave this outstanding game?
+          <p>Are you sure that you really, really want to leave this outstanding game?</p>
+          <p>Remember that after you have left the game someone else can continue playing game as you - and the final game score will affect to your statistics.</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="success" onClick={() => setLeaveGameModal(false)}>No, go back to the game</Button>

@@ -120,7 +120,7 @@ const PromiseTable = () => {
     if (!promiseTable) return null;
     return (
       promiseTable.players.map((player, idx) => {
-        return <tr key={idx}><th className="tableCell">{player}</th>{renderPlayerPromises(idx)}</tr>;
+        return <tr key={idx}><th className="tableCell truncate tableHeading">{player}</th>{renderPlayerPromises(idx)}</tr>;
       })
     );
   };

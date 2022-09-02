@@ -4,6 +4,7 @@ import Accordion from "react-bootstrap/Accordion";
 
 import OpenGamesList from "../components/OpenGamesList";
 import CreateGame from "../components/CreateGame";
+import JoinGameById from "../components/JoinGameById";
 
 const HomeScreen = () => {
   const accRef = createRef<HTMLHeadingElement>();
@@ -27,6 +28,12 @@ const HomeScreen = () => {
           <Accordion.Header>Create New Game</Accordion.Header>
           <Accordion.Body>
             <CreateGame onCreateGame={handleGameCreation} />
+          </Accordion.Body>
+        </Accordion.Item>
+        <Accordion.Item eventKey="2">
+          <Accordion.Header>Join Game by Id</Accordion.Header>
+          <Accordion.Body>
+            <JoinGameById />
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>

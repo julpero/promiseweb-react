@@ -5,6 +5,7 @@ import GameOptions from "../models/GameOptions";
 import { getPlayerStats, getGameRoundCount } from "../common/common";
 import { startGame } from "../common/initGame";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "../../frontend/src/interfaces/IuiLeaveOngoingGame";
+import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "../../frontend/src/interfaces/IuiJoinOngoingGame";
 
 export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Promise<JOIN_LEAVE_RESULT> => {
   const gameInDb = await GameOptions.findById(joinGameRequest.gameId);
@@ -124,4 +125,35 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
     }
   }
   return leaveOngoingGameResponse;
+};
+
+export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame): Promise<IuiJoinOngoingGameResponse> => {
+  const { gameId, playerId } = joinRequest;
+  const joinOngoingGameResponse: IuiJoinOngoingGameResponse = {
+    joinOk: false,
+    playerId: "",
+    playerName: "",
+  };
+
+  const query = GameOptions.where({
+    _id: gameId,
+    "humanPlayers.playerId": {$eq: playerId},
+    gameStatus: GAME_STATUS.onGoing,
+  });
+  const gameInDb = await query.findOne();
+  if (gameInDb) {
+    const player = gameInDb.humanPlayers.find(Player => Player.playerId === playerId);
+    if (player) {
+      player.active = true;
+      const gameAfter = await gameInDb.save();
+      if (gameAfter) {
+        joinOngoingGameResponse.joinOk = true;
+        joinOngoingGameResponse.playerId = player.playerId;
+        joinOngoingGameResponse.playerName = player.name;
+        return joinOngoingGameResponse;
+      }
+    }
+  }
+
+  return joinOngoingGameResponse;
 };

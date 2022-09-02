@@ -84,6 +84,7 @@ body {
 .tableHeading {
   text-align: center;
   cursor: default;
+  font-weight: bolder;
 }
 .evenPromised {
   background-image: radial-gradient(circle, rgba(0, 255, 0, 0) 20%, rgba(0, 255, 0, 0.8) 50%, rgba(0, 255, 0, 0) 30%);

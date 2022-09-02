@@ -15,13 +15,12 @@ const App = () => {
 
   const { socket } = useSocket();
 
-  const handleOnGoingResponse = useCallback((response: IuiCheckIfOngoingGameResponse) => {
-    console.log("check response", response);
-    setGameStatus(response.checkStatus);
-    setGameId(response.gameId ?? "");
-  }, []);
-
   useEffect(() => {
+    const handleOnGoingResponse = (response: IuiCheckIfOngoingGameResponse) => {
+      console.log("check response", response);
+      setGameStatus(response.checkStatus);
+      setGameId(response.gameId ?? "");
+    };
 
     if (window.localStorage.getItem("uUID")) {
       console.log("has uUid:", window.localStorage.getItem("uUID"));
@@ -47,7 +46,7 @@ const App = () => {
     return () => {
       socket.off("game begins");
     };
-  }, [handleOnGoingResponse, socket]);
+  }, [socket]);
 
   console.log("render app...");
 

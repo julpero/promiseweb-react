@@ -22,7 +22,8 @@ import { IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoRespons
 import { getGameInfo, getRound, makePromise, playCard } from "./backend/actions/playingGame";
 import { GAME_STATUS, ROUND_STATUS } from "./frontend/src/interfaces/IuiGameOptions";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "./frontend/src/interfaces/IuiLeaveOngoingGame";
-import { leaveOngoingGame } from "./backend/actions/leaveOngoingGame";
+import { leaveOngoingGame, joinOngoingGame, getHumanPlayer } from "./backend/actions/joinLeaveOngoingGame";
+import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "./frontend/src/interfaces/IuiJoinOngoingGame";
 
 // Routes
 // not defined
@@ -272,7 +273,7 @@ connectDB().then(() => {
       const {gameId: gameIdStr, myId} = leaveOngoingGameRequest;
 
       console.log("leaveOngoingGameRequest", leaveOngoingGameRequest);
-      if (leaveOngoingGameRequest.gameId === "" || leaveOngoingGameRequest.myId === "") {
+      if (gameIdStr === "" || myId === "") {
         return null;
       }
 
@@ -294,6 +295,63 @@ connectDB().then(() => {
         csm.removeUserFromMap(leaverName, socket.id, gameIdStr);
       }
       fn(leaveOngoingGameResponse);
+    });
+
+    socket.on("join ongoing game", async (joinRequest: IuiJoinOngoingGame, fn: (joinResponse: IuiJoinOngoingGameResponse) => void) => {
+      const {gameId: gameIdStr, playerId} = joinRequest;
+
+      console.log("joinRequest", joinRequest);
+      if (gameIdStr === "" || playerId === "") {
+        return null;
+      }
+
+      const playerToJoin = await getHumanPlayer(gameIdStr, playerId);
+      if (playerToJoin) {
+        const playAsName = playerToJoin.name;
+        const playerIsActive = playerToJoin.active;
+        if (playerIsActive) {
+          // check socket status
+          // don't let to join if socket active and it still responses
+          if (csm.isUserConnected(playAsName)) {
+            // ping sockets
+            let pingOk = false;
+            const sockets = csm.getUserSocketsFromMap(playAsName);
+            if (sockets) {
+              // eslint-disable-next-line no-cond-assign
+              for (let it = sockets.values(), val = null; val=it.next().value;) {
+                if (val !== undefined) {
+                  const socketId = val;
+                  pingOk = io.to(socketId).emit("hey");
+                  console.log("join game by id - pinged socket "+socketId+" and result was: ", pingOk, gameIdStr, playAsName);
+                }
+              }
+            }
+
+            if (pingOk) {
+              console.log("join game by id - joining failed because user was still active", gameIdStr, playAsName);
+              return null;
+            }
+          }
+        }
+
+        // player has left the game or is disconnected -> let join
+        const joinResponse = await joinOngoingGame(joinRequest);
+        if (joinResponse.joinOk) {
+          // remove previous player from game
+          csm.removeUserFromMap(playAsName, "-1", gameIdStr);
+
+          // join in the game
+          socket.join(gameIdStr);
+          csm.addUserToMap(playAsName, socket.id, gameIdStr);
+
+          const chatLine = `player ${playAsName} connected again as new player`;
+          io.to(gameIdStr).emit("new chat line", chatLine);
+        }
+
+        fn(joinResponse);
+      } else {
+        return null;
+      }
     });
   });
 });

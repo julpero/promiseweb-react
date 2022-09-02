@@ -84,6 +84,10 @@ const EffectHandler = ({gameId}: IProps) => {
       dispatch(setAnimateCard(animatedCard));
     };
 
+    const heyHey = () => {
+      console.log("Hey hey to me!");
+    };
+
     if (gameId !== "" && initialRender.current) {
       initialRender.current = false;
 
@@ -99,11 +103,13 @@ const EffectHandler = ({gameId}: IProps) => {
 
       socket.on("promise made", onPromiseMadeNotification);
       socket.on("card played", onCardPlayedNotification);
+      socket.on("hey", heyHey);
     }
 
     return () => {
       socket.off("promise made");
       socket.off("card played");
+      socket.off("hey");
     };
   }, [gameId, socket, dispatch]);
 
