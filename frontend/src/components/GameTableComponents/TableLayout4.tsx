@@ -25,7 +25,7 @@ const TableLayout4 = () => {
         <div className="row">
           <div className="col-5 playerTable">
             <OtherPlayer
-              index={1}
+              index={2}
               maxCards={10}
               align="left"
             />
@@ -35,31 +35,42 @@ const TableLayout4 = () => {
           </div>
           <div className="col-5 playerTable">
             <OtherPlayer
-              index={2}
+              index={3}
               maxCards={10}
               align="right"
             />
           </div>
         </div>
-        <div className="row ownPlayedCardRow">
-          <div className="col-6"></div>
-          <AnimatedCardSlot
-            containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
-            classStr="col-1 myPlayedCard"
-            animationObject={animationObject}
-          >
-            {cardFace}
-          </AnimatedCardSlot>
-          <div className="col-5"></div>
-        </div>
         <div className="row">
-          <div className="col-3">
+          <div className="col-5 playerTable">
             <OtherPlayer
-              index={0}
+              index={1}
               maxCards={10}
               align="left"
             />
           </div>
+          <div className="col-7">
+            <div className="row">
+              <div className="col-1"></div>
+              <AnimatedCardSlot
+                containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
+                classStr="col-2 myPlayedCard topMargin"
+                animationObject={animationObject}
+              >
+                {cardFace}
+              </AnimatedCardSlot>
+              <div className="col-9">
+                <OtherPlayer
+                  index={0}
+                  maxCards={10}
+                  align="left"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-3"></div>
           <div className="col-9">
             <OwnPlayer />
           </div>
