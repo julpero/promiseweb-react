@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSocket } from "./socket";
 
 import "./App.css";
@@ -14,14 +14,15 @@ const App = () => {
   const [gameId, setGameId] = useState("");
 
   const { socket } = useSocket();
+  const doCheck = useRef(false);
+
+  const handleOnGoingResponse = useCallback((response: IuiCheckIfOngoingGameResponse) => {
+    console.log("check response", response);
+    setGameStatus(response.checkStatus);
+    setGameId(response.gameId ?? "");
+  }, []);
 
   useEffect(() => {
-    const handleOnGoingResponse = (response: IuiCheckIfOngoingGameResponse) => {
-      console.log("check response", response);
-      setGameStatus(response.checkStatus);
-      setGameId(response.gameId ?? "");
-    };
-
     if (window.localStorage.getItem("uUID")) {
       console.log("has uUid:", window.localStorage.getItem("uUID"));
     } else {
@@ -46,12 +47,13 @@ const App = () => {
     return () => {
       socket.off("game begins");
     };
-  }, [gameId, socket]);
+  }, [handleOnGoingResponse, socket]);
 
   const onJoin = () => {
-    // just randomize gameId and do the game check request with new uUid
-    console.log("onJoin, random gameId");
-    setGameId(uuidv4());
+    const checkGameRequest: IuiCheckIfOngoingGameRequest = {
+      myId: window.localStorage.getItem("uUID") ?? "",
+    };
+    socket.emit("check if ongoing game", checkGameRequest, handleOnGoingResponse);
   };
 
   console.log("render app...");
