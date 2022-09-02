@@ -10,7 +10,11 @@ interface IFormValidationFields {
   playerId?: string,
 }
 
-const JoinGameById = () => {
+interface IProps {
+  onJoin: () => void,
+}
+
+const JoinGameById = ({onJoin}: IProps) => {
   const [ joinOk, setJoinOk ] = useState(false);
   const [ playerName, setPlayerName ] = useState("");
   const { socket } = useSocket();
@@ -29,6 +33,7 @@ const JoinGameById = () => {
 
   const closeAndPlay = () =>  {
     setJoinOk(false);
+    onJoin();
   };
 
   return (

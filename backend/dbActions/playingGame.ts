@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { GAME_STATUS, ROUND_STATUS, RULE } from "../../frontend/src/interfaces/IuiGameOptions";
 import {
   IuiMakePromiseRequest,
@@ -32,11 +33,15 @@ import GameOptions from "../models/GameOptions";
 import { generateRoundStats } from "./generateStats";
 
 export const getGame = async (gameIdStr: string): Promise<IGameOptions | null> => {
+  if (!mongoose.isValidObjectId(gameIdStr)) return null;
+
   const gameInDb = await GameOptions.findById(gameIdStr);
   return gameInDb;
 };
 
 export const getGameWithPlayer = async (gameIdStr: string, playerId: string): Promise<IGameOptions | null> => {
+  if (!mongoose.isValidObjectId(gameIdStr)) return null;
+
   const query = GameOptions.where({
     _id: gameIdStr,
     "humanPlayers.playerId": {$eq: playerId},
@@ -53,6 +58,8 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
     promiser: "",
     promiseTime: -1,
   };
+
+  if (!mongoose.isValidObjectId(gameId)) return promiseResponse;
 
   const query = GameOptions.where({
     _id: gameId,
@@ -128,6 +135,8 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     roundStatusAfterPlay: ROUND_STATUS.onGoing,
     gameStatusAfterPlay: GAME_STATUS.onGoing,
   };
+
+  if (!mongoose.isValidObjectId(gameId)) return response;
 
   const query = GameOptions.where({
     _id: gameId,

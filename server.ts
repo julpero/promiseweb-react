@@ -350,7 +350,9 @@ connectDB().then(() => {
 
         fn(joinResponse);
       } else {
-        return null;
+        fn({
+          joinOk: false,
+        } as IuiJoinOngoingGameResponse);
       }
     });
   });

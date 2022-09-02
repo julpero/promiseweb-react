@@ -6,9 +6,14 @@ import { getPlayerStats, getGameRoundCount } from "../common/common";
 import { startGame } from "../common/initGame";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "../../frontend/src/interfaces/IuiLeaveOngoingGame";
 import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "../../frontend/src/interfaces/IuiJoinOngoingGame";
+import mongoose from "mongoose";
 
 export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Promise<JOIN_LEAVE_RESULT> => {
-  const gameInDb = await GameOptions.findById(joinGameRequest.gameId);
+  const gameIdStr = joinGameRequest.gameId;
+  if (!mongoose.isValidObjectId(gameIdStr)) {
+    return JOIN_LEAVE_RESULT.notOk;
+  }
+  const gameInDb = await GameOptions.findById(gameIdStr);
   console.log("gameInDb", gameInDb);
   if (!gameInDb) return JOIN_LEAVE_RESULT.notOk;
 
@@ -62,7 +67,11 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
 };
 
 export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): Promise<JOIN_LEAVE_RESULT> => {
-  const game = await GameOptions.findById(leaveGameRequest.gameId);
+  const gameIdStr = leaveGameRequest.gameId;
+  if (!mongoose.isValidObjectId(gameIdStr)) {
+    return JOIN_LEAVE_RESULT.notOk;
+  }
+  const game = await GameOptions.findById(gameIdStr);
   console.log("game", game);
   if (!game) return JOIN_LEAVE_RESULT.notOk;
 
@@ -100,6 +109,10 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
     leaverName: "",
     leaveStatus: LEAVE_ONGOING_GAME_RESULT.notOk,
   };
+  if (!mongoose.isValidObjectId(gameId)) {
+    return leaveOngoingGameResponse;
+  }
+
   const query = GameOptions.where({
     _id: gameId,
     "humanPlayers.playerId": {$eq: myId},
@@ -116,6 +129,10 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
         // all players have left the game -> dismiss it
         gameInDb.gameStatus = GAME_STATUS.dismissed;
         leaveOngoingGameResponse.leaveStatus = LEAVE_ONGOING_GAME_RESULT.gameDismissed;
+      } else {
+        leaveOngoingGameResponse.leaveStatus = LEAVE_ONGOING_GAME_RESULT.leaveOk;
+        leaveOngoingGameResponse.gameId = gameId;
+        leaveOngoingGameResponse.myId = myId;
       }
     }
 
@@ -134,6 +151,9 @@ export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame): Promi
     playerId: "",
     playerName: "",
   };
+  if (!mongoose.isValidObjectId(gameId)) {
+    return joinOngoingGameResponse;
+  }
 
   const query = GameOptions.where({
     _id: gameId,

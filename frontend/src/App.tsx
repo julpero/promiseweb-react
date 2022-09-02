@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSocket } from "./socket";
 
 import "./App.css";
@@ -46,14 +46,20 @@ const App = () => {
     return () => {
       socket.off("game begins");
     };
-  }, [socket]);
+  }, [gameId, socket]);
+
+  const onJoin = () => {
+    // just randomize gameId and do the game check request with new uUid
+    console.log("onJoin, random gameId");
+    setGameId(uuidv4());
+  };
 
   console.log("render app...");
 
   if (gameStatus === CHECK_GAME_STATUS.onGoingGame && gameId !== "") {
     return <GameTable gameId={gameId ?? ""} />;
   } else {
-    return <HomeScreen />;
+    return <HomeScreen onJoin={onJoin} />;
   }
 };
 

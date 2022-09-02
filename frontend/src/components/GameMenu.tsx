@@ -1,5 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useSocket } from "../socket";
+import { v4 as uuidv4 } from "uuid";
 import { Form, Button, Modal } from "react-bootstrap";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "../interfaces/IuiLeaveOngoingGame";
 import { useSelector } from "react-redux";
@@ -11,11 +12,13 @@ import { getCurrentGameInfo } from "../store/gameInfoSlice";
 const GameMenu = () => {
   const [leaveGameModal, setLeaveGameModal] = useState(false);
   const [leftGameModal, setLeftGameModal] = useState(false);
+
+  const [leftGameId, setLeftGameId] = useState("");
+  const [leftMMyId, setLeftMyId] = useState("");
+
   const currentGameInfo = useSelector(getCurrentGameInfo);
 
   const { socket } = useSocket();
-  const gameIdRef = useRef("");
-  const myIdRef = useRef("");
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
 
@@ -36,17 +39,21 @@ const GameMenu = () => {
 
     socket.emit("leave ongoing game", leaveOngoingGameRequest, (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => {
       console.log("leaveOngoingGameResponse", leaveOngoingGameResponse);
-      if (leaveOngoingGameResponse.leaveStatus === LEAVE_ONGOING_GAME_RESULT.notOk) {
+      if (leaveOngoingGameResponse.leaveStatus === LEAVE_ONGOING_GAME_RESULT.leaveOk) {
         setLeftGameModal(true);
         setLeaveGameModal(false);
-        gameIdRef.current = leaveOngoingGameResponse.gameId;
-        myIdRef.current = leaveOngoingGameResponse.myId;
+        setLeftGameId(leaveOngoingGameResponse.gameId);
+        setLeftMyId(leaveOngoingGameResponse.myId);
+        const uuid = uuidv4();
+        window.localStorage.setItem("uUID", uuid);
       }
     });
   };
 
   const closeLeftModal = () => {
     setLeftGameModal(false);
+    setLeftGameId("");
+    setLeftMyId("");
   };
 
   return (
@@ -85,17 +92,15 @@ const GameMenu = () => {
           Copy Paste these values to someone else who can continue playing as you.
           <hr />
           <Form>
-            <fieldset disabled>
-              <Form.Group className="mb-3" controlId="formLeftGameId">
-                <Form.Label>Game ID</Form.Label>
-                <Form.Control value={gameIdRef.current} type="text" placeholder="game id" />
-              </Form.Group>
+            <Form.Group className="mb-3" controlId="formLeftGameId">
+              <Form.Label>Game ID</Form.Label>
+              <Form.Control value={leftGameId} readOnly type="text" placeholder="game id" />
+            </Form.Group>
 
-              <Form.Group className="mb-3" controlId="formLeftMyId">
-                <Form.Label>My ID</Form.Label>
-                <Form.Control value={myIdRef.current} type="text" placeholder="my id" />
-              </Form.Group>
-            </fieldset>
+            <Form.Group className="mb-3" controlId="formLeftMyId">
+              <Form.Label>My ID</Form.Label>
+              <Form.Control value={leftMMyId} readOnly type="text" placeholder="my id" />
+            </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>

@@ -6,7 +6,11 @@ import OpenGamesList from "../components/OpenGamesList";
 import CreateGame from "../components/CreateGame";
 import JoinGameById from "../components/JoinGameById";
 
-const HomeScreen = () => {
+interface IProps {
+  onJoin: () => void,
+}
+
+const HomeScreen = ({onJoin}: IProps) => {
   const accRef = createRef<HTMLHeadingElement>();
 
   const handleGameCreation = () => {
@@ -33,7 +37,7 @@ const HomeScreen = () => {
         <Accordion.Item eventKey="2">
           <Accordion.Header>Join Game by Id</Accordion.Header>
           <Accordion.Body>
-            <JoinGameById />
+            <JoinGameById onJoin={onJoin} />
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
