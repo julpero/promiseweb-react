@@ -2,7 +2,7 @@ import { Suite } from "card-games-typescript";
 import { ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { IuiCard } from "../../frontend/src/interfaces/IuiPlayingGame";
 import { getPlayerAvgPoints } from "../dbActions/promiseweb";
-import { ICard, ICardPlayed, IGame, IGameOptions, IHumanPlayer, IPlayer, IPlayerInTurn, IPlayerStatistic, IPlayerStats, IPromiser, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
+import { ICard, ICardPlayed, IGame, IGameOptions, IHumanPlayer, IPlayer, IPlayerInTurn, IPlayerStats, IPromiser, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 import { ICardToIuiCard } from "./model";
 
 export const getPlayerStats = async (roundCount: number, playerName: string): Promise<IPlayerStats> => {

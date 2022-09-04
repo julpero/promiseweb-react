@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSocket } from "./socket";
 
 import "./App.css";
@@ -14,7 +14,6 @@ const App = () => {
   const [gameId, setGameId] = useState("");
 
   const { socket } = useSocket();
-  const doCheck = useRef(false);
 
   const handleOnGoingResponse = useCallback((response: IuiCheckIfOngoingGameResponse) => {
     console.log("check response", response);
