@@ -243,6 +243,7 @@ const CreateGame = (props: IProps) => {
                     </div>
                     <div className="col">
                       <Field
+                        disabled
                         name="hidePromiseRound"
                         type="checkbox"
                         component={CheckboxInput}
@@ -257,6 +258,7 @@ const CreateGame = (props: IProps) => {
                   <div className="row">
                     <div className="col">
                       <Field
+                        disabled
                         name="onlyTotalPromise"
                         type="checkbox"
                         component={CheckboxInput}
@@ -269,6 +271,7 @@ const CreateGame = (props: IProps) => {
                     </div>
                     <div className="col">
                       <Field
+                        disabled
                         name="mustTrump"
                         type="checkbox"
                         component={CheckboxInput}
@@ -283,6 +286,7 @@ const CreateGame = (props: IProps) => {
                   <div className="row">
                     <div className="col">
                       <Field
+                        disabled
                         name="hiddenTrump"
                         type="checkbox"
                         component={CheckboxInput}
@@ -295,6 +299,7 @@ const CreateGame = (props: IProps) => {
                     </div>
                     <div className="col">
                       <Field
+                        disabled
                         name="speedPromise"
                         type="checkbox"
                         component={CheckboxInput}
@@ -309,6 +314,7 @@ const CreateGame = (props: IProps) => {
                   <div className="row">
                     <div className="col">
                       <Field
+                        disabled
                         name="privateSpeedGame"
                         type="checkbox"
                         component={CheckboxInput}
@@ -326,14 +332,15 @@ const CreateGame = (props: IProps) => {
                         component={SelectInput}
                       >
                         <option value="0">show cards normally</option>
-                        <option value="1">show only card in charge</option>
-                        <option value="2">show card in charge and winning card</option>
+                        <option disabled value="1">show only card in charge</option>
+                        <option disabled value="2">show card in charge and winning card</option>
                       </Field>
                     </div>
                   </div>
                   <div className="row">
                     <div className="col">
                       <Field
+                        disabled
                         name="opponentPromiseCardValue"
                         type="checkbox"
                         component={CheckboxInput}
@@ -346,6 +353,7 @@ const CreateGame = (props: IProps) => {
                     </div>
                     <div className="col">
                       <Field
+                        disabled
                         name="opponentGameCardValue"
                         type="checkbox"
                         component={CheckboxInput}
@@ -360,6 +368,7 @@ const CreateGame = (props: IProps) => {
                   <div className="row">
                     <div className="col">
                       <Field
+                        disabled
                         name="thisIsDemoGame"
                         type="checkbox"
                         component={CheckboxInput}
