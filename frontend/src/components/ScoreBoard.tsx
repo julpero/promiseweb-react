@@ -3,6 +3,7 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { TooltipProps } from "react-bootstrap";
 import { Table } from "react-bootstrap";
 import { useSelector } from "react-redux";
+import { colorize } from "../common/commonFunctions";
 import { IuiGetGameInfoResponse, IuiGetRoundResponse } from "../interfaces/IuiPlayingGame";
 import { getCurrentGameInfo } from "../store/gameInfoSlice";
 import { getCurrentRoundInfo } from "../store/roundInfoSlice";
@@ -27,12 +28,14 @@ const ScoreBoard = () => {
   };
 
   const renderScoreBoardHeader = () => {
+    const truncInd = 9 - currentGameInfo.humanPlayersCount;
+    const bgColor = window.getComputedStyle(document.body, null).getPropertyValue("background-color");
     return (
       promiseTable.players.map((playerName, idx) => {
         return (
           <OverlayTrigger placement="left" key={idx} delay={{show: 200, hide: 200}} overlay={renderThTooltip({}, playerName)}>
-            <td className="tableHeading" key={idx}>
-              {playerName.substring(0, 3)}
+            <td className="tableCell tableHeading" key={idx} style={{"backgroundImage": `linear-gradient(90deg, ${colorize(playerName)}, ${bgColor})`}}>
+              {playerName.substring(0, truncInd)}
             </td>
           </OverlayTrigger>
         );

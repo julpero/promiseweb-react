@@ -54,8 +54,6 @@ const PlayerInfo = ({index}: IProps) => {
   };
 
   const renderKeepProgress = () => {
-
-
     if (isThisPromiseTurn()) {
       return <AnimatedProgressBar pbKey={1} initialX={max} min={0} max={max} isChild={false} />;
     }

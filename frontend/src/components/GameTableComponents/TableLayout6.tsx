@@ -16,17 +16,17 @@ const TableLayout6 = () => {
   const myPlayedCard = currentRoundInfo.roundToPlayer.myPlayedCard ?? undefined;
   const cardFace = myPlayedCard ? getCardFace(cardAsString(myPlayedCard), CARD_PLAYABLE.played) : undefined;
   const animationObject = commonAnimationObject();
-  console.log("TableLayout3");
+  console.log("TableLayout6");
 
   if (!currentRoundInfo || !currentRoundInfo.gameId) return null;
   return (
     <div className="row">
       <div className="col">
-        <div className="row">
+        <div className="row layoutRow">
           <div className="col-5 playerTable">
             <OtherPlayer
-              index={1}
-              maxCards={10}
+              index={2}
+              maxCards={8}
               align="left"
             />
           </div>
@@ -35,34 +35,54 @@ const TableLayout6 = () => {
           </div>
           <div className="col-5 playerTable">
             <OtherPlayer
-              index={2}
-              maxCards={10}
+              index={3}
+              maxCards={8}
               align="right"
             />
           </div>
         </div>
-        <div className="row ownPlayedCardRow">
-          <div className="col-6"></div>
+        <div className="row layoutRow">
+          <div className="col-5 playerTable">
+            <OtherPlayer
+              index={1}
+              maxCards={8}
+              align="left"
+            />
+          </div>
           <AnimatedCardSlot
             containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
-            classStr="col-1 myPlayedCard"
+            classStr="col-2 myPlayedCard topMargin"
             animationObject={animationObject}
           >
             {cardFace}
           </AnimatedCardSlot>
-          <div className="col-5"></div>
+          <div className="col-5 playerTable">
+            <OtherPlayer
+              index={4}
+              maxCards={8}
+              align="right"
+            />
+          </div>
         </div>
-        <div className="row">
-          <div className="col-3">
+        <div className="row layoutRow">
+          <div className="col-2">
             <OtherPlayer
               index={0}
-              maxCards={10}
+              maxCards={8}
               align="left"
             />
           </div>
-          <div className="col-9">
-            <OwnPlayer />
+          <div className="col-5">
+            <OwnPlayer maxCards={8} />
           </div>
+          <div className="col-5 playerTable">
+            <OtherPlayer
+              index={5}
+              maxCards={8}
+              align="right"
+            />
+          </div>
+
         </div>
       </div>
     </div>

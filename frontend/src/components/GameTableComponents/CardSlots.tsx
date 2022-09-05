@@ -61,7 +61,7 @@ const CardSlots = ({player, slotCount, cards, playedSlot}: IProps) => {
     const cardToRender = openFaceCard ?? (cards.length == 0 && i < cardsRemainingCount ? null : undefined);
     const classStrArr: string[] = [];
     if (i === 0) classStrArr.push("firstCardCol");
-    if (i === slotCount-1) classStrArr.push("lastCardCol");
+    if (i === slotCount-1 && !player.thisIsMe) classStrArr.push("lastCardCol");
 
     if (cardToRender === undefined) {
       // just empty slot
@@ -71,6 +71,7 @@ const CardSlots = ({player, slotCount, cards, playedSlot}: IProps) => {
           containerId={`cardsToPlaySlotsX${name}X${i}`}
           classStr={classStrArr.join(" ")}
           animationObject={commonAnimationObject()}
+          isSmall={currentRoundInfo.roundToPlayer.players.length === 6}
         />
       );
     } else {
@@ -88,6 +89,7 @@ const CardSlots = ({player, slotCount, cards, playedSlot}: IProps) => {
           onPlayCard={
             () => playCard(canPlayThisCard === CARD_PLAYABLE.ok ? cardToRender : null)
           }
+          isSmall={currentRoundInfo.roundToPlayer.players.length === 6 && !player.thisIsMe}
         >
           {cardFace}
         </AnimatedCardSlot>

@@ -18,9 +18,10 @@ interface IProps {
   animationObject: IuiSpringObject,
   onPlayCard?: () => void,
   isStacked?: boolean,
+  isSmall?: boolean,
 }
 
-const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onPlayCard, isStacked}: IProps) => {
+const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onPlayCard, isStacked, isSmall}: IProps) => {
   const [child, setChild] = useState<JSX.Element | undefined>(undefined);
   const initialChildren = useRef<JSX.Element | undefined>(children);
   const initialEffect = useRef(true);
@@ -163,6 +164,8 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
 
   let finalClassStr = isStacked ? "cardCol" : "col cardCol";
   finalClassStr+= " " + classStr;
+
+  if (isSmall) finalClassStr = finalClassStr.replace("cardCol", "smallCardCol");
 
   return (
     <div onClick={() => handleClick()} id={containerId} className={finalClassStr}>

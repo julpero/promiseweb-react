@@ -66,7 +66,7 @@ const PromiseButtons = () => {
     const buttons: JSX.Element[] = [];
     for (let i = 0; i <= cardsInRound; i++) {
       buttons.push(
-        <div key={i} className="col">
+        <div key={i} className="col promiseButton">
           <Button onClick={() => doPromise(i)} disabled={!isMyPromiseTurn || clicked || disabledButton === i}>
             {i}
           </Button>

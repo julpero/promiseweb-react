@@ -6,7 +6,11 @@ import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 import PromiseButtons from "./PromiseButtons";
 import CardSlots from "./CardSlots";
 
-const OwnPlayer = () => {
+interface IProps {
+  maxCards: number,
+}
+
+const OwnPlayer = ({maxCards}: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   if (!currentRoundInfo.gameId) return null;
 
@@ -18,7 +22,7 @@ const OwnPlayer = () => {
       <div className="row">
         <CardSlots
           player={me}
-          slotCount={10}
+          slotCount={maxCards}
           cards={currentRoundInfo.roundToPlayer.myCards}
         />
       </div>

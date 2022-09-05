@@ -23,8 +23,15 @@ body {
   padding: 5px;
 }
 
+.layoutRow {
+  padding-top: 5px;
+  margin-bottom: 2px;
+}
+
 .playerTable {
-  border: 1px solid black;
+  border: 1px groove cyan;
+  border-radius: 1em;
+  z-index: 200;
 }
 .playerInfoRow {
   margin: 10px 0px;
@@ -40,12 +47,18 @@ body {
 }
 
 .chatBox {
-  height: 140px;
-  border: 1px black solid;
+  height: 210px;
+  border: 1px lightgray groove;
+  border-radius: 0.4em;
+  z-index: 1;
 }
 
 .cardCol {
   height: 112px;
+  padding: 0px;
+}
+.smallCardCol {
+  height: 60px;
   padding: 0px;
 }
 .stackedCards {
@@ -85,6 +98,12 @@ body {
   max-width: 80px;
   border-radius: 5%;
   position: absolute;
+}
+
+.promiseButton {
+  z-index: 9999;
+  padding-right: calc(var(--bs-gutter-x) * .3);
+  padding-left: calc(var(--bs-gutter-x) * .3);
 }
 
 .tableHeading {

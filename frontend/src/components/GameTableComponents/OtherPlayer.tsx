@@ -52,6 +52,7 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
             <AnimatedCardSlot
               containerId={`cardsWonSlotsX${player.name}X${i}`}
               animationObject={animationObject}
+              isSmall={currentRoundInfo.roundToPlayer.players.length === 6}
             >
               {cardFace}
             </AnimatedCardSlot>
@@ -75,7 +76,7 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
   };
 
   const renderAnimatedCardPlayedSlot = () => {
-    if (index === 0 || index === 5) return null;
+    if (index === 0) return null;
     const cardPlayedCard = player.cardPlayed ?? undefined;
     const cardFace = cardPlayedCard ? getCardFace(cardAsString(cardPlayedCard), CARD_PLAYABLE.played) : undefined;
     // const animationObject = cardFace ? commonAnimationObject() : plainAnimationObject;
@@ -85,6 +86,7 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
         containerId={`cardPlayedDivX${player.name}`}
         classStr="playedCardCol"
         animationObject={animationObject}
+        isSmall={currentRoundInfo.roundToPlayer.players.length === 6}
       >
         {cardFace}
       </ AnimatedCardSlot>

@@ -61,7 +61,7 @@ const TableLayout3 = () => {
             />
           </div>
           <div className="col-9">
-            <OwnPlayer />
+            <OwnPlayer maxCards={10} />
           </div>
         </div>
       </div>
