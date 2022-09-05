@@ -26,7 +26,7 @@ const GameTable = ({gameId}: IProps) => {
         </div>
       </div>
       <div className="row fixed-bottom" style={{height: "220px", margin: "0px 0px", zIndex: 1}}>
-        <div className="col-6">
+        <div className="col-6 promiseTableCol">
           <PromiseTable />
         </div>
         <div className="col-4" style={{zIndex: 1}}>

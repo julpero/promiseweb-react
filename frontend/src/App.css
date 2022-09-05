@@ -28,6 +28,10 @@ body {
   margin-bottom: 2px;
 }
 
+.promiseTableCol {
+  align-self:flex-end;
+}
+
 .playerTable {
   border: 1px groove cyan;
   border-radius: 1em;
