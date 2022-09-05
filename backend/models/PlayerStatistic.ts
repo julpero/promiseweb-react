@@ -1,7 +1,7 @@
-import { model, Schema } from "mongoose";
+import { Schema } from "mongoose";
 import { IPlayerStatistic } from "../interfaces/IGameOptions";
 
-const playerStatisticSchema: Schema = new Schema({
+const playerStatisticSchema: Schema = new Schema<IPlayerStatistic>({
   playerName: {type: String, required: true},
   totalPoints: {type: Number, required: true},
   totalKeeps: {type: Number, required: true},
@@ -21,4 +21,4 @@ const playerStatisticSchema: Schema = new Schema({
   playTime: {type: Number, required: false},
 });
 
-export default model<IPlayerStatistic>("PlayerStatistic", playerStatisticSchema);
+export default playerStatisticSchema;

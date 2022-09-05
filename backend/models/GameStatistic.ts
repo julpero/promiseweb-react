@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { Schema } from "mongoose";
 import { IGameStatistics } from "../interfaces/IGameOptions";
 import PlayerStatistic from "./PlayerStatistic";
 
@@ -10,7 +10,7 @@ const spurtAndMeltSchema: Schema = new Schema({
   melter: {type: String, required: true},
 });
 
-const gameStatisticsSchema: Schema = new Schema({
+const gameStatisticsSchema: Schema = new Schema<IGameStatistics>({
   generated: {type: Number, required: true},
   playersStatistics: [PlayerStatistic],
   winnerName: {type: String, required: true},
@@ -22,4 +22,4 @@ const gameStatisticsSchema: Schema = new Schema({
   spurtAndMelt: spurtAndMeltSchema,
 });
 
-export default model<IGameStatistics>("GameStatistics", gameStatisticsSchema);
+export default gameStatisticsSchema;

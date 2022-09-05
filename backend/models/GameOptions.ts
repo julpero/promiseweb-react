@@ -4,8 +4,9 @@ import humanPlayerSchema from "./HumanPlayer";
 import gameSchema from "./Game";
 
 import { PROMISEWEB_COLLECTION } from "./Collections";
+import gameStatisticsSchema from "./GameStatistic";
 
-const gameOptionsSchema: Schema = new Schema({
+const gameOptionsSchema: Schema = new Schema<IGameOptions>({
   humanPlayersCount: {type: Number, required: true},
   botPlayersCount: {type: Number, required: true},
   startRound: {type: Number, required: true},
@@ -29,7 +30,7 @@ const gameOptionsSchema: Schema = new Schema({
   hiddenCardsMode: {type: Number, required: false},
   game: {type: gameSchema, required: false},
   gameStarted: {type: Date, required: false},
-  gameStatistics: [],
+  gameStatistics: gameStatisticsSchema,
 }, {
   collection: PROMISEWEB_COLLECTION,
   timestamps: true,
