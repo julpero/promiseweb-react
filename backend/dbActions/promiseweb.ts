@@ -38,7 +38,7 @@ export const getLastGameByStatus = async (playerId: string, status: GAME_STATUS)
       return {
         gameId: gameInDb?._id.toString() ?? "",
         asAPlayer: gameInDb?.humanPlayers.find(player => player.playerId === playerId)?.name ?? "",
-        currentRound: gameInDb ? getCurrentRoundInd(gameInDb.game) : -1,
+        currentRound: gameInDb && gameInDb.game ? getCurrentRoundInd(gameInDb.game) : -1,
       } as ILastGameStatusResponse;
     } else {
       return null;
