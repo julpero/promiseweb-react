@@ -24,6 +24,8 @@ import { GAME_STATUS, ROUND_STATUS } from "./frontend/src/interfaces/IuiGameOpti
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "./frontend/src/interfaces/IuiLeaveOngoingGame";
 import { leaveOngoingGame, joinOngoingGame, getHumanPlayer } from "./backend/actions/joinLeaveOngoingGame";
 import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "./frontend/src/interfaces/IuiJoinOngoingGame";
+import { IuiPlayedGamesReport } from "./frontend/src/interfaces/IuiGameReports";
+import { getReportData } from "./backend/actions/reports";
 
 // Routes
 // not defined
@@ -354,6 +356,13 @@ connectDB().then(() => {
           joinOk: false,
         } as IuiJoinOngoingGameResponse);
       }
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    socket.on("get report data", async (request: null, fn: (reportResponse: IuiPlayedGamesReport) => void) => {
+      console.log("get report data");
+      const reportData = await getReportData();
+      fn(reportData);
     });
   });
 });

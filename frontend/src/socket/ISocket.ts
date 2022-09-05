@@ -1,5 +1,6 @@
 import { IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "../interfaces/IuiCheckIfOngoingGame";
 import { IuiGetGameListRequest, IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse } from "../interfaces/IuiGameList";
+import { IuiPlayedGamesReport } from "../interfaces/IuiGameReports";
 import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "../interfaces/IuiJoinOngoingGame";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse } from "../interfaces/IuiLeaveOngoingGame";
 import { IuiCreateGameRequest, IuiCreateGameResponse } from "../interfaces/IuiNewGame";
@@ -38,4 +39,5 @@ export interface ClientToServerEvents {
   "check game": (getGameInfoRequest: IuiGetGameInfoRequest, fn: (gameInfo: IuiGetGameInfoResponse) => void) => void;
   "get round": (getRoundRequest: IuiGetRoundRequest, fn: (roundResponse: IuiGetRoundResponse) => void) => void;
   "play card": (playCardRequest: IuiPlayCardRequest, fn: (playCardResponse: IuiPlayCardResponse) => void) => void;
+  "get report data": (request: null, fn: (reportResponse: IuiPlayedGamesReport) => void) => void;
 }

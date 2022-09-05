@@ -5,6 +5,7 @@ import Accordion from "react-bootstrap/Accordion";
 import OpenGamesList from "../components/OpenGamesList";
 import CreateGame from "../components/CreateGame";
 import JoinGameById from "../components/JoinGameById";
+import PlayedGamesReport from "../components/PlayedGamesReport";
 
 interface IProps {
   onJoin: () => void,
@@ -41,6 +42,7 @@ const HomeScreen = ({onJoin}: IProps) => {
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
+      <PlayedGamesReport />
     </div>
   );
 };

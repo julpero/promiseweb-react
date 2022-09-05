@@ -256,7 +256,7 @@ export const generateGameStats = (game: IGame, gameIsPlayed: boolean): IGameStat
 
   const roundsPlayed: IPlayedRoundTypes = getPlayedRoundTypes(game.rounds);
 
-  return {
+  const gameStats: IGameStatistics = {
     generated: Date.now(),
     playersStatistics: playersStatistics,
     winnerName: gameIsPlayed ? playersStatistics[0].playerName : "",
@@ -267,4 +267,5 @@ export const generateGameStats = (game: IGame, gameIsPlayed: boolean): IGameStat
     cardsHit: totalCardsHitInGame(game.rounds),
     spurtAndMelt: spurtAndMelt,
   };
+  return gameStats;
 };
