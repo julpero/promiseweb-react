@@ -97,7 +97,7 @@ const ScoreBoard = () => {
   };
 
   return (
-    <React.Fragment>
+    <div id="scoretableArea">
       <Table size="sm">
         <thead>
           <tr>
@@ -109,7 +109,7 @@ const ScoreBoard = () => {
         </tbody>
       </Table>
       <RuleList rules={currentGameInfo.rules} classStr="smallList" />
-    </React.Fragment>
+    </div>
   );
 };
 

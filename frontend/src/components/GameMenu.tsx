@@ -57,7 +57,7 @@ const GameMenu = () => {
   };
 
   return (
-    <React.Fragment>
+    <div id="menuArea">
       <Button
         size="sm"
         variant="danger"
@@ -107,7 +107,7 @@ const GameMenu = () => {
           <Button variant="primary" onClick={closeLeftModal}>CLOSE</Button>
         </Modal.Footer>
       </Modal>
-    </React.Fragment>
+    </div>
   );
 };
 

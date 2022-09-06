@@ -18,35 +18,43 @@ const CardBoard = () => {
   if (!currentGameInfo || !currentRoundInfo) return null;
   console.log("CardBoard");
 
-  switch (currentGameInfo.humanPlayersCount) {
-    case 3: {
-      return (
-        <TableLayout3 />
-      );
+  const getTableLayout = (playerCount: number) => {
+    switch (playerCount) {
+      case 3: {
+        return (
+          <TableLayout3 />
+        );
+      }
+      case 4: {
+        return (
+          <TableLayout4 />
+        );
+      }
+      case 5: {
+        return (
+          <TableLayout5 />
+        );
+      }
+      case 6: {
+        return (
+          <TableLayout6 />
+        );
+      }
+      default: {
+        return (
+          <div>
+            CardBoard
+          </div>
+        );
+      }
     }
-    case 4: {
-      return (
-        <TableLayout4 />
-      );
-    }
-    case 5: {
-      return (
-        <TableLayout5 />
-      );
-    }
-    case 6: {
-      return (
-        <TableLayout6 />
-      );
-    }
-    default: {
-      return (
-        <div>
-          CardBoard
-        </div>
-      );
-    }
-  }
+  };
+
+  return (
+    <div id="cardboardArea">
+      {getTableLayout(currentGameInfo.humanPlayersCount)}
+    </div>
+  );
 };
 
 export default CardBoard;

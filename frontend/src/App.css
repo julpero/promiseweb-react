@@ -8,6 +8,58 @@ body {
   background-color: azure;
 }
 
+#gameTableContainer {
+  display: grid;
+  grid-template-areas:
+    "cardboard cardboard scoretable"
+    "promisetable chat menu";
+  grid-template-rows: 1fr 220px;
+  grid-template-columns: auto auto 230px;
+  column-gap: 10px;
+  row-gap: 5px;
+  height: 100vh;
+  margin: 0;
+}
+
+#cardboardArea {
+  grid-area: cardboard;
+  position: relative;
+  margin: 5px;
+}
+
+#scoretableArea {
+  grid-area: scoretable;
+  position: relative;
+}
+
+#promisetableArea {
+  grid-area: promisetable;
+  position: relative;
+}
+
+#chatArea {
+  grid-area: chat;
+  position: relative;
+}
+
+#menuArea {
+  grid-area: menu;
+  position: relative;
+}
+
+.playerInfoDiv, .trumpCardSlotDiv, .ownCardsDiv, .myPlayedCardDiv, .animatedCardPlayedSlot {
+  position: absolute;
+}
+
+.playerInfoDiv {
+  min-width: 150px;
+}
+
+.trumpCardSlotDiv, .myPlayedCardDiv, .animatedCardPlayedSlot {
+  height: 112px;
+  width: 88px;
+}
+
 .scrollBars {
   overflow: auto;
 }
@@ -43,11 +95,18 @@ body {
 .otherPlayerCardSlots {
   margin: 5px 0px;
 }
-.otherPlayerWonRow {
+.cardsRow {
   margin: 5px 0px;
+  height: 112px;
+  width: 100%;
 }
 .ownPlayedCardRow {
   margin: 5px 0px;
+}
+
+.playerNameCol {
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .chatBox {
@@ -59,6 +118,7 @@ body {
 
 .cardCol {
   height: 112px;
+  width: 88px;
   padding: 0px;
 }
 .smallCardCol {
@@ -73,6 +133,7 @@ body {
 }
 .myPlayedCard {
   text-align: center;
+  width: fit-content;
 }
 .playableCard {
   cursor: pointer;
@@ -86,15 +147,15 @@ body {
 .firstCardCol {
   padding-left: 20px;
 }
-.playedCardCol {
-  padding-left: 30px;
-}
 .lastCardCol {
   min-width: 85px;
 }
 .cardWonCol {
   padding-left: 1px;
   padding-right: 1px;
+  height: 112px;
+  width: 88px;
+  position: absolute;
 }
 .backSide {
   background-color: white;
@@ -104,7 +165,12 @@ body {
   position: absolute;
 }
 
+.promiseButtonRow {
+  height: 25px;
+}
+
 .promiseButton {
+  position: absolute;
   z-index: 9999;
   padding-right: calc(var(--bs-gutter-x) * .3);
   padding-left: calc(var(--bs-gutter-x) * .3);

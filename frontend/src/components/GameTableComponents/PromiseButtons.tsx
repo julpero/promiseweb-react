@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { CSSProperties, useEffect, useState } from "react";
 
 import { useSelector } from "react-redux";
 import { getCurrentGameInfo } from "../../store/gameInfoSlice";
@@ -39,10 +39,13 @@ const PromiseButtons = () => {
     return -1;
   };
 
-
   const disabledButton = disableButton();
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
+
+  const promiseButtonStyle = (ind: number): CSSProperties => {
+    return {left: `${ind * 72}px`};
+  };
 
   const doPromise = (promise: number) => {
     if (promise === disabledButton) return;
@@ -66,7 +69,7 @@ const PromiseButtons = () => {
     const buttons: JSX.Element[] = [];
     for (let i = 0; i <= cardsInRound; i++) {
       buttons.push(
-        <div key={i} className="col promiseButton">
+        <div key={i} className="promiseButton" style={promiseButtonStyle(i)}>
           <Button onClick={() => doPromise(i)} disabled={!isMyPromiseTurn || clicked || disabledButton === i}>
             {i}
           </Button>
@@ -74,14 +77,18 @@ const PromiseButtons = () => {
       );
     }
     for (let i = cardsInRound + 1; i <= 10; i++) {
-      buttons.push(<div key={i} className="col">&nbsp;</div>);
+      buttons.push(
+        <div key={i} className="promiseButton" style={promiseButtonStyle(i)}>
+          &nbsp;
+        </div>
+      );
     }
     return buttons;
   };
 
   if (!isMyPromiseTurn) return null;
   return (
-    <div className="row">
+    <div className="promiseButtonRow">
       {renderPromiseButtons()}
     </div>
   );

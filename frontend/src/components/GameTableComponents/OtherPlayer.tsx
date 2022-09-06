@@ -1,10 +1,9 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 
 import { useSelector } from "react-redux";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 
 import { IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
-import { cardAsString } from "../../common/commonFunctions";
 import CardSlots from "./CardSlots";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
@@ -19,26 +18,37 @@ interface IProps {
   index: number,
   maxCards: number,
   align?: AlignType,
+  styleProps?: CSSProperties,
+  oneRow?: boolean,
 }
 
-const OtherPlayer = ({ index, maxCards, align }: IProps) => {
+const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   if (!currentRoundInfo.gameId) return null;
 
   const player: IuiRoundPlayer = playerFromIndex(currentRoundInfo, index);
-  console.log("currentRoundInfo, player", player);
+  console.log("OtherPlayer, player", player);
 
   const renderCardsRow = () => {
     if (index === 0) return null;
     return (
-      <div className="row otherPlayerCardSlots">
+      <div className="otherPlayerCardSlots">
         <CardSlots
           player={player}
           slotCount={maxCards}
           cards={[]}
+          oneRow={oneRow}
         />
       </div>
     );
+  };
+
+  const cardWonSlotStyle = (ind: number): CSSProperties => {
+    if (align === "right") {
+      return {right: `${ind * 8}%`};
+    } else {
+      return {left: `${ind * 8}%`};
+    }
   };
 
   const renderCardsWonCols = () => {
@@ -48,7 +58,11 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
         const cardFace = getCardFace("backSide", CARD_PLAYABLE.ok);
         const animationObject = commonAnimationObject();
         cols.push(
-          <div key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}>
+          <div
+            key={i}
+            className={`col cardWonCol ${i === 0 ? "firstCardCol" : ""}`}
+            style={cardWonSlotStyle(i)}
+          >
             <AnimatedCardSlot
               containerId={`cardsWonSlotsX${player.name}X${i}`}
               animationObject={animationObject}
@@ -60,7 +74,12 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
         );
       } else {
         cols.push(
-          <div id={`cardsWonSlotsX${player.name}X${i}`} key={i} className={`col cardCol ${i === 0 ? "firstCardCol" : "cardWonCol"}`}></div>
+          <div
+            id={`cardsWonSlotsX${player.name}X${i}`}
+            key={i}
+            className={`cardWonCol ${i === 0 ? "firstCardCol" : ""}`}
+            style={cardWonSlotStyle(i)}
+          />
         );
       }
     }
@@ -69,113 +88,48 @@ const OtherPlayer = ({ index, maxCards, align }: IProps) => {
 
   const renderCardsWonRow = () => {
     return (
-      <div className="row cardsWonRow">
+      <div>
         {renderCardsWonCols()}
       </div>
     );
   };
 
-  const renderAnimatedCardPlayedSlot = () => {
-    if (index === 0) return null;
-    const cardPlayedCard = player.cardPlayed ?? undefined;
-    const cardFace = cardPlayedCard ? getCardFace(cardAsString(cardPlayedCard), CARD_PLAYABLE.played) : undefined;
-    // const animationObject = cardFace ? commonAnimationObject() : plainAnimationObject;
-    const animationObject = commonAnimationObject();
-    return (
-      <AnimatedCardSlot
-        containerId={`cardPlayedDivX${player.name}`}
-        classStr="playedCardCol"
-        animationObject={animationObject}
-        isSmall={currentRoundInfo.roundToPlayer.players.length === 6}
-      >
-        {cardFace}
-      </ AnimatedCardSlot>
-    );
-  };
-
-  // const renderStatsCol = () => {
-  //   return (
-  //     <div className="col playerStatsCol">
-  //       <div className="row handValueRow">
-  //         <div className="col handValueCol">
-  //           HV
-  //         </div>
-  //       </div>
-  //       <div className="row statsRow2">
-  //         <div className="col statsCol2">
-  //           S1
-  //         </div>
-  //       </div>
-  //       <div className="row statsRow3">
-  //         <div className="col statsCol3">
-  //           S2
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // };
-
-  const renderCardPlayedRow = () => {
-    return (
-      <div className="row">
-        {renderAnimatedCardPlayedSlot()}
-      </div>
-    );
-  };
-
-  // const renderCardPlayedRow = () => {
-  //   if (align === "left") {
-  //     return (
-  //       <div className="row">
-  //         {renderStatsCol()}
-  //         {renderAnimatedCardPlayedSlot()}
-  //       </div>
-  //     );
-  //   }
-  //   if (align === "right") {
-  //     return (
-  //       <div className="row">
-  //         {renderAnimatedCardPlayedSlot()}
-  //         {renderStatsCol()}
-  //       </div>
-  //     );
-  //   }
-  // };
-
-  const renderStatsAndCardPlayedAndWonRow = () => {
+  if (oneRow) {
     if (align === "left") {
       return (
-        <div className="row otherPlayerWonRow">
-          <div className="col-8">
-            {renderCardsWonRow()}
+        <div className="playerInfoDiv" style={styleProps}>
+          <PlayerInfo index={index} />
+          <div style={{position: "absolute", width: "70%", right: "5%"}}>
+            {renderCardsRow()}
           </div>
-          <div className="col-4">
-            {renderCardPlayedRow()}
+          <div style={{position: "absolute", width: "70%", left: "3%"}}>
+            {renderCardsWonRow()}
           </div>
         </div>
       );
-    }
-    if (align === "right") {
+    } else {
       return (
-        <div className="row otherPlayerWonRow">
-          <div className="col-4">
-            {renderCardPlayedRow()}
+        <div className="playerInfoDiv" style={styleProps}>
+          <PlayerInfo index={index} />
+          <div style={{position: "absolute", width: "70%", left: "5%"}}>
+            {renderCardsRow()}
           </div>
-          <div className="col-8">
+          <div style={{position: "absolute", width: "70%", right: "3%"}}>
             {renderCardsWonRow()}
           </div>
         </div>
       );
     }
-  };
+  } else {
+    return (
+      <div className="playerInfoDiv" style={styleProps}>
+        <PlayerInfo index={index} />
+        {renderCardsRow()}
+        {renderCardsWonRow()}
+      </div>
+    );
+  }
 
-  return (
-    <React.Fragment>
-      <PlayerInfo index={index} />
-      {renderCardsRow()}
-      {renderStatsAndCardPlayedAndWonRow()}
-    </React.Fragment>
-  );
 };
 
 export default OtherPlayer;

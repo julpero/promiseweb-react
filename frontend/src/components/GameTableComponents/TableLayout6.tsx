@@ -51,7 +51,7 @@ const TableLayout6 = () => {
           </div>
           <AnimatedCardSlot
             containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
-            classStr="col-2 myPlayedCard topMargin"
+            classStr="myPlayedCard topMargin"
             animationObject={animationObject}
           >
             {cardFace}

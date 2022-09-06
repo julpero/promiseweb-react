@@ -126,7 +126,7 @@ const PromiseTable = () => {
   };
 
   return (
-    <div>
+    <div id="promisetableArea">
       <Table size="sm">
         <thead>
           <tr>

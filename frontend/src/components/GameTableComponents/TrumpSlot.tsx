@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { CSSProperties, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { cardAsString } from "../../common/commonFunctions";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
@@ -7,7 +7,11 @@ import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 
-const TrumpSlot = () => {
+interface IProps {
+  styleProps?: CSSProperties,
+}
+
+const TrumpSlot = ({styleProps}: IProps) => {
   const [trump, setTrump] = useState<IuiCard | null>(null);
   const [cardFace, setCardFace] = useState<JSX.Element | undefined>(undefined);
   const [animationObject, setAnimationObject] = useState(commonAnimationObject(true));
@@ -51,7 +55,7 @@ const TrumpSlot = () => {
 
   if (!cardFace) return null;
   return (
-    <React.Fragment>
+    <div className="trumpCardSlotDiv" style={styleProps}>
       {renderOverDeck()}
       <AnimatedCardSlot
         containerId="trumpCardDiv"
@@ -60,7 +64,7 @@ const TrumpSlot = () => {
       >
         {cardFace}
       </AnimatedCardSlot>
-    </React.Fragment>
+    </div>
   );
 };
 

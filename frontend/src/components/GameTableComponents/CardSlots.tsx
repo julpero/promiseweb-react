@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -6,7 +6,7 @@ import {
 } from "../../store/roundInfoSlice";
 
 import { cardAsString } from "../../common/commonFunctions";
-import { IuiCard, IuiGetRoundResponse, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
+import { IuiCard, IuiGetRoundResponse, IuiRoundPlayer, IuiRoundToPlayer, ROUND_PHASE } from "../../interfaces/IuiPlayingGame";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { setPlayedCard } from "../../store/playCardSlice";
@@ -19,9 +19,10 @@ interface IProps {
   cards: IuiCard[],
   // cardsRemainingCount: number,
   playedSlot?: number,
+  oneRow?: boolean,
 }
 
-const CardSlots = ({player, slotCount, cards, playedSlot}: IProps) => {
+const CardSlots = ({player, slotCount, cards, playedSlot, oneRow}: IProps) => {
   const currentRoundInfo: IuiGetRoundResponse = useSelector(getCurrentRoundInfo);
   const dispatch = useDispatch();
   console.log("CardSlots");
@@ -37,9 +38,9 @@ const CardSlots = ({player, slotCount, cards, playedSlot}: IProps) => {
   let cardsRemainingCount = player.thisIsMe ? 0 : currentRoundInfo.roundToPlayer.cardsInRound - playedHitsCount;
   if (player.cardPlayed) cardsRemainingCount--;
 
-  const cardPlayable = (i: number, roundInfo: IuiGetRoundResponse): CARD_PLAYABLE => {
-    if (roundInfo.roundToPlayer.isMyTurn) {
-      return roundInfo.roundToPlayer.playableCards.some(ind => ind === roundInfo.roundToPlayer.myCards.findIndex(card => card.originalIndex === i))
+  const cardPlayable = (i: number, roundToPlayer: IuiRoundToPlayer): CARD_PLAYABLE => {
+    if (roundToPlayer.isMyTurn && roundToPlayer.roundPhase === ROUND_PHASE.onPlay) {
+      return roundToPlayer.playableCards.some(ind => ind === roundToPlayer.myCards.findIndex(card => card.originalIndex === i))
         ? CARD_PLAYABLE.ok
         : CARD_PLAYABLE.notAllowed;
     } else {
@@ -55,52 +56,60 @@ const CardSlots = ({player, slotCount, cards, playedSlot}: IProps) => {
     }
   };
 
+  const cardSlotStyle = (ind: number): CSSProperties => {
+    if (player.thisIsMe) {
+      return {left: `${ind * 78}px`};
+    } else {
+      return {left: `${ind * 9}%`};
+    }
+  };
+
   const slots: JSX.Element[] = [];
   for (let i = 0; i < slotCount; i++) {
     const openFaceCard = cards.find(card => card.originalIndex === i && card.originalIndex !== playedSlot);
     const cardToRender = openFaceCard ?? (cards.length == 0 && i < cardsRemainingCount ? null : undefined);
     const classStrArr: string[] = [];
-    if (i === 0) classStrArr.push("firstCardCol");
-    if (i === slotCount-1 && !player.thisIsMe) classStrArr.push("lastCardCol");
 
     if (cardToRender === undefined) {
       // just empty slot
       slots.push(
-        <AnimatedCardSlot
-          key={i}
-          containerId={`cardsToPlaySlotsX${name}X${i}`}
-          classStr={classStrArr.join(" ")}
-          animationObject={commonAnimationObject()}
-          isSmall={currentRoundInfo.roundToPlayer.players.length === 6}
-        />
+        <div key={i} className="animatedCardPlayedSlot" style={cardSlotStyle(i)}>
+          <AnimatedCardSlot
+            containerId={`cardsToPlaySlotsX${name}X${i}`}
+            classStr={classStrArr.join(" ")}
+            animationObject={commonAnimationObject()}
+            isSmall={currentRoundInfo.roundToPlayer.players.length === 6}
+          />
+        </div>
       );
     } else {
       // correct card or null
-      const canPlayThisCard = cardPlayable(i, currentRoundInfo);
+      const canPlayThisCard = cardPlayable(i, currentRoundInfo.roundToPlayer);
       const cardAsStr = cardAsString(cardToRender ?? { rank: "0", suite: "dummy", value: 0 });
       const cardFace = getCardFace(cardAsStr, canPlayThisCard);
       if (canPlayThisCard === CARD_PLAYABLE.ok) classStrArr.push("playableCard");
       slots.push(
-        <AnimatedCardSlot
-          key={i}
-          containerId={`cardsToPlaySlotsX${name}X${i}`}
-          classStr={classStrArr.join(" ")}
-          animationObject={commonAnimationObject()}
-          onPlayCard={
-            () => playCard(canPlayThisCard === CARD_PLAYABLE.ok ? cardToRender : null)
-          }
-          isSmall={currentRoundInfo.roundToPlayer.players.length === 6 && !player.thisIsMe}
-        >
-          {cardFace}
-        </AnimatedCardSlot>
+        <div key={i} className="animatedCardPlayedSlot" style={cardSlotStyle(i)}>
+          <AnimatedCardSlot
+            containerId={`cardsToPlaySlotsX${name}X${i}`}
+            classStr={classStrArr.join(" ")}
+            animationObject={commonAnimationObject()}
+            onPlayCard={
+              () => playCard(canPlayThisCard === CARD_PLAYABLE.ok ? cardToRender : null)
+            }
+            isSmall={currentRoundInfo.roundToPlayer.players.length === 6 && !player.thisIsMe}
+          >
+            {cardFace}
+          </AnimatedCardSlot>
+        </div>
       );
     }
   }
 
   return (
-    <React.Fragment>
+    <div className="cardsRow">
       {slots}
-    </React.Fragment>
+    </div>
   );
 };
 

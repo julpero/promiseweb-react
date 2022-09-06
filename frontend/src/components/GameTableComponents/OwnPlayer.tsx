@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 
 import { useSelector } from "react-redux";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
@@ -8,9 +8,10 @@ import CardSlots from "./CardSlots";
 
 interface IProps {
   maxCards: number,
+  styleProps?: CSSProperties,
 }
 
-const OwnPlayer = ({maxCards}: IProps) => {
+const OwnPlayer = ({maxCards, styleProps}: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   if (!currentRoundInfo.gameId) return null;
 
@@ -18,16 +19,14 @@ const OwnPlayer = ({maxCards}: IProps) => {
   if (!me) return null;
 
   return (
-    <React.Fragment>
-      <div className="row">
-        <CardSlots
-          player={me}
-          slotCount={maxCards}
-          cards={currentRoundInfo.roundToPlayer.myCards}
-        />
-      </div>
+    <div className="ownCardsDiv" style={styleProps}>
+      <CardSlots
+        player={me}
+        slotCount={maxCards}
+        cards={currentRoundInfo.roundToPlayer.myCards}
+      />
       <PromiseButtons />
-    </React.Fragment>
+    </div>
   );
 };
 

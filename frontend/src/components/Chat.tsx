@@ -35,12 +35,14 @@ const Chat = () => {
   };
 
   return (
-    <div className="chatBox scrollBars"
-      ref={divChatRef}
-      contentEditable
-      suppressContentEditableWarning={true}
-    >
-      {renderChatLines()}
+    <div id="chatArea">
+      <div className="chatBox scrollBars"
+        ref={divChatRef}
+        contentEditable
+        suppressContentEditableWarning={true}
+      >
+        {renderChatLines()}
+      </div>
     </div>
   );
 };
