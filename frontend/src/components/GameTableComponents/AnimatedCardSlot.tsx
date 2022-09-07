@@ -48,6 +48,8 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
       const fromContainer = document.getElementById(containerId);
       const toContainer = document.getElementById(`cardsWonSlotsX${collectCards.winner}X${collectCards.winCount-1}`);
       if (fromContainer && toContainer) {
+        console.log(fromContainer.classList);
+        fromContainer.classList.remove("winningCardSlot");
         const playedFrom = fromContainer.getBoundingClientRect();
         const playedTo = toContainer.getBoundingClientRect();
         // console.log("collect from", playedFrom);
@@ -145,7 +147,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
         setAnimation(springObject);
       }
     }
-  }, [ animateCard, containerId, dispatch]);
+  }, [animateCard, containerId, dispatch]);
 
   useEffect(() => {
     if (api && animation) {
@@ -162,11 +164,9 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
   };
 
   let finalClassStr = "cardCol";
-  finalClassStr+= " " + classStr;
+  if (classStr) finalClassStr+= " " + classStr;
 
-  if (isSmall) {
-    finalClassStr = finalClassStr.replace("cardCol", "smallCardCol");
-  }
+  if (isSmall) finalClassStr = finalClassStr.replace("cardCol", "smallCardCol");
 
   return (
     <div onClick={() => handleClick()} id={containerId} className={finalClassStr}>

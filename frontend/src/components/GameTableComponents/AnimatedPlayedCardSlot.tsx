@@ -19,8 +19,9 @@ const AnimatedPlayedCardSlot = ({index, styleProps}: IProps) => {
   const player: IuiRoundPlayer = playerFromIndex(currentRoundInfo, index);
   console.log("AnimatedPlayedCardSlot, player", player);
 
-  const renderAnimatedCardPlayedSlot = () => {
+  const thisIsWinningCard = currentRoundInfo.roundToPlayer.playerGoingToWinThisPlay === player.name;
 
+  const renderAnimatedCardPlayedSlot = () => {
     const cardPlayedCard = player.cardPlayed ?? undefined;
     const cardFace = cardPlayedCard ? getCardFace(cardAsString(cardPlayedCard), CARD_PLAYABLE.played) : undefined;
     // const animationObject = cardFace ? commonAnimationObject() : plainAnimationObject;
@@ -36,8 +37,10 @@ const AnimatedPlayedCardSlot = ({index, styleProps}: IProps) => {
     );
   };
 
+  const classStr = `animatedCardPlayedSlot${thisIsWinningCard ? " winningCardSlot" : ""}`;
+
   return (
-    <div className="animatedCardPlayedSlot" style={styleProps}>
+    <div className={classStr} style={styleProps}>
       {renderAnimatedCardPlayedSlot()}
     </div>
   );

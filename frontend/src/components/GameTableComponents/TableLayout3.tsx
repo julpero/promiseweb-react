@@ -14,13 +14,14 @@ import AnimatedPlayedCardSlot from "./AnimatedPlayedCardSlot";
 import { CARD_ALIGN_TYPE } from "../../interfaces/IuiPlayingGame";
 
 const TableLayout3 = () => {
+  console.log("TableLayout3");
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  if (!currentRoundInfo || !currentRoundInfo.gameId) return null;
+
   const myPlayedCard = currentRoundInfo.roundToPlayer.myPlayedCard ?? undefined;
   const cardFace = myPlayedCard ? getCardFace(cardAsString(myPlayedCard), CARD_PLAYABLE.played) : undefined;
   const animationObject = commonAnimationObject();
-  console.log("TableLayout3");
 
-  if (!currentRoundInfo || !currentRoundInfo.gameId) return null;
   return (
     <React.Fragment>
       <OtherPlayer

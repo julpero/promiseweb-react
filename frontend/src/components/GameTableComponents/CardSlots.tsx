@@ -84,7 +84,6 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
         <div key={i} className="animatedCardPlayedSlot" style={cardSlotStyle(i)}>
           <AnimatedCardSlot
             containerId={`cardsToPlaySlotsX${name}X${i}`}
-            classStr={classStrArr.join(" ")}
             animationObject={commonAnimationObject()}
             isSmall={currentRoundInfo.roundToPlayer.players.length === 6}
           />

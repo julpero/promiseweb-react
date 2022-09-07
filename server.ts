@@ -365,4 +365,6 @@ connectDB().then(() => {
       fn(reportData);
     });
   });
+}).catch((e: unknown) => {
+  console.error("DATABASE ERROR", e);
 });

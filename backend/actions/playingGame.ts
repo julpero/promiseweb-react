@@ -28,6 +28,7 @@ import {
   getPlayerNameById,
   getPlayerNameInPlayerOrder,
   getPromiser,
+  winnerOfPlay,
 } from "../common/common";
 import { ICardToIuiCard, isRuleActive, rulesToRuleObj } from "../common/model";
 import { getGame, getGameWithPlayer, makePromiseToPlayer, playerPlaysCard } from "../dbActions/playingGame";
@@ -179,7 +180,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: strin
     myPlayedCard: myPlayedCard ? ICardToIuiCard(myPlayedCard) : null,
     playerInCharge: 0, // TODO hidden cards
     cardInCharge: cardInCharge ? ICardToIuiCard(cardInCharge) : null, // TODO hidden cards
-    playerGoingToWinThisPlay: null, // TODO
+    playerGoingToWinThisPlay: winnerOfPlay(round.cardsPlayed[playIndex], round.trumpCard.suite)?.name, // TODO
     cardsPlayed: getCardsPlayed(round, playIndex), // TODO hidden cards
     doReloadInit: false, // TODO possible not needed anymore
     newRound: false, // TODO possible not needed anymore

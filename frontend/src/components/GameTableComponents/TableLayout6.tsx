@@ -14,13 +14,17 @@ import { CARD_ALIGN_TYPE } from "../../interfaces/IuiPlayingGame";
 import AnimatedPlayedCardSlot from "./AnimatedPlayedCardSlot";
 
 const TableLayout6 = () => {
+  console.log("TableLayout6");
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  if (!currentRoundInfo || !currentRoundInfo.gameId) return null;
+
   const myPlayedCard = currentRoundInfo.roundToPlayer.myPlayedCard ?? undefined;
   const cardFace = myPlayedCard ? getCardFace(cardAsString(myPlayedCard), CARD_PLAYABLE.played) : undefined;
   const animationObject = commonAnimationObject();
-  console.log("TableLayout6");
 
-  if (!currentRoundInfo || !currentRoundInfo.gameId) return null;
+  const iHaveWinningCard = currentRoundInfo.roundToPlayer.playerGoingToWinThisPlay === currentRoundInfo.myName;
+  const classStr = `myPlayedCard${iHaveWinningCard ? " winningCardSlot" : ""}`;
+
   return (
     <React.Fragment>
       <OtherPlayer
@@ -152,7 +156,7 @@ const TableLayout6 = () => {
       >
         <AnimatedCardSlot
           containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
-          classStr="myPlayedCard"
+          classStr={classStr}
           animationObject={animationObject}
         >
           {cardFace}
