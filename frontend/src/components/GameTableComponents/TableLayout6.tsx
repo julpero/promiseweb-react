@@ -59,7 +59,7 @@ const TableLayout6 = () => {
       />
       <AnimatedPlayedCardSlot
         index={2}
-        styleProps={{top: "280px", left: "40%"}}
+        styleProps={{top: "295px", left: "40%"}}
       />
 
       <OtherPlayer
@@ -79,7 +79,7 @@ const TableLayout6 = () => {
       />
       <AnimatedPlayedCardSlot
         index={4}
-        styleProps={{top: "280px", right: "40%"}}
+        styleProps={{top: "295px", right: "40%"}}
       />
 
       <OtherPlayer
@@ -98,7 +98,7 @@ const TableLayout6 = () => {
       />
       <AnimatedPlayedCardSlot
         index={1}
-        styleProps={{bottom: "180px", left: "35%"}}
+        styleProps={{bottom: "190px", left: "35%"}}
       />
 
       <OtherPlayer
@@ -117,7 +117,7 @@ const TableLayout6 = () => {
       />
       <AnimatedPlayedCardSlot
         index={5}
-        styleProps={{bottom: "180px", right: "35%"}}
+        styleProps={{bottom: "190px", right: "35%"}}
       />
 
       <TrumpSlot
