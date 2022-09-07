@@ -165,9 +165,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
   finalClassStr+= " " + classStr;
 
   if (isSmall) {
-    console.log(finalClassStr);
     finalClassStr = finalClassStr.replace("cardCol", "smallCardCol");
-    console.log(finalClassStr);
   }
 
   return (

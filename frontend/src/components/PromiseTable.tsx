@@ -16,7 +16,6 @@ const PromiseTable = () => {
   const promiseTable = currentRoundInfo.roundToPlayer.promiseTable;
 
   const renderTotalPromiseTooltip = (roundIndAsStr: string) => {
-    console.log("renderThTooltip", roundIndAsStr);
     if (!roundIndAsStr) return null;
     const roundInd = parseInt(roundIndAsStr, 10);
     const {cardsInRound, totalPromise} = promiseTable.rounds[roundInd];
