@@ -29,6 +29,11 @@ export enum ROUND_PHASE {
   played,
 }
 
+export enum CARD_ALIGN_TYPE {
+  left,
+  right,
+}
+
 export interface IuiGetRoundRequest {
   gameId: string,
   myId: string,

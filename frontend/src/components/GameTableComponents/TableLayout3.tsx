@@ -11,6 +11,7 @@ import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { cardAsString } from "../../common/commonFunctions";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 import AnimatedPlayedCardSlot from "./AnimatedPlayedCardSlot";
+import { CARD_ALIGN_TYPE } from "../../interfaces/IuiPlayingGame";
 
 const TableLayout3 = () => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
@@ -25,7 +26,7 @@ const TableLayout3 = () => {
       <OtherPlayer
         index={1}
         maxCards={10}
-        align="left"
+        align={CARD_ALIGN_TYPE.left}
         styleProps={{
           top: 0,
           left: 0,
@@ -43,7 +44,7 @@ const TableLayout3 = () => {
       <OtherPlayer
         index={2}
         maxCards={10}
-        align="right"
+        align={CARD_ALIGN_TYPE.right}
         styleProps={{
           top: 0,
           right: 0,
@@ -65,7 +66,7 @@ const TableLayout3 = () => {
       <OtherPlayer
         index={0}
         maxCards={10}
-        align="left"
+        align={CARD_ALIGN_TYPE.left}
         styleProps={{
           bottom: "2%",
           left: 0,

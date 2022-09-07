@@ -11,6 +11,7 @@ import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { cardAsString } from "../../common/commonFunctions";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 import AnimatedPlayedCardSlot from "./AnimatedPlayedCardSlot";
+import { CARD_ALIGN_TYPE } from "../../interfaces/IuiPlayingGame";
 
 const TableLayout5 = () => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
@@ -25,7 +26,7 @@ const TableLayout5 = () => {
       <OtherPlayer
         index={2}
         maxCards={10}
-        align="left"
+        align={CARD_ALIGN_TYPE.left}
         styleProps={{
           top: 0,
           left: 0,
@@ -39,13 +40,13 @@ const TableLayout5 = () => {
       />
       <AnimatedPlayedCardSlot
         index={2}
-        styleProps={{top: "30%", left: "30%"}}
+        styleProps={{top: "150px", left: "40%"}}
       />
 
       <OtherPlayer
         index={3}
         maxCards={10}
-        align="right"
+        align={CARD_ALIGN_TYPE.right}
         styleProps={{
           top: 0,
           right: 0,
@@ -59,13 +60,13 @@ const TableLayout5 = () => {
       />
       <AnimatedPlayedCardSlot
         index={3}
-        styleProps={{top: "28%", right: "40%"}}
+        styleProps={{top: "150px", right: "40%"}}
       />
 
       <OtherPlayer
         index={1}
         maxCards={10}
-        align="right"
+        align={CARD_ALIGN_TYPE.left}
         styleProps={{
           top: "200px",
           left: 0,
@@ -77,13 +78,13 @@ const TableLayout5 = () => {
       />
       <AnimatedPlayedCardSlot
         index={1}
-        styleProps={{top: "50%", right: "45%"}}
+        styleProps={{top: "270px", left: "40%"}}
       />
 
       <OtherPlayer
         index={4}
         maxCards={10}
-        align="left"
+        align={CARD_ALIGN_TYPE.right}
         styleProps={{
           top: "200px",
           right: 0,
@@ -95,7 +96,7 @@ const TableLayout5 = () => {
       />
       <AnimatedPlayedCardSlot
         index={4}
-        styleProps={{top: "50%", right: "45%"}}
+        styleProps={{top: "270px", right: "40%"}}
       />
 
       <TrumpSlot
@@ -105,7 +106,7 @@ const TableLayout5 = () => {
       <OtherPlayer
         index={0}
         maxCards={10}
-        align="left"
+        align={CARD_ALIGN_TYPE.left}
         styleProps={{
           bottom: "2%",
           left: 0,
@@ -119,7 +120,15 @@ const TableLayout5 = () => {
         maxCards={10}
         styleProps={{bottom: "2%", left: "27%", width: "65%"}}
       />
-      <div className="myPlayedCardDiv" style={{bottom: "165px", left: "35%", right: "60%", transform: "translate(-40%, 0)"}}>
+      <div
+        className="myPlayedCardDiv"
+        style={{
+          bottom: "150px",
+          left: "50%",
+          right: "50%",
+          transform: "translate(-50%, 0)",
+        }}
+      >
         <AnimatedCardSlot
           containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
           classStr="myPlayedCard"

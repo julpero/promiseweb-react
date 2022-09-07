@@ -10,6 +10,8 @@ import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { cardAsString } from "../../common/commonFunctions";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
+import { CARD_ALIGN_TYPE } from "../../interfaces/IuiPlayingGame";
+import AnimatedPlayedCardSlot from "./AnimatedPlayedCardSlot";
 
 const TableLayout6 = () => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
@@ -20,72 +22,143 @@ const TableLayout6 = () => {
 
   if (!currentRoundInfo || !currentRoundInfo.gameId) return null;
   return (
-    <div className="row">
-      <div className="col">
-        <div className="row layoutRow">
-          <div className="col-5 playerTable">
-            <OtherPlayer
-              index={2}
-              maxCards={8}
-              align="left"
-            />
-          </div>
-          <div className="col-2 trumpSlotDiv">
-            <TrumpSlot />
-          </div>
-          <div className="col-5 playerTable">
-            <OtherPlayer
-              index={3}
-              maxCards={8}
-              align="right"
-            />
-          </div>
-        </div>
-        <div className="row layoutRow">
-          <div className="col-5 playerTable">
-            <OtherPlayer
-              index={1}
-              maxCards={8}
-              align="left"
-            />
-          </div>
-          <AnimatedCardSlot
-            containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
-            classStr="myPlayedCard topMargin"
-            animationObject={animationObject}
-          >
-            {cardFace}
-          </AnimatedCardSlot>
-          <div className="col-5 playerTable">
-            <OtherPlayer
-              index={4}
-              maxCards={8}
-              align="right"
-            />
-          </div>
-        </div>
-        <div className="row layoutRow">
-          <div className="col-2">
-            <OtherPlayer
-              index={0}
-              maxCards={8}
-              align="left"
-            />
-          </div>
-          <div className="col-5">
-            <OwnPlayer maxCards={8} />
-          </div>
-          <div className="col-5 playerTable">
-            <OtherPlayer
-              index={5}
-              maxCards={8}
-              align="right"
-            />
-          </div>
+    <React.Fragment>
+      <OtherPlayer
+        index={3}
+        maxCards={10}
+        align={CARD_ALIGN_TYPE.right}
+        styleProps={{
+          top: 0,
+          left: "35%",
+          width: "52%",
+          borderRadius: "5px",
+          borderTop: "1px inset cyan",
+          borderLeft: "1px inset cyan",
+          borderRight: "1px inset cyan",
+        }}
+        oneRow={true}
+      />
+      <AnimatedPlayedCardSlot
+        index={3}
+        styleProps={{top: "170px", left: "50%", right: "50%", transform: "translate(-50%, 0)"}}
+      />
 
-        </div>
+      <OtherPlayer
+        index={2}
+        maxCards={10}
+        align={CARD_ALIGN_TYPE.left}
+        styleProps={{
+          top: "175px",
+          left: 0,
+          width: "40%",
+          borderRadius: "5px",
+          borderTop: "1px inset cyan",
+          borderLeft: "1px inset cyan",
+        }}
+        oneRow={true}
+      />
+      <AnimatedPlayedCardSlot
+        index={2}
+        styleProps={{top: "280px", left: "40%"}}
+      />
+
+      <OtherPlayer
+        index={4}
+        maxCards={10}
+        align={CARD_ALIGN_TYPE.right}
+        styleProps={{
+          top: "175px",
+          right: 0,
+          width: "40%",
+          borderRadius: "5px",
+          borderTop: "1px inset cyan",
+          borderLeft: "1px inset cyan",
+          borderRight: "1px inset cyan",
+        }}
+        oneRow={true}
+      />
+      <AnimatedPlayedCardSlot
+        index={4}
+        styleProps={{top: "280px", right: "40%"}}
+      />
+
+      <OtherPlayer
+        index={1}
+        maxCards={10}
+        align={CARD_ALIGN_TYPE.left}
+        styleProps={{
+          bottom: "300px",
+          left: 0,
+          width: "35%",
+          borderRadius: "5px",
+          borderTop: "1px inset cyan",
+          borderLeft: "1px inset cyan",
+        }}
+        oneRow={true}
+      />
+      <AnimatedPlayedCardSlot
+        index={1}
+        styleProps={{bottom: "180px", left: "35%"}}
+      />
+
+      <OtherPlayer
+        index={5}
+        maxCards={10}
+        align={CARD_ALIGN_TYPE.right}
+        styleProps={{
+          bottom: "300px",
+          right: 0,
+          width: "35%",
+          borderRadius: "5px",
+          borderTop: "1px inset cyan",
+          borderRight: "1px inset cyan",
+        }}
+        oneRow={true}
+      />
+      <AnimatedPlayedCardSlot
+        index={5}
+        styleProps={{bottom: "180px", right: "35%"}}
+      />
+
+      <TrumpSlot
+        styleProps={{top: "20px", left: "15%"}}
+      />
+
+      <OtherPlayer
+        index={0}
+        maxCards={10}
+        align={CARD_ALIGN_TYPE.left}
+        styleProps={{
+          bottom: "2%",
+          left: 0,
+          width: "25%",
+          borderRadius: "5px",
+          borderBottom: "1px inset cyan",
+          borderLeft: "1px inset cyan",
+        }}
+      />
+      <OwnPlayer
+        maxCards={10}
+        styleProps={{bottom: "2%", left: "27%", width: "65%"}}
+      />
+      <div
+        className="myPlayedCardDiv"
+        style={{
+          bottom: "150px",
+          left: "50%",
+          right: "50%",
+          transform: "translate(-50%, 0)",
+        }}
+      >
+        <AnimatedCardSlot
+          containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
+          classStr="myPlayedCard"
+          animationObject={animationObject}
+        >
+          {cardFace}
+        </AnimatedCardSlot>
       </div>
-    </div>
+    </React.Fragment>
   );
 };
 

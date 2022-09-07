@@ -6,7 +6,7 @@ import {
 } from "../../store/roundInfoSlice";
 
 import { cardAsString } from "../../common/commonFunctions";
-import { IuiCard, IuiGetRoundResponse, IuiRoundPlayer, IuiRoundToPlayer, ROUND_PHASE } from "../../interfaces/IuiPlayingGame";
+import { CARD_ALIGN_TYPE, IuiCard, IuiGetRoundResponse, IuiRoundPlayer, IuiRoundToPlayer, ROUND_PHASE } from "../../interfaces/IuiPlayingGame";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { setPlayedCard } from "../../store/playCardSlice";
@@ -19,10 +19,10 @@ interface IProps {
   cards: IuiCard[],
   // cardsRemainingCount: number,
   playedSlot?: number,
-  oneRow?: boolean,
+  align?: CARD_ALIGN_TYPE,
 }
 
-const CardSlots = ({player, slotCount, cards, playedSlot, oneRow}: IProps) => {
+const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
   const currentRoundInfo: IuiGetRoundResponse = useSelector(getCurrentRoundInfo);
   const dispatch = useDispatch();
   console.log("CardSlots");
@@ -60,7 +60,11 @@ const CardSlots = ({player, slotCount, cards, playedSlot, oneRow}: IProps) => {
     if (player.thisIsMe) {
       return {left: `${ind * 78}px`};
     } else {
-      return {left: `${ind * 9}%`};
+      if (align === CARD_ALIGN_TYPE.right) {
+        return {left: `${ind * 9}%`};
+      } else {
+        return {right: `${ind * 9}%`};
+      }
     }
   };
 

@@ -3,7 +3,7 @@ import React, { CSSProperties } from "react";
 import { useSelector } from "react-redux";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 
-import { IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
+import { CARD_ALIGN_TYPE, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
 import CardSlots from "./CardSlots";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
@@ -11,13 +11,11 @@ import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 import { playerFromIndex } from "../../common/playingGame";
 import PlayerInfo from "./PlayerInfo";
 
-type AlignType = "left" | "right";
-
 interface IProps {
   /** index goes clockwise, starting from you 0 and rest players from 1 to 5 */
   index: number,
   maxCards: number,
-  align?: AlignType,
+  align: CARD_ALIGN_TYPE,
   styleProps?: CSSProperties,
   oneRow?: boolean,
 }
@@ -37,14 +35,14 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
           player={player}
           slotCount={maxCards}
           cards={[]}
-          oneRow={oneRow}
+          align={align}
         />
       </div>
     );
   };
 
   const cardWonSlotStyle = (ind: number): CSSProperties => {
-    if (align === "right") {
+    if (align === CARD_ALIGN_TYPE.right) {
       return {right: `${ind * 8}%`};
     } else {
       return {left: `${ind * 8}%`};
@@ -86,16 +84,8 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
     return cols;
   };
 
-  const renderCardsWonRow = () => {
-    return (
-      <div>
-        {renderCardsWonCols()}
-      </div>
-    );
-  };
-
   if (oneRow) {
-    if (align === "left") {
+    if (align === CARD_ALIGN_TYPE.left) {
       return (
         <div className="playerInfoDiv" style={styleProps}>
           <PlayerInfo index={index} />
@@ -103,7 +93,7 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
             {renderCardsRow()}
           </div>
           <div style={{position: "absolute", width: "70%", left: "3%"}}>
-            {renderCardsWonRow()}
+            {renderCardsWonCols()}
           </div>
         </div>
       );
@@ -115,7 +105,7 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
             {renderCardsRow()}
           </div>
           <div style={{position: "absolute", width: "70%", right: "3%"}}>
-            {renderCardsWonRow()}
+            {renderCardsWonCols()}
           </div>
         </div>
       );
@@ -125,7 +115,9 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
       <div className="playerInfoDiv" style={styleProps}>
         <PlayerInfo index={index} />
         {renderCardsRow()}
-        {renderCardsWonRow()}
+        <div style={{height: "122px"}}>
+          {renderCardsWonCols()}
+        </div>
       </div>
     );
   }
