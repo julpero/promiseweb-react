@@ -58,7 +58,7 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
         cols.push(
           <div
             key={i}
-            className={`col cardWonCol ${i === 0 ? "firstCardCol" : ""}`}
+            className={`cardWonCol ${i === 0 ? "firstCardCol" : ""}`}
             style={cardWonSlotStyle(i)}
           >
             <AnimatedCardSlot

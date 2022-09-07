@@ -59,6 +59,9 @@ body {
   height: 112px;
   width: 88px;
 }
+.animatedCardPlayedSlot.cardTop:hover {
+  z-index: 9999;
+}
 
 .scrollBars {
   overflow: auto;

@@ -44,7 +44,6 @@ const TrumpSlot = ({styleProps}: IProps) => {
           containerId={`overDeckSlotX${i}`}
           classStr="stackedCards"
           animationObject={commonAnimationObject()}
-          isStacked={true}
         >
           {overCardFace}
         </AnimatedCardSlot>

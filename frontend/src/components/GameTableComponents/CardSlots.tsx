@@ -68,6 +68,10 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
     }
   };
 
+  const isThisCardPlayable = (canPlayThisCard: CARD_PLAYABLE): boolean => {
+    return canPlayThisCard === CARD_PLAYABLE.ok && player.thisIsMe;
+  };
+
   const slots: JSX.Element[] = [];
   for (let i = 0; i < slotCount; i++) {
     const openFaceCard = cards.find(card => card.originalIndex === i && card.originalIndex !== playedSlot);
@@ -91,9 +95,10 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
       const canPlayThisCard = cardPlayable(i, currentRoundInfo.roundToPlayer);
       const cardAsStr = cardAsString(cardToRender ?? { rank: "0", suite: "dummy", value: 0 });
       const cardFace = getCardFace(cardAsStr, canPlayThisCard);
-      if (canPlayThisCard === CARD_PLAYABLE.ok) classStrArr.push("playableCard");
+      if (isThisCardPlayable(canPlayThisCard)) classStrArr.push("playableCard");
+      const className = `animatedCardPlayedSlot${isThisCardPlayable(canPlayThisCard) ? " cardTop" : ""}`;
       slots.push(
-        <div key={i} className="animatedCardPlayedSlot" style={cardSlotStyle(i)}>
+        <div key={i} className={className} style={cardSlotStyle(i)}>
           <AnimatedCardSlot
             containerId={`cardsToPlaySlotsX${name}X${i}`}
             classStr={classStrArr.join(" ")}
