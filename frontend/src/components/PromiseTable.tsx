@@ -3,9 +3,9 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { getCurrentRoundInfo } from "../store/roundInfoSlice";
 
-import { OverlayTrigger, Table, Tooltip } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import { IuiPlayerPromise } from "../interfaces/IuiPlayingGame";
-import { TooltipProps } from "react-bootstrap";
+import ReactTooltip from "react-tooltip";
 
 /**
  * Promises made, table in bottom screen
@@ -15,7 +15,10 @@ const PromiseTable = () => {
   if (!currentRoundInfo.gameId) return null;
   const promiseTable = currentRoundInfo.roundToPlayer.promiseTable;
 
-  const renderThTooltip = (props: TooltipProps, roundInd: number) => {
+  const renderTotalPromiseTooltip = (roundIndAsStr: string) => {
+    console.log("renderThTooltip", roundIndAsStr);
+    if (!roundIndAsStr) return null;
+    const roundInd = parseInt(roundIndAsStr, 10);
     const {cardsInRound, totalPromise} = promiseTable.rounds[roundInd];
     const promiseState = cardsInRound - (totalPromise ?? 0);
     let promiseStateString = "Even promised";
@@ -23,26 +26,28 @@ const PromiseTable = () => {
     if (promiseState < 0) promiseStateString = "Over promised";
 
     return (
-      <Tooltip id="thTooltip" { ...props }>
+      <div>
         {promiseStateString} {totalPromise ?? 0} / {cardsInRound}
-      </Tooltip>
+      </div>
     );
   };
 
-  const renderPlayerPromiseTooltip = (props: TooltipProps, promise: IuiPlayerPromise) => {
-
-    const {promise: promised, keep, points} = promise;
-    const promiseState = keep - (promised ?? 0);
+  const renderPlayerPromiseTooltip = (promisesAsStr: string) => {
+    if (!promisesAsStr) return null;
+    const promises = promisesAsStr.split("|");
+    if (promises.length !== 3) return null;
+    const [promised, keep, points] = promises;
+    const promiseState = parseInt(keep, 10) - (parseInt(promised, 10) ?? 0);
     let promiseStateString = "Kept";
     if (promiseState > 0) promiseStateString = "Over";
     if (promiseState < 0) promiseStateString = "Under";
 
     return (
-      <Tooltip id="thTooltip" { ...props }>
+      <div>
         {promiseStateString} {keep} / {promised ?? 0}
         <br />
         {points} points
-      </Tooltip>
+      </div>
     );
   };
 
@@ -82,11 +87,9 @@ const PromiseTable = () => {
           );
         } else {
           return (
-            <OverlayTrigger placement="top" key={idx} delay={{show: 200, hide: 200}} overlay={renderThTooltip({}, idx)}>
-              <th className={promiseHeaderClass(idx)}>
-                {round.cardsInRound}
-              </th>
-            </OverlayTrigger>
+            <th key={idx} data-for="promisesThTooltip" data-tip={idx} className={promiseHeaderClass(idx)}>
+              {round.cardsInRound}
+            </th>
           );
         }
       })
@@ -100,16 +103,14 @@ const PromiseTable = () => {
         if (promise.promise === null) {
           return (
             <td key={idx} className={playerPromiseClass(idx, promise)}>
-              <span>{promise.promise}</span>
+              {promise.promise}
             </td>
           );
         } else {
           return (
-            <OverlayTrigger placement="top" key={idx} delay={{show: 200, hide: 200}} overlay={renderPlayerPromiseTooltip({}, promise)}>
-              <td className={playerPromiseClass(idx, promise)}>
-                {promise.promise}
-              </td>
-            </OverlayTrigger>
+            <td key={idx} data-for="promisesTdTooltip" data-tip={`${promise.promise}|${promise.keep}|${promise.points ?? ""}`} className={playerPromiseClass(idx, promise)}>
+              {promise.promise}
+            </td>
           );
         }
       })
@@ -127,6 +128,8 @@ const PromiseTable = () => {
 
   return (
     <div id="promisetableArea">
+      <ReactTooltip id="promisesThTooltip" getContent={(dataTip) => renderTotalPromiseTooltip(dataTip)} />
+      <ReactTooltip id="promisesTdTooltip" getContent={(dataTip) => renderPlayerPromiseTooltip(dataTip)} />
       <Table size="sm">
         <thead>
           <tr>

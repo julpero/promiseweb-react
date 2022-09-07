@@ -1,7 +1,6 @@
 import React from "react";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { TooltipProps } from "react-bootstrap";
 import { Table } from "react-bootstrap";
+import ReactTooltip from "react-tooltip";
 import { useSelector } from "react-redux";
 import { colorize } from "../common/commonFunctions";
 import { IuiGetGameInfoResponse, IuiGetRoundResponse } from "../interfaces/IuiPlayingGame";
@@ -19,11 +18,11 @@ const ScoreBoard = () => {
 
   const { promiseTable } = currentRoundInfo.roundToPlayer;
 
-  const renderThTooltip = (props: TooltipProps, playerName: string) => {
+  const renderNameTooltip = (playerName: string) => {
     return (
-      <Tooltip { ...props } id="thTooltip">
+      <div>
         {playerName}
-      </Tooltip>
+      </div>
     );
   };
 
@@ -33,11 +32,9 @@ const ScoreBoard = () => {
     return (
       promiseTable.players.map((playerName, idx) => {
         return (
-          <OverlayTrigger placement="left" key={idx} delay={{show: 200, hide: 200}} overlay={renderThTooltip({}, playerName)}>
-            <td className="tableCell tableHeading" key={idx} style={{"backgroundImage": `linear-gradient(90deg, ${colorize(playerName)}, ${bgColor})`}}>
-              {playerName.substring(0, truncInd)}
-            </td>
-          </OverlayTrigger>
+          <td key={idx} className="tableCell tableHeading" data-for="scoreBoardThTooltip" data-tip={playerName} style={{"backgroundImage": `linear-gradient(90deg, ${colorize(playerName)}, ${bgColor})`}}>
+            {playerName.substring(0, truncInd)}
+          </td>
         );
       })
     );
@@ -108,6 +105,7 @@ const ScoreBoard = () => {
           {renderScoreBoardRows()}
         </tbody>
       </Table>
+      <ReactTooltip place="left" id="scoreBoardThTooltip" getContent={(dataTip) => renderNameTooltip(dataTip)} />
       <RuleList rules={currentGameInfo.rules} classStr="smallList" />
     </div>
   );
