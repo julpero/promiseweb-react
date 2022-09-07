@@ -89,9 +89,6 @@ body {
   border-radius: 1em;
   z-index: 200;
 }
-.playerInfoRow {
-  margin: 10px 0px;
-}
 .otherPlayerCardSlots {
   margin: 5px 0px;
 }
@@ -104,9 +101,25 @@ body {
   margin: 5px 0px;
 }
 
+.playerInfoRow {
+  margin: 10px 0px;
+  position: relative;
+}
 .playerNameCol {
+  position: absolute;
   font-weight: bold;
   white-space: nowrap;
+  width: 25%;
+}
+.playerInfoCol {
+  position: absolute;
+  left: 25%;
+  width: 30%;
+}
+.progressInfoCol {
+  position: relative;
+  left: 50%;
+  width: 45%;
 }
 
 .chatBox {

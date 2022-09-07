@@ -89,17 +89,14 @@ const PlayerInfo = ({index}: IProps) => {
   const bgColor = window.getComputedStyle(document.body, null).getPropertyValue("background-color");
 
   return (
-    <div className="row playerInfoRow">
-      <div className="col-3 nameCol playerNameCol" style={{"backgroundImage": `linear-gradient(90deg, ${colorize(player.name)}, ${bgColor})`}}>
+    <div className="playerInfoRow">
+      <div className="playerNameCol" style={{"backgroundImage": `linear-gradient(90deg, ${colorize(player.name)}, ${bgColor})`}}>
         {player.name.substring(0, 10)}
       </div>
-      <div className="col-5 playerInfoCol">
-        keeps/pr:&nbsp;
-        {renderKeeps()}
-        /
-        {renderPromise()}
+      <div className="playerInfoCol">
+        k: {renderKeeps()} p: {renderPromise()}
       </div>
-      <div className="col-4 progressInfoCol">
+      <div className="progressInfoCol">
         {renderKeepProgress()}
       </div>
     </div>
