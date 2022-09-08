@@ -150,7 +150,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
         setAnimation(springObject);
       }
     }
-  }, [animateCard, containerId, dispatch]);
+  }, [isSmall, animateCard, containerId, dispatch]);
 
   useEffect(() => {
     if (api && animation) {
