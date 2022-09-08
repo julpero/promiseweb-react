@@ -17,12 +17,14 @@ const TableLayout6 = () => {
   console.log("TableLayout6");
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   if (!currentRoundInfo || !currentRoundInfo.gameId) return null;
+  const { roundToPlayer, myName } = currentRoundInfo;
 
-  const myPlayedCard = currentRoundInfo.roundToPlayer.myPlayedCard ?? undefined;
+  const myPlayedCard = roundToPlayer.myPlayedCard ?? undefined;
   const cardFace = myPlayedCard ? getCardFace(cardAsString(myPlayedCard), CARD_PLAYABLE.played) : undefined;
   const animationObject = commonAnimationObject();
 
-  const iHaveWinningCard = currentRoundInfo.roundToPlayer.playerGoingToWinThisPlay === currentRoundInfo.myName;
+  const iAmStarter = roundToPlayer.playerInCharge === myName;
+  const iHaveWinningCard = roundToPlayer.playerGoingToWinThisPlay === myName;
   const classStr = `myPlayedCard${iHaveWinningCard ? " winningCardSlot" : ""}`;
 
   return (
@@ -155,10 +157,11 @@ const TableLayout6 = () => {
         }}
       >
         <AnimatedCardSlot
-          containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
+          containerId={`cardPlayedDivX${myName}`}
           classStr={classStr}
           animationObject={animationObject}
           isSmall={true}
+          isCardInCharge={iAmStarter && roundToPlayer.cardsPlayed.length > 0}
           isWinningCard={iHaveWinningCard}
         >
           {cardFace}

@@ -16,11 +16,13 @@ interface IProps {
 const AnimatedPlayedCardSlot = ({index, styleProps}: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   if (!currentRoundInfo.gameId) return null;
+  const { roundToPlayer } = currentRoundInfo;
   const player: IuiRoundPlayer = playerFromIndex(currentRoundInfo, index);
   console.log("AnimatedPlayedCardSlot, player", player);
 
-  const thisIsWinningCard = currentRoundInfo.roundToPlayer.playerGoingToWinThisPlay === player.name;
-  const isSmall = currentRoundInfo.roundToPlayer.players.length === 6 && !player.thisIsMe;
+  const thisIsCardInCharge = roundToPlayer.playerInCharge === player.name && roundToPlayer.cardsPlayed.length > 0;
+  const thisIsWinningCard = roundToPlayer.playerGoingToWinThisPlay === player.name;
+  const isSmall = roundToPlayer.players.length === 6 && !player.thisIsMe;
 
   const renderAnimatedCardPlayedSlot = () => {
     const cardPlayedCard = player.cardPlayed ?? undefined;
@@ -32,6 +34,7 @@ const AnimatedPlayedCardSlot = ({index, styleProps}: IProps) => {
         containerId={`cardPlayedDivX${player.name}`}
         animationObject={animationObject}
         isSmall={isSmall}
+        isCardInCharge={thisIsCardInCharge}
         isWinningCard={thisIsWinningCard}
       >
         {cardFace}

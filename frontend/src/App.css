@@ -82,17 +82,32 @@ body {
 
 .winningCard {
   box-shadow:
-    -9px -9px 10px 2px rgba(255, 255, 0, 0.3),
-    -9px -9px 10px 2px rgba(255, 255, 0, 0.3) inset,
-    9px 9px 10px 2px rgba(255, 255, 0, 0.3),
-    9px 9px 10px 2px rgba(255, 255, 0, 0.3) inset;
+    -9px -9px 10px 2px rgba(255, 255, 0, 0.35),
+    -9px -9px 10px 2px rgba(255, 255, 0, 0.35) inset,
+    9px 9px 10px 2px rgba(255, 255, 0, 0.35),
+    9px 9px 10px 2px rgba(255, 255, 0, 0.35) inset;
 }
 .winningCard:hover {
   box-shadow:
-    -9px -9px 20px 3px rgba(255, 255, 0, 0.5),
-    -9px -9px 20px 3px rgba(255, 255, 0, 0.5) inset,
-    9px 9px 20px 3px rgba(255, 255, 0, 0.5),
-    9px 9px 20px 3px rgba(255, 255, 0, 0.5) inset;
+    -9px -9px 20px 3px rgba(255, 255, 0, 0.55),
+    -9px -9px 20px 3px rgba(255, 255, 0, 0.55) inset,
+    9px 9px 20px 3px rgba(255, 255, 0, 0.55),
+    9px 9px 20px 3px rgba(255, 255, 0, 0.55) inset;
+}
+
+.cardInCharge {
+  box-shadow:
+    -9px -9px 10px 2px rgba(255, 0, 0, 0.24),
+    -9px -9px 10px 2px rgba(255, 0, 0, 0.24) inset,
+    9px 9px 10px 2px rgba(255, 0, 0, 0.24),
+    9px 9px 10px 2px rgba(255, 0, 0, 0.24) inset;
+}
+.cardInCharge:hover {
+  box-shadow:
+    -9px -9px 20px 3px rgba(255, 0, 0, 0.5),
+    -9px -9px 20px 3px rgba(255, 0, 0, 0.5) inset,
+    9px 9px 20px 3px rgba(255, 0, 0, 0.5),
+    9px 9px 20px 3px rgba(255, 0, 0, 0.5) inset;
 }
 
 .scrollBars {

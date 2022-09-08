@@ -160,12 +160,21 @@ const getCardsPlayed = (round: IRound, playIndex: number): IuiCardPlayed[] => {
   return playedCards;
 };
 
+const starterOfThisPlay = (round: IRound, playInd: number): string => {
+  if (playInd === 0) {
+    return round.roundPlayers[round.starterPositionIndex].name;
+  } else {
+    return winnerOfPlay(round.cardsPlayed[playInd-1], round.trumpCard.suite)?.name ?? "";
+  }
+};
+
 const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: string): IuiRoundToPlayer => {
   const round = gameInDb.game.rounds[roundInd];
   const playIndex = getCurrentPlayIndex(round);
   const playerInTurn = getPlayerInTurn(round);
   const isNowMyTurn = playerInTurn?.playerId === playerId;
   const myCards = getMyCards(playerId, round, false);
+  const playerInCharge = starterOfThisPlay(round, playIndex);
   const cardInCharge = getCurrentCardInCharge(round.cardsPlayed);
   const myPlayedCard = round.cardsPlayed[playIndex].find(playedCard => playedCard.playerId === playerId)?.card;
 
@@ -178,7 +187,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: strin
     players: getRoundPlayers(playerId, round, playIndex, !isRuleActive(gameInDb, RULE.hiddenPromiseRound)), // TODO showPromisesNow
     trumpCard: ICardToIuiCard(round.trumpCard), // TODO hidden trump mode
     myPlayedCard: myPlayedCard ? ICardToIuiCard(myPlayedCard) : null,
-    playerInCharge: 0, // TODO hidden cards
+    playerInCharge: playerInCharge,
     cardInCharge: cardInCharge ? ICardToIuiCard(cardInCharge) : null, // TODO hidden cards
     playerGoingToWinThisPlay: winnerOfPlay(round.cardsPlayed[playIndex], round.trumpCard.suite)?.name, // TODO
     cardsPlayed: getCardsPlayed(round, playIndex), // TODO hidden cards

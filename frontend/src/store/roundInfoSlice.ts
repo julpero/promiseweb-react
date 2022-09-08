@@ -20,7 +20,7 @@ const initialState: RoundInfoState = {
       players: [],
       trumpCard: null,
       myPlayedCard: null,
-      playerInCharge: -1,
+      playerInCharge: "",
       promiseTable: {
         players: [],
         promisesByPlayers: [],
