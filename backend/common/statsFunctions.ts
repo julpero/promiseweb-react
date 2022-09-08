@@ -70,7 +70,7 @@ const getPlayerGameInfoForStats = (game: IGame, playerName: string): IGameInfoFo
   return gameInfo;
 };
 
-const countHandCards = (rounds: IRound[], playerName: string): IGameHandCardsForStats => {
+const countHandCardsByTypes = (rounds: IRound[], playerName: string): IGameHandCardsForStats => {
   const handCards: IGameHandCardsForStats = {
     trumpsInGame: 0,
     bigsCardsInGame: 0,
@@ -79,23 +79,18 @@ const countHandCards = (rounds: IRound[], playerName: string): IGameHandCardsFor
   };
 
   rounds.forEach(round => {
-    const trumpSuit = round.trumpCard.suite;
-    round.cardsPlayed.forEach(hitRound => {
-      const playerCards = hitRound.find(hitCards => hitCards.name === playerName);
-      if (playerCards) {
-        if (playerCards.card.suite === trumpSuit) {
-          handCards.trumpsInGame++;
-        } else {
-          if (playerCards.card.value > 10) {
-            handCards.bigsCardsInGame++;
-          } else if (playerCards.card.value < 6) {
-            handCards.smallCardsInGame++;
-          } else {
-            handCards.otherCardsInGame++;
-          }
-        }
-      }
-    });
+    const trumpSuite = round.trumpCard.suite;
+    const playerInRound = round.roundPlayers.find(player => player.name === playerName);
+    if (playerInRound) {
+      const trumps = playerInRound.cardsToDebug.filter(card => card.suite === trumpSuite).length;
+      const bigCards = playerInRound.cardsToDebug.filter(card => card.suite !== trumpSuite && card.value > 10).length;
+      const smallCards = playerInRound.cardsToDebug.filter(card => card.suite !== trumpSuite && card.value < 6).length;
+      const otherCards = round.cardsInRound - trumps - bigCards - smallCards;
+      handCards.trumpsInGame+= trumps;
+      handCards.bigsCardsInGame+= bigCards;
+      handCards.smallCardsInGame+= smallCards;
+      handCards.otherCardsInGame+= otherCards;
+    }
   });
 
   return handCards;
@@ -109,6 +104,35 @@ const countTotalPlayTime = (rounds: IRound[], playerName: string): number => {
   return totalPlayTime;
 };
 
+const countTotalPromiseTime = (rounds: IRound[], playerName: string): number => {
+  let totalPromiseTime = 0;
+  rounds.forEach(round => {
+    const player = round.roundPlayers.find(player => player.name === playerName);
+    if (player && player.promiseMade && player.promiseStarted) {
+      totalPromiseTime+= player.promiseMade - player.promiseStarted;
+    }
+  });
+  return totalPromiseTime;
+};
+
+const playerPointsByRounds = (rounds: IRound[], playerName: string): number[] => {
+  const pointsArr: number[] = [0];
+  rounds.forEach(round => {
+    pointsArr.push(round.roundPlayers.find(player => player.name === playerName)?.points ?? 0);
+  });
+  return pointsArr;
+};
+
+const playerCumulativePointsByRounds = (rounds: IRound[], playerName: string): number[] => {
+  const cumulativePointsArr: number[] = [0];
+  let cumulativeValue = 0;
+  rounds.forEach(round => {
+    cumulativeValue+= round.roundPlayers.find(player => player.name === playerName)?.points ?? 0;
+    cumulativePointsArr.push(cumulativeValue);
+  });
+  return cumulativePointsArr;
+};
+
 const getPlayerStatistics = (game: IGame): IPlayerStatistic[] => {
   const players: IPlayerStatistic[] = [];
   game.playerOrder.forEach(function (player) {
@@ -116,7 +140,7 @@ const getPlayerStatistics = (game: IGame): IPlayerStatistic[] => {
     const totalPoints = getGamePointsForPlayer(game.rounds, playerName);
     const gameInfo = getPlayerGameInfoForStats(game, playerName);
     const pointsPerKeeps = gameInfo.totalKeeps == 0 ? 0 : totalPoints/gameInfo.totalKeeps;
-    const cards = countHandCards(game.rounds, playerName);
+    const cards = countHandCardsByTypes(game.rounds, playerName);
     players.push({
       playerName: playerName,
       totalPoints: totalPoints,
@@ -135,6 +159,9 @@ const getPlayerStatistics = (game: IGame): IPlayerStatistic[] => {
       smallCardsInGame: cards.smallCardsInGame,
       otherCardsInGame: cards.otherCardsInGame,
       playTime: countTotalPlayTime(game.rounds, playerName),
+      promiseTime: countTotalPromiseTime(game.rounds, playerName),
+      pointsPerRound: playerPointsByRounds(game.rounds, playerName),
+      cumulativePointsPerRound: playerCumulativePointsByRounds(game.rounds, playerName),
     });
   });
   return players;
@@ -171,8 +198,15 @@ const totalCardsHitInGame = (rounds: IRound[]): number => {
   return cardsHit;
 };
 
+/**
+ * This is called after every card hit.
+ * If game ends, we will count more statistics.
+ * This method can use only the game property.
+ * @param game
+ * @param gameIsPlayed
+ * @returns IGameStatistics which can be saved to gameStatistics
+ */
 export const generateGameStats = (game: IGame, gameIsPlayed: boolean): IGameStatistics => {
-
   const playersStatistics = getPlayerStatistics(game).sort(sortPlayerStatistics);
   for (let i = 0; i < playersStatistics.length; i++) {
     const position = i+1;
@@ -189,60 +223,33 @@ export const generateGameStats = (game: IGame, gameIsPlayed: boolean): IGameStat
   };
 
   if (gameIsPlayed) {
-    const roundStats = getGameReport(game, playersStatistics);
-    const winnerName = playersStatistics[0].playerName;
+    // const roundStats = getGameReport(game, playersStatistics);
+    // const winnerName = playersStatistics[0].playerName;
+    const winnerCumulativePoints = playersStatistics[0].cumulativePointsPerRound;
 
     let maxSpurt = 0;
     let spurtFrom = 0;
     let maxMelt = 0;
     let meltFrom = 0;
     let melter = "";
-    for (let j = 0; j < roundStats.points[0].length; j++) {
-      let winnerPoints = 0;
-      let roundBest = null;
-      let points1 = null;
-      let points2 = null;
-      let curMelter = "";
-      for (let i = 0; i < roundStats.points.length; i++) {
-        if (roundStats.players[i] === winnerName) {
-          winnerPoints = roundStats.points[i][j];
-        } else {
-          if (roundBest === null || roundStats.points[i][j] > roundBest) {
-            roundBest = roundStats.points[i][j];
-          }
+    let winnerSpurted = 0;
 
-          if (points1 === null) {
-            points1 = roundStats.points[i][j];
-            curMelter = roundStats.players[i];
-          } else {
-            if (roundStats.points[i][j] > points1) {
-              points2 = points1;
-              points1 = roundStats.points[i][j];
-              curMelter = roundStats.players[i];
-            } else if (points2 === null) {
-              points2 = roundStats.points[i][j];
-            } else if (roundStats.points[i][j] > points2) {
-              points2 = roundStats.points[i][j];
-            }
-          }
+    for (let i = 1; i < playersStatistics.length; i++) {
+      const playerStatistics = playersStatistics[i];
+      let playersMaxMelt = 0;
+      playerStatistics.cumulativePointsPerRound.forEach((points, idx) => {
+        playersMaxMelt = Math.max(playersMaxMelt, points - winnerCumulativePoints[idx]);
+        winnerSpurted = Math.max(winnerSpurted, points - winnerCumulativePoints[idx]);
+        if (playersMaxMelt > maxMelt) {
+          maxMelt = playersMaxMelt;
+          melter = playerStatistics.playerName;
+          meltFrom = idx;
         }
-      }
-      if (points1 !== null && points1 > winnerPoints) {
-        const thisLead = points1 - Math.max(winnerPoints, points2 ?? 0);
-        if (maxMelt <= thisLead) {
-          maxMelt = thisLead;
-          meltFrom = j;
-          melter = curMelter;
+        if (winnerSpurted > maxSpurt) {
+          maxSpurt = winnerSpurted;
+          spurtFrom = idx;
         }
-      }
-
-      if (roundBest !== null) {
-        const thisSpurt = roundBest - winnerPoints;
-        if (winnerPoints < roundBest && thisSpurt >= maxSpurt) {
-          maxSpurt = thisSpurt;
-          spurtFrom = j;
-        }
-      }
+      });
     }
 
     if (spurtFrom > 0) {

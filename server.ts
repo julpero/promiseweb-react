@@ -25,7 +25,8 @@ import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_
 import { leaveOngoingGame, joinOngoingGame, getHumanPlayer } from "./backend/actions/joinLeaveOngoingGame";
 import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "./frontend/src/interfaces/IuiJoinOngoingGame";
 import { IuiPlayedGamesReport } from "./frontend/src/interfaces/IuiGameReports";
-import { getReportData } from "./backend/actions/reports";
+import { getOneGameReportData, getReportData } from "./backend/actions/reports";
+import { IuiGetOneGameReportRequest, IuiOneGameReport } from "./frontend/src/interfaces/IuiReports";
 
 // Routes
 // not defined
@@ -200,7 +201,7 @@ connectDB().then(() => {
         return null;
       }
 
-      const playCardResponse = await playCard(playCardRequest);
+      const playCardResponse: IuiPlayCardResponse = await playCard(playCardRequest);
       if (playCardResponse.playResponse === PLAY_CARD_RESPONSE.playOk) {
         const {
           playerName,
@@ -213,6 +214,7 @@ connectDB().then(() => {
           winnerOfPlay,
           winCount,
           newDealer,
+          winnerOfGame,
         } = playCardResponse;
         const chatLine = `${playerName} hit card in ${(playTime/1000).toFixed(1)} seconds`;
         io.to(gameIdStr).emit("new chat line", chatLine);
@@ -258,6 +260,8 @@ connectDB().then(() => {
         if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.played) {
           const chatLine = "GAME OVER!";
           io.to(gameIdStr).emit("new chat line", chatLine);
+          const chatLine2 = `${winnerOfGame} won the Game!`;
+          io.to(gameIdStr).emit("new chat line", chatLine2);
         }
       }
 
@@ -362,6 +366,14 @@ connectDB().then(() => {
     socket.on("get report data", async (request: null, fn: (reportResponse: IuiPlayedGamesReport) => void) => {
       console.log("get report data");
       const reportData = await getReportData();
+      fn(reportData);
+    });
+
+    socket.on("get game report", async (reportRequest: IuiGetOneGameReportRequest, fn: (reportResponse: IuiOneGameReport) => void) => {
+      console.log("get game report", reportRequest);
+      const reportData = await getOneGameReportData(reportRequest);
+      if (!reportData) return null;
+
       fn(reportData);
     });
   });

@@ -12,4 +12,14 @@ export interface IuiGameReport {
   bigCards: number[],
   smallCards: number[],
   otherCards: number[],
+  promiseTimes?: number[],
+  playTimes?: number[],
+}
+
+export interface IuiGetOneGameReportRequest {
+  gameId: string,
+}
+
+export interface IuiOneGameReport extends IuiGameReport {
+  gameId: string,
 }

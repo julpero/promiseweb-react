@@ -92,6 +92,9 @@ export interface IPlayerStatistic extends IGameInfoForStats, IGameHandCardsForSt
   position: number,
   scorePoints: number,
   playTime: number,
+  promiseTime: number,
+  pointsPerRound: number[],
+  cumulativePointsPerRound: number[],
 }
 
 export interface ISpurtAndMelt {

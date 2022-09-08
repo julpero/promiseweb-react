@@ -1,8 +1,9 @@
-import { IGame, IPlayerStatistic } from "../interfaces/IGameOptions";
+import { IGame } from "../interfaces/IGameOptions";
 import { getPlayerNameInPlayerOrder } from "./common";
 import { IuiGameReport } from "../../frontend/src/interfaces/IuiReports";
+import { ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 
-export const getGameReport = (game: IGame, playersStatistics: IPlayerStatistic[], onlyName?: string): IuiGameReport => {
+export const getGameReport = (game: IGame, onlyName?: string): IuiGameReport => {
   const retObj: IuiGameReport = {
     players: [],
     points: [],
@@ -15,10 +16,11 @@ export const getGameReport = (game: IGame, playersStatistics: IPlayerStatistic[]
     bigCards: [],
     smallCards: [],
     otherCards: [],
+    promiseTimes: [],
+    playTimes: [],
   };
 
   const players: string[] = [];
-  const startPointsArr: number[] = [0];
   const roundsArr: number[] = [0];
   const pointsBigArr: number[] = [];
   const pointsSmallArr: number[] = [];
@@ -33,58 +35,61 @@ export const getGameReport = (game: IGame, playersStatistics: IPlayerStatistic[]
   for (let i = 0; i < game.playerOrder.length; i++) {
     const playerName = getPlayerNameInPlayerOrder(game.playerOrder[i]);
     if (onlyName !== undefined && onlyName !== playerName) continue;
+
     players.push(playerName);
-    startPointsArr.push(0);
     keepsBigArr.push(0);
     keepsSmallArr.push(0);
     const totalPointsByPlayer = [0];
     let pointsPerPlayer = 0;
     let bigPointsPerPlayer = 0;
     let smallPointsPerPlayer = 0;
-    for (let j = 0; j < game.rounds.length; j++) {
-      for (let k = 0; k < game.rounds[j].roundPlayers.length; k++) {
-        if (game.rounds[j].roundPlayers[k].name == playerName) {
-          const pointsFromRound = game.rounds[j].roundPlayers[k].points ?? 0;
-          pointsPerPlayer+= pointsFromRound;
-          totalPointsByPlayer.push(pointsPerPlayer);
-          if (game.rounds[j].cardsInRound > 5) {
-            bigPointsPerPlayer+= pointsFromRound;
-          } else {
-            smallPointsPerPlayer+= pointsFromRound;
-          }
-          break;
+    game.rounds.forEach((round) => {
+      const trumpSuite = round.trumpCard.suite;
+      const playerInRound = round.roundPlayers.find(player => player.name === playerName);
+      if (playerInRound) {
+        const pointsFromRound = playerInRound.points ?? 0;
+        pointsPerPlayer+= pointsFromRound;
+        totalPointsByPlayer.push(pointsPerPlayer);
+        if (round.cardsInRound > 5) {
+          bigPointsPerPlayer+= pointsFromRound;
+        } else {
+          smallPointsPerPlayer+= pointsFromRound;
         }
+        const trumps = playerInRound.cardsToDebug.filter(card => card.suite === trumpSuite).length;
+        const bigCards = playerInRound.cardsToDebug.filter(card => card.suite !== trumpSuite && card.value > 10).length;
+        const smallCards = playerInRound.cardsToDebug.filter(card => card.suite !== trumpSuite && card.value < 6).length;
+        const otherCards = round.cardsInRound - trumps - bigCards - smallCards;
+        trumpsArr.push(trumps);
+        bigCardsArr.push(bigCards);
+        smallCardsArr.push(smallCards);
+        otherCardsArr.push(otherCards);
+
       }
-    }
-    if (playersStatistics != null) {
-      for (let j = 0; j < playersStatistics.length; j++) {
-        if (playersStatistics[j].playerName == playerName) {
-          trumpsArr.push(playersStatistics[j].trumpsInGame);
-          bigCardsArr.push(playersStatistics[j].bigsCardsInGame);
-          smallCardsArr.push(playersStatistics[j].smallCardsInGame);
-          otherCardsArr.push(playersStatistics[j].otherCardsInGame);
-          break;
-        }
-      }
-    }
+    });
+
     pointsArr.push(totalPointsByPlayer);
     pointsBigArr.push(bigPointsPerPlayer);
     pointsSmallArr.push(smallPointsPerPlayer);
   }
   retObj.players = players;
 
+  game.rounds.filter(round => round.roundStatus === ROUND_STATUS.played)
+    .forEach((round, idx) => {
+      roundsArr.push(idx+1);
+    });
+
   for (let i = 0; i < game.rounds.length; i++) {
-    if (game.rounds[i].roundStatus != 2) break;
+    if (game.rounds[i].roundStatus !== 2) break;
     roundsArr.push(i+1);
     for (let j = 0; j < game.rounds[i].roundPlayers.length; j++) {
-      if (game.rounds[i].roundPlayers[j].promise == game.rounds[i].roundPlayers[j].keeps) {
+      if (game.rounds[i].roundPlayers[j].promise === game.rounds[i].roundPlayers[j].keeps) {
         if (game.rounds[i].cardsInRound > 5) {
-          if (retObj.smallStart != null && retObj.smallEnd == null) {
+          if (retObj.smallStart !== null && retObj.smallEnd === null) {
             retObj.smallEnd = i;
           }
           keepsBigArr[j]++;
         } else {
-          if (retObj.smallStart == null) {
+          if (retObj.smallStart === null) {
             retObj.smallStart = i;
           }
           keepsSmallArr[j]++;

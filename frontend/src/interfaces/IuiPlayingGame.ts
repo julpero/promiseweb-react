@@ -188,6 +188,7 @@ export interface IuiPlayCardResponse {
   winnerOfPlay?: string,
   winCount?: number,
   newDealer?: string,
+  winnerOfGame?: string;
 }
 
 export interface IuiCardPlayedNotification {

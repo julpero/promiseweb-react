@@ -85,8 +85,8 @@ export const getPlayerAvgPoints = async (playerName: string, roundsInGame: numbe
   ]);
   console.log("gamesInDb", gamesInDb);
 
-  gamesInDb.forEach(function(gameInDb) {
-    gameStats.push(getGameReport(gameInDb.game, gameInDb.gameStatistics.playersStatistics, playerName));
+  gamesInDb.forEach((gameInDb) => {
+    gameStats.push(getGameReport(gameInDb.game, playerName));
   });
   for (let i = 0; i < gameStats.length; i++) {
     for (let j = 0; j < gameStats[i].points[0].length; j++) {

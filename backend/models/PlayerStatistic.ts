@@ -19,6 +19,9 @@ const playerStatisticSchema: Schema = new Schema<IPlayerStatistic>({
   smallCardsInGame: {type: Number, required: true},
   otherCardsInGame: {type: Number, required: true},
   playTime: {type: Number, required: false},
+  promiseTime: {type: Number, required: false},
+  pointsPerRound: {type: [Number], required: false},
+  cumulativePointsPerRound: {type: [Number], required: false},
 });
 
 export default playerStatisticSchema;
