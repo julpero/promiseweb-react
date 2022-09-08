@@ -240,6 +240,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     }
 
     // let's update game statistics after every card hit
+    // (when game is over we calculate more data than just after card hit)
     gameInDb.gameStatistics = generateGameStats(gameInDb.game, response.gameStatusAfterPlay === GAME_STATUS.played);
 
     const gameAfter = await gameInDb.save();
