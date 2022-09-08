@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { useSelector } from "react-redux";
 import { getCurrentRoundInfo } from "../store/roundInfoSlice";
@@ -11,7 +11,13 @@ import ReactTooltip from "react-tooltip";
  * Promises made, table in bottom screen
  */
 const PromiseTable = () => {
+  console.log("PromiseTable");
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
+
+  useEffect(() => {
+    ReactTooltip.rebuild();
+  });
+
   if (!currentRoundInfo.gameId) return null;
   const promiseTable = currentRoundInfo.roundToPlayer.promiseTable;
 
