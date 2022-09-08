@@ -95,7 +95,7 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
       // correct card or null
       const canPlayThisCard = cardPlayable(i, currentRoundInfo.roundToPlayer);
       const cardAsStr = cardAsString(cardToRender ?? { rank: "0", suite: "dummy", value: 0 });
-      const cardFace = getCardFace(cardAsStr, canPlayThisCard);
+      const cardFace = getCardFace(cardAsStr, canPlayThisCard, isSmall);
       if (isThisCardPlayable(canPlayThisCard)) classStrArr.push("playableCard");
       let className = `animatedCardPlayedSlot${isThisCardPlayable(canPlayThisCard) ? " cardTop" : ""}`;
       if (isSmall) className = className.replace("animatedCardPlayedSlot", "smallAnimatedCardPlayedSlot");

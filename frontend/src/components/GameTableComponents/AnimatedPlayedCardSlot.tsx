@@ -26,7 +26,7 @@ const AnimatedPlayedCardSlot = ({index, styleProps}: IProps) => {
 
   const renderAnimatedCardPlayedSlot = () => {
     const cardPlayedCard = player.cardPlayed ?? undefined;
-    const cardFace = cardPlayedCard ? getCardFace(cardAsString(cardPlayedCard), CARD_PLAYABLE.played) : undefined;
+    const cardFace = cardPlayedCard ? getCardFace(cardAsString(cardPlayedCard), CARD_PLAYABLE.played, isSmall) : undefined;
     // const animationObject = cardFace ? commonAnimationObject() : plainAnimationObject;
     const animationObject = commonAnimationObject();
     return (

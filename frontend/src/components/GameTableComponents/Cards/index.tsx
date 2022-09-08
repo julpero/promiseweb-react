@@ -70,8 +70,9 @@ const playableToClass = (playableStatus: CARD_PLAYABLE): string => {
   }
 };
 
-const getCardFace = (cardStr: string, playableStatus: CARD_PLAYABLE) => {
+const getCardFace = (cardStr: string, playableStatus: CARD_PLAYABLE, isSmall?: boolean) => {
   // console.log(cardStr);
+  const backSideClassStr = isSmall ? "smallBackSide" : "backSide";
   switch (cardStr) {
     case "spadesA": return <SpadesAce text="A" title="SpadesAce" playableClass={playableToClass(playableStatus)} suite="spades" />;
     case "spades2": return <SpadesTwo text="2" title="SpadesTwo" playableClass={playableToClass(playableStatus)} suite="spades" />;
@@ -125,8 +126,8 @@ const getCardFace = (cardStr: string, playableStatus: CARD_PLAYABLE) => {
     case "diamondsJ": return <DiamondsJack text="J" title="DiamondsJack" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
     case "diamondsQ": return <DiamondsQueen text="Q" title="DiamondsQueen" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
     case "diamondsK": return <DiamondsKing text="K" title="DiamondsKing" playableClass={playableToClass(playableStatus)} suite="diamonds" />;
-    case "backSide": return <img className="backSide" src={backSide} />;
-    default: return <img className="backSide" src={backSide} />;
+    case "backSide": return <img className={backSideClassStr} src={backSide} />;
+    default: return <img className={backSideClassStr} src={backSide} />;
     // case "dummy0": null;
   }
 };

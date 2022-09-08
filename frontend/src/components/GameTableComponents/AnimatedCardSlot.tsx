@@ -106,7 +106,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
       // this is the slot where card is played to, so it should handle the animation
       // console.log("animateCard, to slot, set children", animateCard);
       const newChildren = animateCard.cardFace;
-      const cardFace = getCardFace(cardAsString(newChildren ?? { rank: "0", suite: "dummy", value: 0 }), CARD_PLAYABLE.played);
+      const cardFace = getCardFace(cardAsString(newChildren ?? { rank: "0", suite: "dummy", value: 0 }), CARD_PLAYABLE.played, isSmall);
       // console.log("animateCard, to slot, new card face", cardFace);
 
       const fromContainerStr = `cardsToPlaySlotsX${animateCard.fromPlayer}X${animateCard.fromSlot}`;

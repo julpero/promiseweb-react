@@ -44,7 +44,7 @@ const TableLayout3 = () => {
       />
       <AnimatedPlayedCardSlot
         index={1}
-        styleProps={{top: "30%", left: "30%"}}
+        styleProps={{top: "200px", left: "30%"}}
       />
 
       <OtherPlayer
@@ -62,7 +62,7 @@ const TableLayout3 = () => {
       />
       <AnimatedPlayedCardSlot
         index={2}
-        styleProps={{top: "30%", right: "30%"}}
+        styleProps={{top: "200px", right: "30%"}}
       />
 
       <TrumpSlot

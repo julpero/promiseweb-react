@@ -79,6 +79,12 @@ body {
 .animatedCardPlayedSlot.cardTop:hover {
   z-index: 9999;
 }
+.wonCardsRow {
+  height: var(--normal-container-height);
+}
+.smallWonCardsRow {
+  height: var(--small-container-height);
+}
 
 .winningCard {
   box-shadow:
@@ -236,9 +242,16 @@ body {
 .backSide {
   background-color: white;
   border: black 1px solid;
-  max-width: -moz-available;
-  max-width: -webkit-fill-available;
-  max-width: stretch;
+  max-height: var(--normal-container-height);
+  max-width: var(--normal-container-width);
+  border-radius: 5%;
+  position: absolute;
+}
+.smallBackSide {
+  background-color: white;
+  border: black 1px solid;
+  max-height: var(--small-container-height);
+  max-width: var(--small-container-width);
   border-radius: 5%;
   position: absolute;
 }
