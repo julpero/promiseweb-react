@@ -72,6 +72,8 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
     return canPlayThisCard === CARD_PLAYABLE.ok && player.thisIsMe;
   };
 
+  const isSmall = currentRoundInfo.roundToPlayer.players.length === 6 && !player.thisIsMe;
+
   const slots: JSX.Element[] = [];
   for (let i = 0; i < slotCount; i++) {
     const openFaceCard = cards.find(card => card.originalIndex === i && card.originalIndex !== playedSlot);
@@ -85,7 +87,7 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
           <AnimatedCardSlot
             containerId={`cardsToPlaySlotsX${name}X${i}`}
             animationObject={commonAnimationObject()}
-            isSmall={currentRoundInfo.roundToPlayer.players.length === 6}
+            isSmall={isSmall}
           />
         </div>
       );
@@ -95,7 +97,8 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
       const cardAsStr = cardAsString(cardToRender ?? { rank: "0", suite: "dummy", value: 0 });
       const cardFace = getCardFace(cardAsStr, canPlayThisCard);
       if (isThisCardPlayable(canPlayThisCard)) classStrArr.push("playableCard");
-      const className = `animatedCardPlayedSlot${isThisCardPlayable(canPlayThisCard) ? " cardTop" : ""}`;
+      let className = `animatedCardPlayedSlot${isThisCardPlayable(canPlayThisCard) ? " cardTop" : ""}`;
+      if (isSmall) className = className.replace("animatedCardPlayedSlot", "smallAnimatedCardPlayedSlot");
       slots.push(
         <div key={i} className={className} style={cardSlotStyle(i)}>
           <AnimatedCardSlot
@@ -105,7 +108,7 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
             onPlayCard={
               () => playCard(canPlayThisCard === CARD_PLAYABLE.ok ? cardToRender : null)
             }
-            isSmall={currentRoundInfo.roundToPlayer.players.length === 6 && !player.thisIsMe}
+            isSmall={isSmall}
           >
             {cardFace}
           </AnimatedCardSlot>
@@ -114,8 +117,10 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
     }
   }
 
+  const cardsRowClassName = isSmall ? "smallCardsRow" : "cardsRow";
+
   return (
-    <div className="cardsRow">
+    <div className={cardsRowClassName}>
       {slots}
     </div>
   );

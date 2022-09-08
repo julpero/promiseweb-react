@@ -22,6 +22,9 @@ const TableLayout3 = () => {
   const cardFace = myPlayedCard ? getCardFace(cardAsString(myPlayedCard), CARD_PLAYABLE.played) : undefined;
   const animationObject = commonAnimationObject();
 
+  const iHaveWinningCard = currentRoundInfo.roundToPlayer.playerGoingToWinThisPlay === currentRoundInfo.myName;
+  const classStr = `myPlayedCard${iHaveWinningCard ? " winningCardSlot" : ""}`;
+
   return (
     <React.Fragment>
       <OtherPlayer
@@ -84,8 +87,9 @@ const TableLayout3 = () => {
       <div className="myPlayedCardDiv" style={{top: "50%", left: "50%", right: "50%", transform: "translate(-50%, 0)"}}>
         <AnimatedCardSlot
           containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
-          classStr="myPlayedCard"
+          classStr={classStr}
           animationObject={animationObject}
+          isWinningCard={iHaveWinningCard}
         >
           {cardFace}
         </AnimatedCardSlot>

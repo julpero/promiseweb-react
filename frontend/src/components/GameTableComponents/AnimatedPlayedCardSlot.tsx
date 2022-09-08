@@ -20,6 +20,7 @@ const AnimatedPlayedCardSlot = ({index, styleProps}: IProps) => {
   console.log("AnimatedPlayedCardSlot, player", player);
 
   const thisIsWinningCard = currentRoundInfo.roundToPlayer.playerGoingToWinThisPlay === player.name;
+  const isSmall = currentRoundInfo.roundToPlayer.players.length === 6 && !player.thisIsMe;
 
   const renderAnimatedCardPlayedSlot = () => {
     const cardPlayedCard = player.cardPlayed ?? undefined;
@@ -30,14 +31,15 @@ const AnimatedPlayedCardSlot = ({index, styleProps}: IProps) => {
       <AnimatedCardSlot
         containerId={`cardPlayedDivX${player.name}`}
         animationObject={animationObject}
-        isSmall={currentRoundInfo.roundToPlayer.players.length === 6}
+        isSmall={isSmall}
+        isWinningCard={thisIsWinningCard}
       >
         {cardFace}
       </ AnimatedCardSlot>
     );
   };
 
-  const classStr = `animatedCardPlayedSlot${thisIsWinningCard ? " winningCardSlot" : ""}`;
+  const classStr = isSmall ? "smallAnimatedCardPlayedSlot" : "animatedCardPlayedSlot";
 
   return (
     <div className={classStr} style={styleProps}>

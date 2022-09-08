@@ -1,3 +1,10 @@
+#root {
+  --small-container-height: 98px;
+  --small-container-width: 77px;
+  --normal-container-height: 112px;
+  --normal-container-width: 88px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -47,7 +54,13 @@ body {
   position: relative;
 }
 
-.playerInfoDiv, .trumpCardSlotDiv, .ownCardsDiv, .myPlayedCardDiv, .animatedCardPlayedSlot {
+.playerInfoDiv,
+.trumpCardSlotDiv,
+.ownCardsDiv,
+.myPlayedCardDiv,
+.animatedCardPlayedSlot,
+.smallMyPlayedCardDiv,
+.smallAnimatedCardPlayedSlot {
   position: absolute;
 }
 
@@ -56,18 +69,30 @@ body {
 }
 
 .trumpCardSlotDiv, .myPlayedCardDiv, .animatedCardPlayedSlot {
-  height: 112px;
-  width: 88px;
+  height: var(--normal-container-height);
+  width: var(--normal-container-width);
+}
+.smallMyPlayedCardDiv, .smallAnimatedCardPlayedSlot {
+  height: var(--small-container-height);
+  width: var(--small-container-width);
 }
 .animatedCardPlayedSlot.cardTop:hover {
   z-index: 9999;
 }
 
-.winningCardSlot {
-  box-shadow: -9px -9px 10px 2px rgba(255, 255, 0, 0.3), -9px -9px 10px 2px rgba(255, 255, 0, 0.3) inset;
+.winningCard {
+  box-shadow:
+    -9px -9px 10px 2px rgba(255, 255, 0, 0.3),
+    -9px -9px 10px 2px rgba(255, 255, 0, 0.3) inset,
+    9px 9px 10px 2px rgba(255, 255, 0, 0.3),
+    9px 9px 10px 2px rgba(255, 255, 0, 0.3) inset;
 }
-.winningCardSlot:hover {
-  box-shadow: -9px -9px 20px 3px rgba(255, 255, 0, 0.5), -9px -9px 20px 3px rgba(255, 255, 0, 0.5) inset;
+.winningCard:hover {
+  box-shadow:
+    -9px -9px 20px 3px rgba(255, 255, 0, 0.5),
+    -9px -9px 20px 3px rgba(255, 255, 0, 0.5) inset,
+    9px 9px 20px 3px rgba(255, 255, 0, 0.5),
+    9px 9px 20px 3px rgba(255, 255, 0, 0.5) inset;
 }
 
 .scrollBars {
@@ -104,7 +129,12 @@ body {
 }
 .cardsRow {
   margin: 5px 0px;
-  height: 112px;
+  height: var(--normal-container-height);
+  width: 100%;
+}
+.smallCardsRow {
+  margin: 5px 0px;
+  height: var(--small-container-height);
   width: 100%;
 }
 .ownPlayedCardRow {
@@ -140,12 +170,13 @@ body {
 }
 
 .cardCol {
-  height: 112px;
-  width: 88px;
+  height: var(--normal-container-height);
+  width: var(--normal-container-width);
   padding: 0px;
 }
 .smallCardCol {
-  height: 60px;
+  height: var(--small-container-height);
+  width: var(--small-container-width);
   padding: 0px;
 }
 .stackedCards {
@@ -176,14 +207,23 @@ body {
 .cardWonCol {
   padding-left: 1px;
   padding-right: 1px;
-  height: 112px;
-  width: 88px;
+  height: var(--normal-container-height);
+  width: var(--normal-container-width);
+  position: absolute;
+}
+.smallCardWonCol {
+  padding-left: 1px;
+  padding-right: 1px;
+  height: var(--small-container-height);
+  width: var(--small-container-width);
   position: absolute;
 }
 .backSide {
   background-color: white;
   border: black 1px solid;
-  max-width: 80px;
+  max-width: -moz-available;
+  max-width: -webkit-fill-available;
+  max-width: stretch;
   border-radius: 5%;
   position: absolute;
 }

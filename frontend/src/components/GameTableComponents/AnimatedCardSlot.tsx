@@ -18,9 +18,10 @@ interface IProps {
   animationObject: IuiSpringObject,
   onPlayCard?: () => void,
   isSmall?: boolean,
+  isWinningCard?: boolean,
 }
 
-const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onPlayCard, isSmall}: IProps) => {
+const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onPlayCard, isSmall, isWinningCard}: IProps) => {
   const [child, setChild] = useState<JSX.Element | undefined>(undefined);
   const initialChildren = useRef<JSX.Element | undefined>(children);
   const initialEffect = useRef(true);
@@ -49,7 +50,6 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
       const toContainer = document.getElementById(`cardsWonSlotsX${collectCards.winner}X${collectCards.winCount-1}`);
       if (fromContainer && toContainer) {
         console.log(fromContainer.classList);
-        fromContainer.classList.remove("winningCardSlot");
         const playedFrom = fromContainer.getBoundingClientRect();
         const playedTo = toContainer.getBoundingClientRect();
         // console.log("collect from", playedFrom);
@@ -66,6 +66,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
             rotate: randomNegToPos(5),
             onStart: () => {
               console.log("started to animate");
+              fromContainer.classList.remove("winningCard");
             },
             onRest: () => {
               // set this only once, easiest handle with winner containerId
@@ -165,7 +166,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
 
   let finalClassStr = "cardCol";
   if (classStr) finalClassStr+= " " + classStr;
-
+  if (isWinningCard) finalClassStr+= " winningCard";
   if (isSmall) finalClassStr = finalClassStr.replace("cardCol", "smallCardCol");
 
   return (

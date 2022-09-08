@@ -44,7 +44,7 @@ const TableLayout6 = () => {
       />
       <AnimatedPlayedCardSlot
         index={3}
-        styleProps={{top: "170px", left: "50%", right: "50%", transform: "translate(-50%, 0)"}}
+        styleProps={{top: "165px", left: "50%", right: "50%", transform: "translate(-50%, 0)"}}
       />
 
       <OtherPlayer
@@ -52,7 +52,7 @@ const TableLayout6 = () => {
         maxCards={10}
         align={CARD_ALIGN_TYPE.left}
         styleProps={{
-          top: "175px",
+          top: "170px",
           left: 0,
           width: "40%",
           borderRadius: "5px",
@@ -63,7 +63,7 @@ const TableLayout6 = () => {
       />
       <AnimatedPlayedCardSlot
         index={2}
-        styleProps={{top: "295px", left: "40%"}}
+        styleProps={{top: "290px", left: "40%"}}
       />
 
       <OtherPlayer
@@ -71,7 +71,7 @@ const TableLayout6 = () => {
         maxCards={10}
         align={CARD_ALIGN_TYPE.right}
         styleProps={{
-          top: "175px",
+          top: "170px",
           right: 0,
           width: "40%",
           borderRadius: "5px",
@@ -83,7 +83,7 @@ const TableLayout6 = () => {
       />
       <AnimatedPlayedCardSlot
         index={4}
-        styleProps={{top: "295px", right: "40%"}}
+        styleProps={{top: "290px", right: "40%"}}
       />
 
       <OtherPlayer
@@ -146,7 +146,7 @@ const TableLayout6 = () => {
         styleProps={{bottom: "2%", left: "27%", width: "65%"}}
       />
       <div
-        className="myPlayedCardDiv"
+        className="smallMyPlayedCardDiv"
         style={{
           bottom: "150px",
           left: "50%",
@@ -158,6 +158,8 @@ const TableLayout6 = () => {
           containerId={`cardPlayedDivX${currentRoundInfo.myName}`}
           classStr={classStr}
           animationObject={animationObject}
+          isSmall={true}
+          isWinningCard={iHaveWinningCard}
         >
           {cardFace}
         </AnimatedCardSlot>
