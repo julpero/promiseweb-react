@@ -1,6 +1,7 @@
 interface ISocketMap {
   sockets: Set<string>,
   games: Set<string>,
+  adminSocket?: string,
 }
 
 const userSocketIdMap = new Map<string, ISocketMap>(); //a map of online usernames and their clients
@@ -59,6 +60,25 @@ export const getUserGamesFromMap = (userName: string): Set<string> | undefined =
 
 export const isUserConnected = (userName: string): boolean => {
   return userSocketIdMap.has(userName);
+};
+
+export const setUserAsAdmin = (userName: string, socketId: string) => {
+  if (!userSocketIdMap.has(userName)) {
+    userSocketIdMap.set(userName, { sockets: new Set([socketId]), games: new Set(), adminSocket: socketId});
+  } else {
+    const user = userSocketIdMap.get(userName);
+    if (user) {
+      user.adminSocket = socketId;
+    }
+  }
+};
+
+export const isUserAdmin = (userName: string, socketId: string): boolean => {
+  if (!userSocketIdMap.has(userName)) {
+    return false;
+  } else {
+    return userSocketIdMap.get(userName)?.adminSocket === socketId;
+  }
 };
 
 // export default userSocketIdMap;

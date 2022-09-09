@@ -4,6 +4,7 @@ export enum LOGIN_RESPONSE {
   passwordMismatch,
   password2Empty,
   passwordShort,
+  justAdminCheck,
 }
 
 export interface IuiLoginRequest {

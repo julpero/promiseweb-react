@@ -65,6 +65,13 @@ export const checkLogin = async ({userName, userPass1, userPass2, needsToBeAdmin
     }
   } else {
     console.log("is user", user);
+    if (needsToBeAdmin && userPass1 === process.env.ADMIN_DUMMY_PASS) {
+      // this is internal check
+      console.log("... and login ok with dummy admin pass!");
+      loginObj.result = LOGIN_RESPONSE.justAdminCheck;
+      loginObj.loginOk = true;
+      return loginObj;
+    }
     // check if password matches
     const passOk = await bcrypt.compare(passStr, user.passHash);
     if (passOk) {

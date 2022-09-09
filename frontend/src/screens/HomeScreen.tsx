@@ -11,8 +11,9 @@ import { Field, Form } from "react-final-form";
 import TextInput from "../components/FormComponents/TextInput";
 import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "../interfaces/IuiUser";
 import { useSocket } from "../socket";
-import { ModalProps } from "react-bootstrap";
 import AdminGameList from "../components/AdminComponents/AdminGameList";
+import { useDispatch, useSelector } from "react-redux";
+import { isAdminLoggedIn, setAdminLoggedIn } from "../store/adminSlice";
 
 interface IAdminLoginFormValidationFields {
   userName?: string,
@@ -29,9 +30,10 @@ interface IProps {
 
 const HomeScreen = ({onJoin}: IProps) => {
   const [showLoginAdminModal, setShowLoginAdminModal] = useState(false);
-  const [adminLogged, setAdminLogged] = useState(false);
+  const [adminUserName, setAdminUserName] = useState("");
+  const adminLoggedIn = useSelector(isAdminLoggedIn);
+  const dispatch = useDispatch();
   const accRef = createRef<HTMLHeadingElement>();
-  const modalRef = createRef<ModalProps>();
 
   const { socket } = useSocket();
 
@@ -43,11 +45,13 @@ const HomeScreen = ({onJoin}: IProps) => {
 
   const closeLoginAdminModal = () => {
     setShowLoginAdminModal(false);
-    setAdminLogged(false);
+    dispatch(setAdminLoggedIn(false));
+    setAdminUserName("");
   };
 
   const closeAdminModal = () => {
     closeLoginAdminModal();
+    setAdminUserName("");
   };
 
   const onLoginSubmit = ({userName, password}: IAdminLoginForm) => {
@@ -58,13 +62,11 @@ const HomeScreen = ({onJoin}: IProps) => {
     socket.emit("admin login", loginRequest, (loginResponse: IuiLoginResponse) => {
       console.log("loginResponse", loginResponse);
       if (loginResponse.loginStatus === LOGIN_RESPONSE.ok) {
-        setAdminLogged(true);
-        if (modalRef.current) {
-          console.log("set fullscreen");
-          modalRef.current.fullscreen = "true";
-        }
+        dispatch(setAdminLoggedIn(true));
+        setAdminUserName(loginRequest.userName);
       } else {
-        setAdminLogged(false);
+        dispatch(setAdminLoggedIn(false));
+        setAdminUserName("");
       }
     });
   };
@@ -91,6 +93,7 @@ const HomeScreen = ({onJoin}: IProps) => {
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
+
       <PlayedGamesReport />
 
       <div className="adminButtonDiv">
@@ -136,19 +139,19 @@ const HomeScreen = ({onJoin}: IProps) => {
       </Modal>
 
       <Modal
-        show={adminLogged}
+        show={adminLoggedIn}
         fullscreen={true}
       >
         <Modal.Header>
           <Modal.Title>
-            Admin Panel
+            Admin Panel - <i>{adminUserName}</i>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Accordion>
             <Accordion.Item eventKey="0">
               <Accordion.Header>Game List</Accordion.Header>
-              <Accordion.Body><AdminGameList /></Accordion.Body>
+              <Accordion.Body><AdminGameList userName={adminUserName} /></Accordion.Body>
             </Accordion.Item>
           </Accordion>
         </Modal.Body>
@@ -169,7 +172,7 @@ const validateLoginForm = (values: IAdminLoginForm) => {
     errors.userName = "Your (nick)name must be at least three characters long";
   }
 
-  if (values.password?.length <= 0) {
+  if (!values.password || values.password?.length < 4) {
     errors.password = "Password doesn't match!";
   }
 
