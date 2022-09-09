@@ -7,6 +7,7 @@ import animateCardReducer from "./animateCardSlice";
 import actionsAvailableReducer from "./actionsAvailableSlice";
 import emptySlotReducer from "./emptyAnimatedCardSlotSlice";
 import collectCardsReducer from "./collectAnimatedCardsSlice";
+import adminReducer from "./adminSlice";
 
 const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ const store = configureStore({
     actionsAvailableReducer,
     emptySlotReducer,
     collectCardsReducer,
+    adminReducer,
   }
 });
 
