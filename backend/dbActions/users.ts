@@ -4,7 +4,7 @@ import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
 
 import bcrypt from "bcrypt";
 
-export const checkLogin = async ({userName, userPass1, userPass2}: ICheckLoginRequest): Promise<ICheckLoginResponse> => {
+export const checkLogin = async ({userName, userPass1, userPass2, needsToBeAdmin}: ICheckLoginRequest): Promise<ICheckLoginResponse> => {
   const loginObj: ICheckLoginResponse = {
     result: LOGIN_RESPONSE.passwordFails,
     loginOk: false,
@@ -16,11 +16,27 @@ export const checkLogin = async ({userName, userPass1, userPass2}: ICheckLoginRe
   const passStr = userPass1+":"+secretConfig+":"+userName;
   const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS ?? "10", 10);
 
+  if (needsToBeAdmin) {
+    // check that user name is in admin list
+    console.log("admin login...");
+    const adminsStr = process.env.ADMIN_USER_NAME;
+    if (!adminsStr) return loginObj;
+    const admins = adminsStr.split(",");
+    if (!admins.some(admin => admin === userName)) {
+      console.warn("... user name is not admin!");
+      return loginObj;
+    }
+  }
+
   const uQuery = User.where({
     playerName: { $eq: userName }
   });
   const user = await uQuery.findOne();
-  if (!user) {
+  if (!user && needsToBeAdmin) {
+    // can't create admin users
+    console.warn("... can't create admin user!");
+    return loginObj;
+  } else if (!user) {
     // first time user, check if there is also second password
     if (userPass2.length === 0) {
       loginObj.result = LOGIN_RESPONSE.password2Empty;
@@ -52,9 +68,11 @@ export const checkLogin = async ({userName, userPass1, userPass2}: ICheckLoginRe
     // check if password matches
     const passOk = await bcrypt.compare(passStr, user.passHash);
     if (passOk) {
+      console.log("... and login ok!");
       loginObj.result = LOGIN_RESPONSE.ok;
       loginObj.loginOk = true;
     } else {
+      console.warn("... but password fails");
       loginObj.result = LOGIN_RESPONSE.passwordFails;
       loginObj.loginOk = false;
     }

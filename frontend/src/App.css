@@ -307,3 +307,9 @@ body {
 .noPoints {
   background-image: radial-gradient(farthest-side circle, rgba(255, 0, 0, 0) 20%, rgba(255, 0, 0, 0.2) 50%, rgba(255, 0, 0, 0) 30%);
 }
+
+.adminButtonDiv {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}

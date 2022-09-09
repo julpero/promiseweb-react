@@ -5,3 +5,13 @@ export enum LOGIN_RESPONSE {
   password2Empty,
   passwordShort,
 }
+
+export interface IuiLoginRequest {
+  userName: string,
+  password1: string,
+  password2?: string,
+}
+
+export interface IuiLoginResponse {
+  loginStatus: LOGIN_RESPONSE,
+}

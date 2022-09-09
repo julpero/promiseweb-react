@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import React, { createRef, useState } from "react";
 // import { socket, SocketContext } from "../socket";
 import Accordion from "react-bootstrap/Accordion";
 
@@ -6,18 +6,67 @@ import OpenGamesList from "../components/OpenGamesList";
 import CreateGame from "../components/CreateGame";
 import JoinGameById from "../components/JoinGameById";
 import PlayedGamesReport from "../components/PlayedGamesReport";
+import { Button, Modal } from "react-bootstrap";
+import { Field, Form } from "react-final-form";
+import TextInput from "../components/FormComponents/TextInput";
+import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "../interfaces/IuiUser";
+import { useSocket } from "../socket";
+import { ModalProps } from "react-bootstrap";
+import AdminGameList from "../components/AdminComponents/AdminGameList";
+
+interface IAdminLoginFormValidationFields {
+  userName?: string,
+  password?: string,
+}
+interface IAdminLoginForm {
+  userName: string,
+  password: string,
+}
 
 interface IProps {
   onJoin: () => void,
 }
 
 const HomeScreen = ({onJoin}: IProps) => {
+  const [showLoginAdminModal, setShowLoginAdminModal] = useState(false);
+  const [adminLogged, setAdminLogged] = useState(false);
   const accRef = createRef<HTMLHeadingElement>();
+  const modalRef = createRef<ModalProps>();
+
+  const { socket } = useSocket();
 
   const handleGameCreation = () => {
     if (accRef.current?.firstElementChild) {
       (accRef.current.firstElementChild as HTMLButtonElement).click();
     }
+  };
+
+  const closeLoginAdminModal = () => {
+    setShowLoginAdminModal(false);
+    setAdminLogged(false);
+  };
+
+  const closeAdminModal = () => {
+    closeLoginAdminModal();
+  };
+
+  const onLoginSubmit = ({userName, password}: IAdminLoginForm) => {
+    const loginRequest: IuiLoginRequest = {
+      userName: userName,
+      password1: password,
+    };
+    socket.emit("admin login", loginRequest, (loginResponse: IuiLoginResponse) => {
+      console.log("loginResponse", loginResponse);
+      if (loginResponse.loginStatus === LOGIN_RESPONSE.ok) {
+        setAdminLogged(true);
+        if (modalRef.current) {
+          console.log("set fullscreen");
+          modalRef.current.fullscreen = "true";
+        }
+      } else {
+        setAdminLogged(false);
+      }
+    });
   };
 
   return(
@@ -43,8 +92,88 @@ const HomeScreen = ({onJoin}: IProps) => {
         </Accordion.Item>
       </Accordion>
       <PlayedGamesReport />
+
+      <div className="adminButtonDiv">
+        <Button onClick={() => setShowLoginAdminModal(true)}>Admin</Button>
+      </div>
+
+      <Modal
+        show={showLoginAdminModal}
+        onHide={() => closeLoginAdminModal()}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Admin Panel
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form
+            onSubmit={onLoginSubmit}
+            validate={validateLoginForm}
+            render={({handleSubmit, submitting}) => (
+              <form onSubmit={handleSubmit}>
+                <Field<string>
+                  name="userName"
+                  component={TextInput}
+                  label="User name"
+                />
+                <Field<string>
+                  name="password"
+                  component={TextInput}
+                  label="Password"
+                  ispassword="true"
+                />
+                <div className="d-grid gap-2">
+                  <Button disabled={submitting} type="submit" variant="primary" size="lg">Log In</Button>
+                </div>
+              </form>
+            )}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" onClick={() => closeLoginAdminModal()}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={adminLogged}
+        fullscreen={true}
+      >
+        <Modal.Header>
+          <Modal.Title>
+            Admin Panel
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Accordion>
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Game List</Accordion.Header>
+              <Accordion.Body><AdminGameList /></Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" onClick={() => closeAdminModal()}>Log out</Button>
+        </Modal.Footer>
+
+      </Modal>
     </div>
   );
+};
+
+const validateLoginForm = (values: IAdminLoginForm) => {
+  console.log("validating form");
+  const errors: IAdminLoginFormValidationFields = {};
+
+  if (!values.userName || values.userName.length < 3) {
+    errors.userName = "Your (nick)name must be at least three characters long";
+  }
+
+  if (values.password?.length <= 0) {
+    errors.password = "Password doesn't match!";
+  }
+
+  return errors;
 };
 
 export default HomeScreen;

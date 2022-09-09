@@ -17,6 +17,7 @@ import {
   IuiPromiseMadeNotification,
 } from "../interfaces/IuiPlayingGame";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "../interfaces/IuiReports";
+import { IuiLoginRequest, IuiLoginResponse } from "../interfaces/IuiUser";
 
 export interface ServerToClientEvents {
   "new game created": (newGameId: string) => void;
@@ -42,4 +43,5 @@ export interface ClientToServerEvents {
   "play card": (playCardRequest: IuiPlayCardRequest, fn: (playCardResponse: IuiPlayCardResponse) => void) => void;
   "get report data": (request: null, fn: (reportResponse: IuiPlayedGamesReport) => void) => void;
   "get game report": (reportRequest: IuiGetOneGameReportRequest, fn: (reportResponse: IuiOneGameReport) => void) => void;
+  "admin login": (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => void;
 }

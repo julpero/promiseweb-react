@@ -8,6 +8,7 @@ export interface ICheckLoginRequest {
   userName: string,
   userPass1: string,
   userPass2: string,
+  needsToBeAdmin?: boolean,
 }
 
 export interface ICheckLoginResponse {

@@ -27,6 +27,8 @@ import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "./frontend/src/i
 import { IuiPlayedGamesReport } from "./frontend/src/interfaces/IuiGameReports";
 import { getOneGameReportData, getReportData } from "./backend/actions/reports";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "./frontend/src/interfaces/IuiReports";
+import { IuiLoginRequest, IuiLoginResponse } from "./frontend/src/interfaces/IuiUser";
+import { handleLoginRequest } from "./backend/actions/login";
 
 // Routes
 // not defined
@@ -76,6 +78,13 @@ connectDB().then(() => {
         io.to(gameIdStr).emit("new chat line", chatLine);
       }
       csm.removeUserFromMap(userName, socket.id, gameIdStr ?? "");
+    });
+
+    socket.on("admin login", async (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => {
+      console.log("admin login", loginRequest);
+      if (loginRequest.userName.length < 4 || loginRequest.password1.length < 4) return null;
+      const loginResponse = await handleLoginRequest(loginRequest);
+      fn(loginResponse);
     });
 
     socket.on("create game", async (createGameRequest: IuiCreateGameRequest, fn: (createGameResponse: IuiCreateGameResponse) => void) => {
