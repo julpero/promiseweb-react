@@ -46,7 +46,7 @@ const OpenGamesList = () => {
 
   const fetchGameItemList = useCallback(() => {
     const gameListRequest: IuiGetGameListRequest = { myId: getMyId() };
-    socket.emit("get games", gameListRequest, (gameList: IuiGetGameListResponse) => {
+    socket.emit("get open games", gameListRequest, (gameList: IuiGetGameListResponse) => {
       console.log("gameList", gameList);
       setGameItemList(gameList.games);
     });

@@ -98,7 +98,7 @@ connectDB().then(() => {
       fn(createGameResponse);
     });
 
-    socket.on("get games", async (getGameListRequest: IuiGetGameListRequest, fn: (getGameListResponse: IuiGetGameListResponse) => void) => {
+    socket.on("get open games", async (getGameListRequest: IuiGetGameListRequest, fn: (getGameListResponse: IuiGetGameListResponse) => void) => {
       const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(getGameListRequest);
       fn(getGameListResponse);
     });
