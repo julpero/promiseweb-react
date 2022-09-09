@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { IuiGameReport } from "../../frontend/src/interfaces/IuiReports";
 import { getGameReport } from "../common/reportFunctions";
@@ -43,10 +44,11 @@ export const reportData = async (): Promise<IGamesPlayedReportData> => {
   return reportDataObj;
 };
 
-export const oneGameReportData = async (gameId: string): Promise<IuiGameReport | null> => {
-  const gameInDb = await GameOptions.findById(gameId);
+export const oneGameReportData = async (gameIdStr: string): Promise<IuiGameReport | null> => {
+  if (!mongoose.isValidObjectId(gameIdStr)) return null;
+  const gameInDb = await GameOptions.findById(gameIdStr);
   if (gameInDb) {
-    return await getGameReport(gameInDb?.game);
+    return getGameReport(gameInDb);
   } else {
     return null;
   }

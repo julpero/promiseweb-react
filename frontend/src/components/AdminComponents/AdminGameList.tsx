@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table } from "react-bootstrap";
+import { Button, Modal, Table } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { IuiAdminGame, IuiGetGamesRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../../interfaces/IuiAdminOperations";
 import { useSocket } from "../../socket";
 import { isAdminLoggedIn } from "../../store/adminSlice";
+import OneGameReport from "../OneGameReport";
 
 interface IProps {
   userName: string,
@@ -14,6 +15,7 @@ const AdminGameList = ({userName}: IProps) => {
   const adminLoggedIn = useSelector(isAdminLoggedIn);
   const [gameList, setGameList] = useState<IuiAdminGame[]>([]);
   const [buttonsActive, setButtonsActive] = useState(true);
+  const [gameToReport, setGameToReport] = useState("");
 
   const { socket } = useSocket();
   useEffect(() => {
@@ -78,7 +80,7 @@ const AdminGameList = ({userName}: IProps) => {
     return gameList.map((game, idx) => {
       return (
         <tr key={idx}>
-          <td><Button size="sm" disabled={!buttonsActive}>Show</Button></td>
+          <td><Button size="sm" disabled={!buttonsActive} onClick={() => setGameToReport(game.gameId)}>Show</Button></td>
           <td>{new Date(game.played).toLocaleString()}</td>
           <td>{renderGamePlayers(game.players)}</td>
           <td>{new Date(game.statsGenerated).toLocaleString()}</td>
@@ -88,31 +90,55 @@ const AdminGameList = ({userName}: IProps) => {
     });
   };
 
-  return (
-    <Table size="sm" striped bordered hover>
-      <thead>
-        <tr>
-          <th>
+  const closeReportModal = () => {
+    setGameToReport("");
+  };
 
-          </th>
-          <th>
+  return (
+    <React.Fragment>
+      <Table size="sm" striped bordered hover>
+        <thead>
+          <tr>
+            <th>
+
+            </th>
+            <th>
             Played
-          </th>
-          <th>
+            </th>
+            <th>
             Players
-          </th>
-          <th>
+            </th>
+            <th>
             Stats gen
-          </th>
-          <th>
+            </th>
+            <th>
             Actions
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {renderGameList()}
-      </tbody>
-    </Table>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {renderGameList()}
+        </tbody>
+      </Table>
+      <Modal
+        show={gameToReport !== ""}
+        onHide={() => closeReportModal()}
+        fullscreen={true}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+          Game Report
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <OneGameReport gameId={gameToReport} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" onClick={() => closeReportModal()}>Close Report</Button>
+        </Modal.Footer>
+
+      </Modal>
+    </React.Fragment>
   );
 };
 

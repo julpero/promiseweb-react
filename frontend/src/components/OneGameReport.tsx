@@ -14,9 +14,11 @@ const OneGameReport = ({gameId}: IProps) => {
     const reportRequest: IuiGetOneGameReportRequest = {
       gameId: gameId,
     };
-    socket.emit("get game report", reportRequest, (reportResponse: IuiOneGameReport) => {
-      setGameReportData(reportResponse);
-    });
+    if (gameId) {
+      socket.emit("get game report", reportRequest, (reportResponse: IuiOneGameReport) => {
+        setGameReportData(reportResponse);
+      });
+    }
   }, [gameId, socket]);
 
   return (

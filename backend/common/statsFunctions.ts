@@ -40,7 +40,11 @@ const getPlayerGameInfoForStats = (game: IGame, playerName: string): IGameInfoFo
     bigZeroFailPromisesCount: 0,
     smallPointsNotZero: 0,
     smallNotZeroKeepPromisesCount: 0,
-    smallNotZeroFailPromisesCount: 0
+    smallNotZeroFailPromisesCount: 0,
+    totalPointsBig: 0,
+    totalPointsSmall: 0,
+    totalKeepsBig: 0,
+    totalKeepsSmall: 0,
   };
 
   game.rounds.filter(round => round.roundStatus !== ROUND_STATUS.initialized).forEach(function(round) {
@@ -48,6 +52,8 @@ const getPlayerGameInfoForStats = (game: IGame, playerName: string): IGameInfoFo
     const roundKept = roundInfo.keeps === roundInfo.promise;
     if (roundKept) gameInfo.totalKeeps++;
     if (round.cardsInRound > 5) {
+      gameInfo.totalPointsBig+= roundInfo.points;
+      if (roundKept) gameInfo.totalKeepsBig++;
       if (roundInfo.promise === 0) {
         if (roundKept) {
           gameInfo.bigZeroKeepPromisesCount++;
@@ -57,6 +63,8 @@ const getPlayerGameInfoForStats = (game: IGame, playerName: string): IGameInfoFo
         }
       }
     } else {
+      gameInfo.totalPointsSmall+= roundInfo.points;
+      if (roundKept) gameInfo.totalKeepsSmall++;
       if (roundInfo.promise > 0) {
         if (roundKept) {
           gameInfo.smallNotZeroKeepPromisesCount++;
@@ -145,6 +153,10 @@ const getPlayerStatistics = (game: IGame): IPlayerStatistic[] => {
       playerName: playerName,
       totalPoints: totalPoints,
       totalKeeps: gameInfo.totalKeeps,
+      totalPointsBig: gameInfo.totalPointsBig,
+      totalPointsSmall: gameInfo.totalPointsSmall,
+      totalKeepsBig: gameInfo.totalKeepsBig,
+      totalKeepsSmall: gameInfo.totalKeepsSmall,
       bigPointsByZero: gameInfo.bigPointsByZero,
       bigZeroKeepPromisesCount: gameInfo.bigZeroKeepPromisesCount,
       bigZeroFailPromisesCount: gameInfo.bigZeroFailPromisesCount,
@@ -162,7 +174,7 @@ const getPlayerStatistics = (game: IGame): IPlayerStatistic[] => {
       promiseTime: countTotalPromiseTime(game.rounds, playerName),
       pointsPerRound: playerPointsByRounds(game.rounds, playerName),
       cumulativePointsPerRound: playerCumulativePointsByRounds(game.rounds, playerName),
-    });
+    } as IPlayerStatistic);
   });
   return players;
 };

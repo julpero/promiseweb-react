@@ -1,6 +1,7 @@
 export interface IuiGameReport {
   players: string[],
-  points: number[][],
+  pointsPerRound: number[][],
+  cumulativePointsPerRound: number[][],
   rounds: number[],
   pointsBig: number[], // rounds of 6-10 cards
   pointsSmall: number[], // rounds of 1-5 cards
@@ -14,6 +15,7 @@ export interface IuiGameReport {
   otherCards: number[],
   promiseTimes?: number[],
   playTimes?: number[],
+  roundType: string,
 }
 
 export interface IuiGetOneGameReportRequest {

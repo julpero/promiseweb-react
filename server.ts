@@ -105,7 +105,7 @@ connectDB().then(() => {
 
     socket.on("re-create game statistics", async (reCreateGameStatisticsRequest: IuiReCreateGameStatisticsRequest, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
       console.log("re-create game statistics", reCreateGameStatisticsRequest);
-      const {userName, gameId} = reCreateGameStatisticsRequest;
+      const {userName} = reCreateGameStatisticsRequest;
       if (!csm.isUserAdmin(userName, socket.id)) return null;
       await reCreateGameStats(reCreateGameStatisticsRequest);
       const getGamesRequest: IuiGetGamesRequest = {

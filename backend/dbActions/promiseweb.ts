@@ -86,14 +86,16 @@ export const getPlayerAvgPoints = async (playerName: string, roundsInGame: numbe
   console.log("gamesInDb", gamesInDb);
 
   gamesInDb.forEach((gameInDb) => {
-    gameStats.push(getGameReport(gameInDb.game, playerName));
+    gameStats.push(getGameReport(gameInDb, playerName));
   });
   for (let i = 0; i < gameStats.length; i++) {
-    for (let j = 0; j < gameStats[i].points[0].length; j++) {
+    for (let j = 0; j < gameStats[i].pointsPerRound[0].length; j++) {
+    // for (let j = 0; j < gameStats[i].points[0].length; j++) {
       if (i == 0) {
         stats[j] = 0;
       }
-      stats[j]+= gameStats[i].points[0][j];
+      stats[j]+= gameStats[i].pointsPerRound[0][j];
+      // stats[j]+= gameStats[i].points[0][j];
     }
   }
   return stats.map(v => v/gameStats.length);

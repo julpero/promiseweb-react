@@ -1,12 +1,41 @@
-import { IGame } from "../interfaces/IGameOptions";
+import { IGameOptions, IGameStatistics, IPlayer, IRound } from "../interfaces/IGameOptions";
 import { getPlayerNameInPlayerOrder } from "./common";
 import { IuiGameReport } from "../../frontend/src/interfaces/IuiReports";
-import { ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 
-export const getGameReport = (game: IGame, onlyName?: string): IuiGameReport => {
+const roundTypeAsStr = (rounds: IRound[]): string => {
+  let retStr = "";
+  const firstSmallIndex = rounds.findIndex(round => round.cardsInRound === 5);
+  if (firstSmallIndex >= 0) {
+    // started with big round
+    retStr = `0;${firstSmallIndex};`;
+  } else if (firstSmallIndex === 0) {
+    retStr = `;${firstSmallIndex};`;
+  } else {
+    // no small rounds
+    return "0;;";
+  }
+
+  for (let i = firstSmallIndex + 1; i < rounds.length; i++) {
+    if (rounds[i].cardsInRound > 5) {
+      return retStr+= i;
+    }
+  }
+  return retStr;
+};
+
+/**
+ * This method uses only games gameStatistics property.
+ * If stats are not available re-create them with generateGameStats method.
+ * @param game
+ * @param onlyName
+ * @returns IuiGameReport object
+ */
+export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGameReport => {
+  const {gameStatistics: gameStats} = gameInDb;
   const retObj: IuiGameReport = {
     players: [],
-    points: [],
+    pointsPerRound: [],
+    cumulativePointsPerRound: [],
     rounds: [],
     pointsBig: [], // rounds of 6-10 cards
     pointsSmall: [], // rounds of 1-5 cards
@@ -18,6 +47,7 @@ export const getGameReport = (game: IGame, onlyName?: string): IuiGameReport => 
     otherCards: [],
     promiseTimes: [],
     playTimes: [],
+    roundType: "",
   };
 
   const players: string[] = [];
@@ -26,79 +56,38 @@ export const getGameReport = (game: IGame, onlyName?: string): IuiGameReport => 
   const pointsSmallArr: number[] = [];
   const keepsBigArr: number[] = [];
   const keepsSmallArr: number[] = [];
-  const pointsArr: number[][] = [];
+  const pointsPerRoundArr: number[][] = [];
+  const cumulativePointsPerRoundArr: number[][] = [];
   const trumpsArr: number[] = [];
   const bigCardsArr: number[] = [];
   const smallCardsArr: number[] = [];
   const otherCardsArr: number[] = [];
 
-  for (let i = 0; i < game.playerOrder.length; i++) {
-    const playerName = getPlayerNameInPlayerOrder(game.playerOrder[i]);
+  for (let i = 0; i < gameInDb.game.playerOrder.length; i++) {
+    const playerName = getPlayerNameInPlayerOrder(gameInDb.game.playerOrder[i]);
     if (onlyName !== undefined && onlyName !== playerName) continue;
 
     players.push(playerName);
-    keepsBigArr.push(0);
-    keepsSmallArr.push(0);
-    const totalPointsByPlayer = [0];
-    let pointsPerPlayer = 0;
-    let bigPointsPerPlayer = 0;
-    let smallPointsPerPlayer = 0;
-    game.rounds.forEach((round) => {
-      const trumpSuite = round.trumpCard.suite;
-      const playerInRound = round.roundPlayers.find(player => player.name === playerName);
-      if (playerInRound) {
-        const pointsFromRound = playerInRound.points ?? 0;
-        pointsPerPlayer+= pointsFromRound;
-        totalPointsByPlayer.push(pointsPerPlayer);
-        if (round.cardsInRound > 5) {
-          bigPointsPerPlayer+= pointsFromRound;
-        } else {
-          smallPointsPerPlayer+= pointsFromRound;
-        }
-        const trumps = playerInRound.cardsToDebug.filter(card => card.suite === trumpSuite).length;
-        const bigCards = playerInRound.cardsToDebug.filter(card => card.suite !== trumpSuite && card.value > 10).length;
-        const smallCards = playerInRound.cardsToDebug.filter(card => card.suite !== trumpSuite && card.value < 6).length;
-        const otherCards = round.cardsInRound - trumps - bigCards - smallCards;
-        trumpsArr.push(trumps);
-        bigCardsArr.push(bigCards);
-        smallCardsArr.push(smallCards);
-        otherCardsArr.push(otherCards);
-
-      }
-    });
-
-    pointsArr.push(totalPointsByPlayer);
-    pointsBigArr.push(bigPointsPerPlayer);
-    pointsSmallArr.push(smallPointsPerPlayer);
+    const playerStats = gameStats.playersStatistics.find(playerStat => playerStat.playerName === playerName);
+    if (playerStats) {
+      pointsBigArr.push(playerStats.totalPointsBig);
+      pointsSmallArr.push(playerStats.totalPointsSmall);
+      keepsBigArr.push(playerStats.totalKeepsBig);
+      keepsSmallArr.push(playerStats.totalKeepsSmall);
+      pointsPerRoundArr.push(playerStats.pointsPerRound);
+      cumulativePointsPerRoundArr.push(playerStats.cumulativePointsPerRound);
+      trumpsArr.push(playerStats.trumpsInGame);
+      bigCardsArr.push(playerStats.bigsCardsInGame);
+      smallCardsArr.push(playerStats.smallCardsInGame);
+      otherCardsArr.push(playerStats.otherCardsInGame);
+    }
   }
   retObj.players = players;
 
-  game.rounds.filter(round => round.roundStatus === ROUND_STATUS.played)
-    .forEach((round, idx) => {
-      roundsArr.push(idx+1);
-    });
+  for (let i = 0; i <= gameStats.roundsPlayed; i++) roundsArr.push(i);
 
-  for (let i = 0; i < game.rounds.length; i++) {
-    if (game.rounds[i].roundStatus !== 2) break;
-    roundsArr.push(i+1);
-    for (let j = 0; j < game.rounds[i].roundPlayers.length; j++) {
-      if (game.rounds[i].roundPlayers[j].promise === game.rounds[i].roundPlayers[j].keeps) {
-        if (game.rounds[i].cardsInRound > 5) {
-          if (retObj.smallStart !== null && retObj.smallEnd === null) {
-            retObj.smallEnd = i;
-          }
-          keepsBigArr[j]++;
-        } else {
-          if (retObj.smallStart === null) {
-            retObj.smallStart = i;
-          }
-          keepsSmallArr[j]++;
-        }
-      }
-    }
-  }
-
-  retObj.points = pointsArr;
+  retObj.pointsPerRound = pointsPerRoundArr;
+  retObj.cumulativePointsPerRound = cumulativePointsPerRoundArr;
   retObj.rounds = roundsArr;
   retObj.pointsBig = pointsBigArr;
   retObj.pointsSmall = pointsSmallArr;
@@ -108,6 +97,7 @@ export const getGameReport = (game: IGame, onlyName?: string): IuiGameReport => 
   retObj.bigCards = bigCardsArr;
   retObj.smallCards = smallCardsArr;
   retObj.otherCards = otherCardsArr;
+  retObj.roundType = roundTypeAsStr(gameInDb.game.rounds);
 
   return retObj;
 };

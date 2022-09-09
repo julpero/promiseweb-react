@@ -76,6 +76,10 @@ export interface IGameInfoForStats {
   smallPointsNotZero: number,
   smallNotZeroKeepPromisesCount: number,
   smallNotZeroFailPromisesCount: number,
+  totalPointsBig: number,
+  totalPointsSmall: number,
+  totalKeepsBig: number,
+  totalKeepsSmall: number,
 }
 
 export interface IGameHandCardsForStats {
