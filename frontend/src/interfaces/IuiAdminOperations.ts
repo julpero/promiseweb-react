@@ -1,5 +1,7 @@
-export interface IuiGetGamesRequest {
+export interface IuiAdminRequest {
+  uuid: string,
   userName: string,
+  hash: string,
 }
 
 export interface IuiAdminGame {
@@ -13,7 +15,6 @@ export interface IuiGetGamesResponse {
   gameList: IuiAdminGame[],
 }
 
-export interface IuiReCreateGameStatisticsRequest {
-  userName: string,
+export interface IuiReCreateGameStatisticsRequest extends IuiAdminRequest {
   gameId: string,
 }

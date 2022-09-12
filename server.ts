@@ -29,8 +29,9 @@ import { getOneGameReportData, getReportData } from "./backend/actions/reports";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "./frontend/src/interfaces/IuiReports";
 import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "./frontend/src/interfaces/IuiUser";
 import { handleLoginRequest } from "./backend/actions/login";
-import { IuiGetGamesRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "./frontend/src/interfaces/IuiAdminOperations";
+import { IuiAdminRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "./frontend/src/interfaces/IuiAdminOperations";
 import { getGamesForAdmin, reCreateGameStats } from "./backend/actions/adminActions";
+import { isValidUser } from "./backend/common/userValidation";
 
 // Routes
 // not defined
@@ -84,34 +85,37 @@ connectDB().then(() => {
 
     socket.on("admin login", async (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => {
       console.log("admin login", loginRequest);
-      const {userName, password1} = loginRequest;
-      if (!userName || !password1) return null;
-      if (userName.length < 4 || password1.length < 4) return null;
+      const {uuid, userName, hash, password1} = loginRequest;
+      if (!isValidUser(userName, uuid, hash)) return null;
+      if (password1.length < 4) return null;
 
       const loginResponse = await handleLoginRequest(loginRequest);
       if (loginResponse.loginStatus === LOGIN_RESPONSE.ok) {
-        csm.setUserAsAdmin(userName, socket.id);
+        csm.setUserAsAdmin(userName, socket.id, uuid);
+      } else {
+        csm.unsetUserAsAdmin(userName);
       }
       fn(loginResponse);
     });
 
-    socket.on("get games for admin", async (getGamesRequest: IuiGetGamesRequest, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
+    socket.on("get games for admin", async (getGamesRequest: IuiAdminRequest, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
       console.log("get games for admin", getGamesRequest);
-      if (!getGamesRequest.userName) return null;
-      if (!csm.isUserAdmin(getGamesRequest.userName, socket.id)) return null;
-      const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(getGamesRequest);
+      const {uuid, userName, hash} = getGamesRequest;
+      if (!isValidUser(userName, uuid, hash)) return null;
+      if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
+
+      const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(userName);
       fn(getGamesResponse);
     });
 
     socket.on("re-create game statistics", async (reCreateGameStatisticsRequest: IuiReCreateGameStatisticsRequest, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
       console.log("re-create game statistics", reCreateGameStatisticsRequest);
-      const {userName} = reCreateGameStatisticsRequest;
-      if (!csm.isUserAdmin(userName, socket.id)) return null;
+      const {uuid, userName, hash} = reCreateGameStatisticsRequest;
+      if (!isValidUser(userName, uuid, hash)) return null;
+      if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
+
       await reCreateGameStats(reCreateGameStatisticsRequest);
-      const getGamesRequest: IuiGetGamesRequest = {
-        userName: userName,
-      };
-      const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(getGamesRequest);
+      const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(userName);
       fn(getGamesResponse);
     });
 

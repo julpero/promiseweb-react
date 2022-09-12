@@ -1,21 +1,27 @@
+interface ISocketAdminData {
+  socketId: string,
+  uuid: string,
+}
+
 interface ISocketMap {
   sockets: Set<string>,
   games: Set<string>,
-  adminSocket?: string,
+  adminSocket?: ISocketAdminData,
 }
 
 const userSocketIdMap = new Map<string, ISocketMap>(); //a map of online usernames and their clients
 
 export const addUserToMap = (userName: string, socketId: string, gameId: string): void => {
-  if (!userSocketIdMap.has(userName)) {
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    //user had already joined from one client and now joining using another client
+    user.sockets.add(socketId);
+    user.games.add(gameId);
+  } else {
     //when user is joining first time
     userSocketIdMap.set(userName, { sockets: new Set([socketId]), games: new Set([gameId])});
-  } else {
-    //user had already joined from one client and now joining using another client
-    userSocketIdMap.get(userName)?.sockets.add(socketId);
-    userSocketIdMap.get(userName)?.games.add(gameId);
   }
-  console.log(userSocketIdMap);
+  // console.log(userSocketIdMap);
 };
 
 export const removeUserFromMap = (userName: string, socketId: string, gameId: string): void => {
@@ -24,6 +30,7 @@ export const removeUserFromMap = (userName: string, socketId: string, gameId: st
     if (userSocketIdSet) {
       userSocketIdSet.sockets.delete(socketId);
       userSocketIdSet.games.delete(gameId);
+      userSocketIdSet.adminSocket = undefined;
 
       //if there are no clients for a user, remove that user from online list (map)
       if (userSocketIdSet.sockets.size === 0) {
@@ -31,7 +38,7 @@ export const removeUserFromMap = (userName: string, socketId: string, gameId: st
       }
     }
   }
-  console.log(userSocketIdMap);
+  // console.log(userSocketIdMap);
 };
 
 export const getUserNameFromMapBySocket = (socketId: string): string | null => {
@@ -47,14 +54,16 @@ export const getUserNameFromMapBySocket = (socketId: string): string | null => {
 };
 
 export const getUserSocketsFromMap = (userName: string): Set<string> | undefined => {
-  if (userSocketIdMap.has(userName)) {
-    return userSocketIdMap.get(userName)?.sockets;
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    return user.sockets;
   }
 };
 
 export const getUserGamesFromMap = (userName: string): Set<string> | undefined => {
-  if (userSocketIdMap.has(userName)) {
-    return userSocketIdMap.get(userName)?.games;
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    return user.games;
   }
 };
 
@@ -62,23 +71,32 @@ export const isUserConnected = (userName: string): boolean => {
   return userSocketIdMap.has(userName);
 };
 
-export const setUserAsAdmin = (userName: string, socketId: string) => {
-  if (!userSocketIdMap.has(userName)) {
-    userSocketIdMap.set(userName, { sockets: new Set([socketId]), games: new Set(), adminSocket: socketId});
+export const setUserAsAdmin = (userName: string, socketId: string, uuid: string) => {
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    user.adminSocket = { socketId: socketId, uuid: uuid } as ISocketAdminData;
   } else {
-    const user = userSocketIdMap.get(userName);
-    if (user) {
-      user.adminSocket = socketId;
-    }
+    userSocketIdMap.set(userName, {
+      sockets: new Set([socketId]),
+      games: new Set(),
+      adminSocket: { socketId: socketId, uuid: uuid } as ISocketAdminData,
+    });
   }
 };
 
-export const isUserAdmin = (userName: string, socketId: string): boolean => {
-  if (!userSocketIdMap.has(userName)) {
-    return false;
-  } else {
-    return userSocketIdMap.get(userName)?.adminSocket === socketId;
+export const unsetUserAsAdmin = (userName: string) => {
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    user.adminSocket = undefined;
   }
+};
+
+export const isUserAdmin = (userName: string, socketId: string, uuid: string): boolean => {
+  const user = userSocketIdMap.get(userName);
+  if (user && user.adminSocket) {
+    return user.adminSocket.socketId === socketId && user.adminSocket.uuid === uuid;
+  }
+  return false;
 };
 
 // export default userSocketIdMap;

@@ -1,4 +1,4 @@
-import { IuiAdminGame, IuiGetGamesRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../../frontend/src/interfaces/IuiAdminOperations";
+import { IuiAdminGame, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../../frontend/src/interfaces/IuiAdminOperations";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
 import { reCreateGameStatistic } from "../dbActions/adminOperations";
@@ -17,11 +17,11 @@ const allowAdminActions = async (userName: string): Promise<boolean> => {
   return checkLoginObj.result === LOGIN_RESPONSE.justAdminCheck;
 };
 
-export const getGamesForAdmin = async (getGamesRequest: IuiGetGamesRequest): Promise<IuiGetGamesResponse> => {
+export const getGamesForAdmin = async (adminUserName: string): Promise<IuiGetGamesResponse> => {
   const response: IuiGetGamesResponse = {
     gameList: [],
   };
-  if (await allowAdminActions(getGamesRequest.userName)) {
+  if (await allowAdminActions(adminUserName)) {
     const playedGames = await getGamesByStatus(GAME_STATUS.played);
     playedGames.forEach(playedGame => {
       response.gameList.push({

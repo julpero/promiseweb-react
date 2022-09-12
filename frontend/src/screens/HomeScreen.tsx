@@ -14,6 +14,7 @@ import { useSocket } from "../socket";
 import AdminGameList from "../components/AdminComponents/AdminGameList";
 import { useDispatch, useSelector } from "react-redux";
 import { isAdminLoggedIn, setAdminLoggedIn } from "../store/adminSlice";
+import { hashUserName } from "../common/userFunctions";
 
 interface IAdminLoginFormValidationFields {
   userName?: string,
@@ -37,6 +38,8 @@ const HomeScreen = ({onJoin}: IProps) => {
 
   const { socket } = useSocket();
 
+  const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
+
   const handleGameCreation = () => {
     if (accRef.current?.firstElementChild) {
       (accRef.current.firstElementChild as HTMLButtonElement).click();
@@ -56,8 +59,10 @@ const HomeScreen = ({onJoin}: IProps) => {
 
   const onLoginSubmit = ({userName, password}: IAdminLoginForm) => {
     const loginRequest: IuiLoginRequest = {
+      uuid: getMyId(),
       userName: userName,
       password1: password,
+      hash: hashUserName(userName),
     };
     socket.emit("admin login", loginRequest, (loginResponse: IuiLoginResponse) => {
       console.log("loginResponse", loginResponse);

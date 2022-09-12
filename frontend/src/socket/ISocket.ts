@@ -1,4 +1,4 @@
-import { IuiGetGamesRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../interfaces/IuiAdminOperations";
+import { IuiAdminRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../interfaces/IuiAdminOperations";
 import { IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "../interfaces/IuiCheckIfOngoingGame";
 import { IuiGetGameListRequest, IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse } from "../interfaces/IuiGameList";
 import { IuiPlayedGamesReport } from "../interfaces/IuiGameReports";
@@ -45,6 +45,6 @@ export interface ClientToServerEvents {
   "get report data": (request: null, fn: (reportResponse: IuiPlayedGamesReport) => void) => void;
   "get game report": (reportRequest: IuiGetOneGameReportRequest, fn: (reportResponse: IuiOneGameReport) => void) => void;
   "admin login": (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => void;
-  "get games for admin": (getGamesRequest: IuiGetGamesRequest, fn: (gamesResponse: IuiGetGamesResponse) => void) => void,
+  "get games for admin": (getGamesRequest: IuiAdminRequest, fn: (gamesResponse: IuiGetGamesResponse) => void) => void,
   "re-create game statistics": (reCreateGameStatisticsRequest: IuiReCreateGameStatisticsRequest, fn: (gamesResponse: IuiGetGamesResponse) => void) => void,
 }
