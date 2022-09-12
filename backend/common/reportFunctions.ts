@@ -1,4 +1,4 @@
-import { IGameOptions, IGameStatistics, IPlayer, IRound } from "../interfaces/IGameOptions";
+import { IGameOptions, IRound } from "../interfaces/IGameOptions";
 import { getPlayerNameInPlayerOrder } from "./common";
 import { IuiGameReport } from "../../frontend/src/interfaces/IuiReports";
 
@@ -26,7 +26,7 @@ const roundTypeAsStr = (rounds: IRound[]): string => {
 /**
  * This method uses only games gameStatistics property.
  * If stats are not available re-create them with generateGameStats method.
- * @param game
+ * @param gameInDb
  * @param onlyName
  * @returns IuiGameReport object
  */
@@ -51,7 +51,7 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
   };
 
   const players: string[] = [];
-  const roundsArr: number[] = [0];
+  const roundsArr: number[] = [];
   const pointsBigArr: number[] = [];
   const pointsSmallArr: number[] = [];
   const keepsBigArr: number[] = [];
@@ -62,6 +62,8 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
   const bigCardsArr: number[] = [];
   const smallCardsArr: number[] = [];
   const otherCardsArr: number[] = [];
+  const promiseTimesArr: number[] = [];
+  const playTimesArr: number[] = [];
 
   for (let i = 0; i < gameInDb.game.playerOrder.length; i++) {
     const playerName = getPlayerNameInPlayerOrder(gameInDb.game.playerOrder[i]);
@@ -80,6 +82,8 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
       bigCardsArr.push(playerStats.bigsCardsInGame);
       smallCardsArr.push(playerStats.smallCardsInGame);
       otherCardsArr.push(playerStats.otherCardsInGame);
+      promiseTimesArr.push(playerStats.promiseTime);
+      playTimesArr.push(playerStats.playTime);
     }
   }
   retObj.players = players;
@@ -97,6 +101,8 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
   retObj.bigCards = bigCardsArr;
   retObj.smallCards = smallCardsArr;
   retObj.otherCards = otherCardsArr;
+  retObj.promiseTimes = promiseTimesArr;
+  retObj.playTimes = playTimesArr;
   retObj.roundType = roundTypeAsStr(gameInDb.game.rounds);
 
   return retObj;

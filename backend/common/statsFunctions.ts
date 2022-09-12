@@ -2,7 +2,6 @@ import { ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { countPlayTime } from "../dbActions/generateStats";
 import { IGame, IGameHandCardsForStats, IGameInfoForStats, IGameStatistics, IPlayerStatistic, IRound, IRoundPlayer, ISpurtAndMelt } from "../interfaces/IGameOptions";
 import { getPlayerNameInPlayerOrder } from "./common";
-import { getGameReport } from "./reportFunctions";
 
 interface IPlayedRoundTypes {
   bigRounds: number,
@@ -52,7 +51,7 @@ const getPlayerGameInfoForStats = (game: IGame, playerName: string): IGameInfoFo
     const roundKept = roundInfo.keeps === roundInfo.promise;
     if (roundKept) gameInfo.totalKeeps++;
     if (round.cardsInRound > 5) {
-      gameInfo.totalPointsBig+= roundInfo.points;
+      gameInfo.totalPointsBig+= roundInfo.points ?? 0;
       if (roundKept) gameInfo.totalKeepsBig++;
       if (roundInfo.promise === 0) {
         if (roundKept) {
@@ -63,7 +62,7 @@ const getPlayerGameInfoForStats = (game: IGame, playerName: string): IGameInfoFo
         }
       }
     } else {
-      gameInfo.totalPointsSmall+= roundInfo.points;
+      gameInfo.totalPointsSmall+= roundInfo.points ?? 0;
       if (roundKept) gameInfo.totalKeepsSmall++;
       if (roundInfo.promise > 0) {
         if (roundKept) {
