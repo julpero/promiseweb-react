@@ -73,6 +73,7 @@ const TimesUsedInGame = ({gameReportData}: IProps) => {
         stacked: true,
         // max: Math.max(...reportObject.timesUsed.map(v => parseInt(v.totalPromiseTime, 10) + parseInt(v.totalPlayTime, 10))),
         min: 0,
+        display: false,
       },
       y: {
         stacked: true,

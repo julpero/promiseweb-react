@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "../interfaces/IuiReports";
 import { useSocket } from "../socket";
+import CardsInGame from "./ReportComponents/CardsInGame";
 
 import CumulativePoints from "./ReportComponents/CumulativePoints";
 import KeepsInGame from "./ReportComponents/KeepsInGame";
@@ -33,6 +34,7 @@ const OneGameReport = ({gameId}: IProps) => {
       <KeepsInGame gameReportData={gameReportData} />
       <PointsInGame gameReportData={gameReportData} />
       <TimesUsedInGame gameReportData={gameReportData} />
+      <CardsInGame gameReportData={gameReportData} />
       {JSON.stringify(gameReportData)}
     </div>
   );

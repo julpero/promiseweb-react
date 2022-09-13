@@ -10,6 +10,7 @@ import {
   LinearScale,
   BarElement,
   Title,
+  Legend,
   Tooltip,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
@@ -19,6 +20,7 @@ ChartJS.register(
   LinearScale,
   BarElement,
   Title,
+  Legend,
   Tooltip,
 );
 
@@ -26,22 +28,34 @@ interface IProps {
   gameReportData?: IuiOneGameReport,
 }
 
-const PointsInGame = ({gameReportData}: IProps) => {
+const CardsInGame = ({gameReportData}: IProps) => {
   const chartRef = useRef<ChartJS<"bar">>(null);
 
   const getDataSetsData = (): ChartDataset<"bar">[] => {
     const dataSetsData: ChartDataset<"bar">[] = [];
     dataSetsData.push({
-      label: "Big rounds",
-      data: gameReportData?.pointsBig ?? [],
+      label: "Trumps",
+      data: gameReportData?.trumps ?? [],
       borderWidth: 1,
       backgroundColor: "rgba(255,153,0,0.6)",
     });
     dataSetsData.push({
-      label: "Small rounds",
-      data: gameReportData?.pointsSmall ?? [],
+      label: "Big Cards",
+      data: gameReportData?.bigCards ?? [],
       borderWidth: 1,
       backgroundColor: "lightgreen",
+    });
+    dataSetsData.push({
+      label: "Small Cards",
+      data: gameReportData?.smallCards ?? [],
+      borderWidth: 1,
+      backgroundColor: "lightblue",
+    });
+    dataSetsData.push({
+      label: "Other Cards",
+      data: gameReportData?.otherCards ?? [],
+      borderWidth: 1,
+      backgroundColor: "lightyellow",
     });
     return dataSetsData;
   };
@@ -53,6 +67,7 @@ const PointsInGame = ({gameReportData}: IProps) => {
     scales: {
       x: {
         stacked: true,
+        max: (gameReportData?.bigCards[0] ?? 0)+(gameReportData?.smallCards[0] ?? 0)+(gameReportData?.otherCards[0] ?? 0)+(gameReportData?.trumps[0] ?? 0),
         min: 0,
       },
       y: {
@@ -62,21 +77,7 @@ const PointsInGame = ({gameReportData}: IProps) => {
     plugins: {
       title: {
         display: true,
-        text: "Points in game by nickname"
-      },
-      tooltip: {
-        callbacks: {
-          footer: (tooltipItem) => {
-            const chart = chartRef.current;
-            let total = 0;
-            if (chart) {
-              for (let i = 0; i < chart.data.datasets.length; i++) {
-                total += chart.data.datasets[i].data[tooltipItem[0].dataIndex];
-              }
-            }
-            return "TOTAL: "+total;
-          }
-        }
+        text: "Cards in game by nickname"
       },
     }
   };
@@ -87,7 +88,7 @@ const PointsInGame = ({gameReportData}: IProps) => {
   };
 
   return (
-    <div style={{height: "210px"}}>
+    <div style={{height: "230px"}}>
       <Bar
         ref={chartRef}
         data={chartData}
@@ -97,4 +98,4 @@ const PointsInGame = ({gameReportData}: IProps) => {
   );
 };
 
-export default PointsInGame;
+export default CardsInGame;
