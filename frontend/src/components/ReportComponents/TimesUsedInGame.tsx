@@ -28,20 +28,36 @@ interface IProps {
   gameReportData?: IuiOneGameReport,
 }
 
-const KeepsInGame = ({gameReportData}: IProps) => {
+const TimesUsedInGame = ({gameReportData}: IProps) => {
   const chartRef = useRef<ChartJS<"bar">>(null);
+
+  const msToHMS = (ms: number): string => {
+    // 1- Convert to seconds:
+    let seconds = Math.floor(ms / 1000);
+    // 2- Extract hours:
+    const hours = Math.floor(seconds/3600); // 3,600 seconds in 1 hour
+    seconds = seconds % 3600; // seconds remaining after extracting hours
+    // 3- Extract minutes:
+    const minutes = Math.floor(seconds/60); // 60 seconds in 1 minute
+    // 4- Keep only seconds not extracted to minutes:
+    seconds = seconds % 60;
+    const minStr = ("00"+minutes).slice(-2);
+    const secStr = ("00"+seconds).slice(-2);
+
+    return hours > 0 ? `${hours}:${minStr}:${secStr}` : `${minStr}:${secStr}`;
+  };
 
   const getDataSetsData = (): ChartDataset<"bar">[] => {
     const dataSetsData: ChartDataset<"bar">[] = [];
     dataSetsData.push({
-      label: "Big rounds",
-      data: gameReportData?.keepsBig ?? [],
+      label: "Hit Time",
+      data: gameReportData?.playTimes ?? [],
       borderWidth: 1,
       backgroundColor: "rgba(255,153,0,0.6)",
     });
     dataSetsData.push({
-      label: "Small rounds",
-      data: gameReportData?.keepsSmall ?? [],
+      label: "Promise Time",
+      data: gameReportData?.promiseTimes ?? [],
       borderWidth: 1,
       backgroundColor: "lightgreen",
     });
@@ -55,7 +71,7 @@ const KeepsInGame = ({gameReportData}: IProps) => {
     scales: {
       x: {
         stacked: true,
-        max: (gameReportData?.rounds.length ?? 19) -1,
+        // max: Math.max(...reportObject.timesUsed.map(v => parseInt(v.totalPromiseTime, 10) + parseInt(v.totalPlayTime, 10))),
         min: 0,
       },
       y: {
@@ -65,11 +81,11 @@ const KeepsInGame = ({gameReportData}: IProps) => {
     plugins: {
       title: {
         display: true,
-        text: "Keeps in game by nickname"
+        text: "Used time in game by nickname"
       },
       tooltip: {
         callbacks: {
-          footer: (tooltipItem) => {
+          footer: function(tooltipItem) {
             const chart = chartRef.current;
             let total = 0;
             if (chart) {
@@ -77,8 +93,11 @@ const KeepsInGame = ({gameReportData}: IProps) => {
                 total += chart.data.datasets[i].data[tooltipItem[0].dataIndex];
               }
             }
-            return "TOTAL: "+total;
-          }
+            return "TOTAL: "+msToHMS(total);
+          },
+          label: function(context) {
+            return " "+context.dataset.label+": "+msToHMS(parseInt((context.raw) as string, 10));
+          },
         }
       },
     }
@@ -100,4 +119,4 @@ const KeepsInGame = ({gameReportData}: IProps) => {
   );
 };
 
-export default KeepsInGame;
+export default TimesUsedInGame;

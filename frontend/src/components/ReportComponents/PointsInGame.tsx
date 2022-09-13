@@ -10,7 +10,6 @@ import {
   LinearScale,
   BarElement,
   Title,
-  Legend,
   Tooltip,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
@@ -20,7 +19,6 @@ ChartJS.register(
   LinearScale,
   BarElement,
   Title,
-  Legend,
   Tooltip,
 );
 
@@ -54,6 +52,7 @@ const PointsInGame = ({gameReportData}: IProps) => {
     indexAxis: "y",
     scales: {
       x: {
+        stacked: true,
         min: 0,
       },
       y: {

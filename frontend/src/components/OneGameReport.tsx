@@ -5,6 +5,7 @@ import { useSocket } from "../socket";
 import CumulativePoints from "./ReportComponents/CumulativePoints";
 import KeepsInGame from "./ReportComponents/KeepsInGame";
 import PointsInGame from "./ReportComponents/PointsInGame";
+import TimesUsedInGame from "./ReportComponents/TimesUsedInGame";
 
 interface IProps {
   gameId: string,
@@ -31,6 +32,7 @@ const OneGameReport = ({gameId}: IProps) => {
       <CumulativePoints gameReportData={gameReportData} />
       <KeepsInGame gameReportData={gameReportData} />
       <PointsInGame gameReportData={gameReportData} />
+      <TimesUsedInGame gameReportData={gameReportData} />
       {JSON.stringify(gameReportData)}
     </div>
   );
