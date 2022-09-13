@@ -107,11 +107,10 @@ const CumulativePoints = ({gameReportData}: IProps) => {
 
   const chartOptions: ChartOptions<"line"> = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     scales: {
       x: {
         ticks: {
-          // beginAtZero: true,
           includeBounds: true,
         }
       }
@@ -160,11 +159,13 @@ const CumulativePoints = ({gameReportData}: IProps) => {
   };
 
   return (
-    <Line
-      ref={chartRef}
-      data={chartData}
-      options={chartOptions}
-    />
+    <div style={{height: "430px"}}>
+      <Line
+        ref={chartRef}
+        data={chartData}
+        options={chartOptions}
+      />
+    </div>
   );
 };
 

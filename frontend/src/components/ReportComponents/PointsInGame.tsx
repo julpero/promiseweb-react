@@ -28,20 +28,20 @@ interface IProps {
   gameReportData?: IuiOneGameReport,
 }
 
-const KeepsInGame = ({gameReportData}: IProps) => {
+const PointsInGame = ({gameReportData}: IProps) => {
   const chartRef = useRef<ChartJS<"bar">>(null);
 
   const getDataSetsData = (): ChartDataset<"bar">[] => {
     const dataSetsData: ChartDataset<"bar">[] = [];
     dataSetsData.push({
       label: "Big rounds",
-      data: gameReportData?.keepsBig ?? [],
+      data: gameReportData?.pointsBig ?? [],
       borderWidth: 1,
       backgroundColor: "rgba(255,153,0,0.6)",
     });
     dataSetsData.push({
       label: "Small rounds",
-      data: gameReportData?.keepsSmall ?? [],
+      data: gameReportData?.pointsSmall ?? [],
       borderWidth: 1,
       backgroundColor: "lightgreen",
     });
@@ -54,7 +54,6 @@ const KeepsInGame = ({gameReportData}: IProps) => {
     indexAxis: "y",
     scales: {
       x: {
-        max: (gameReportData?.rounds.length ?? 19) -1,
         min: 0,
       },
       y: {
@@ -64,7 +63,7 @@ const KeepsInGame = ({gameReportData}: IProps) => {
     plugins: {
       title: {
         display: true,
-        text: "Keeps in game by nickname"
+        text: "Points in game by nickname"
       },
       tooltip: {
         callbacks: {
@@ -77,9 +76,11 @@ const KeepsInGame = ({gameReportData}: IProps) => {
               }
             }
             return "TOTAL: "+total;
-
           }
         }
+      },
+      legend: {
+        display: false,
       },
     }
   };
@@ -90,7 +91,7 @@ const KeepsInGame = ({gameReportData}: IProps) => {
   };
 
   return (
-    <div style={{height: "230px"}}>
+    <div style={{height: "210px"}}>
       <Bar
         ref={chartRef}
         data={chartData}
@@ -100,4 +101,4 @@ const KeepsInGame = ({gameReportData}: IProps) => {
   );
 };
 
-export default KeepsInGame;
+export default PointsInGame;
