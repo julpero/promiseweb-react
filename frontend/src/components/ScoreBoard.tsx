@@ -26,6 +26,25 @@ const ScoreBoard = () => {
     );
   };
 
+  const renderAvgTooltip = (playerAndRoundAndPoints: string) => {
+    if (!playerAndRoundAndPoints) return null;
+    const dataArr = playerAndRoundAndPoints.split("|");
+    if (dataArr.length !== 3) return null;
+    const curPoints = parseInt(dataArr[2], 10);
+    let toolTipStr = `Total ${curPoints}`;
+    const playerInd = parseInt(dataArr[0], 10);
+    const roundInd = parseInt(dataArr[1], 10);
+    const avgPoints = playerAvgPoint(playerInd, roundInd);
+    if (avgPoints !== null) {
+      toolTipStr+= ` = ${(curPoints - avgPoints).toFixed(1)} points in average`;
+    }
+    return (
+      <div>
+        {toolTipStr}
+      </div>
+    );
+  };
+
   const renderScoreBoardHeader = () => {
     const truncInd = 9 - currentGameInfo.humanPlayersCount;
     const bgColor = window.getComputedStyle(document.body, null).getPropertyValue("background-color");
@@ -53,6 +72,10 @@ const ScoreBoard = () => {
     }
   };
 
+  const playerAvgPoint = (playerInd: number, roundInd: number): number | null => {
+    return currentGameInfo.humanPlayers[playerInd]?.playerStats.playerAvgPointsInRounds[roundInd] ?? null;
+  };
+
   const playerScoreClass = (pointStr: string): string => {
     if (pointStr === "") return "";
     if (pointStr === "-") return "noPoints";
@@ -70,12 +93,19 @@ const ScoreBoard = () => {
       const classStr = "tableCell " + playerScoreClass(str);
       if (str) {
         colArr.push(
-          <td className={classStr} key={i}>{str}</td>
+          <td className={classStr} data-for="scoreBoardAvgTooltip" data-tip={`${i}|${rowInd}|${playersCumulativePointsInRound}`} key={i}>{str}</td>
         );
       } else {
-        colArr.push(
-          <td className={classStr} key={i}>&nbsp;</td>
-        );
+        const avgPoint = playerAvgPoint(i, rowInd);
+        if (avgPoint !== null) {
+          colArr.push(
+            <td className={`${classStr} avgPointCol`} key={i}>{avgPoint.toFixed(1)}</td>
+          );
+        } else {
+          colArr.push(
+            <td className={classStr} key={i}>&nbsp;</td>
+          );
+        }
       }
     }
     return colArr;
@@ -106,6 +136,7 @@ const ScoreBoard = () => {
         </tbody>
       </Table>
       <ReactTooltip place="left" id="scoreBoardThTooltip" getContent={(dataTip) => renderNameTooltip(dataTip)} />
+      <ReactTooltip place="left" id="scoreBoardAvgTooltip" getContent={(dataTip) => renderAvgTooltip(dataTip)} />
       <RuleList rules={currentGameInfo.rules} classStr="smallList" />
     </div>
   );
