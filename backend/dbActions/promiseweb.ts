@@ -72,15 +72,12 @@ export const getPlayerAvgPoints = async (playerName: string, startRound: number,
     gameStats.push(getGameReport(gameInDb, playerName));
   });
   console.log("gameStats", gameStats);
-  // TODO: maybe we could use cumulativePointsPerRound?
   for (let i = 0; i < gameStats.length; i++) {
     for (let j = 0; j < gameStats[i].cumulativePointsPerRound[0].length; j++) {
-    // for (let j = 0; j < gameStats[i].points[0].length; j++) {
       if (i == 0) {
         stats[j] = 0;
       }
       stats[j]+= gameStats[i].cumulativePointsPerRound[0][j];
-      // stats[j]+= gameStats[i].points[0][j];
     }
   }
   return stats.map(v => v/gameStats.length);
