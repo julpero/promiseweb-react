@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ROUND_STATUS } from "../interfaces/IuiGameOptions";
+import { GAME_STATUS, ROUND_STATUS } from "../interfaces/IuiGameOptions";
 import { IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, ROUND_PHASE } from "../interfaces/IuiPlayingGame";
 import { useSocket } from "../socket";
 import { setActionsAvailable } from "../store/actionsAvailableSlice";
@@ -58,7 +58,7 @@ const EffectHandler = ({gameId}: IProps) => {
 
     const onCardPlayedNotification = (cardPlayedNotification: IuiCardPlayedNotification) => {
       console.log("cardPlayedNotification", cardPlayedNotification);
-      const { playerName, playedFromSlot, playedCard, roundStatusAfterPlay, currentRoundIndex, winnerOfPlay, winCount, newPlayAfterHit } = cardPlayedNotification;
+      const { playerName, playedFromSlot, playedCard, roundStatusAfterPlay, currentRoundIndex, winnerOfPlay, winCount, newPlayAfterHit, gameStatusAfterPlay } = cardPlayedNotification;
 
       // animate played card
       dispatch(setActionsAvailable(false));
@@ -71,13 +71,13 @@ const EffectHandler = ({gameId}: IProps) => {
           gameId: gameId,
           roundInd: currentRoundIndex,
         } : null,
-        collectCards: newPlayAfterHit ? {
+        collectCards: newPlayAfterHit || gameStatusAfterPlay === GAME_STATUS.played ? {
           winner: winnerOfPlay ?? "",
           winCount: winCount ?? 0,
           getRoundRequest: {
             myId: getMyId(),
             gameId: gameId,
-            roundInd: (roundStatusAfterPlay === ROUND_STATUS.played) ? currentRoundIndex + 1 : currentRoundIndex,
+            roundInd: (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay !== GAME_STATUS.played) ? currentRoundIndex + 1 : currentRoundIndex,
           }
         } : null,
       };

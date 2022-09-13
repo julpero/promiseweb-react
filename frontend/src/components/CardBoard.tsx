@@ -1,4 +1,5 @@
 import React from "react";
+import { Modal } from "react-bootstrap";
 
 import { useSelector } from "react-redux";
 import { getCurrentGameInfo } from "../store/gameInfoSlice";
@@ -8,6 +9,7 @@ import TableLayout3 from "./GameTableComponents/TableLayout3";
 import TableLayout4 from "./GameTableComponents/TableLayout4";
 import TableLayout5 from "./GameTableComponents/TableLayout5";
 import TableLayout6 from "./GameTableComponents/TableLayout6";
+import OneGameReport from "./OneGameReport";
 
 /**
  * Cardboard, where the all fun happens
@@ -53,6 +55,19 @@ const CardBoard = () => {
   return (
     <div id="cardboardArea">
       {getTableLayout(currentGameInfo.humanPlayersCount)}
+      <Modal
+        show={currentRoundInfo.roundToPlayer.gameOver}
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+          Game Report
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <OneGameReport gameId={currentGameInfo.gameId} />
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };
