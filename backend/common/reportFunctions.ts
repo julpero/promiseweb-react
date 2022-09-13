@@ -76,8 +76,8 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
       pointsSmallArr.push(playerStats.totalPointsSmall);
       keepsBigArr.push(playerStats.totalKeepsBig);
       keepsSmallArr.push(playerStats.totalKeepsSmall);
-      pointsPerRoundArr.push(playerStats.pointsPerRound);
-      cumulativePointsPerRoundArr.push(playerStats.cumulativePointsPerRound);
+      pointsPerRoundArr.push([0, ...playerStats.pointsPerRound]);
+      cumulativePointsPerRoundArr.push([0, ...playerStats.cumulativePointsPerRound]);
       trumpsArr.push(playerStats.trumpsInGame);
       bigCardsArr.push(playerStats.bigsCardsInGame);
       smallCardsArr.push(playerStats.smallCardsInGame);

@@ -123,7 +123,7 @@ const countTotalPromiseTime = (rounds: IRound[], playerName: string): number => 
 };
 
 const playerPointsByRounds = (rounds: IRound[], playerName: string): number[] => {
-  const pointsArr: number[] = [0];
+  const pointsArr: number[] = [];
   rounds.forEach(round => {
     pointsArr.push(round.roundPlayers.find(player => player.name === playerName)?.points ?? 0);
   });
@@ -131,7 +131,7 @@ const playerPointsByRounds = (rounds: IRound[], playerName: string): number[] =>
 };
 
 const playerCumulativePointsByRounds = (rounds: IRound[], playerName: string): number[] => {
-  const cumulativePointsArr: number[] = [0];
+  const cumulativePointsArr: number[] = [];
   let cumulativeValue = 0;
   rounds.forEach(round => {
     cumulativeValue+= round.roundPlayers.find(player => player.name === playerName)?.points ?? 0;
