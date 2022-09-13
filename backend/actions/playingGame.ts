@@ -1,4 +1,4 @@
-import { ROUND_STATUS, RULE } from "../../frontend/src/interfaces/IuiGameOptions";
+import { GAME_STATUS, ROUND_STATUS, RULE } from "../../frontend/src/interfaces/IuiGameOptions";
 import {
   IuiCard,
   IuiCardPlayed,
@@ -191,9 +191,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: strin
     cardInCharge: cardInCharge ? ICardToIuiCard(cardInCharge) : null, // TODO hidden cards
     playerGoingToWinThisPlay: winnerOfPlay(round.cardsPlayed[playIndex], round.trumpCard.suite)?.name, // TODO
     cardsPlayed: getCardsPlayed(round, playIndex), // TODO hidden cards
-    doReloadInit: false, // TODO possible not needed anymore
-    newRound: false, // TODO possible not needed anymore
-    gameOver: false, // TODO possible not needed anymore
+    gameOver: gameInDb.gameStatus === GAME_STATUS.played,
     whoseTurn: playerInTurn?.name ?? "",
     isMyTurn: isNowMyTurn, // TODO
     isMyPromiseTurn: isMyPromiseTurn(playerId, round), // TODO ?

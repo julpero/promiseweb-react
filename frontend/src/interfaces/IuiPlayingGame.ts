@@ -135,8 +135,6 @@ export interface IuiRoundToPlayer {
   playerGoingToWinThisPlay: string | null,
   /** only current plays played cards */
   cardsPlayed: IuiCardPlayed[],
-  doReloadInit: boolean,
-  newRound: boolean,
   gameOver: boolean,
   whoseTurn: string,
   isMyTurn: boolean,

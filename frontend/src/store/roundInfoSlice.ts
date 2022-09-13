@@ -29,8 +29,6 @@ const initialState: RoundInfoState = {
       cardInCharge: null,
       playerGoingToWinThisPlay: null,
       cardsPlayed: [],
-      doReloadInit: false,
-      newRound: false,
       gameOver: false,
       whoseTurn: "",
       isMyTurn: false,
