@@ -1,20 +1,21 @@
 import React, { createRef, useState } from "react";
-// import { socket, SocketContext } from "../socket";
+import { useDispatch, useSelector } from "react-redux";
+import { useSocket } from "../socket";
+
 import Accordion from "react-bootstrap/Accordion";
+import { Button, Modal } from "react-bootstrap";
+import { Field, Form } from "react-final-form";
 
 import OpenGamesList from "../components/OpenGamesList";
 import CreateGame from "../components/CreateGame";
 import JoinGameById from "../components/JoinGameById";
 import PlayedGamesReport from "../components/PlayedGamesReport";
-import { Button, Modal } from "react-bootstrap";
-import { Field, Form } from "react-final-form";
 import TextInput from "../components/FormComponents/TextInput";
 import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "../interfaces/IuiUser";
-import { useSocket } from "../socket";
 import AdminGameList from "../components/AdminComponents/AdminGameList";
-import { useDispatch, useSelector } from "react-redux";
 import { isAdminLoggedIn, setAdminLoggedIn } from "../store/adminSlice";
 import { hashUserName } from "../common/userFunctions";
+import AdminMassOperations from "../components/AdminComponents/AdminMassOperations";
 
 interface IAdminLoginFormValidationFields {
   userName?: string,
@@ -157,6 +158,10 @@ const HomeScreen = ({onJoin}: IProps) => {
             <Accordion.Item eventKey="0">
               <Accordion.Header>Game List</Accordion.Header>
               <Accordion.Body><AdminGameList userName={adminUserName} /></Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="1">
+              <Accordion.Header>Mass Operations</Accordion.Header>
+              <Accordion.Body><AdminMassOperations userName={adminUserName} /></Accordion.Body>
             </Accordion.Item>
           </Accordion>
         </Modal.Body>
