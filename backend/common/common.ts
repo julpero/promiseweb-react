@@ -5,15 +5,12 @@ import { getPlayerAvgPoints } from "../dbActions/promiseweb";
 import { ICard, ICardPlayed, IGame, IGameOptions, IHumanPlayer, IPlayer, IPlayerInTurn, IPlayerStats, IPromiser, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 import { ICardToIuiCard } from "./model";
 
-export const getPlayerStats = async (roundCount: number, playerName: string): Promise<IPlayerStats> => {
+export const getPlayerStats = async (gameInDb: IGameOptions, playerName: string): Promise<IPlayerStats> => {
+  const {startRound, turnRound, endRound} = gameInDb;
   const statsGamesObj = {
-    playerAvgPointsInRounds: await getPlayerAvgPoints(playerName, roundCount)
+    playerAvgPointsInRounds: await getPlayerAvgPoints(playerName, startRound, turnRound, endRound)
   };
   return statsGamesObj;
-};
-
-export const getGameRoundCount = (gameInDb: IGameOptions): number => {
-  return (gameInDb.startRound-gameInDb.turnRound+1)+(gameInDb.endRound-gameInDb.turnRound);
 };
 
 export const getPlayerNameInPlayerOrder = (player: IPlayer | string): string => {

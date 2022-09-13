@@ -49,7 +49,7 @@ export const getLastGameByStatus = async (playerId: string, status: GAME_STATUS)
   }
 };
 
-export const getPlayerAvgPoints = async (playerName: string, roundsInGame: number): Promise<number[]> => {
+export const getPlayerAvgPoints = async (playerName: string, startRound: number, turnRound: number, endRound: number): Promise<number[]> => {
   const gameStats: IuiGameReport[] = [];
   const stats: number[] = [];
 
@@ -59,42 +59,27 @@ export const getPlayerAvgPoints = async (playerName: string, roundsInGame: numbe
         gameStatus: {
           $eq: GAME_STATUS.played
         },
-        "humanPlayers.name": {$eq: playerName}
-      }
-    }, {
-      $addFields: {
-        rounds: {
-          $sum: [
-            {
-              $subtract: [
-                "$startRound", "$turnRound"
-              ]
-            }, {
-              $subtract: [
-                "$endRound", "$turnRound"
-              ]
-            }, 1
-          ]
-        }
-      }
-    }, {
-      $match: {
-        rounds: { $eq: roundsInGame}
+        "humanPlayers.name": {$eq: playerName},
+        startRound: { $eq: startRound },
+        turnRound: { $eq: turnRound },
+        endRound: { $eq: endRound },
       }
     }
   ]);
-  console.log("gamesInDb", gamesInDb);
+  console.log("getPlayerAvgPoints gamesInDb", gamesInDb);
 
   gamesInDb.forEach((gameInDb) => {
     gameStats.push(getGameReport(gameInDb, playerName));
   });
+  console.log("gameStats", gameStats);
+  // TODO: maybe we could use cumulativePointsPerRound?
   for (let i = 0; i < gameStats.length; i++) {
-    for (let j = 0; j < gameStats[i].pointsPerRound[0].length; j++) {
+    for (let j = 0; j < gameStats[i].cumulativePointsPerRound[0].length; j++) {
     // for (let j = 0; j < gameStats[i].points[0].length; j++) {
       if (i == 0) {
         stats[j] = 0;
       }
-      stats[j]+= gameStats[i].pointsPerRound[0][j];
+      stats[j]+= gameStats[i].cumulativePointsPerRound[0][j];
       // stats[j]+= gameStats[i].points[0][j];
     }
   }

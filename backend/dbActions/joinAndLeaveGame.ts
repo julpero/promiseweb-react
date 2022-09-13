@@ -2,7 +2,7 @@ import { IuiJoinLeaveGameRequest, JOIN_LEAVE_RESULT } from "../../frontend/src/i
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { IHumanPlayer } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
-import { getPlayerStats, getGameRoundCount } from "../common/common";
+import { getPlayerStats } from "../common/common";
 import { startGame } from "../common/initGame";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "../../frontend/src/interfaces/IuiLeaveOngoingGame";
 import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "../../frontend/src/interfaces/IuiJoinOngoingGame";
@@ -36,7 +36,7 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
     return JOIN_LEAVE_RESULT.notOk;
   }
 
-  const newPlayerStats = await getPlayerStats(getGameRoundCount(gameInDb), joinGameRequest.myName);
+  const newPlayerStats = await getPlayerStats(gameInDb, joinGameRequest.myName);
   const newPlayer: IHumanPlayer = {
     name: joinGameRequest.myName,
     playerId: joinGameRequest.myId,
