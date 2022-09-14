@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { hashUserName } from "../../common/userFunctions";
-import { IuiAdminGame, IuiAdminRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../../interfaces/IuiAdminOperations";
+import { IuiAdminRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../../interfaces/IuiAdminOperations";
 import { useSocket } from "../../socket";
-import { isAdminLoggedIn } from "../../store/adminSlice";
+import { getAdminGameList, isAdminLoggedIn, setAdminGameList } from "../../store/adminSlice";
 import OneGameReport from "../OneGameReport";
 
 interface IProps {
@@ -14,9 +14,11 @@ interface IProps {
 const AdminGameList = ({userName}: IProps) => {
   console.log("AdminGameList");
   const adminLoggedIn = useSelector(isAdminLoggedIn);
-  const [gameList, setGameList] = useState<IuiAdminGame[]>([]);
+  const adminGameList = useSelector(getAdminGameList);
   const [buttonsActive, setButtonsActive] = useState(true);
   const [gameToReport, setGameToReport] = useState("");
+
+  const dispatch = useDispatch();
 
   const { socket } = useSocket();
 
@@ -30,9 +32,9 @@ const AdminGameList = ({userName}: IProps) => {
     };
     socket.emit("get games for admin", getGamesRequest, (getGamesResponse: IuiGetGamesResponse) => {
       console.log(getGamesResponse);
-      setGameList(getGamesResponse.gameList);
+      dispatch(setAdminGameList(getGamesResponse.gameList));
     });
-  }, [userName, socket]);
+  }, [userName, socket, dispatch]);
 
   if (!adminLoggedIn) return null;
   if (!userName) return null;
@@ -66,7 +68,7 @@ const AdminGameList = ({userName}: IProps) => {
     };
     socket.emit("re-create game statistics", reCreateGameStatisticsRequest, (getGamesResponse: IuiGetGamesResponse) => {
       console.log(getGamesResponse);
-      setGameList(getGamesResponse.gameList);
+      dispatch(setAdminGameList(getGamesResponse.gameList));
       setButtonsActive(true);
     });
   };
@@ -85,7 +87,7 @@ const AdminGameList = ({userName}: IProps) => {
   };
 
   const renderGameList = () => {
-    return gameList.map((game, idx) => {
+    return adminGameList.map((game, idx) => {
       return (
         <tr key={idx}>
           <td><Button size="sm" disabled={!buttonsActive} onClick={() => setGameToReport(game.gameId)}>Show</Button></td>

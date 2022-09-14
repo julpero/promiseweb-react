@@ -1,8 +1,8 @@
 import React from "react";
-import { Modal } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 
-import { useSelector } from "react-redux";
-import { getCurrentGameInfo } from "../store/gameInfoSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { getCurrentGameInfo, setGameId } from "../store/gameInfoSlice";
 import { getCurrentRoundInfo } from "../store/roundInfoSlice";
 
 import TableLayout3 from "./GameTableComponents/TableLayout3";
@@ -17,8 +17,13 @@ import OneGameReport from "./OneGameReport";
 const CardBoard = () => {
   const currentGameInfo = useSelector(getCurrentGameInfo);
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  const dispatch = useDispatch();
   if (!currentGameInfo || !currentRoundInfo) return null;
   console.log("CardBoard");
+
+  const closeReportModal = () => {
+    dispatch(setGameId(""));
+  };
 
   const getTableLayout = (playerCount: number) => {
     switch (playerCount) {
@@ -59,7 +64,7 @@ const CardBoard = () => {
         show={currentRoundInfo.roundToPlayer.gameOver}
         size="lg"
       >
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>
           Game Report
           </Modal.Title>
@@ -67,6 +72,9 @@ const CardBoard = () => {
         <Modal.Body>
           <OneGameReport gameId={currentGameInfo.gameId} />
         </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" onClick={() => closeReportModal()}>Close Report and Game</Button>
+        </Modal.Footer>
       </Modal>
     </div>
   );

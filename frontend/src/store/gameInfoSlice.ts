@@ -5,6 +5,7 @@ import { RootState } from "./store";
 
 export interface GameInfoState {
   value: IuiGetGameInfoResponse,
+  gameId: string,
 }
 
 const initialState: GameInfoState = {
@@ -27,6 +28,7 @@ const initialState: GameInfoState = {
     reloaded: false,
     thisIsDemoGame: false,
   },
+  gameId: "",
 };
 
 export const gameInfoSlice = createSlice({
@@ -35,12 +37,16 @@ export const gameInfoSlice = createSlice({
   reducers: {
     setGameInfo: (state, action: PayloadAction<IuiGetGameInfoResponse>) => {
       state.value = action.payload;
+    },
+    setGameId: (state, action: PayloadAction<string>) => {
+      state.gameId = action.payload;
     }
   }
 });
 
-export const { setGameInfo } = gameInfoSlice.actions;
+export const { setGameInfo, setGameId } = gameInfoSlice.actions;
 
 export const getCurrentGameInfo = (state: RootState) => state.gameInfoReducer.value;
+export const getCurrentGameId = (state: RootState) => state.gameInfoReducer.gameId;
 
 export default gameInfoSlice.reducer;

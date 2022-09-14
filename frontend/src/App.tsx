@@ -8,18 +8,22 @@ import HomeScreen from "./screens/HomeScreen";
 import GameTable from "./screens/GameTable";
 
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "./interfaces/IuiCheckIfOngoingGame";
+import { useDispatch, useSelector } from "react-redux";
+import { getCurrentGameId, setGameId } from "./store/gameInfoSlice";
 
 const App = () => {
   const [gameStatus, setGameStatus] = useState(CHECK_GAME_STATUS.noGame);
-  const [gameId, setGameId] = useState("");
+  const gameId = useSelector(getCurrentGameId);
+
+  const dispatch = useDispatch();
 
   const { socket } = useSocket();
 
   const handleOnGoingResponse = useCallback((response: IuiCheckIfOngoingGameResponse) => {
     console.log("check response", response);
     setGameStatus(response.checkStatus);
-    setGameId(response.gameId ?? "");
-  }, []);
+    dispatch(setGameId(response.gameId ?? ""));
+  }, [dispatch]);
 
   useEffect(() => {
     if (window.localStorage.getItem("uUID")) {
@@ -39,14 +43,14 @@ const App = () => {
       console.log("game begins call");
       if (gameId !== "") {
         setGameStatus(CHECK_GAME_STATUS.onGoingGame);
-        setGameId(gameId);
+        dispatch(setGameId(gameId));
       }
     });
 
     return () => {
       socket.off("game begins");
     };
-  }, [handleOnGoingResponse, socket]);
+  }, [handleOnGoingResponse, dispatch, socket]);
 
   const onJoin = () => {
     const checkGameRequest: IuiCheckIfOngoingGameRequest = {
