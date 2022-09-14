@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { hashUserName } from "../../common/userFunctions";
 import { IuiAdminRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../../interfaces/IuiAdminOperations";
 import { useSocket } from "../../socket";
 import { getAdminGameList, isAdminLoggedIn, setAdminGameList } from "../../store/adminSlice";
@@ -28,7 +27,6 @@ const AdminGameList = ({userName}: IProps) => {
     const getGamesRequest: IuiAdminRequest = {
       uuid: getMyId(),
       userName: userName,
-      hash: hashUserName(userName),
     };
     socket.emit("get games for admin", getGamesRequest, (getGamesResponse: IuiGetGamesResponse) => {
       console.log(getGamesResponse);
@@ -63,7 +61,6 @@ const AdminGameList = ({userName}: IProps) => {
     const reCreateGameStatisticsRequest: IuiReCreateGameStatisticsRequest = {
       uuid: getMyId(),
       userName: userName,
-      hash: hashUserName(userName),
       gameId: gameId,
     };
     socket.emit("re-create game statistics", reCreateGameStatisticsRequest, (getGamesResponse: IuiGetGamesResponse) => {

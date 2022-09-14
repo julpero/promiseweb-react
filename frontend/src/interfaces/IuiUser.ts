@@ -9,7 +9,6 @@ export enum LOGIN_RESPONSE {
 
 export interface IuiLoginRequest {
   uuid: string,
-  hash: string,
   userName: string,
   password1: string,
   password2?: string,

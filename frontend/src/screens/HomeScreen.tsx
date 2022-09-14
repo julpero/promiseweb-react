@@ -14,7 +14,6 @@ import TextInput from "../components/FormComponents/TextInput";
 import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "../interfaces/IuiUser";
 import AdminGameList from "../components/AdminComponents/AdminGameList";
 import { isAdminLoggedIn, setAdminLoggedIn } from "../store/adminSlice";
-import { hashUserName } from "../common/userFunctions";
 import AdminMassOperations from "../components/AdminComponents/AdminMassOperations";
 
 interface IAdminLoginFormValidationFields {
@@ -63,7 +62,6 @@ const HomeScreen = ({onJoin}: IProps) => {
       uuid: getMyId(),
       userName: userName,
       password1: password,
-      hash: hashUserName(userName),
     };
     socket.emit("admin login", loginRequest, (loginResponse: IuiLoginResponse) => {
       console.log("loginResponse", loginResponse);

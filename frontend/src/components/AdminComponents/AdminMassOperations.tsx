@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { hashUserName } from "../../common/userFunctions";
 import { IuiAdminRequest, IuiGetGamesResponse } from "../../interfaces/IuiAdminOperations";
 import { useSocket } from "../../socket";
 import { isAdminLoggedIn, setAdminGameList } from "../../store/adminSlice";
@@ -29,7 +28,6 @@ const AdminMassOperations = ({userName}: IProps) => {
     const request: IuiAdminRequest = {
       uuid: getMyId(),
       userName: userName,
-      hash: hashUserName(userName),
     };
     socket.emit("re-create all game statistics", request, (getGamesResponse: IuiGetGamesResponse) => {
       console.log(getGamesResponse);

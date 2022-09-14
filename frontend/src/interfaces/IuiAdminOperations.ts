@@ -1,7 +1,6 @@
 export interface IuiAdminRequest {
   uuid: string,
   userName: string,
-  hash: string,
 }
 
 export interface IuiAdminGame {

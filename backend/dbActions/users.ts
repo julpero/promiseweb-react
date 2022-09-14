@@ -16,18 +16,6 @@ export const checkLogin = async ({userName, userPass1, userPass2, needsToBeAdmin
   const passStr = userPass1+":"+secretConfig+":"+userName;
   const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS ?? "10", 10);
 
-  if (needsToBeAdmin) {
-    // check that user name is in admin list
-    console.log("admin login...");
-    const adminsStr = process.env.ADMIN_USER_NAME;
-    if (!adminsStr) return loginObj;
-    const admins = adminsStr.split(",");
-    if (!admins.some(admin => admin === userName)) {
-      console.warn("... user name is not admin!");
-      return loginObj;
-    }
-  }
-
   const uQuery = User.where({
     playerName: { $eq: userName }
   });

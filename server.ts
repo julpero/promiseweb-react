@@ -31,7 +31,7 @@ import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "./frontend/sr
 import { handleLoginRequest } from "./backend/actions/login";
 import { IuiAdminRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "./frontend/src/interfaces/IuiAdminOperations";
 import { getGamesForAdmin, reCreateAllGameStats, reCreateGameStats } from "./backend/actions/adminActions";
-import { isValidUser } from "./backend/common/userValidation";
+import { isValidAdminUser } from "./backend/common/userValidation";
 
 // Routes
 // not defined
@@ -85,8 +85,8 @@ connectDB().then(() => {
 
     socket.on("admin login", async (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => {
       console.log("admin login", loginRequest);
-      const {uuid, userName, hash, password1} = loginRequest;
-      if (!isValidUser(userName, uuid, hash)) return null;
+      const {uuid, userName, password1} = loginRequest;
+      if (!isValidAdminUser(userName, uuid)) return null;
       if (password1.length < 4) return null;
 
       const loginResponse = await handleLoginRequest(loginRequest);
@@ -100,8 +100,8 @@ connectDB().then(() => {
 
     socket.on("get games for admin", async (getGamesRequest: IuiAdminRequest, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
       console.log("get games for admin", getGamesRequest);
-      const {uuid, userName, hash} = getGamesRequest;
-      if (!isValidUser(userName, uuid, hash)) return null;
+      const {uuid, userName} = getGamesRequest;
+      if (!isValidAdminUser(userName, uuid)) return null;
       if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
 
       const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(userName);
@@ -110,8 +110,8 @@ connectDB().then(() => {
 
     socket.on("re-create game statistics", async (reCreateGameStatisticsRequest: IuiReCreateGameStatisticsRequest, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
       console.log("re-create game statistics", reCreateGameStatisticsRequest);
-      const {uuid, userName, hash} = reCreateGameStatisticsRequest;
-      if (!isValidUser(userName, uuid, hash)) return null;
+      const {uuid, userName} = reCreateGameStatisticsRequest;
+      if (!isValidAdminUser(userName, uuid)) return null;
       if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
 
       await reCreateGameStats(reCreateGameStatisticsRequest);
@@ -121,8 +121,8 @@ connectDB().then(() => {
 
     socket.on("re-create all game statistics", async (reCreateAllGameStatisticsRequest: IuiAdminRequest, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
       console.log("re-create all game statistics", reCreateAllGameStatisticsRequest);
-      const {uuid, userName, hash} = reCreateAllGameStatisticsRequest;
-      if (!isValidUser(userName, uuid, hash)) return null;
+      const {uuid, userName} = reCreateAllGameStatisticsRequest;
+      if (!isValidAdminUser(userName, uuid)) return null;
       if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
 
       await reCreateAllGameStats(userName);
