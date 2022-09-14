@@ -19,9 +19,6 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "paths": {
-      "deck-of-cards":["../@types/deck-of-cards"]
-    }
   },
   "include": [
     "src"
