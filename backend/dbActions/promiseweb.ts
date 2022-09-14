@@ -1,8 +1,6 @@
-import { getGameReport } from "../common/reportFunctions";
 import GameOptions from "../models/GameOptions";
 import { IGameOptions } from "../interfaces/IGameOptions";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
-import { IuiGameReport } from "../../frontend/src/interfaces/IuiReports";
 import { getCurrentRoundInd } from "../common/common";
 
 export interface ILastGameStatusResponse {
