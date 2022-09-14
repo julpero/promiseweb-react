@@ -50,10 +50,9 @@ export const getLastGameByStatus = async (playerId: string, status: GAME_STATUS)
 };
 
 export const getPlayerAvgPoints = async (playerName: string, startRound: number, turnRound: number, endRound: number): Promise<number[]> => {
-  const gameStats: IuiGameReport[] = [];
   const stats: number[] = [];
 
-  const gamesInDb = await GameOptions.aggregate([
+  const gamesInDb: IGameOptions[] = await GameOptions.aggregate([
     {
       $match: {
         gameStatus: {
@@ -69,16 +68,18 @@ export const getPlayerAvgPoints = async (playerName: string, startRound: number,
   console.log("getPlayerAvgPoints gamesInDb", gamesInDb);
 
   gamesInDb.forEach((gameInDb) => {
-    gameStats.push(getGameReport(gameInDb, playerName));
-  });
-  console.log("gameStats", gameStats);
-  for (let i = 0; i < gameStats.length; i++) {
-    for (let j = 0; j < gameStats[i].cumulativePointsPerRound[0].length; j++) {
-      if (i == 0) {
-        stats[j] = 0;
+    const playerStats = gameInDb.gameStatistics.playersStatistics.find(playerStatistics => playerStatistics.playerName === playerName);
+    if (playerStats) {
+      const cumulativePoints = playerStats.cumulativePointsPerRound;
+      for (let i = 0; i < cumulativePoints.length; i++) {
+        if (!stats[i]) {
+          stats[i] = cumulativePoints[i];
+        } else {
+          stats[i]+= cumulativePoints[i];
+        }
       }
-      stats[j]+= gameStats[i].cumulativePointsPerRound[0][j];
     }
-  }
-  return stats.map(v => v/gameStats.length);
+  });
+  if (gamesInDb.length > 0) return stats.map(v => v/gamesInDb.length);
+  return stats;
 };
