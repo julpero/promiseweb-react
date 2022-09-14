@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { hashUserName } from "../../common/userFunctions";
 import { IuiAdminRequest, IuiGetGamesResponse } from "../../interfaces/IuiAdminOperations";
 import { useSocket } from "../../socket";
-import { isAdminLoggedIn } from "../../store/adminSlice";
+import { isAdminLoggedIn, setAdminGameList } from "../../store/adminSlice";
 
 interface IProps {
   userName: string,
@@ -14,6 +14,8 @@ const AdminMassOperations = ({userName}: IProps) => {
   console.log("AdminMassOperations");
   const adminLoggedIn = useSelector(isAdminLoggedIn);
   const [operationInProgress, setOperationInProgress] = useState(false);
+
+  const dispatch = useDispatch();
 
   const { socket } = useSocket();
 
@@ -29,10 +31,10 @@ const AdminMassOperations = ({userName}: IProps) => {
       userName: userName,
       hash: hashUserName(userName),
     };
-    socket.emit("get games for admin", request, (getGamesResponse: IuiGetGamesResponse) => {
+    socket.emit("re-create all game statistics", request, (getGamesResponse: IuiGetGamesResponse) => {
       console.log(getGamesResponse);
+      dispatch(setAdminGameList(getGamesResponse.gameList));
       setOperationInProgress(false);
-      // setGameList(getGamesResponse.gameList);
     });
   };
 

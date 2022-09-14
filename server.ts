@@ -30,7 +30,7 @@ import { IuiGetOneGameReportRequest, IuiOneGameReport } from "./frontend/src/int
 import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "./frontend/src/interfaces/IuiUser";
 import { handleLoginRequest } from "./backend/actions/login";
 import { IuiAdminRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "./frontend/src/interfaces/IuiAdminOperations";
-import { getGamesForAdmin, reCreateGameStats } from "./backend/actions/adminActions";
+import { getGamesForAdmin, reCreateAllGameStats, reCreateGameStats } from "./backend/actions/adminActions";
 import { isValidUser } from "./backend/common/userValidation";
 
 // Routes
@@ -115,6 +115,17 @@ connectDB().then(() => {
       if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
 
       await reCreateGameStats(reCreateGameStatisticsRequest);
+      const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(userName);
+      fn(getGamesResponse);
+    });
+
+    socket.on("re-create all game statistics", async (reCreateAllGameStatisticsRequest: IuiAdminRequest, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
+      console.log("re-create all game statistics", reCreateAllGameStatisticsRequest);
+      const {uuid, userName, hash} = reCreateAllGameStatisticsRequest;
+      if (!isValidUser(userName, uuid, hash)) return null;
+      if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
+
+      await reCreateAllGameStats(userName);
       const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(userName);
       fn(getGamesResponse);
     });
