@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { IuiGamesByPlayer, IuiPlayedGamesReport } from "../interfaces/IuiGameReports";
+import { IuiPlayedGamesReport } from "../interfaces/IuiGameReports";
 import { useSocket } from "../socket";
 
 import "react-tabulator/lib/styles.css"; // required styles
