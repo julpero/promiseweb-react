@@ -31,6 +31,7 @@ const gameOptionsSchema: Schema = new Schema<IGameOptions>({
   game: {type: gameSchema, required: false},
   gameStarted: {type: Date, required: false},
   gameStatistics: gameStatisticsSchema,
+  oldId: {type: String, required: false},
 }, {
   collection: PROMISEWEB_COLLECTION,
   timestamps: true,

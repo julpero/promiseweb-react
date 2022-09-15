@@ -16,6 +16,7 @@ const statsSchema: Schema = new Schema({
   kept: {type: Boolean, required: true},
   promiseTime: {type: Number, required: true},
   playTime: {type: Number, required: true},
+  oldId: {type: String, required: false},
 }, {
   collection: STATS_COLLECTION,
   timestamps: true,

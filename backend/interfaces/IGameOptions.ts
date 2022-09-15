@@ -30,6 +30,7 @@ export interface IGameOptions {
   game: IGame,
   gameStarted: Date,
   gameStatistics: IGameStatistics,
+  oldId?: string,
 }
 
 export interface IHumanPlayer {

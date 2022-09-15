@@ -11,4 +11,5 @@ export interface IRoundOfPlayerStats {
   kept: boolean,
   promiseTime: number,
   playTime: number,
+  oldId?: string,
 }
