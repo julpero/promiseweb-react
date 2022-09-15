@@ -17,6 +17,12 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
   console.log("gameInDb", gameInDb);
   if (!gameInDb) return JOIN_LEAVE_RESULT.notOk;
 
+  if (gameInDb.password) {
+    if (!joinGameRequest.gamePassword || joinGameRequest.gamePassword !== gameInDb.password) {
+      return JOIN_LEAVE_RESULT.notOk;
+    }
+  }
+
   if (gameInDb.gameStatus !== GAME_STATUS.created) {
     console.log("wrong game status", gameInDb.gameStatus);
     return JOIN_LEAVE_RESULT.notOk;
