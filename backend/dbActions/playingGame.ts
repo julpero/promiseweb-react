@@ -30,7 +30,6 @@ import { isRuleActive, IuiCardToICard } from "../common/model";
 import { generateGameStats } from "../common/statsFunctions";
 import { ICardPlayed, IGameOptions, IPromiser, PromiseValue } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
-import { generateRoundStats } from "./generateStats";
 
 export const getGame = async (gameIdStr: string): Promise<IGameOptions | null> => {
   if (!mongoose.isValidObjectId(gameIdStr)) return null;
@@ -214,10 +213,6 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
 
         // let's count points for this round
         countRoundPoints(round.roundPlayers, round.cardsInRound > 5);
-
-        if (!generateRoundStats(gameId, round)) {
-          console.warn("round stats generation failed!");
-        }
 
         if (currentRoundInd === gameInDb.game.rounds.length - 1) {
           // this was the last round in the game so now game ends
