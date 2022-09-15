@@ -13,22 +13,6 @@ export const getPlayerStats = async (gameInDb: IGameOptions, playerName: string)
   return statsGamesObj;
 };
 
-export const getPlayerNameInPlayerOrder = (player: IPlayer | string): string => {
-  if (typeof player === "string") {
-    return player;
-  } else {
-    return player.name;
-  }
-};
-
-export const getPlayerIdInPlayerOrder = (player: IPlayer | string): string => {
-  if (typeof player === "string") {
-    return ""; // this should be obsolete now
-  } else {
-    return player.playerId;
-  }
-};
-
 export const getPlayerNameById = (players: IHumanPlayer[], playerId: string): string => {
   return players.find(player => player.playerId == playerId)?.name ?? "";
 };

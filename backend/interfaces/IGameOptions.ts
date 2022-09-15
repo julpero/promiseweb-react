@@ -45,7 +45,7 @@ export interface IPlayerStats {
 }
 
 export interface IGame {
-  playerOrder: IPlayer[] | string[],
+  playerOrder: IPlayer[],
   rounds: IRound[],
   lastTimeStamp: number,
 }

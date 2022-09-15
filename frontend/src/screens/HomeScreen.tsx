@@ -173,7 +173,7 @@ const HomeScreen = ({onJoin}: IProps) => {
 };
 
 const validateLoginForm = (values: IAdminLoginForm) => {
-  console.log("validating form");
+  // console.log("validating form");
   const errors: IAdminLoginFormValidationFields = {};
 
   if (!values.userName || values.userName.length < 3) {

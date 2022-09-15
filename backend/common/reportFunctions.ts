@@ -1,5 +1,4 @@
 import { IGameOptions, IRound } from "../interfaces/IGameOptions";
-import { getPlayerNameInPlayerOrder } from "./common";
 import { IuiGameReport } from "../../frontend/src/interfaces/IuiReports";
 
 const roundTypeAsStr = (rounds: IRound[]): string => {
@@ -66,7 +65,7 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
   const playTimesArr: number[] = [];
 
   for (let i = 0; i < gameInDb.game.playerOrder.length; i++) {
-    const playerName = getPlayerNameInPlayerOrder(gameInDb.game.playerOrder[i]);
+    const playerName = gameInDb.game.playerOrder[i].name;
     if (onlyName !== undefined && onlyName !== playerName) continue;
 
     players.push(playerName);

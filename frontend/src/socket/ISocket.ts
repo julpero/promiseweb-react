@@ -48,4 +48,5 @@ export interface ClientToServerEvents {
   "get games for admin": (getGamesRequest: IuiAdminRequest, fn: (gamesResponse: IuiGetGamesResponse) => void) => void,
   "re-create game statistics": (reCreateGameStatisticsRequest: IuiReCreateGameStatisticsRequest, fn: (gamesResponse: IuiGetGamesResponse) => void) => void,
   "re-create all game statistics": (updateRequest: IuiAdminRequest, fn: (gamesResponse: IuiGetGamesResponse) => void) => void,
+  "convert old data": (updateRequest: IuiAdminRequest, fn: (convertReport: string[]) => void) => void,
 }

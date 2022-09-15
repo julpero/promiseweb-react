@@ -1,7 +1,6 @@
 import { ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { countPlayTime } from "../dbActions/generateStats";
 import { IGame, IGameHandCardsForStats, IGameInfoForStats, IGameStatistics, IPlayerStatistic, IRound, IRoundPlayer, ISpurtAndMelt } from "../interfaces/IGameOptions";
-import { getPlayerNameInPlayerOrder } from "./common";
 
 interface IPlayedRoundTypes {
   bigRounds: number,
@@ -143,7 +142,7 @@ const playerCumulativePointsByRounds = (rounds: IRound[], playerName: string): n
 const getPlayerStatistics = (game: IGame): IPlayerStatistic[] => {
   const players: IPlayerStatistic[] = [];
   game.playerOrder.forEach(function (player) {
-    const playerName = getPlayerNameInPlayerOrder(player);
+    const playerName = player.name;
     const totalPoints = getGamePointsForPlayer(game.rounds, playerName);
     const gameInfo = getPlayerGameInfoForStats(game, playerName);
     const pointsPerKeeps = gameInfo.totalKeeps == 0 ? 0 : totalPoints/gameInfo.totalKeeps;

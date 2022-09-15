@@ -1,7 +1,6 @@
 import { knuthShuffle } from "knuth-shuffle";
 import { Card, DeckOfCards, Suite } from "card-games-typescript";
 import { ICardPlayed, IGameOptions, IGame, IPlayer, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
-import { getPlayerIdInPlayerOrder, getPlayerNameInPlayerOrder } from "./common";
 import { GAME_STATUS, ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { startRound } from "./game";
 
@@ -63,7 +62,7 @@ const sortCards = (cards: Card[]): Card[] => {
   return sortedCards;
 };
 
-const initRound = (roundIndex: number, cardsInRound: number, players: IPlayer[] | string[], speedPromise: boolean): IRound => {
+const initRound = (roundIndex: number, cardsInRound: number, players: IPlayer[], speedPromise: boolean): IRound => {
   const deck = initDeck();
   const roundPlayers: IRoundPlayer[] = [];
   players.forEach(player => {
@@ -73,8 +72,8 @@ const initRound = (roundIndex: number, cardsInRound: number, players: IPlayer[] 
     }
     const sortedCards = sortCards(playerCards);
     roundPlayers.push({
-      name: getPlayerNameInPlayerOrder(player),
-      playerId: getPlayerIdInPlayerOrder(player),
+      name: player.name,
+      playerId: player.playerId,
       cards: sortedCards,
       promise: null,
       promiseStarted: null,

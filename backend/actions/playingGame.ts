@@ -26,7 +26,6 @@ import {
   getPlayableCardIndexes,
   getPlayerInTurn,
   getPlayerNameById,
-  getPlayerNameInPlayerOrder,
   getPromiser,
   winnerOfPlay,
 } from "../common/common";
@@ -125,7 +124,7 @@ const getPromisesByPlayers = (gameInDb: IGameOptions): IuiPlayerPromise[][] => {
 const getPromiseTable = (gameInDb: IGameOptions): IuiPromiseTable => {
   const game = gameInDb.game;
   return {
-    players: game.playerOrder.map(player => getPlayerNameInPlayerOrder(player)),
+    players: game.playerOrder.map(player => player.name),
     promisesByPlayers: getPromisesByPlayers(gameInDb),
     rounds: game.rounds.map(round => {
       return {

@@ -12,6 +12,7 @@ interface IProps {
 const AdminMassOperations = ({userName}: IProps) => {
   console.log("AdminMassOperations");
   const adminLoggedIn = useSelector(isAdminLoggedIn);
+  const [logArray, setLogArray] = useState<string[]>([]);
   const [operationInProgress, setOperationInProgress] = useState(false);
 
   const dispatch = useDispatch();
@@ -36,9 +37,37 @@ const AdminMassOperations = ({userName}: IProps) => {
     });
   };
 
+  const convertAllData = () => {
+    setOperationInProgress(true);
+    const request: IuiAdminRequest = {
+      uuid: getMyId(),
+      userName: userName,
+    };
+    socket.emit("convert old data", request, (convertReport: string[]) => {
+      console.log(convertReport);
+      setLogArray(convertReport);
+      setOperationInProgress(false);
+    });
+  };
+
+  const renderLogArray = () => {
+    return logArray.map((row, ind) => {
+      return (
+        <div key={ind}>{row}</div>
+      );
+    });
+  };
+
   return (
     <div>
-      <Button onClick={() => updateAllStats()} disabled={operationInProgress}>Update all stats</Button>
+      <div>
+        <Button onClick={() => updateAllStats()} disabled={operationInProgress}>Update all stats</Button>
+        &nbsp;
+        <Button onClick={() => convertAllData()} disabled={operationInProgress}>Convert old data</Button>
+      </div>
+      <div>
+        {renderLogArray()}
+      </div>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { IuiAdminGame, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../../frontend/src/interfaces/IuiAdminOperations";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
-import { reCreateAllGamesStatistic, reCreateGameStatistic } from "../dbActions/adminOperations";
+import { convertOldDataToNew, reCreateAllGamesStatistic, reCreateGameStatistic } from "../dbActions/adminOperations";
 import { getGamesByStatus } from "../dbActions/games";
 import { checkLogin } from "../dbActions/users";
 import { ICheckLoginRequest } from "../interfaces/IUser";
@@ -44,4 +44,9 @@ export const reCreateGameStats = async (reCreateGameStatisticsRequest: IuiReCrea
 export const reCreateAllGameStats = async (userName: string): Promise<boolean> => {
   if (!await allowAdminActions(userName)) return false;
   return await reCreateAllGamesStatistic();
+};
+
+export const convertOldData = async (userName: string): Promise<string[]> => {
+  if (!await allowAdminActions(userName)) return [];
+  return await convertOldDataToNew();
 };

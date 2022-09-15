@@ -30,7 +30,7 @@ import { IuiGetOneGameReportRequest, IuiOneGameReport } from "./frontend/src/int
 import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "./frontend/src/interfaces/IuiUser";
 import { handleLoginRequest } from "./backend/actions/login";
 import { IuiAdminRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "./frontend/src/interfaces/IuiAdminOperations";
-import { getGamesForAdmin, reCreateAllGameStats, reCreateGameStats } from "./backend/actions/adminActions";
+import { convertOldData, getGamesForAdmin, reCreateAllGameStats, reCreateGameStats } from "./backend/actions/adminActions";
 import { isValidAdminUser } from "./backend/common/userValidation";
 
 // Routes
@@ -128,6 +128,16 @@ connectDB().then(() => {
       await reCreateAllGameStats(userName);
       const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(userName);
       fn(getGamesResponse);
+    });
+
+    socket.on("convert old data", async (convertRequest: IuiAdminRequest, fn: (response: string[]) => void) => {
+      console.log("convert old data", convertRequest);
+      const {uuid, userName} = convertRequest;
+      if (!isValidAdminUser(userName, uuid)) return null;
+      if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
+
+      const response = await convertOldData(userName);
+      fn(response);
     });
 
     socket.on("create game", async (createGameRequest: IuiCreateGameRequest, fn: (createGameResponse: IuiCreateGameResponse) => void) => {
