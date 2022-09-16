@@ -35,7 +35,6 @@ const OneGameReport = ({gameId}: IProps) => {
       <PointsInGame gameReportData={gameReportData} />
       <TimesUsedInGame gameReportData={gameReportData} />
       <CardsInGame gameReportData={gameReportData} />
-      {JSON.stringify(gameReportData)}
     </div>
   );
 };
