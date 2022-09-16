@@ -116,9 +116,9 @@ const showSpeedPromiseCards = (): boolean => {
   return true;
 };
 
-export const getMyCards = (myId: string, round: IRound, speedPromise: boolean): IuiCard[] => {
+export const getMyCards = (uuid: string, round: IRound, speedPromise: boolean): IuiCard[] => {
   if (!speedPromise || showSpeedPromiseCards()) {
-    const player = round.roundPlayers.find(player => player.playerId === myId);
+    const player = round.roundPlayers.find(player => player.playerId === uuid);
     return player?.cards.map(card => {
       const uiCard = ICardToIuiCard(card);
       uiCard.originalIndex = player.cardsToDebug.findIndex(dCard => dCard.value === card.value && dCard.suite === card.suite);

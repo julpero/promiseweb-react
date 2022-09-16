@@ -1,6 +1,6 @@
 import { IuiRules } from "./IuiGameList";
 import { GAME_STATUS, ROUND_STATUS } from "./IuiGameOptions";
-import { IuiAuth } from "./IuiUser";
+import { IuiAuth, IuiUserData } from "./IuiUser";
 
 // import Card from "deck-of-cards";
 // in frontend we have also a dummy card with value of 0
@@ -35,21 +35,19 @@ export enum CARD_ALIGN_TYPE {
   right,
 }
 
-export interface IuiGetRoundRequest {
+export interface IuiGetRoundRequest extends IuiUserData {
   gameId: string,
-  myId: string,
   roundInd: number,
 }
 
 export interface IuiGetRoundResponse extends IuiAuth {
   gameId: string,
   roundInd: number,
-  myName: string,
+  userName: string,
   roundToPlayer: IuiRoundToPlayer,
 }
 
-export interface IuiGetGameInfoRequest {
-  myId: string,
+export interface IuiGetGameInfoRequest extends IuiUserData {
   gameId: string,
 }
 
@@ -145,10 +143,9 @@ export interface IuiRoundToPlayer {
   roundPhase: ROUND_PHASE,
 }
 
-export interface IuiMakePromiseRequest {
+export interface IuiMakePromiseRequest extends IuiUserData {
   gameId: string,
   roundInd: number,
-  myId: string,
   promise: number,
   isSpeedPromise: boolean,
 }
@@ -166,10 +163,9 @@ export interface IuiPromiseMadeNotification {
   currentRoundIndex: number,
 }
 
-export interface IuiPlayCardRequest {
+export interface IuiPlayCardRequest extends IuiUserData {
   gameId: string,
   roundInd: number,
-  myId: string,
   card: IuiCard,
   isSpeedPlay: boolean,
 }

@@ -1,5 +1,5 @@
 export interface IuiChatObj {
   gameId: string,
-  myName: string,
+  userName: string,
   chatLine: string,
 }

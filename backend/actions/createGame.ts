@@ -22,10 +22,10 @@ const createGameOptions = (values: IuiCreateGameRequest): IGameOptions => {
     startRound: parseInt(values.newGameStartRound, 10),
     turnRound: parseInt(values.newGameTurnRound, 10),
     endRound: parseInt(values.newGameEndRound, 10),
-    adminName: values.newGameMyName,
+    adminName: values.userName,
     password: values.newGamePassword,
     gameStatus: GAME_STATUS.created,
-    humanPlayers: [{name: values.newGameMyName, playerId: values.playerId, active: true}],
+    humanPlayers: [{name: values.userName, playerId: values.uuid, active: true}],
     createDateTime: new Date(),
     evenPromisesAllowed: !values.noEvenPromises,
     visiblePromiseRound: !values.hidePromiseRound,
@@ -41,22 +41,14 @@ const createGameOptions = (values: IuiCreateGameRequest): IGameOptions => {
   } as IGameOptions;
 };
 
-const createGame = async (createGameRequest: IuiCreateGameRequest): Promise<IuiCreateGameResponse> => {
+export const createGame = async (createGameRequest: IuiCreateGameRequest): Promise<IuiCreateGameResponse> => {
   const response: IuiCreateGameResponse = {
     responseStatus: CREATE_GAME_STATUS.notOk,
     newGameId: "",
     loginStatus: LOGIN_RESPONSE.ok
   };
 
-  if (!uuidValidate(createGameRequest.playerId)) {
-    console.log("uuidValidate");
-    response.responseStatus = CREATE_GAME_STATUS.notValidPlayerId;
-    return response;
-  }
-
-  const adminId = createGameRequest.playerId;
-
-  const okToCreate = !(await hasOngoingOrCreatedGame(adminId));
+  const okToCreate = !(await hasOngoingOrCreatedGame(createGameRequest.uuid));
   if (!okToCreate) {
     console.log("hasOngoingOrCreatedGame");
     return response;
@@ -75,5 +67,3 @@ const createGame = async (createGameRequest: IuiCreateGameRequest): Promise<IuiC
 
   return response;
 };
-
-export default createGame;

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { IuiAdminRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../../interfaces/IuiAdminOperations";
+import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../../interfaces/IuiAdminOperations";
+import { IuiUserData } from "../../interfaces/IuiUser";
 import { useSocket } from "../../socket";
 import { getAdminGameList, isAdminLoggedIn, setAdminGameList } from "../../store/adminSlice";
 import OneGameReport from "../OneGameReport";
@@ -22,11 +23,13 @@ const AdminGameList = ({userName}: IProps) => {
   const { socket } = useSocket();
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
+  const getToken = (): string => window.localStorage.getItem("token") ?? "";
 
   useEffect(() => {
-    const getGamesRequest: IuiAdminRequest = {
+    const getGamesRequest: IuiUserData = {
       uuid: getMyId(),
       userName: userName,
+      token: getToken(),
     };
     socket.emit("get games for admin", getGamesRequest, (getGamesResponse: IuiGetGamesResponse) => {
       console.log(getGamesResponse);
@@ -61,6 +64,7 @@ const AdminGameList = ({userName}: IProps) => {
     const reCreateGameStatisticsRequest: IuiReCreateGameStatisticsRequest = {
       uuid: getMyId(),
       userName: userName,
+      token: getToken(),
       gameId: gameId,
     };
     socket.emit("re-create game statistics", reCreateGameStatisticsRequest, (getGamesResponse: IuiGetGamesResponse) => {

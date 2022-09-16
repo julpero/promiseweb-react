@@ -4,7 +4,6 @@ import { useSocket } from "../socket";
 import GameItem from "./GameItem";
 import {
   IuiGameListItem,
-  IuiGetGameListRequest,
   IuiGetGameListResponse,
   IuiJoinLeaveGameRequest,
   IuiJoinLeaveGameResponse,
@@ -13,17 +12,19 @@ import {
 import TextInput from "./FormComponents/TextInput";
 import { Modal } from "react-bootstrap";
 import { FormApi } from "final-form";
-import { LOGIN_RESPONSE } from "../interfaces/IuiUser";
+import { IuiUserData, LOGIN_RESPONSE } from "../interfaces/IuiUser";
+import { useSelector } from "react-redux";
+import { getUserName } from "../store/userSlice";
 
 interface IFormValidationFields {
-  myName?: string,
+  userName?: string,
   password1?: string,
   password2?: string,
   gamePassword?: string,
 }
 
 interface IFormFields {
-  myName: string,
+  userName: string,
   password1: string,
   password2: string,
   gamePassword?: string,
@@ -37,20 +38,26 @@ const OpenGamesList = () => {
   const [ gameItemList, setGameItemList ] = useState<IuiGameListItem[]>([]);
   const [ loginStatus, setLoginStatus ] = useState<LOGIN_RESPONSE | null>(null);
   const [ joinLeaveStatus, setJoinLeaveStatus ] = useState<JOIN_LEAVE_RESULT | null>(null);
+  const userName = useSelector(getUserName);
 
   const { socket } = useSocket();
 
   const callBackList = useRef<(() => void)[]>([]);
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
+  const getToken = (): string => window.localStorage.getItem("token") ?? "";
 
   const fetchGameItemList = useCallback(() => {
-    const gameListRequest: IuiGetGameListRequest = { myId: getMyId() };
+    const gameListRequest: IuiUserData = {
+      uuid: getMyId(),
+      userName: userName,
+      token: getToken(),
+    };
     socket.emit("get open games", gameListRequest, (gameList: IuiGetGameListResponse) => {
       console.log("gameList", gameList);
       setGameItemList(gameList.games);
     });
-  }, [socket]);
+  }, [userName, socket]);
 
   useEffect(() => {
     fetchGameItemList();
@@ -168,9 +175,10 @@ const OpenGamesList = () => {
     console.log("onSubmit", values);
     if (gameId.length > 0 && method !== null) {
       const request: IuiJoinLeaveGameRequest = {
-        myId: getMyId(),
+        uuid: getMyId(),
+        token: getToken(),
         gameId: gameId,
-        myName: values.myName,
+        userName: values.userName,
         password1: values.password1,
         password2: values.password2,
         gamePassword: values.gamePassword ?? "",
@@ -199,7 +207,7 @@ const OpenGamesList = () => {
             <div className="row">
               <div className="col">
                 <Field<string>
-                  name="myName"
+                  name="userName"
                   component={TextInput}
                   label="My (nick)name in the game"
                 />
@@ -255,8 +263,8 @@ const validateForm = (values: IFormFields ) => {
     errors.password1 = "Password must be at least four characters long";
   }
 
-  if (!values.myName || values.myName.length < 3) {
-    errors.myName = "Your (nick)name must be at least three characters long";
+  if (!values.userName || values.userName.length < 3) {
+    errors.userName = "Your (nick)name must be at least three characters long";
   }
 
   if (values.password2?.length > 0 && values.password1 !== values.password2) {

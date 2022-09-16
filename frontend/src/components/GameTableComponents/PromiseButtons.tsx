@@ -10,11 +10,13 @@ import { IuiMakePromiseRequest, IuiMakePromiseResponse, IuiRoundPlayer, PROMISE_
 import { isRuleActive } from "../../common/commonFunctions";
 import { currentTotalPromise } from "../../common/playingGame";
 import { RULE } from "../../interfaces/IuiGameOptions";
+import { getUserName } from "../../store/userSlice";
 
 const PromiseButtons = () => {
   const [clicked, setClicked] = useState(false);
   const currentGameInfo = useSelector(getCurrentGameInfo);
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  const userName = useSelector(getUserName);
   const { gameId, roundInd } = currentRoundInfo;
   const { cardsInRound, isMyPromiseTurn } = currentRoundInfo.roundToPlayer;
 
@@ -42,6 +44,7 @@ const PromiseButtons = () => {
   const disabledButton = disableButton();
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
+  const getToken = (): string => window.localStorage.getItem("token") ?? "";
 
   const promiseButtonStyle = (ind: number): CSSProperties => {
     return {left: `${ind * 72}px`};
@@ -51,9 +54,11 @@ const PromiseButtons = () => {
     if (promise === disabledButton) return;
     setClicked(true);
     const promiseRequest: IuiMakePromiseRequest = {
+      uuid: getMyId(),
+      userName: userName,
+      token: getToken(),
       gameId: gameId,
       roundInd: roundInd,
-      myId: getMyId(),
       promise: promise,
       isSpeedPromise: false,
     };

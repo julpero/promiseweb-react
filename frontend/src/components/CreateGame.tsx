@@ -14,7 +14,7 @@ import CheckboxInput from "./FormComponents/CheckBoxInput";
 import { IuiNewGameForm, initialNewGameValues, IuiCreateGameRequest, IuiCreateGameResponse, CREATE_GAME_STATUS } from "../interfaces/IuiNewGame";
 import { LOGIN_RESPONSE } from "../interfaces/IuiUser";
 import { useSelector } from "react-redux";
-import { getUserName, isUserLoggedIn } from "../store/userSlice";
+import { getUserName } from "../store/userSlice";
 
 interface IFormValidationFields {
   newGameHumanPlayersCount?: string,
@@ -29,17 +29,18 @@ interface IProps {
 const CreateGame = (props: IProps) => {
   const [ loginStatus, setLoginStatus ] = useState<LOGIN_RESPONSE | null>(null);
   const [ createGameStatus, setCreateGameStatus ] = useState<CREATE_GAME_STATUS | null>(null);
-  const userLoggedIn = useSelector(isUserLoggedIn);
-  const userName = useSelector(getUserName);
+  const globalUserName = useSelector(getUserName);
 
   const { socket } = useSocket();
 
   const initialValues: IuiNewGameForm = initialNewGameValues;
+
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
+  const getToken = (): string => window.localStorage.getItem("token") ?? "";
 
   const onSubmit = (values: IuiNewGameForm) => {
-    const playerId: string = getMyId();
-    const newGameRequest: IuiCreateGameRequest = {...values, playerId };
+    const uuid: string = getMyId();
+    const newGameRequest: IuiCreateGameRequest = {...values, uuid, userName: globalUserName, token: getToken() };
     socket.emit("create game", newGameRequest, (createGameResponse: IuiCreateGameResponse) => {
       setLoginStatus(createGameResponse.loginStatus);
       setCreateGameStatus(createGameResponse.responseStatus);
@@ -198,17 +199,17 @@ const CreateGame = (props: IProps) => {
                 </Field>
               </div>
             </div>
-            <div className="row">
+            {/* <div className="row">
               <div className="col">
                 <Field<string>
-                  name="newGameMyName"
+                  name="userName"
                   component={TextInput}
                   label="My (nick)name in the game"
-                  value={userName}
+                  value={globalUserName}
                   disabled={true}
                 />
               </div>
-              {/* <div className="col">
+              <div className="col">
                 <Field<string>
                   name="password1"
                   component={TextInput}
@@ -223,8 +224,8 @@ const CreateGame = (props: IProps) => {
                   label="Re-type password if first time user"
                   ispassword="true"
                 />
-              </div> */}
-            </div>
+              </div>
+            </div> */}
             <Card>
               <Card.Header>
                 Game Rules

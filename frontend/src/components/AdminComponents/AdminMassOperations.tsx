@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { IuiAdminRequest, IuiGetGamesResponse } from "../../interfaces/IuiAdminOperations";
+import { IuiGetGamesResponse } from "../../interfaces/IuiAdminOperations";
+import { IuiUserData } from "../../interfaces/IuiUser";
 import { useSocket } from "../../socket";
 import { isAdminLoggedIn, setAdminGameList } from "../../store/adminSlice";
 
@@ -20,15 +21,17 @@ const AdminMassOperations = ({userName}: IProps) => {
   const { socket } = useSocket();
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
+  const getToken = (): string => window.localStorage.getItem("token") ?? "";
 
   if (!adminLoggedIn) return null;
   if (!userName) return null;
 
   const updateAllStats = () => {
     setOperationInProgress(true);
-    const request: IuiAdminRequest = {
+    const request: IuiUserData = {
       uuid: getMyId(),
       userName: userName,
+      token: getToken(),
     };
     socket.emit("re-create all game statistics", request, (getGamesResponse: IuiGetGamesResponse) => {
       console.log(getGamesResponse);
@@ -39,9 +42,10 @@ const AdminMassOperations = ({userName}: IProps) => {
 
   const convertAllData = () => {
     setOperationInProgress(true);
-    const request: IuiAdminRequest = {
+    const request: IuiUserData = {
       uuid: getMyId(),
       userName: userName,
+      token: getToken(),
     };
     socket.emit("convert old data", request, (convertReport: string[]) => {
       console.log(convertReport);

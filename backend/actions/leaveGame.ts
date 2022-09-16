@@ -12,7 +12,7 @@ export const leaveGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): Prom
   };
 
   const checkLoginObj: ICheckLoginRequest = {
-    userName: leaveGameRequest.myName,
+    userName: leaveGameRequest.userName,
     userPass1: leaveGameRequest.password1 ?? "",
     userPass2: leaveGameRequest.password2 ?? "",
     email: "",

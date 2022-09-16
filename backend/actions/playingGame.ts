@@ -34,27 +34,27 @@ import { getGame, getGameWithPlayer, makePromiseToPlayer, playerPlaysCard } from
 import { ICardPlayed, IGameOptions, IRound } from "../interfaces/IGameOptions";
 
 export const getRound = async (getRoundObj: IuiGetRoundRequest): Promise<IuiGetRoundResponse | null> => {
-  const {gameId, myId, roundInd} = getRoundObj;
+  const {gameId, uuid, roundInd} = getRoundObj;
   const gameInDb = await getGame(gameId);
 
-  if (!gameInDb || !gameInDb.humanPlayers.find(player => player.playerId === myId)) {
+  if (!gameInDb || !gameInDb.humanPlayers.find(player => player.playerId === uuid)) {
     return null;
   }
 
-  const myName = getPlayerNameById(gameInDb.humanPlayers, myId);
+  const userName = getPlayerNameById(gameInDb.humanPlayers, uuid);
 
   const roundResponse: IuiGetRoundResponse = {
     gameId: gameId,
     roundInd: roundInd,
-    myName: myName,
-    roundToPlayer: roundToPlayer(gameInDb, roundInd, myId),
+    userName: userName,
+    roundToPlayer: roundToPlayer(gameInDb, roundInd, uuid),
   };
   return roundResponse;
 };
 
 export const getGameInfo = async (getGameInfoRequest: IuiGetGameInfoRequest): Promise<IuiGetGameInfoResponse | null> => {
   const gameId = getGameInfoRequest.gameId;
-  const gameInDb = await getGameWithPlayer(gameId, getGameInfoRequest.myId);
+  const gameInDb = await getGameWithPlayer(gameId, getGameInfoRequest.uuid);
   if (gameInDb) {
     return gameToGameInfo(gameId, gameInDb);
   } else {
@@ -76,13 +76,13 @@ const getPlayerPlayedCard = (playerId: string, cardsPlayed: ICardPlayed[], retur
   return null;
 };
 
-const getRoundPlayers = (myId: string, round: IRound, playIndex: number, showPromises: boolean): IuiRoundPlayer[] => {
+const getRoundPlayers = (uuid: string, round: IRound, playIndex: number, showPromises: boolean): IuiRoundPlayer[] => {
   const players: IuiRoundPlayer[] = [];
   // TODO const firstPlayerInThePlay = getFirstPlayerInThePlay(round, play);
   // TODO const lastPlayerInThePlay = getLastPlayerInThePlay(round, play);
 
   round.roundPlayers.forEach((player, idx) => {
-    const thisIsMe = player.playerId == myId;
+    const thisIsMe = player.playerId == uuid;
     const returnCard = thisIsMe || true; // TODO || module.exports.okToReturnCard(hiddenCardsMode, player.name == firstPlayerInThePlay, player.name == lastPlayerInThePlay, player.name == playerGoingToWinThisPlay);
     players.push({
       thisIsMe: thisIsMe,
@@ -135,8 +135,8 @@ const getPromiseTable = (gameInDb: IGameOptions): IuiPromiseTable => {
   } as IuiPromiseTable;
 };
 
-const isMyPromiseTurn = (myId: string, round: IRound): boolean => {
-  return getPromiser(round)?.playerId === myId;
+const isMyPromiseTurn = (uuid: string, round: IRound): boolean => {
+  return getPromiser(round)?.playerId === uuid;
 };
 
 export const getRoundPhase = (round: IRound): ROUND_PHASE => {

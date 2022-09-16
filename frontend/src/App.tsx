@@ -7,15 +7,17 @@ import { v4 as uuidv4 } from "uuid";
 import HomeScreen from "./screens/HomeScreen";
 import GameTable from "./screens/GameTable";
 
-import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "./interfaces/IuiCheckIfOngoingGame";
+import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameResponse } from "./interfaces/IuiCheckIfOngoingGame";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentGameId, setGameId } from "./store/gameInfoSlice";
-import { isUserLoggedIn, setUserLoggedIn } from "./store/userSlice";
+import { getUserName, isUserLoggedIn, setUserLoggedIn } from "./store/userSlice";
+import { IuiUserData } from "./interfaces/IuiUser";
 
 const App = () => {
   const [gameStatus, setGameStatus] = useState(CHECK_GAME_STATUS.noGame);
   const gameId = useSelector(getCurrentGameId);
   const userLoggedIn = useSelector(isUserLoggedIn);
+  const userName = useSelector(getUserName);
 
   const dispatch = useDispatch();
 
@@ -44,8 +46,9 @@ const App = () => {
       dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
     }
 
-    const checkGameRequest: IuiCheckIfOngoingGameRequest = {
-      myId: window.localStorage.getItem("uUID") ?? "",
+    const checkGameRequest: IuiUserData = {
+      uuid: window.localStorage.getItem("uUID") ?? "",
+      userName: userName,
     };
     socket.emit("check if ongoing game", checkGameRequest, handleOnGoingResponse);
 
@@ -60,11 +63,12 @@ const App = () => {
     return () => {
       socket.off("game begins");
     };
-  }, [handleOnGoingResponse, userLoggedIn, dispatch, socket]);
+  }, [handleOnGoingResponse, userLoggedIn, userName, dispatch, socket]);
 
   const onJoin = () => {
-    const checkGameRequest: IuiCheckIfOngoingGameRequest = {
-      myId: window.localStorage.getItem("uUID") ?? "",
+    const checkGameRequest: IuiUserData = {
+      uuid: window.localStorage.getItem("uUID") ?? "",
+      userName: userName,
     };
     socket.emit("check if ongoing game", checkGameRequest, handleOnGoingResponse);
   };

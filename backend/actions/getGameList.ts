@@ -1,10 +1,11 @@
-import { IuiGameListItem, IuiGetGameListRequest, IuiGetGameListResponse } from "../../frontend/src/interfaces/IuiGameList";
+import { IuiGameListItem, IuiGetGameListResponse } from "../../frontend/src/interfaces/IuiGameList";
 import { IGameOptions } from "../interfaces/IGameOptions";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { getGamesByStatus } from "../dbActions/games";
 import { playersToArr, rulesToRuleObj } from "../common/model";
+import { IuiUserData } from "../../frontend/src/interfaces/IuiUser";
 
-export const getOpenGamesList = async (getGameListRequest: IuiGetGameListRequest): Promise<IuiGetGameListResponse> => {
+export const getOpenGamesList = async (getGameListRequest: IuiUserData): Promise<IuiGetGameListResponse> => {
   const response: IuiGetGameListResponse = {
     games: [],
   };
@@ -16,7 +17,7 @@ export const getOpenGamesList = async (getGameListRequest: IuiGetGameListRequest
       id: openGame.id,
       rules: rulesToRuleObj(openGame),
       humanPlayers: playersToArr(openGame.humanPlayers),
-      imInTheGame: openGame.humanPlayers.filter((player) => player.playerId === getGameListRequest.myId).length !== 0,
+      imInTheGame: openGame.humanPlayers.filter((player) => player.playerId === getGameListRequest.uuid).length !== 0,
       playerCount: openGame.humanPlayersCount,
       gameHasPassword: openGame.password.length > 0,
     } as IuiGameListItem);

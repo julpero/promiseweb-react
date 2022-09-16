@@ -1,9 +1,5 @@
 import { IuiAuth } from "./IuiUser";
 
-export interface IuiCheckIfOngoingGameRequest {
-  myId: string,
-}
-
 export enum CHECK_GAME_STATUS {
   noGame,
   joinedGame,

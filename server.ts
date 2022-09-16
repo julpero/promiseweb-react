@@ -9,14 +9,14 @@ import connectDB from "./backend/config/db";
 import { ClientToServerEvents, ServerToClientEvents } from "./frontend/src/socket/ISocket";
 import * as csm from "./backend/socket/clientSocketMapper";
 
-import createGame from "./backend/actions/createGame";
+import { createGame } from "./backend/actions/createGame";
 import { getOpenGamesList } from "./backend/actions/getGameList";
 import { joinGame } from "./backend/actions/joinGame";
 import { leaveGame } from "./backend/actions/leaveGame";
 import { checkIfOngoingGame } from "./backend/actions/checkIfOngoingGame";
 import { CREATE_GAME_STATUS, IuiCreateGameRequest, IuiCreateGameResponse } from "./frontend/src/interfaces/IuiNewGame";
-import { IuiGetGameListRequest, IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IuiGameList";
-import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "./frontend/src/interfaces/IuiCheckIfOngoingGame";
+import { IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IuiGameList";
+import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameResponse } from "./frontend/src/interfaces/IuiCheckIfOngoingGame";
 import { IuiChatObj } from "./frontend/src/interfaces/IuiChat";
 import { IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, PLAY_CARD_RESPONSE, PROMISE_RESPONSE } from "./frontend/src/interfaces/IuiPlayingGame";
 import { getGameInfo, getRound, makePromise, playCard } from "./backend/actions/playingGame";
@@ -27,9 +27,9 @@ import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "./frontend/src/i
 import { IuiPlayedGamesReport } from "./frontend/src/interfaces/IuiGameReports";
 import { getOneGameReportData, getReportData } from "./backend/actions/reports";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "./frontend/src/interfaces/IuiReports";
-import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "./frontend/src/interfaces/IuiUser";
+import { IuiLoginRequest, IuiLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./frontend/src/interfaces/IuiUser";
 import { handleLoginRequest } from "./backend/actions/login";
-import { IuiAdminRequest, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "./frontend/src/interfaces/IuiAdminOperations";
+import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "./frontend/src/interfaces/IuiAdminOperations";
 import { convertOldData, getGamesForAdmin, reCreateAllGameStats, reCreateGameStats } from "./backend/actions/adminActions";
 import { isUserAuthenticated, isValidAdminUser, isValidUser, signUserToken } from "./backend/common/userValidation";
 
@@ -127,7 +127,7 @@ connectDB().then(() => {
       fn(loginResponse);
     });
 
-    socket.on("get games for admin", async (getGamesRequest: IuiAdminRequest, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
+    socket.on("get games for admin", async (getGamesRequest: IuiUserData, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
       console.log("get games for admin", getGamesRequest);
       const {uuid, userName} = getGamesRequest;
       if (!isValidAdminUser(userName, uuid)) return null;
@@ -148,7 +148,7 @@ connectDB().then(() => {
       fn(getGamesResponse);
     });
 
-    socket.on("re-create all game statistics", async (reCreateAllGameStatisticsRequest: IuiAdminRequest, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
+    socket.on("re-create all game statistics", async (reCreateAllGameStatisticsRequest: IuiUserData, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
       console.log("re-create all game statistics", reCreateAllGameStatisticsRequest);
       const {uuid, userName} = reCreateAllGameStatisticsRequest;
       if (!isValidAdminUser(userName, uuid)) return null;
@@ -159,7 +159,7 @@ connectDB().then(() => {
       fn(getGamesResponse);
     });
 
-    socket.on("convert old data", async (convertRequest: IuiAdminRequest, fn: (response: string[]) => void) => {
+    socket.on("convert old data", async (convertRequest: IuiUserData, fn: (response: string[]) => void) => {
       console.log("convert old data", convertRequest);
       const {uuid, userName} = convertRequest;
       if (!isValidAdminUser(userName, uuid)) return null;
@@ -170,18 +170,25 @@ connectDB().then(() => {
     });
 
     socket.on("create game", async (createGameRequest: IuiCreateGameRequest, fn: (createGameResponse: IuiCreateGameResponse) => void) => {
-      const createGameResponse: IuiCreateGameResponse = await createGame(createGameRequest);
-      if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
-        const gameIdStr = createGameResponse.newGameId;
-        socket.join(gameIdStr);
-        csm.addUserToMap(createGameRequest.newGameMyName, socket.id, gameIdStr);
-        io.emit("new game created", gameIdStr);
+      const {uuid, userName, token} = createGameRequest;
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid);
+      if (isAuthenticated) {
+        const createGameResponse: IuiCreateGameResponse = await createGame(createGameRequest);
+        if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
+          const gameIdStr = createGameResponse.newGameId;
+          socket.join(gameIdStr);
+          csm.addUserToMap(createGameRequest.userName, socket.id, gameIdStr);
+          io.emit("new game created", gameIdStr);
+        }
+        fn(createGameResponse);
+      } else {
+        return null;
       }
-      fn(createGameResponse);
     });
 
-    socket.on("get open games", async (getGameListRequest: IuiGetGameListRequest, fn: (getGameListResponse: IuiGetGameListResponse) => void) => {
-      const isAuthenticated = isUserAuthenticated(socket.handshake.query.token);
+    socket.on("get open games", async (getGameListRequest: IuiUserData, fn: (getGameListResponse: IuiGetGameListResponse) => void) => {
+      const {userName, uuid, token} = getGameListRequest;
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid);
       if (isAuthenticated) {
         const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(getGameListRequest);
         fn(getGameListResponse);
@@ -195,7 +202,7 @@ connectDB().then(() => {
       const joinResponse: IuiJoinLeaveGameResponse = await joinGame(joinGameRequest);
       if (joinResponse.joinLeaveResult !== JOIN_LEAVE_RESULT.notOk) {
         socket.join(gameIdStr);
-        csm.addUserToMap(joinGameRequest.myName, socket.id, gameIdStr);
+        csm.addUserToMap(joinGameRequest.userName, socket.id, gameIdStr);
         // notify other users
         io.emit("game list updated");
       }
@@ -216,31 +223,37 @@ connectDB().then(() => {
       fn(leaveResponse);
     });
 
-    socket.on("check if ongoing game", async (checkIfOngoingGameRequest: IuiCheckIfOngoingGameRequest, fn: (checkResponse: IuiCheckIfOngoingGameResponse) => void) => {
-      const isAuthenticated = isUserAuthenticated(socket.handshake.query.token);
-      const checkResponse: IuiCheckIfOngoingGameResponse = await checkIfOngoingGame(checkIfOngoingGameRequest);
-      switch (checkResponse.checkStatus) {
-        case CHECK_GAME_STATUS.joinedGame:
-        case CHECK_GAME_STATUS.onGoingGame:
-        case CHECK_GAME_STATUS.observedGame: {
-          const gameIdStr = checkResponse.gameId ?? "";
-          const playerName = checkResponse.asAPlayer ?? "";
-          socket.join(gameIdStr);
-          csm.addUserToMap(playerName, socket.id, gameIdStr);
-          const chatLine = playerName + " joined game!";
-          console.log("sending new chat line", chatLine, gameIdStr);
-          io.to(gameIdStr).emit("new chat line", chatLine);
+    socket.on("check if ongoing game", async (checkIfOngoingGameRequest: IuiUserData, fn: (checkResponse: IuiCheckIfOngoingGameResponse) => void) => {
+      console.log("check if ongoing game", checkIfOngoingGameRequest);
+      const {userName, uuid, token} = checkIfOngoingGameRequest;
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid);
+      if (isAuthenticated) {
+        const checkResponse: IuiCheckIfOngoingGameResponse = await checkIfOngoingGame(checkIfOngoingGameRequest);
+        switch (checkResponse.checkStatus) {
+          case CHECK_GAME_STATUS.joinedGame:
+          case CHECK_GAME_STATUS.onGoingGame:
+          case CHECK_GAME_STATUS.observedGame: {
+            const gameIdStr = checkResponse.gameId ?? "";
+            const playerName = checkResponse.asAPlayer ?? "";
+            socket.join(gameIdStr);
+            csm.addUserToMap(playerName, socket.id, gameIdStr);
+            const chatLine = playerName + " joined game!";
+            console.log("sending new chat line", chatLine, gameIdStr);
+            io.to(gameIdStr).emit("new chat line", chatLine);
 
-          break;
+            break;
+          }
         }
+        checkResponse.isAuthenticated = isAuthenticated;
+        fn(checkResponse);
+      } else {
+        return null;
       }
-      checkResponse.isAuthenticated = isAuthenticated;
-      fn(checkResponse);
     });
 
     socket.on("check game", async (getGameInfoRequest: IuiGetGameInfoRequest, fn: (gameInfoResponse: IuiGetGameInfoResponse) => void) => {
       // console.log("check game", getGameInfoRequest);
-      if (getGameInfoRequest.gameId === "" || getGameInfoRequest.myId === "") {
+      if (getGameInfoRequest.gameId === "" || getGameInfoRequest.uuid === "") {
         return null;
       }
       const gameInfoResponse: IuiGetGameInfoResponse | null = await getGameInfo(getGameInfoRequest);
@@ -269,7 +282,7 @@ connectDB().then(() => {
     socket.on("make promise", async (makePromiseRequest: IuiMakePromiseRequest, fn: (promiseResponse: IuiMakePromiseResponse) => void) => {
       console.log("make promise", makePromiseRequest);
       const { gameId: gameIdStr, roundInd } = makePromiseRequest;
-      if (!gameIdStr || !makePromiseRequest.myId) {
+      if (!gameIdStr || !makePromiseRequest.uuid) {
         return null;
       }
 
@@ -295,7 +308,7 @@ connectDB().then(() => {
     socket.on("play card", async (playCardRequest: IuiPlayCardRequest, fn: (playCardResponse: IuiPlayCardResponse) => void) => {
       console.log("play card", playCardRequest);
       const { gameId: gameIdStr, roundInd } = playCardRequest;
-      if (!gameIdStr || !playCardRequest.myId) {
+      if (!gameIdStr || !playCardRequest.uuid) {
         return null;
       }
 
@@ -368,16 +381,16 @@ connectDB().then(() => {
 
     socket.on("write chat", async (chatObj: IuiChatObj ) => {
       const gameIdStr = chatObj.gameId;
-      const chatLine = chatObj.myName + ": " + chatObj.chatLine;
+      const chatLine = chatObj.userName + ": " + chatObj.chatLine;
       console.log("sending new chat line", chatLine, gameIdStr);
       io.to(gameIdStr).emit("new chat line", chatLine);
     });
 
     socket.on("leave ongoing game", async (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest, fn: (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => void) => {
-      const {gameId: gameIdStr, myId} = leaveOngoingGameRequest;
+      const {gameId: gameIdStr, uuid} = leaveOngoingGameRequest;
 
       console.log("leaveOngoingGameRequest", leaveOngoingGameRequest);
-      if (gameIdStr === "" || myId === "") {
+      if (gameIdStr === "" || uuid === "") {
         return null;
       }
 
@@ -391,7 +404,7 @@ connectDB().then(() => {
           io.to(gameIdStr).emit("new chat line", chatLine);
           chatLine = `GameId: ${gameIdStr}`;
           io.to(gameIdStr).emit("new chat line", chatLine);
-          chatLine = `PlayerId: ${myId}`;
+          chatLine = `PlayerId: ${uuid}`;
           io.to(gameIdStr).emit("new chat line", chatLine);
         }
 
@@ -460,13 +473,17 @@ connectDB().then(() => {
       }
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    socket.on("get report data", async (request: null, fn: (reportResponse: IuiPlayedGamesReport) => void) => {
-      console.log("get report data");
-      const isAuthenticated = isUserAuthenticated(socket.handshake.query.token);
-      const reportData = await getReportData();
-      reportData.isAuthenticated = isAuthenticated;
-      fn(reportData);
+    socket.on("get report data", async (request: IuiUserData, fn: (reportResponse: IuiPlayedGamesReport) => void) => {
+      console.log("get report data", request);
+      const {userName, uuid, token} = request;
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid);
+      if (isAuthenticated) {
+        const reportData = await getReportData();
+        reportData.isAuthenticated = isAuthenticated;
+        fn(reportData);
+      } else {
+        return null;
+      }
     });
 
     socket.on("get game report", async (reportRequest: IuiGetOneGameReportRequest, fn: (reportResponse: IuiOneGameReport) => void) => {

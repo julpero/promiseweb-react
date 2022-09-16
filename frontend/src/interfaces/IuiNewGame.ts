@@ -1,11 +1,10 @@
-import { IuiAuth, LOGIN_RESPONSE } from "./IuiUser";
+import { IuiAuth, IuiUserData, LOGIN_RESPONSE } from "./IuiUser";
 
 export interface IuiNewGameForm {
   newGameHumanPlayersCount: string;
   newGameStartRound: string;
   newGameTurnRound: string;
   newGameEndRound: string;
-  newGameMyName: string;
   noEvenPromises: boolean;
   hidePromiseRound: boolean;
   onlyTotalPromise: boolean;
@@ -25,7 +24,6 @@ export const initialNewGameValues: IuiNewGameForm = {
   newGameStartRound: "10",
   newGameTurnRound: "1",
   newGameEndRound: "10",
-  newGameMyName: "",
   noEvenPromises: false,
   hidePromiseRound: false,
   onlyTotalPromise: false,
@@ -40,8 +38,7 @@ export const initialNewGameValues: IuiNewGameForm = {
   newGamePassword: "",
 };
 
-export interface IuiCreateGameRequest extends IuiNewGameForm {
-  playerId: string,
+export interface IuiCreateGameRequest extends IuiNewGameForm, IuiUserData {
 }
 
 export enum CREATE_GAME_STATUS {

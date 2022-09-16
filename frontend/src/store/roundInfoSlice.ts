@@ -10,7 +10,7 @@ const initialState: RoundInfoState = {
   value: {
     gameId: "",
     roundInd: -1,
-    myName: "",
+    userName: "",
     roundToPlayer: {
       cardsInRound: -1,
       dealerPositionIndex: -1,

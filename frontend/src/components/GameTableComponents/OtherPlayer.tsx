@@ -23,10 +23,10 @@ interface IProps {
 const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   if (!currentRoundInfo.gameId) return null;
-  const {roundToPlayer, myName} = currentRoundInfo;
+  const {roundToPlayer, userName} = currentRoundInfo;
 
   const player: IuiRoundPlayer = playerFromIndex(currentRoundInfo, index);
-  const isSmall = roundToPlayer.players.length === 6 && player.name !== myName;
+  const isSmall = roundToPlayer.players.length === 6 && player.name !== userName;
   console.log("OtherPlayer, player", player);
 
   const renderCardsRow = () => {

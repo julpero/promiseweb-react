@@ -54,6 +54,7 @@ const HomeScreen = ({onJoin}: IProps) => {
   const { socket } = useSocket();
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
+  const getToken = (): string => window.localStorage.getItem("token") ?? "";
 
   const handleGameCreation = () => {
     if (accRef.current?.firstElementChild) {
@@ -84,15 +85,13 @@ const HomeScreen = ({onJoin}: IProps) => {
       password2: password2,
       email: email,
     };
-    console.log("loginRequest", loginRequest);
     socket.emit("user login", loginRequest, (loginResponse: IuiLoginResponse) => {
-      console.log("loginResponse", loginResponse);
       if (loginResponse.loginStatus === LOGIN_RESPONSE.ok && loginResponse.isAuthenticated) {
-        dispatch(setUserLoggedIn({loggedIn: true, name: loginRequest.userName}));
         window.localStorage.setItem("token", loginResponse.token ?? "");
+        dispatch(setUserLoggedIn({loggedIn: true, name: loginRequest.userName}));
       } else {
-        dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
         window.localStorage.removeItem("token");
+        dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
       }
     });
   };
@@ -101,6 +100,7 @@ const HomeScreen = ({onJoin}: IProps) => {
     const loginRequest: IuiLoginRequest = {
       uuid: getMyId(),
       userName: userName,
+      token: getToken(),
       password1: password,
     };
     socket.emit("admin login", loginRequest, (loginResponse: IuiLoginResponse) => {
@@ -148,7 +148,7 @@ const HomeScreen = ({onJoin}: IProps) => {
         show={!userLoggedIn}
         onHide={() => closeLoginUserModal()}
       >
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>
             Log in / Register
           </Modal.Title>
@@ -190,9 +190,6 @@ const HomeScreen = ({onJoin}: IProps) => {
             )}
           />
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="warning" onClick={() => closeLoginAdminModal()}>Close</Button>
-        </Modal.Footer>
       </Modal>
 
       <Modal

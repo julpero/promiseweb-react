@@ -1,4 +1,4 @@
-import { IuiAuth } from "./IuiUser";
+import { IuiAuth, IuiUserData } from "./IuiUser";
 
 export interface IuiGameReport extends IuiAuth {
   players: string[],
@@ -20,7 +20,7 @@ export interface IuiGameReport extends IuiAuth {
   roundType: string,
 }
 
-export interface IuiGetOneGameReportRequest {
+export interface IuiGetOneGameReportRequest extends IuiUserData {
   gameId: string,
 }
 

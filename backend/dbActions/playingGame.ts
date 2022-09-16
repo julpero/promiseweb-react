@@ -50,7 +50,7 @@ export const getGameWithPlayer = async (gameIdStr: string, playerId: string): Pr
 };
 
 export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequest): Promise<IuiMakePromiseResponse> => {
-  const { gameId, myId, roundInd, promise } = makePromiseRequest;
+  const { gameId, uuid, roundInd, promise } = makePromiseRequest;
   const promiseResponse: IuiMakePromiseResponse = {
     promiseResponse: PROMISE_RESPONSE.unknownError,
     promise: promise,
@@ -62,7 +62,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
 
   const query = GameOptions.where({
     _id: gameId,
-    "humanPlayers.playerId": {$eq: myId},
+    "humanPlayers.playerId": {$eq: uuid},
     gameStatus: GAME_STATUS.onGoing,
   });
   const gameInDb = await query.findOne();
@@ -85,7 +85,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
       console.warn("promising, possible not promising phase");
       return promiseResponse;
     }
-    if (myId !== promiser.playerId) {
+    if (uuid !== promiser.playerId) {
       console.warn("promising, wrong promiser turn");
       promiseResponse.promiseResponse = PROMISE_RESPONSE.notMyTurn;
       return promiseResponse;
@@ -122,7 +122,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
 };
 
 export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Promise<IuiPlayCardResponse> => {
-  const { card, gameId, roundInd, myId } = playCardRequest;
+  const { card, gameId, roundInd, uuid } = playCardRequest;
   const response: IuiPlayCardResponse = {
     playResponse: PLAY_CARD_RESPONSE.notOk,
     playerName: "",
@@ -139,7 +139,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
 
   const query = GameOptions.where({
     _id: gameId,
-    "humanPlayers.playerId": {$eq: myId},
+    "humanPlayers.playerId": {$eq: uuid},
     gameStatus: GAME_STATUS.onGoing,
   });
   const gameInDb = await query.findOne();
@@ -158,12 +158,12 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     }
 
     const playerInTurn = getPlayerInTurn(round);
-    if (playerInTurn?.playerId !== myId) {
+    if (playerInTurn?.playerId !== uuid) {
       console.warn("playing card, not my turn");
       response.playResponse = PLAY_CARD_RESPONSE.notMyTurn;
       return response;
     }
-    const playerCards = getMyCards(myId, round, false);
+    const playerCards = getMyCards(uuid, round, false);
     const playedCardIndex = playerCards.findIndex(cardInDb => cardInDb.suite === card.suite && cardInDb.value === card.value);
     if (playedCardIndex === -1) {
       response.playResponse = PLAY_CARD_RESPONSE.invalidCard;
@@ -177,12 +177,12 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     }
 
     // All checks made, let's play card
-    const myIndexInRound = getPlayerIndexFromRoundById(round.roundPlayers, myId);
-    const myName = getPlayerNameById(gameInDb.humanPlayers, myId);
+    const myIndexInRound = getPlayerIndexFromRoundById(round.roundPlayers, uuid);
+    const userName = getPlayerNameById(gameInDb.humanPlayers, uuid);
     const playTime = Date.now() - gameInDb.game.lastTimeStamp;
     round.cardsPlayed[playIndex].push({
-      playerId: myId,
-      name: myName,
+      playerId: uuid,
+      name: userName,
       card: IuiCardToICard(card),
       playedTime: Date.now(),
       playStarted: gameInDb.game.lastTimeStamp,
@@ -240,7 +240,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
 
     const gameAfter = await gameInDb.save();
     if (gameAfter) {
-      response.playerName = myName;
+      response.playerName = userName;
       response.playTime = playTime;
       response.playResponse = PLAY_CARD_RESPONSE.playOk;
       return response;

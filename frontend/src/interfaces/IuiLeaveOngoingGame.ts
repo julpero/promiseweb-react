@@ -1,8 +1,7 @@
-import { IuiAuth } from "./IuiUser";
+import { IuiAuth, IuiUserData } from "./IuiUser";
 
-export interface IuiLeaveOngoingGameRequest {
+export interface IuiLeaveOngoingGameRequest extends IuiUserData {
   gameId: string,
-  myId: string,
 }
 
 export enum LEAVE_ONGOING_GAME_RESULT {
@@ -13,7 +12,7 @@ export enum LEAVE_ONGOING_GAME_RESULT {
 
 export interface IuiLeaveOngoingGameResponse extends IuiAuth {
   gameId: string,
-  myId: string,
+  uuid: string,
   leaverName: string,
   leaveStatus: LEAVE_ONGOING_GAME_RESULT,
 }

@@ -1,5 +1,5 @@
 import { HIDDEN_CARDS_MODE, IuiRoundInfo, RULE } from "./IuiGameOptions";
-import { IuiAuth, LOGIN_RESPONSE } from "./IuiUser";
+import { IuiAuth, IuiUserData, LOGIN_RESPONSE } from "./IuiUser";
 
 export interface IuiRules {
   ruleList: RULE[],
@@ -17,18 +17,12 @@ export interface IuiGameListItem {
   gameHasPassword: boolean,
 }
 
-export interface IuiGetGameListRequest {
-  myId: string,
-}
-
 export interface IuiGetGameListResponse extends IuiAuth {
   games: IuiGameListItem[],
 }
 
-export interface IuiJoinLeaveGameRequest {
-  myId: string,
+export interface IuiJoinLeaveGameRequest extends IuiUserData {
   gameId: string,
-  myName: string,
   password1: string,
   password2: string,
   gamePassword: string,

@@ -9,6 +9,7 @@ import { getCurrentGameInfo, setGameInfo } from "../store/gameInfoSlice";
 import { getGetRoundInfo, setGetRoundInfo } from "../store/getRoundInfoSlice";
 import { getPlayedCard, setPlayedCard } from "../store/playCardSlice";
 import { getCurrentRoundInfo, setRoundInfo } from "../store/roundInfoSlice";
+import { getUserName } from "../store/userSlice";
 
 interface IProps {
   gameId: string,
@@ -19,6 +20,7 @@ const EffectHandler = ({gameId}: IProps) => {
   const getRoundInfoRequest = useSelector(getGetRoundInfo);
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const playedCard = useSelector(getPlayedCard);
+  const userName = useSelector(getUserName);
   const dispatch = useDispatch();
   console.log("EffectHandler");
 
@@ -26,6 +28,7 @@ const EffectHandler = ({gameId}: IProps) => {
 
   const { socket } = useSocket();
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
+  const getToken = (): string => window.localStorage.getItem("token") ?? "";
 
   useEffect(() => {
     console.log("getRoundInfoRequest", getRoundInfoRequest);
@@ -49,7 +52,9 @@ const EffectHandler = ({gameId}: IProps) => {
       console.log("promise made", promiseNotification);
 
       const getRoundRequest: IuiGetRoundRequest = {
-        myId: getMyId(),
+        uuid: getMyId(),
+        userName: userName,
+        token: getToken(),
         gameId: gameId,
         roundInd: promiseNotification.currentRoundIndex,
       };
@@ -67,7 +72,9 @@ const EffectHandler = ({gameId}: IProps) => {
         fromPlayer: playerName,
         fromSlot: playedFromSlot,
         getRoundRequest: !newPlayAfterHit && roundStatusAfterPlay === ROUND_STATUS.onGoing ? {
-          myId: getMyId(),
+          uuid: getMyId(),
+          userName: userName,
+          token: getToken(),
           gameId: gameId,
           roundInd: currentRoundIndex,
         } : null,
@@ -75,7 +82,9 @@ const EffectHandler = ({gameId}: IProps) => {
           winner: winnerOfPlay ?? "",
           winCount: winCount ?? 0,
           getRoundRequest: {
-            myId: getMyId(),
+            uuid: getMyId(),
+            userName: userName,
+            token: getToken(),
             gameId: gameId,
             roundInd: (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay !== GAME_STATUS.played) ? currentRoundIndex + 1 : currentRoundIndex,
           }
@@ -92,7 +101,9 @@ const EffectHandler = ({gameId}: IProps) => {
       initialRender.current = false;
 
       const getGameInfoRequest: IuiGetGameInfoRequest = {
-        myId: getMyId(),
+        uuid: getMyId(),
+        userName: userName,
+        token: getToken(),
         gameId: gameId,
       };
       // console.log("getGameInfoRequest", getGameInfoRequest);
@@ -111,13 +122,15 @@ const EffectHandler = ({gameId}: IProps) => {
       socket.off("card played");
       socket.off("hey");
     };
-  }, [gameId, socket, dispatch]);
+  }, [gameId, userName, socket, dispatch]);
 
   useEffect(() => {
     console.log("playedCard useEffect (store)", playedCard);
     if (playedCard && currentRoundInfo.roundToPlayer.isMyTurn && currentRoundInfo.roundToPlayer.roundPhase === ROUND_PHASE.onPlay) {
       const playCardRequest: IuiPlayCardRequest = {
-        myId: getMyId(),
+        uuid: getMyId(),
+        userName: userName,
+        token: getToken(),
         gameId: gameId,
         roundInd: currentRoundInfo.roundInd ?? 0,
         card: playedCard,
@@ -132,20 +145,22 @@ const EffectHandler = ({gameId}: IProps) => {
     } else {
       dispatch(setPlayedCard(null));
     }
-  }, [gameId, currentRoundInfo, playedCard, socket, dispatch]);
+  }, [gameId, userName, currentRoundInfo, playedCard, socket, dispatch]);
 
   useEffect(() => {
     console.log("currentGameInfo updated", currentGameInfo);
     if (currentGameInfo.currentRound !== null && currentGameInfo.currentRound >= 0) {
       const getRoundRequest: IuiGetRoundRequest = {
-        myId: getMyId(),
+        uuid: getMyId(),
+        userName: userName,
+        token: getToken(),
         gameId: currentGameInfo.gameId,
         roundInd: currentGameInfo.currentRound,
       };
       console.log("getRoundRequest A", getRoundRequest);
       dispatch(setGetRoundInfo(getRoundRequest));
     }
-  }, [currentGameInfo, dispatch]);
+  }, [currentGameInfo, userName, dispatch]);
 
   return null;
 };

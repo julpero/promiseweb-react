@@ -1,6 +1,5 @@
 import { validate as uuidValidate } from "uuid";
-import { sign, verify, JwtPayload } from "jsonwebtoken";
-import { IuiUserData } from "../../frontend/src/interfaces/IuiUser";
+import { sign, verify } from "jsonwebtoken";
 
 export const isValidAdminUser = (userName: string, uuid: string): boolean => {
   if (!userName || !uuid) return false;
@@ -29,25 +28,24 @@ export const isValidUser = (userName: string, password: string, uuid: string): b
   return true;
 };
 
-export const isUserAuthenticated = (token: string | string[] | undefined, userName: string, uuid: string): boolean => {
+export const isUserAuthenticated = (token: string | undefined, userName: string, uuid: string): boolean => {
   console.log("isUserAuthenticated");
   console.log("token", token);
-  if (! token || token === undefined) return false;
-  const checkToken = (typeof token === "object") ? token[0] : token;
+  if (!token || token === undefined) return false;
 
   // JWT must be splitted into three parts by full stop (.)
-  if (checkToken.split(".").length !== 3) return false;
-  const checked = verify(checkToken, process.env.AUTH_SECRET ?? "MUST_SET_THIS");
+  if (token.split(".").length !== 3) return false;
+  const checked = verify(token, process.env.AUTH_SECRET ?? "MUST_SET_THIS");
   console.log("checked", checked);
-  // return (checked.userName === userName && checked.uuid === uuid);
-  return false;
+
+  if (typeof checked === "string") return false;
+  return (checked.userName === userName && checked.uuid === uuid);
 };
 
 export const signUserToken = (userName: string, uuid: string): string => {
-  const tokenBody: IuiUserData = {
+  const tokenBody = {
     userName: userName,
     uuid: uuid,
   };
-
-  return sign(tokenBody, process.env.AUTH_SECRET ?? "MUST_SET_THIS");
+  return sign(tokenBody, process.env.AUTH_SECRET ?? "SET_THIS_NOW");
 };

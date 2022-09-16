@@ -33,19 +33,19 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
     return JOIN_LEAVE_RESULT.notOk;
   }
 
-  if (gameInDb.humanPlayers.find(player => player.name === joinGameRequest.myName) !== undefined) {
-    console.log("player name is already in game", joinGameRequest.myName);
+  if (gameInDb.humanPlayers.find(player => player.name === joinGameRequest.userName) !== undefined) {
+    console.log("player name is already in game", joinGameRequest.userName);
     return JOIN_LEAVE_RESULT.notOk;
   }
-  if (gameInDb.humanPlayers.find(player => player.playerId === joinGameRequest.myId) !== undefined) {
-    console.log("player id is already in game", joinGameRequest.myId);
+  if (gameInDb.humanPlayers.find(player => player.playerId === joinGameRequest.uuid) !== undefined) {
+    console.log("player id is already in game", joinGameRequest.uuid);
     return JOIN_LEAVE_RESULT.notOk;
   }
 
-  const newPlayerStats = await getPlayerStats(gameInDb, joinGameRequest.myName);
+  const newPlayerStats = await getPlayerStats(gameInDb, joinGameRequest.userName);
   const newPlayer: IHumanPlayer = {
-    name: joinGameRequest.myName,
-    playerId: joinGameRequest.myId,
+    name: joinGameRequest.userName,
+    playerId: joinGameRequest.uuid,
     active: true,
     playerStats: newPlayerStats,
   };
@@ -86,17 +86,17 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
     return JOIN_LEAVE_RESULT.notOk;
   }
 
-  if (!game.humanPlayers.find(player => player.name === leaveGameRequest.myName)) {
-    console.log("player name is not in game", leaveGameRequest.myName);
+  if (!game.humanPlayers.find(player => player.name === leaveGameRequest.userName)) {
+    console.log("player name is not in game", leaveGameRequest.userName);
     return JOIN_LEAVE_RESULT.notOk;
   }
-  if (!game.humanPlayers.find(player => player.playerId === leaveGameRequest.myId)) {
-    console.log("player id is not in game", leaveGameRequest.myId);
+  if (!game.humanPlayers.find(player => player.playerId === leaveGameRequest.uuid)) {
+    console.log("player id is not in game", leaveGameRequest.uuid);
     return JOIN_LEAVE_RESULT.notOk;
   }
 
   // remove player from humanPlayers
-  game.humanPlayers = game.humanPlayers.filter(player => player.name !== leaveGameRequest.myName);
+  game.humanPlayers = game.humanPlayers.filter(player => player.name !== leaveGameRequest.userName);
 
   if (game.humanPlayers.length === 0) {
     // this was last player in the game -> set game dismissed
@@ -108,10 +108,10 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
 };
 
 export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest): Promise<IuiLeaveOngoingGameResponse> => {
-  const {gameId, myId} = leaveOngoingGameRequest;
+  const {gameId, uuid} = leaveOngoingGameRequest;
   const leaveOngoingGameResponse: IuiLeaveOngoingGameResponse = {
     gameId: "",
-    myId: "",
+    uuid: "",
     leaverName: "",
     leaveStatus: LEAVE_ONGOING_GAME_RESULT.notOk,
   };
@@ -121,12 +121,12 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
 
   const query = GameOptions.where({
     _id: gameId,
-    "humanPlayers.playerId": {$eq: myId},
+    "humanPlayers.playerId": {$eq: uuid},
     gameStatus: GAME_STATUS.onGoing,
   });
   const gameInDb = await query.findOne();
   if (gameInDb) {
-    const leaver = gameInDb.humanPlayers.find(player => player.playerId === myId);
+    const leaver = gameInDb.humanPlayers.find(player => player.playerId === uuid);
     if (leaver) {
       leaveOngoingGameResponse.leaverName = leaver.name;
       leaver.active = false;
@@ -138,7 +138,7 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
       } else {
         leaveOngoingGameResponse.leaveStatus = LEAVE_ONGOING_GAME_RESULT.leaveOk;
         leaveOngoingGameResponse.gameId = gameId;
-        leaveOngoingGameResponse.myId = myId;
+        leaveOngoingGameResponse.uuid = uuid;
       }
     }
 

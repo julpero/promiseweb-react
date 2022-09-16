@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "../interfaces/IuiReports";
 import { useSocket } from "../socket";
+import { getUserName } from "../store/userSlice";
 import CardsInGame from "./ReportComponents/CardsInGame";
 
 import CumulativePoints from "./ReportComponents/CumulativePoints";
@@ -14,11 +16,18 @@ interface IProps {
 
 const OneGameReport = ({gameId}: IProps) => {
   const [gameReportData, setGameReportData] = useState<IuiOneGameReport>();
+  const userName = useSelector(getUserName);
 
   const { socket } = useSocket();
 
+  const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
+  const getToken = (): string => window.localStorage.getItem("token") ?? "";
+
   useEffect(() => {
     const reportRequest: IuiGetOneGameReportRequest = {
+      uuid: getMyId(),
+      userName: userName,
+      token: getToken(),
       gameId: gameId,
     };
     if (gameId) {
@@ -26,7 +35,7 @@ const OneGameReport = ({gameId}: IProps) => {
         setGameReportData(reportResponse);
       });
     }
-  }, [gameId, socket]);
+  }, [gameId, userName, socket]);
 
   return (
     <div>

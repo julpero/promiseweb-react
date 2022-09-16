@@ -7,9 +7,7 @@ export enum LOGIN_RESPONSE {
   justAdminCheck,
 }
 
-export interface IuiLoginRequest {
-  uuid: string,
-  userName: string,
+export interface IuiLoginRequest extends IuiUserData {
   password1: string,
   password2?: string,
   email?: string,
@@ -27,4 +25,5 @@ export interface IuiAuth {
 export interface IuiUserData {
   userName: string,
   uuid: string,
+  token?: string,
 }

@@ -6,11 +6,7 @@ interface Context {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>,
 }
 
-export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io({
-  query: {
-    token: window.localStorage.getItem("token")
-  }
-});
+export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io();
 
 export const SocketContext = React.createContext<Context>({
   socket,

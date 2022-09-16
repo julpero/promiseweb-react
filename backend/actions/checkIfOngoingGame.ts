@@ -1,10 +1,11 @@
-import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "../../frontend/src/interfaces/IuiCheckIfOngoingGame";
+import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameResponse } from "../../frontend/src/interfaces/IuiCheckIfOngoingGame";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
+import { IuiUserData } from "../../frontend/src/interfaces/IuiUser";
 import { getLastGameByStatus, ILastGameStatusResponse } from "../dbActions/promiseweb";
 
-export const checkIfOngoingGame = async (checkRequest: IuiCheckIfOngoingGameRequest): Promise<IuiCheckIfOngoingGameResponse> => {
+export const checkIfOngoingGame = async (checkRequest: IuiUserData): Promise<IuiCheckIfOngoingGameResponse> => {
   // console.log("checkRequest", checkRequest);
-  const playerId = checkRequest.myId;
+  const playerId = checkRequest.uuid;
 
   const response: IuiCheckIfOngoingGameResponse = {
     checkStatus: CHECK_GAME_STATUS.noGame,

@@ -5,6 +5,7 @@ import { Form, Button, Modal } from "react-bootstrap";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "../interfaces/IuiLeaveOngoingGame";
 import { useSelector } from "react-redux";
 import { getCurrentGameInfo } from "../store/gameInfoSlice";
+import { getUserName } from "../store/userSlice";
 
 /**
  * GameMenu
@@ -17,10 +18,12 @@ const GameMenu = () => {
   const [leftMMyId, setLeftMyId] = useState("");
 
   const currentGameInfo = useSelector(getCurrentGameInfo);
+  const userName = useSelector(getUserName);
 
   const { socket } = useSocket();
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
+  const getToken = (): string => window.localStorage.getItem("token") ?? "";
 
   const showLeaveModal = (): boolean => {
     return leaveGameModal && !leftGameModal;
@@ -34,7 +37,9 @@ const GameMenu = () => {
   const leaveGameClick = () => {
     const leaveOngoingGameRequest: IuiLeaveOngoingGameRequest = {
       gameId: currentGameInfo.gameId,
-      myId: getMyId(),
+      uuid: getMyId(),
+      userName: userName,
+      token: getToken(),
     };
 
     socket.emit("leave ongoing game", leaveOngoingGameRequest, (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => {
@@ -43,7 +48,7 @@ const GameMenu = () => {
         setLeftGameModal(true);
         setLeaveGameModal(false);
         setLeftGameId(leaveOngoingGameResponse.gameId);
-        setLeftMyId(leaveOngoingGameResponse.myId);
+        setLeftMyId(leaveOngoingGameResponse.uuid);
         const uuid = uuidv4();
         window.localStorage.setItem("uUID", uuid);
       }
