@@ -15,6 +15,20 @@ import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "../interfaces
 import AdminGameList from "../components/AdminComponents/AdminGameList";
 import { isAdminLoggedIn, setAdminLoggedIn } from "../store/adminSlice";
 import AdminMassOperations from "../components/AdminComponents/AdminMassOperations";
+import { isUserLoggedIn, setUserLoggedIn } from "../store/userSlice";
+
+interface IUserLoginFormValidationFields {
+  userName?: string,
+  password1?: string,
+  password2?: string,
+  email?: string,
+}
+interface IUserLoginForm {
+  userName: string,
+  password1: string,
+  password2: string,
+  email: string,
+}
 
 interface IAdminLoginFormValidationFields {
   userName?: string,
@@ -33,6 +47,7 @@ const HomeScreen = ({onJoin}: IProps) => {
   const [showLoginAdminModal, setShowLoginAdminModal] = useState(false);
   const [adminUserName, setAdminUserName] = useState("");
   const adminLoggedIn = useSelector(isAdminLoggedIn);
+  const userLoggedIn = useSelector(isUserLoggedIn);
   const dispatch = useDispatch();
   const accRef = createRef<HTMLHeadingElement>();
 
@@ -46,15 +61,40 @@ const HomeScreen = ({onJoin}: IProps) => {
     }
   };
 
+  const closeLoginUserModal = () => {
+    dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
+  };
+
   const closeLoginAdminModal = () => {
     setShowLoginAdminModal(false);
     dispatch(setAdminLoggedIn(false));
     setAdminUserName("");
   };
 
-  const closeAdminModal = () => {
+  const closeAndLogoutAdminModal = () => {
     closeLoginAdminModal();
     setAdminUserName("");
+  };
+
+  const onLoginUserSubmit = ({userName, password1, password2, email}: IUserLoginForm) => {
+    const loginRequest: IuiLoginRequest = {
+      uuid: getMyId(),
+      userName: userName,
+      password1: password1,
+      password2: password2,
+      email: email,
+    };
+    console.log("loginRequest", loginRequest);
+    socket.emit("user login", loginRequest, (loginResponse: IuiLoginResponse) => {
+      console.log("loginResponse", loginResponse);
+      if (loginResponse.loginStatus === LOGIN_RESPONSE.ok && loginResponse.isAuthenticated) {
+        dispatch(setUserLoggedIn({loggedIn: true, name: loginRequest.userName}));
+        window.localStorage.setItem("token", loginResponse.token ?? "");
+      } else {
+        dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
+        window.localStorage.removeItem("token");
+      }
+    });
   };
 
   const onLoginSubmit = ({userName, password}: IAdminLoginForm) => {
@@ -103,6 +143,57 @@ const HomeScreen = ({onJoin}: IProps) => {
       <div className="adminButtonDiv">
         <Button onClick={() => setShowLoginAdminModal(true)}>Admin</Button>
       </div>
+
+      <Modal
+        show={!userLoggedIn}
+        onHide={() => closeLoginUserModal()}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Log in / Register
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form
+            onSubmit={onLoginUserSubmit}
+            validate={validateLoginUserForm}
+            render={({handleSubmit, submitting}) => (
+              <form onSubmit={handleSubmit}>
+                <Field<string>
+                  name="userName"
+                  component={TextInput}
+                  label="(Nick)Name"
+                />
+                <Field<string>
+                  name="password1"
+                  component={TextInput}
+                  label="Password"
+                  ispassword="true"
+                />
+                <br />
+                <Field<string>
+                  name="password2"
+                  component={TextInput}
+                  label="Password (again, if new user)"
+                  ispassword="true"
+                />
+                <Field<string>
+                  name="email"
+                  component={TextInput}
+                  label="Email (if new user - optional)"
+                />
+                <br />
+                <div className="d-grid gap-2">
+                  <Button disabled={submitting} type="submit" variant="primary" size="lg">Log In / Register</Button>
+                </div>
+              </form>
+            )}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" onClick={() => closeLoginAdminModal()}>Close</Button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal
         show={showLoginAdminModal}
@@ -164,12 +255,35 @@ const HomeScreen = ({onJoin}: IProps) => {
           </Accordion>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="warning" onClick={() => closeAdminModal()}>Log out</Button>
+          <Button variant="warning" onClick={() => closeAndLogoutAdminModal()}>Log out</Button>
         </Modal.Footer>
 
       </Modal>
     </div>
   );
+};
+
+const validateLoginUserForm = (values: IUserLoginForm) => {
+  // console.log("validating form");
+  const errors: IUserLoginFormValidationFields = {};
+
+  if (!values.userName || values.userName.length < 3) {
+    errors.userName = "Your (nick)name must be at least three characters long";
+  }
+
+  if (!values.password1 || values.password1?.length < 4) {
+    errors.password1 = "Password doesn't match!";
+  }
+
+  if (values.password2 && (values.password1 !== values.password2)) {
+    errors.password2 = "Password doesn't match!";
+  }
+
+  if (values.email && (values.email.split("@").length !== 2 || values.email.split(".").length < 2)) {
+    errors.email = "Not valid email!";
+  }
+
+  return errors;
 };
 
 const validateLoginForm = (values: IAdminLoginForm) => {

@@ -1,4 +1,4 @@
-import { LOGIN_RESPONSE } from "./IuiUser";
+import { IuiAuth, LOGIN_RESPONSE } from "./IuiUser";
 
 export interface IuiNewGameForm {
   newGameHumanPlayersCount: string;
@@ -6,8 +6,6 @@ export interface IuiNewGameForm {
   newGameTurnRound: string;
   newGameEndRound: string;
   newGameMyName: string;
-  password1: string;
-  password2: string;
   noEvenPromises: boolean;
   hidePromiseRound: boolean;
   onlyTotalPromise: boolean;
@@ -28,8 +26,6 @@ export const initialNewGameValues: IuiNewGameForm = {
   newGameTurnRound: "1",
   newGameEndRound: "10",
   newGameMyName: "",
-  password1: "",
-  password2: "",
   noEvenPromises: false,
   hidePromiseRound: false,
   onlyTotalPromise: false,
@@ -54,7 +50,7 @@ export enum CREATE_GAME_STATUS {
   notValidPlayerId,
 }
 
-export interface IuiCreateGameResponse {
+export interface IuiCreateGameResponse extends IuiAuth {
   responseStatus: CREATE_GAME_STATUS,
   loginStatus: LOGIN_RESPONSE,
   newGameId: string,

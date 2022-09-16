@@ -1,3 +1,5 @@
+import { IuiAuth } from "./IuiUser";
+
 export interface IuiPlayersInGameReport {
   playersInGame: number,
   count: number,
@@ -15,7 +17,7 @@ export interface IuiGamesByPlayer {
   avgPercentagePoints: number, // avgPercentagePoints
 }
 
-export interface IuiPlayedGamesReport {
+export interface IuiPlayedGamesReport extends IuiAuth {
   gamesPlayed: number,
   roundsPlayed: number,
   totalCardsHit: number,

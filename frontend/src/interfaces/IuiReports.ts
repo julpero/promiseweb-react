@@ -1,4 +1,6 @@
-export interface IuiGameReport {
+import { IuiAuth } from "./IuiUser";
+
+export interface IuiGameReport extends IuiAuth {
   players: string[],
   pointsPerRound: number[][],
   cumulativePointsPerRound: number[][],
@@ -22,6 +24,6 @@ export interface IuiGetOneGameReportRequest {
   gameId: string,
 }
 
-export interface IuiOneGameReport extends IuiGameReport {
+export interface IuiOneGameReport extends IuiGameReport, IuiAuth {
   gameId: string,
 }

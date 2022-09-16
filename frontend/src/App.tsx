@@ -10,10 +10,12 @@ import GameTable from "./screens/GameTable";
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameRequest, IuiCheckIfOngoingGameResponse } from "./interfaces/IuiCheckIfOngoingGame";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentGameId, setGameId } from "./store/gameInfoSlice";
+import { isUserLoggedIn, setUserLoggedIn } from "./store/userSlice";
 
 const App = () => {
   const [gameStatus, setGameStatus] = useState(CHECK_GAME_STATUS.noGame);
   const gameId = useSelector(getCurrentGameId);
+  const userLoggedIn = useSelector(isUserLoggedIn);
 
   const dispatch = useDispatch();
 
@@ -23,6 +25,7 @@ const App = () => {
     console.log("check response", response);
     setGameStatus(response.checkStatus);
     dispatch(setGameId(response.gameId ?? ""));
+    dispatch(setUserLoggedIn({loggedIn: response.isAuthenticated ?? false, name: response.asAPlayer ?? ""}));
   }, [dispatch]);
 
   useEffect(() => {
@@ -34,6 +37,13 @@ const App = () => {
       window.localStorage.setItem("uUID", uuid);
     }
 
+    if (window.localStorage.getItem("token")) {
+      console.log("has token:", window.localStorage.getItem("token"));
+    } else {
+      console.log("no token");
+      dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
+    }
+
     const checkGameRequest: IuiCheckIfOngoingGameRequest = {
       myId: window.localStorage.getItem("uUID") ?? "",
     };
@@ -41,7 +51,7 @@ const App = () => {
 
     socket.on("game begins", (gameId: string) => {
       console.log("game begins call");
-      if (gameId !== "") {
+      if (gameId !== "" && userLoggedIn) {
         setGameStatus(CHECK_GAME_STATUS.onGoingGame);
         dispatch(setGameId(gameId));
       }
@@ -50,7 +60,7 @@ const App = () => {
     return () => {
       socket.off("game begins");
     };
-  }, [handleOnGoingResponse, dispatch, socket]);
+  }, [handleOnGoingResponse, userLoggedIn, dispatch, socket]);
 
   const onJoin = () => {
     const checkGameRequest: IuiCheckIfOngoingGameRequest = {
@@ -61,10 +71,12 @@ const App = () => {
 
   console.log("render app...");
 
-  if (gameStatus === CHECK_GAME_STATUS.onGoingGame && gameId !== "") {
+  if (gameStatus === CHECK_GAME_STATUS.onGoingGame && gameId !== "" && userLoggedIn) {
     return <GameTable gameId={gameId ?? ""} />;
   } else {
-    return <HomeScreen onJoin={onJoin} />;
+    return (
+      <HomeScreen onJoin={onJoin} />
+    );
   }
 };
 

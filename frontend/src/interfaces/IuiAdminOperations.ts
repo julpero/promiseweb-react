@@ -1,3 +1,5 @@
+import { IuiAuth } from "./IuiUser";
+
 export interface IuiAdminRequest {
   uuid: string,
   userName: string,
@@ -10,7 +12,7 @@ export interface IuiAdminGame {
   statsGenerated: number,
 }
 
-export interface IuiGetGamesResponse {
+export interface IuiGetGamesResponse extends IuiAuth {
   gameList: IuiAdminGame[],
 }
 

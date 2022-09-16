@@ -31,6 +31,7 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
+  "user login": (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => void;
   "check if ongoing game": (checkGameRequest: IuiCheckIfOngoingGameRequest, fn: (response: IuiCheckIfOngoingGameResponse) => void) => void;
   "create game": (createGameRequest: IuiCreateGameRequest, fn: (createGameResponse: IuiCreateGameResponse) => void) => void;
   "leave ongoing game": (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest, fn: (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => void) => void;

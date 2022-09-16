@@ -15,6 +15,7 @@ export const leaveGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): Prom
     userName: leaveGameRequest.myName,
     userPass1: leaveGameRequest.password1 ?? "",
     userPass2: leaveGameRequest.password2 ?? "",
+    email: "",
   };
   const loginObj = await checkLogin(checkLoginObj);
   response.loginStatus = loginObj.result;

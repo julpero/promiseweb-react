@@ -12,6 +12,7 @@ const allowAdminActions = async (userName: string): Promise<boolean> => {
     userPass1: process.env.ADMIN_DUMMY_PASS ?? "zxcvbnmmnbvcxz",
     userPass2: "",
     needsToBeAdmin: true,
+    email: "",
   };
   const checkLoginObj = await checkLogin(checkLoginRequest);
   return checkLoginObj.result === LOGIN_RESPONSE.justAdminCheck;

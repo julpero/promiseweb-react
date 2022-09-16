@@ -1,5 +1,6 @@
 import { IuiRules } from "./IuiGameList";
 import { GAME_STATUS, ROUND_STATUS } from "./IuiGameOptions";
+import { IuiAuth } from "./IuiUser";
 
 // import Card from "deck-of-cards";
 // in frontend we have also a dummy card with value of 0
@@ -40,7 +41,7 @@ export interface IuiGetRoundRequest {
   roundInd: number,
 }
 
-export interface IuiGetRoundResponse {
+export interface IuiGetRoundResponse extends IuiAuth {
   gameId: string,
   roundInd: number,
   myName: string,
@@ -62,7 +63,7 @@ export interface IuiParsedHumanPlayer {
   playerStats: IuiPlayerStats,
 }
 
-export interface IuiGetGameInfoResponse {
+export interface IuiGetGameInfoResponse extends IuiAuth {
   gameId: string,
   humanPlayersCount: number,
   computerPlayersCount: number,
@@ -152,7 +153,7 @@ export interface IuiMakePromiseRequest {
   isSpeedPromise: boolean,
 }
 
-export interface IuiMakePromiseResponse {
+export interface IuiMakePromiseResponse extends IuiAuth {
   promiseResponse: PROMISE_RESPONSE,
   promise: number,
   promiser: string,
@@ -173,7 +174,7 @@ export interface IuiPlayCardRequest {
   isSpeedPlay: boolean,
 }
 
-export interface IuiPlayCardResponse {
+export interface IuiPlayCardResponse extends IuiAuth {
   playResponse: PLAY_CARD_RESPONSE,
   playerName: string,
   playedFromSlot: number,

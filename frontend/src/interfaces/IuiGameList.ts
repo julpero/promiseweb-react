@@ -1,5 +1,5 @@
 import { HIDDEN_CARDS_MODE, IuiRoundInfo, RULE } from "./IuiGameOptions";
-import { LOGIN_RESPONSE } from "./IuiUser";
+import { IuiAuth, LOGIN_RESPONSE } from "./IuiUser";
 
 export interface IuiRules {
   ruleList: RULE[],
@@ -21,7 +21,7 @@ export interface IuiGetGameListRequest {
   myId: string,
 }
 
-export interface IuiGetGameListResponse {
+export interface IuiGetGameListResponse extends IuiAuth {
   games: IuiGameListItem[],
 }
 
@@ -41,7 +41,7 @@ export enum JOIN_LEAVE_RESULT {
   lastOk,
 }
 
-export interface IuiJoinLeaveGameResponse {
+export interface IuiJoinLeaveGameResponse extends IuiAuth {
   joinLeaveResult: JOIN_LEAVE_RESULT,
   loginStatus: LOGIN_RESPONSE,
   startGame?: boolean,

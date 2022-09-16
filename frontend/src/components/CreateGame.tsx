@@ -13,14 +13,13 @@ import CheckboxInput from "./FormComponents/CheckBoxInput";
 
 import { IuiNewGameForm, initialNewGameValues, IuiCreateGameRequest, IuiCreateGameResponse, CREATE_GAME_STATUS } from "../interfaces/IuiNewGame";
 import { LOGIN_RESPONSE } from "../interfaces/IuiUser";
+import { useSelector } from "react-redux";
+import { getUserName, isUserLoggedIn } from "../store/userSlice";
 
 interface IFormValidationFields {
   newGameHumanPlayersCount?: string,
   newGameTurnRound?: string,
   newGameEndRound?: string,
-  newGameMyName?: string,
-  password1?: string,
-  password2?: string,
 }
 
 interface IProps {
@@ -30,6 +29,8 @@ interface IProps {
 const CreateGame = (props: IProps) => {
   const [ loginStatus, setLoginStatus ] = useState<LOGIN_RESPONSE | null>(null);
   const [ createGameStatus, setCreateGameStatus ] = useState<CREATE_GAME_STATUS | null>(null);
+  const userLoggedIn = useSelector(isUserLoggedIn);
+  const userName = useSelector(getUserName);
 
   const { socket } = useSocket();
 
@@ -203,9 +204,11 @@ const CreateGame = (props: IProps) => {
                   name="newGameMyName"
                   component={TextInput}
                   label="My (nick)name in the game"
+                  value={userName}
+                  disabled={true}
                 />
               </div>
-              <div className="col">
+              {/* <div className="col">
                 <Field<string>
                   name="password1"
                   component={TextInput}
@@ -220,7 +223,7 @@ const CreateGame = (props: IProps) => {
                   label="Re-type password if first time user"
                   ispassword="true"
                 />
-              </div>
+              </div> */}
             </div>
             <Card>
               <Card.Header>
@@ -431,22 +434,6 @@ const validateForm = (values: IuiNewGameForm) => {
   }
   if (endRound < turnRound) {
     errors.newGameEndRound = "End round must be equal or greater than turn round";
-  }
-
-  if (values.password1.length < 4) {
-    errors.password1 = "Password must be at least four characters long";
-  }
-
-  if (values.newGameMyName.length < 3) {
-    errors.newGameMyName = "Your (nick)name must be at least three characters long";
-  }
-
-  if (parseInt(values.newGameHumanPlayersCount, 10) > 5 && (startRound > 8 || endRound > 8)) {
-    errors.newGameHumanPlayersCount = "For six players eight is maximum start and end round";
-  }
-
-  if (values.password2?.length > 0 && values.password1 !== values.password2) {
-    errors.password2 = "Password doesn't match!";
   }
 
   return errors;

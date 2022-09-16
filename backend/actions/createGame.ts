@@ -1,10 +1,8 @@
 import { insertNewGame, hasOngoingOrCreatedGame } from "../dbActions/promiseweb";
-import { checkLogin } from "../dbActions/users";
 import { getPlayerStats } from "../common/common";
 import { IGameOptions} from "../interfaces/IGameOptions";
 import { IuiCreateGameRequest, IuiCreateGameResponse, CREATE_GAME_STATUS } from "../../frontend/src/interfaces/IuiNewGame";
 import { GAME_STATUS, HIDDEN_CARDS_MODE } from "../../frontend/src/interfaces/IuiGameOptions";
-import { ICheckLoginRequest  } from "../interfaces/IUser";
 import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
 
 import { validate as uuidValidate } from "uuid";
@@ -56,20 +54,7 @@ const createGame = async (createGameRequest: IuiCreateGameRequest): Promise<IuiC
     return response;
   }
 
-  const adminUserName = createGameRequest.newGameMyName;
   const adminId = createGameRequest.playerId;
-
-  const checkLoginObj: ICheckLoginRequest = {
-    userName: adminUserName,
-    userPass1: createGameRequest.password1 ?? "",
-    userPass2: createGameRequest.password2 ?? "",
-  };
-  const loginObj = await checkLogin(checkLoginObj);
-  response.loginStatus = loginObj.result;
-  if (!loginObj.loginOk) {
-    console.log("loginFailed", response.loginStatus);
-    return response;
-  }
 
   const okToCreate = !(await hasOngoingOrCreatedGame(adminId));
   if (!okToCreate) {
@@ -77,7 +62,7 @@ const createGame = async (createGameRequest: IuiCreateGameRequest): Promise<IuiC
     return response;
   }
 
-  if (okToCreate && loginObj.loginOk) {
+  if (okToCreate) {
     const gameOptions = createGameOptions(createGameRequest);
     console.log("gameOptions", gameOptions);
 

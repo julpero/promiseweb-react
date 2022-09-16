@@ -4,7 +4,7 @@ import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
 
 import bcrypt from "bcrypt";
 
-export const checkLogin = async ({userName, userPass1, userPass2, needsToBeAdmin}: ICheckLoginRequest): Promise<ICheckLoginResponse> => {
+export const checkLogin = async ({userName, userPass1, userPass2, email, needsToBeAdmin}: ICheckLoginRequest): Promise<ICheckLoginResponse> => {
   const loginObj: ICheckLoginResponse = {
     result: LOGIN_RESPONSE.passwordFails,
     loginOk: false,
@@ -45,6 +45,7 @@ export const checkLogin = async ({userName, userPass1, userPass2, needsToBeAdmin
     const newUserObj = new User({
       playerName: userName,
       passHash: hashedPass,
+      email: email,
     });
     const newUser = await newUserObj.save();
     if (newUser) {

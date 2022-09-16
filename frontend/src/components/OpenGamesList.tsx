@@ -251,7 +251,7 @@ const validateForm = (values: IFormFields ) => {
   console.log("validating form");
   const errors: IFormValidationFields = {};
 
-  if (!values.password1 || values.password1.length < 4) {
+  if (!values.password1 || values.password1.length < 3) {
     errors.password1 = "Password must be at least four characters long";
   }
 
