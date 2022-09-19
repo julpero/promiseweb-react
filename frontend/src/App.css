@@ -54,6 +54,14 @@ body {
   position: relative;
 }
 
+.smallErrorDiv {
+  border: 1px red solid;
+  border-radius: 5px;
+  color: red;
+  margin-bottom: 5px;
+  padding: 5px;
+}
+
 .playerInfoDiv,
 .trumpCardSlotDiv,
 .ownCardsDiv,

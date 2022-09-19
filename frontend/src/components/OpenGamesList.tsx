@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Form, Field } from "react-final-form";
+import { Form } from "react-final-form";
 import { useSocket } from "../socket";
 import GameItem from "./GameItem";
 import {
@@ -9,24 +9,14 @@ import {
   IuiJoinLeaveGameResponse,
   JOIN_LEAVE_RESULT
 } from "../interfaces/IuiGameList";
-import TextInput from "./FormComponents/TextInput";
 import { Modal } from "react-bootstrap";
 import { FormApi } from "final-form";
 import { IuiUserData, LOGIN_RESPONSE } from "../interfaces/IuiUser";
-import { useSelector } from "react-redux";
-import { getUserName } from "../store/userSlice";
-
-interface IFormValidationFields {
-  userName?: string,
-  password1?: string,
-  password2?: string,
-  gamePassword?: string,
-}
+import { useDispatch, useSelector } from "react-redux";
+import { getUser } from "../store/userSlice";
+import { handleUnauthenticatedRequest } from "../common/userFunctions";
 
 interface IFormFields {
-  userName: string,
-  password1: string,
-  password2: string,
   gamePassword?: string,
 }
 
@@ -38,7 +28,9 @@ const OpenGamesList = () => {
   const [ gameItemList, setGameItemList ] = useState<IuiGameListItem[]>([]);
   const [ loginStatus, setLoginStatus ] = useState<LOGIN_RESPONSE | null>(null);
   const [ joinLeaveStatus, setJoinLeaveStatus ] = useState<JOIN_LEAVE_RESULT | null>(null);
-  const userName = useSelector(getUserName);
+  const user = useSelector(getUser);
+
+  const dispatch = useDispatch();
 
   const { socket } = useSocket();
 
@@ -48,16 +40,23 @@ const OpenGamesList = () => {
   const getToken = (): string => window.localStorage.getItem("token") ?? "";
 
   const fetchGameItemList = useCallback(() => {
-    const gameListRequest: IuiUserData = {
-      uuid: getMyId(),
-      userName: userName,
-      token: getToken(),
-    };
-    socket.emit("get open games", gameListRequest, (gameList: IuiGetGameListResponse) => {
-      console.log("gameList", gameList);
-      setGameItemList(gameList.games);
-    });
-  }, [userName, socket]);
+    if (user.isUserLoggedIn) {
+      const gameListRequest: IuiUserData = {
+        uuid: getMyId(),
+        userName: user.userName,
+        token: getToken(),
+      };
+      socket.emit("get open games", gameListRequest, (gameList: IuiGetGameListResponse) => {
+        console.log("gameList", gameList);
+        if (gameList.isAuthenticated) {
+          window.localStorage.setItem("token", gameList.token ?? "");
+          setGameItemList(gameList.games);
+        } else {
+          handleUnauthenticatedRequest(dispatch);
+        }
+      });
+    }
+  }, [user, dispatch, socket]);
 
   useEffect(() => {
     fetchGameItemList();
@@ -130,10 +129,15 @@ const OpenGamesList = () => {
   const joinGame = (joinGameRequest: IuiJoinLeaveGameRequest) => {
     socket.emit("join game", joinGameRequest, (response: IuiJoinLeaveGameResponse) => {
       console.log("join response", response);
-      setLoginStatus(response.loginStatus);
-      setJoinLeaveStatus(response.joinLeaveResult);
-      if (response.loginStatus !== LOGIN_RESPONSE.ok || response.joinLeaveResult === JOIN_LEAVE_RESULT.notOk) {
-        fetchGameItemList();
+      if (response.isAuthenticated) {
+        window.localStorage.setItem("token", response.token ?? "");
+        setLoginStatus(response.loginStatus);
+        setJoinLeaveStatus(response.joinLeaveResult);
+        if (response.loginStatus !== LOGIN_RESPONSE.ok || response.joinLeaveResult === JOIN_LEAVE_RESULT.notOk) {
+          fetchGameItemList();
+        }
+      } else {
+        handleUnauthenticatedRequest(dispatch);
       }
     });
   };
@@ -141,10 +145,15 @@ const OpenGamesList = () => {
   const leaveGame = (leaveGameRequest: IuiJoinLeaveGameRequest) => {
     socket.emit("leave game", leaveGameRequest, (response: IuiJoinLeaveGameResponse) => {
       console.log("leave response", response);
-      setLoginStatus(response.loginStatus);
-      setJoinLeaveStatus(response.joinLeaveResult);
-      if (response.loginStatus !== LOGIN_RESPONSE.ok || response.joinLeaveResult === JOIN_LEAVE_RESULT.notOk) {
-        fetchGameItemList();
+      if (response.isAuthenticated) {
+        window.localStorage.setItem("token", response.token ?? "");
+        setLoginStatus(response.loginStatus);
+        setJoinLeaveStatus(response.joinLeaveResult);
+        if (response.loginStatus !== LOGIN_RESPONSE.ok || response.joinLeaveResult === JOIN_LEAVE_RESULT.notOk) {
+          fetchGameItemList();
+        }
+      } else {
+        handleUnauthenticatedRequest(dispatch);
       }
     });
   };
@@ -173,14 +182,12 @@ const OpenGamesList = () => {
 
   const onSubmit = (values: IFormFields) => {
     console.log("onSubmit", values);
-    if (gameId.length > 0 && method !== null) {
+    if (user.isUserLoggedIn && gameId.length > 0 && method !== null) {
       const request: IuiJoinLeaveGameRequest = {
         uuid: getMyId(),
         token: getToken(),
         gameId: gameId,
-        userName: values.userName,
-        password1: values.password1,
-        password2: values.password2,
+        userName: user.userName,
         gamePassword: values.gamePassword ?? "",
         method: method,
       };
@@ -201,34 +208,8 @@ const OpenGamesList = () => {
     <React.Fragment>
       <Form
         onSubmit={onSubmit}
-        validate={validateForm}
         render={({handleSubmit, form }) => (
           <form onSubmit={ handleSubmit }>
-            <div className="row">
-              <div className="col">
-                <Field<string>
-                  name="userName"
-                  component={TextInput}
-                  label="My (nick)name in the game"
-                />
-              </div>
-              <div className="col">
-                <Field<string>
-                  name="password1"
-                  component={TextInput}
-                  label="Password"
-                  ispassword="true"
-                />
-              </div>
-              <div className="col">
-                <Field<string>
-                  name="password2"
-                  component={TextInput}
-                  label="Re-type password if first time user"
-                  ispassword="true"
-                />
-              </div>
-            </div>
             <div className="row">
               <div className="col">
                 {renderGameItems(form)}
@@ -253,25 +234,6 @@ const OpenGamesList = () => {
       </Modal>
     </React.Fragment>
   );
-};
-
-const validateForm = (values: IFormFields ) => {
-  console.log("validating form");
-  const errors: IFormValidationFields = {};
-
-  if (!values.password1 || values.password1.length < 3) {
-    errors.password1 = "Password must be at least four characters long";
-  }
-
-  if (!values.userName || values.userName.length < 3) {
-    errors.userName = "Your (nick)name must be at least three characters long";
-  }
-
-  if (values.password2?.length > 0 && values.password1 !== values.password2) {
-    errors.password2 = "Password doesn't match!";
-  }
-
-  return errors;
 };
 
 export default OpenGamesList;

@@ -13,8 +13,9 @@ import CheckboxInput from "./FormComponents/CheckBoxInput";
 
 import { IuiNewGameForm, initialNewGameValues, IuiCreateGameRequest, IuiCreateGameResponse, CREATE_GAME_STATUS } from "../interfaces/IuiNewGame";
 import { LOGIN_RESPONSE } from "../interfaces/IuiUser";
-import { useSelector } from "react-redux";
-import { getUserName } from "../store/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser } from "../store/userSlice";
+import { handleUnauthenticatedRequest } from "../common/userFunctions";
 
 interface IFormValidationFields {
   newGameHumanPlayersCount?: string,
@@ -29,7 +30,8 @@ interface IProps {
 const CreateGame = (props: IProps) => {
   const [ loginStatus, setLoginStatus ] = useState<LOGIN_RESPONSE | null>(null);
   const [ createGameStatus, setCreateGameStatus ] = useState<CREATE_GAME_STATUS | null>(null);
-  const globalUserName = useSelector(getUserName);
+  const user = useSelector(getUser);
+  const dispatch = useDispatch();
 
   const { socket } = useSocket();
 
@@ -39,16 +41,23 @@ const CreateGame = (props: IProps) => {
   const getToken = (): string => window.localStorage.getItem("token") ?? "";
 
   const onSubmit = (values: IuiNewGameForm) => {
-    const uuid: string = getMyId();
-    const newGameRequest: IuiCreateGameRequest = {...values, uuid, userName: globalUserName, token: getToken() };
-    socket.emit("create game", newGameRequest, (createGameResponse: IuiCreateGameResponse) => {
-      setLoginStatus(createGameResponse.loginStatus);
-      setCreateGameStatus(createGameResponse.responseStatus);
-      if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
-        // created new game
-        props.onCreateGame();
-      }
-    });
+    if (user.isUserLoggedIn) {
+      const uuid: string = getMyId();
+      const newGameRequest: IuiCreateGameRequest = {...values, uuid, userName: user.userName, token: getToken() };
+      socket.emit("create game", newGameRequest, (createGameResponse: IuiCreateGameResponse) => {
+        if (createGameResponse.isAuthenticated) {
+          window.localStorage.setItem("token", createGameResponse.token ?? "");
+          setLoginStatus(createGameResponse.loginStatus);
+          setCreateGameStatus(createGameResponse.responseStatus);
+          if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
+            // created new game
+            props.onCreateGame();
+          }
+        } else {
+          handleUnauthenticatedRequest(dispatch);
+        }
+      });
+    }
   };
 
   const createGameErrorHeaderStr = (): string => {

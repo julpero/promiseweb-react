@@ -27,33 +27,17 @@ import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "./frontend/src/i
 import { IuiPlayedGamesReport } from "./frontend/src/interfaces/IuiGameReports";
 import { getOneGameReportData, getReportData } from "./backend/actions/reports";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "./frontend/src/interfaces/IuiReports";
-import { IuiLoginRequest, IuiLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./frontend/src/interfaces/IuiUser";
+import { IuiLoginRequest, IuiLoginResponse, IuiRefreshLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./frontend/src/interfaces/IuiUser";
 import { handleLoginRequest } from "./backend/actions/login";
 import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "./frontend/src/interfaces/IuiAdminOperations";
 import { convertOldData, getGamesForAdmin, reCreateAllGameStats, reCreateGameStats } from "./backend/actions/adminActions";
-import { isUserAuthenticated, isValidAdminUser, isValidUser, signUserToken } from "./backend/common/userValidation";
+import { getValidToken, isUserAuthenticated, isValidAdminUser, isValidUser, signUserToken } from "./backend/common/userValidation";
 
 dotenv.config();
 
 const app: Application = express();
 const server = http.createServer(app);
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server);
-
-// io.use((socket: Socket, next: () => void) => {
-//   const token = (socket.handshake.query.token as string) ?? "";
-//   console.log("check token", token);
-//   if (token && token !== null && token !== undefined && token.split(".").length === 3) {
-//     console.log("is token", token);
-//     // const token = socket.handshake.query.token as string;
-//     const juupaJuu = verify(token, process.env.AUTH_SECRET ?? "MUST_SET_THIS");
-//     console.log(juupaJuu);
-//     // next();
-//   } else {
-//     console.log("no token");
-//     // next();
-//   }
-//   next();
-// });
 
 app.use(cors());
 app.use(express.json());
@@ -77,6 +61,26 @@ connectDB().then(() => {
     console.log("server listening on *:" + PORT);
   });
 
+  // io.use((socket: Socket, next) => {
+  //   // console.log("!middleware starts!", socket.handshake);
+  //   if (socket.handshake.query && socket.handshake.query.token) {
+  //     const token = socket.handshake.query.token;
+  //     const validToken = getValidToken(token);
+  //     // console.log("validToken", validToken);
+  //     // console.log("socket.data", socket.data);
+  //     if (validToken && validToken.userName && validToken.uuid) {
+  //       // this means only that there is a "valid" token in headers
+  //       socket.data.claimsToBeAuthenticated = true;
+  //     } else {
+  //       socket.data.claimsToBeAuthenticated = false;
+  //     }
+  //     // console.log("socket.data", socket.data);
+  //   } else {
+  //     // console.log("no token");
+  //   }
+  //   // console.log("!middleware ends!");
+  //   next();
+  // }).
   io.on("connection", (socket: Socket) => {
     console.log("connected!", socket.id);
 
@@ -97,19 +101,35 @@ connectDB().then(() => {
     });
 
     socket.on("user login", async (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => {
-      console.log("user login", loginRequest);
+      // console.log("user login", loginRequest);
       const {uuid, userName, password1} = loginRequest;
       if (!isValidUser(userName, password1, uuid)) return null;
 
       const loginResponse = await handleLoginRequest(loginRequest, false);
       if (loginResponse.loginStatus === LOGIN_RESPONSE.ok) {
-        loginResponse.isAuthenticated = true;
         const newToken = signUserToken(userName, uuid);
         loginResponse.token = newToken;
+        loginResponse.isAuthenticated = true;
       } else {
         loginResponse.isAuthenticated = false;
       }
       fn(loginResponse);
+    });
+
+    socket.on("do refresh login", async (loginRequest: IuiUserData, fn: (loginResponse: IuiRefreshLoginResponse) => void) => {
+      const {uuid, userName, token} = loginRequest;
+      const validToken = getValidToken(token);
+      if (validToken && validToken.uuid === uuid && userName === "dummy") {
+        const userNameFromToken = validToken.userName;
+        const newToken = signUserToken(userNameFromToken, uuid);
+        const loginResponse: IuiRefreshLoginResponse = {
+          isAuthenticated: true,
+          myName: userNameFromToken,
+          loginStatus: LOGIN_RESPONSE.ok,
+          token: newToken,
+        };
+        fn(loginResponse);
+      }
     });
 
     socket.on("admin login", async (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => {
@@ -180,6 +200,8 @@ connectDB().then(() => {
           csm.addUserToMap(createGameRequest.userName, socket.id, gameIdStr);
           io.emit("new game created", gameIdStr);
         }
+        createGameResponse.isAuthenticated = true;
+        createGameResponse.token = signUserToken(userName, uuid);
         fn(createGameResponse);
       } else {
         return null;
@@ -191,6 +213,8 @@ connectDB().then(() => {
       const isAuthenticated = isUserAuthenticated(token, userName, uuid);
       if (isAuthenticated) {
         const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(getGameListRequest);
+        getGameListResponse.isAuthenticated = true;
+        getGameListResponse.token = signUserToken(userName, uuid);
         fn(getGameListResponse);
       } else {
         return null;
@@ -198,29 +222,46 @@ connectDB().then(() => {
     });
 
     socket.on("join game", async (joinGameRequest: IuiJoinLeaveGameRequest, fn: (joinResponse: IuiJoinLeaveGameResponse) => void) => {
-      const gameIdStr = joinGameRequest.gameId;
-      const joinResponse: IuiJoinLeaveGameResponse = await joinGame(joinGameRequest);
-      if (joinResponse.joinLeaveResult !== JOIN_LEAVE_RESULT.notOk) {
-        socket.join(gameIdStr);
-        csm.addUserToMap(joinGameRequest.userName, socket.id, gameIdStr);
-        // notify other users
-        io.emit("game list updated");
+      const {userName, uuid, token} = joinGameRequest;
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid);
+      if (isAuthenticated) {
+        const gameIdStr = joinGameRequest.gameId;
+        const joinResponse: IuiJoinLeaveGameResponse = await joinGame(joinGameRequest);
+        if (joinResponse.joinLeaveResult !== JOIN_LEAVE_RESULT.notOk) {
+          socket.join(gameIdStr);
+          csm.addUserToMap(joinGameRequest.userName, socket.id, gameIdStr);
+          // notify other users
+          io.emit("game list updated");
+        }
+        if (joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.lastOk) {
+          // notify all games players about game start
+          io.to(gameIdStr).emit("game begins", gameIdStr);
+        }
+        joinResponse.isAuthenticated = true;
+        joinResponse.token = signUserToken(userName, uuid);
+        fn(joinResponse);
+      } else {
+        return null;
       }
-      if (joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.lastOk) {
-        // notify all games players about game start
-        io.to(gameIdStr).emit("game begins", gameIdStr);
-      }
-      fn(joinResponse);
     });
 
     socket.on("leave game", async (leaveGameRequest: IuiJoinLeaveGameRequest, fn: (leaveResponse: IuiJoinLeaveGameResponse) => void) => {
-      const leaveResponse: IuiJoinLeaveGameResponse = await leaveGame(leaveGameRequest);
-      if (leaveResponse.joinLeaveResult === JOIN_LEAVE_RESULT.ok) {
-        socket.leave(leaveGameRequest.gameId);
-        // notify other users
-        io.emit("game list updated");
+      const {userName, uuid, token} = leaveGameRequest;
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid);
+      if (isAuthenticated) {
+        const leaveResponse: IuiJoinLeaveGameResponse = await leaveGame(leaveGameRequest);
+        if (leaveResponse.joinLeaveResult === JOIN_LEAVE_RESULT.ok) {
+          socket.leave(leaveGameRequest.gameId);
+          csm.removeUserFromGame(userName, leaveGameRequest.gameId);
+          // notify other users
+          io.emit("game list updated");
+        }
+        leaveResponse.isAuthenticated = true;
+        leaveResponse.token = signUserToken(userName, uuid);
+        fn(leaveResponse);
+      } else {
+        return null;
       }
-      fn(leaveResponse);
     });
 
     socket.on("check if ongoing game", async (checkIfOngoingGameRequest: IuiUserData, fn: (checkResponse: IuiCheckIfOngoingGameResponse) => void) => {
@@ -245,6 +286,7 @@ connectDB().then(() => {
           }
         }
         checkResponse.isAuthenticated = isAuthenticated;
+        checkResponse.token = signUserToken(userName, uuid);
         fn(checkResponse);
       } else {
         return null;
@@ -480,6 +522,7 @@ connectDB().then(() => {
       if (isAuthenticated) {
         const reportData = await getReportData();
         reportData.isAuthenticated = isAuthenticated;
+        reportData.token = signUserToken(userName, uuid);
         fn(reportData);
       } else {
         return null;

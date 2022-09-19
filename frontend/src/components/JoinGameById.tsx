@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { Field, Form } from "react-final-form";
+import { useDispatch } from "react-redux";
+import { handleUnauthenticatedRequest } from "../common/userFunctions";
 import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "../interfaces/IuiJoinOngoingGame";
 import { useSocket } from "../socket";
 import TextInput from "./FormComponents/TextInput";
@@ -17,16 +19,22 @@ interface IProps {
 const JoinGameById = ({onJoin}: IProps) => {
   const [ joinOk, setJoinOk ] = useState(false);
   const [ playerName, setPlayerName ] = useState("");
+  const dispatch = useDispatch();
   const { socket } = useSocket();
 
   const onSubmit = (values: IuiJoinOngoingGame): void => {
     console.log("onSubmit", values);
     socket.emit("join ongoing game", values, (joinResponse: IuiJoinOngoingGameResponse) => {
       console.log("join response", joinResponse);
-      if (joinResponse.joinOk) {
-        window.localStorage.setItem("uUID", joinResponse.playerId);
-        setPlayerName(joinResponse.playerName);
-        setJoinOk(joinResponse.joinOk);
+      if (joinResponse.isAuthenticated) {
+        window.localStorage.setItem("token", joinResponse.token ?? "");
+        if (joinResponse.joinOk) {
+          window.localStorage.setItem("uUID", joinResponse.playerId);
+          setPlayerName(joinResponse.playerName);
+          setJoinOk(joinResponse.joinOk);
+        }
+      } else {
+        handleUnauthenticatedRequest(dispatch);
       }
     });
   };

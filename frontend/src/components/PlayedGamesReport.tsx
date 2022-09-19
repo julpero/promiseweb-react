@@ -5,14 +5,17 @@ import { useSocket } from "../socket";
 import "react-tabulator/lib/styles.css"; // required styles
 import "react-tabulator/lib/css/tabulator.min.css"; // theme
 import { ReactTabulator, ColumnDefinition } from "react-tabulator";
-import { useSelector } from "react-redux";
-import { getUserName } from "../store/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser } from "../store/userSlice";
 import { IuiUserData } from "../interfaces/IuiUser";
+import { handleUnauthenticatedRequest } from "../common/userFunctions";
 
 const PlayedGamesReport = () => {
   console.log("PlayedGamesReport");
   const [reportData, setReportData] = useState<IuiPlayedGamesReport>();
-  const userName = useSelector(getUserName);
+  const user = useSelector(getUser);
+
+  const dispatch = useDispatch();
 
   const { socket } = useSocket();
 
@@ -183,20 +186,24 @@ const PlayedGamesReport = () => {
 
   useEffect(() => {
     console.log("PlayedGamesReport A");
-    const request: IuiUserData = {
-      uuid: getMyId(),
-      userName: userName,
-      token: getToken(),
-    };
-    console.log(request);
-    if (userName) {
+    if (user.isUserLoggedIn) {
+      const request: IuiUserData = {
+        uuid: getMyId(),
+        userName: user.userName,
+        token: getToken(),
+      };
       console.log("A", request);
       socket.emit("get report data", request, (reportData: IuiPlayedGamesReport) => {
         console.log("report data", reportData);
-        setReportData(reportData);
+        if (reportData.isAuthenticated) {
+          window.localStorage.setItem("token", reportData.token ?? "");
+          setReportData(reportData);
+        } else {
+          handleUnauthenticatedRequest(dispatch);
+        }
       });
     }
-  }, [userName, socket]);
+  }, [user, dispatch, socket]);
 
   return (
     <div>

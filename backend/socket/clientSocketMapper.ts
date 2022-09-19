@@ -41,6 +41,13 @@ export const removeUserFromMap = (userName: string, socketId: string, gameId: st
   // console.log(userSocketIdMap);
 };
 
+export const removeUserFromGame = (userName: string, gameId: string): void => {
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    user.games.delete(gameId);
+  }
+};
+
 export const getUserNameFromMapBySocket = (socketId: string): string | null => {
   let name = null;
   userSocketIdMap.forEach(function(value, key) {

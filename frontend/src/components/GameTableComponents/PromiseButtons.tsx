@@ -1,6 +1,6 @@
 import React, { CSSProperties, useEffect, useState } from "react";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getCurrentGameInfo } from "../../store/gameInfoSlice";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 
@@ -10,15 +10,18 @@ import { IuiMakePromiseRequest, IuiMakePromiseResponse, IuiRoundPlayer, PROMISE_
 import { isRuleActive } from "../../common/commonFunctions";
 import { currentTotalPromise } from "../../common/playingGame";
 import { RULE } from "../../interfaces/IuiGameOptions";
-import { getUserName } from "../../store/userSlice";
+import { getUser } from "../../store/userSlice";
+import { handleUnauthenticatedRequest } from "../../common/userFunctions";
 
 const PromiseButtons = () => {
   const [clicked, setClicked] = useState(false);
   const currentGameInfo = useSelector(getCurrentGameInfo);
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
-  const userName = useSelector(getUserName);
+  const user = useSelector(getUser);
   const { gameId, roundInd } = currentRoundInfo;
   const { cardsInRound, isMyPromiseTurn } = currentRoundInfo.roundToPlayer;
+
+  const dispatch = useDispatch();
 
   const { socket } = useSocket();
 
@@ -51,23 +54,30 @@ const PromiseButtons = () => {
   };
 
   const doPromise = (promise: number) => {
-    if (promise === disabledButton) return;
-    setClicked(true);
-    const promiseRequest: IuiMakePromiseRequest = {
-      uuid: getMyId(),
-      userName: userName,
-      token: getToken(),
-      gameId: gameId,
-      roundInd: roundInd,
-      promise: promise,
-      isSpeedPromise: false,
-    };
-    socket.emit("make promise", promiseRequest, (promiseResponse: IuiMakePromiseResponse) => {
-      console.log("promiseResponse", promiseResponse);
-      if (promiseResponse.promiseResponse !== PROMISE_RESPONSE.promiseOk) {
-        setClicked(false);
-      }
-    });
+    if (user.isUserLoggedIn) {
+      if (promise === disabledButton) return;
+      setClicked(true);
+      const promiseRequest: IuiMakePromiseRequest = {
+        uuid: getMyId(),
+        userName: user.userName,
+        token: getToken(),
+        gameId: gameId,
+        roundInd: roundInd,
+        promise: promise,
+        isSpeedPromise: false,
+      };
+      socket.emit("make promise", promiseRequest, (promiseResponse: IuiMakePromiseResponse) => {
+        console.log("promiseResponse", promiseResponse);
+        if (promiseResponse.isAuthenticated) {
+          window.localStorage.setItem("token", promiseResponse.token ?? "");
+          if (promiseResponse.promiseResponse !== PROMISE_RESPONSE.promiseOk) {
+            setClicked(false);
+          }
+        } else {
+          handleUnauthenticatedRequest(dispatch);
+        }
+      });
+    }
   };
 
   const renderPromiseButtons = (): JSX.Element[] => {

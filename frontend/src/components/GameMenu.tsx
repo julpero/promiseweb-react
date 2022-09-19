@@ -3,9 +3,10 @@ import { useSocket } from "../socket";
 import { v4 as uuidv4 } from "uuid";
 import { Form, Button, Modal } from "react-bootstrap";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "../interfaces/IuiLeaveOngoingGame";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getCurrentGameInfo } from "../store/gameInfoSlice";
-import { getUserName } from "../store/userSlice";
+import { getUser } from "../store/userSlice";
+import { handleUnauthenticatedRequest } from "../common/userFunctions";
 
 /**
  * GameMenu
@@ -18,7 +19,9 @@ const GameMenu = () => {
   const [leftMMyId, setLeftMyId] = useState("");
 
   const currentGameInfo = useSelector(getCurrentGameInfo);
-  const userName = useSelector(getUserName);
+  const user = useSelector(getUser);
+
+  const dispatch = useDispatch();
 
   const { socket } = useSocket();
 
@@ -35,24 +38,31 @@ const GameMenu = () => {
   if (!currentGameInfo.gameId) return null;
 
   const leaveGameClick = () => {
-    const leaveOngoingGameRequest: IuiLeaveOngoingGameRequest = {
-      gameId: currentGameInfo.gameId,
-      uuid: getMyId(),
-      userName: userName,
-      token: getToken(),
-    };
+    if (user.isUserLoggedIn) {
+      const leaveOngoingGameRequest: IuiLeaveOngoingGameRequest = {
+        gameId: currentGameInfo.gameId,
+        uuid: getMyId(),
+        userName: user.userName,
+        token: getToken(),
+      };
 
-    socket.emit("leave ongoing game", leaveOngoingGameRequest, (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => {
-      console.log("leaveOngoingGameResponse", leaveOngoingGameResponse);
-      if (leaveOngoingGameResponse.leaveStatus === LEAVE_ONGOING_GAME_RESULT.leaveOk) {
-        setLeftGameModal(true);
-        setLeaveGameModal(false);
-        setLeftGameId(leaveOngoingGameResponse.gameId);
-        setLeftMyId(leaveOngoingGameResponse.uuid);
-        const uuid = uuidv4();
-        window.localStorage.setItem("uUID", uuid);
-      }
-    });
+      socket.emit("leave ongoing game", leaveOngoingGameRequest, (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => {
+        console.log("leaveOngoingGameResponse", leaveOngoingGameResponse);
+        if (leaveOngoingGameResponse.isAuthenticated) {
+          window.localStorage.setItem("token", leaveOngoingGameResponse.token ?? "");
+          if (leaveOngoingGameResponse.leaveStatus === LEAVE_ONGOING_GAME_RESULT.leaveOk) {
+            setLeftGameModal(true);
+            setLeaveGameModal(false);
+            setLeftGameId(leaveOngoingGameResponse.gameId);
+            setLeftMyId(leaveOngoingGameResponse.uuid);
+            const uuid = uuidv4();
+            window.localStorage.setItem("uUID", uuid);
+          }
+        } else {
+          handleUnauthenticatedRequest(dispatch);
+        }
+      });
+    }
   };
 
   const closeLeftModal = () => {

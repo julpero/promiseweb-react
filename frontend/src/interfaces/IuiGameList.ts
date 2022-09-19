@@ -23,8 +23,6 @@ export interface IuiGetGameListResponse extends IuiAuth {
 
 export interface IuiJoinLeaveGameRequest extends IuiUserData {
   gameId: string,
-  password1: string,
-  password2: string,
   gamePassword: string,
   method: "join" | "leave",
 }

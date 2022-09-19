@@ -18,8 +18,13 @@ export interface IuiLoginResponse extends IuiAuth {
   token?: string,
 }
 
+export interface IuiRefreshLoginResponse extends IuiLoginResponse {
+  myName: string,
+}
+
 export interface IuiAuth {
   isAuthenticated?: boolean,
+  token?: string,
 }
 
 export interface IuiUserData {

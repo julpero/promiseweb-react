@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { handleUnauthenticatedRequest } from "../common/userFunctions";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "../interfaces/IuiReports";
 import { useSocket } from "../socket";
-import { getUserName } from "../store/userSlice";
+import { getUser } from "../store/userSlice";
 import CardsInGame from "./ReportComponents/CardsInGame";
 
 import CumulativePoints from "./ReportComponents/CumulativePoints";
@@ -16,7 +17,8 @@ interface IProps {
 
 const OneGameReport = ({gameId}: IProps) => {
   const [gameReportData, setGameReportData] = useState<IuiOneGameReport>();
-  const userName = useSelector(getUserName);
+  const user = useSelector(getUser);
+  const dispatch = useDispatch();
 
   const { socket } = useSocket();
 
@@ -24,18 +26,23 @@ const OneGameReport = ({gameId}: IProps) => {
   const getToken = (): string => window.localStorage.getItem("token") ?? "";
 
   useEffect(() => {
-    const reportRequest: IuiGetOneGameReportRequest = {
-      uuid: getMyId(),
-      userName: userName,
-      token: getToken(),
-      gameId: gameId,
-    };
-    if (gameId) {
+    if (gameId && user.isUserLoggedIn) {
+      const reportRequest: IuiGetOneGameReportRequest = {
+        uuid: getMyId(),
+        userName: user.userName,
+        token: getToken(),
+        gameId: gameId,
+      };
       socket.emit("get game report", reportRequest, (reportResponse: IuiOneGameReport) => {
-        setGameReportData(reportResponse);
+        if (reportResponse.isAuthenticated) {
+          window.localStorage.setItem("token", reportResponse.token ?? "");
+          setGameReportData(reportResponse);
+        } else {
+          handleUnauthenticatedRequest(dispatch);
+        }
       });
     }
-  }, [gameId, userName, socket]);
+  }, [gameId, user, dispatch, socket]);
 
   return (
     <div>

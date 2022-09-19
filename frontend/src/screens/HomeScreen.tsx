@@ -15,7 +15,7 @@ import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "../interfaces
 import AdminGameList from "../components/AdminComponents/AdminGameList";
 import { isAdminLoggedIn, setAdminLoggedIn } from "../store/adminSlice";
 import AdminMassOperations from "../components/AdminComponents/AdminMassOperations";
-import { isUserLoggedIn, setUserLoggedIn } from "../store/userSlice";
+import { getUser, setUserLoggedIn } from "../store/userSlice";
 
 interface IUserLoginFormValidationFields {
   userName?: string,
@@ -44,10 +44,11 @@ interface IProps {
 }
 
 const HomeScreen = ({onJoin}: IProps) => {
+  const [loginFormValidationError, setLoginFormValidationError] = useState("");
   const [showLoginAdminModal, setShowLoginAdminModal] = useState(false);
   const [adminUserName, setAdminUserName] = useState("");
   const adminLoggedIn = useSelector(isAdminLoggedIn);
-  const userLoggedIn = useSelector(isUserLoggedIn);
+  const user = useSelector(getUser);
   const dispatch = useDispatch();
   const accRef = createRef<HTMLHeadingElement>();
 
@@ -77,7 +78,19 @@ const HomeScreen = ({onJoin}: IProps) => {
     setAdminUserName("");
   };
 
+  const renderLoginError = () => {
+    if (loginFormValidationError) {
+      return (<div className="smallErrorDiv">
+        {loginFormValidationError}
+      </div>
+      );
+    } else {
+      return null;
+    }
+  };
+
   const onLoginUserSubmit = ({userName, password1, password2, email}: IUserLoginForm) => {
+    setLoginFormValidationError("");
     const loginRequest: IuiLoginRequest = {
       uuid: getMyId(),
       userName: userName,
@@ -86,33 +99,64 @@ const HomeScreen = ({onJoin}: IProps) => {
       email: email,
     };
     socket.emit("user login", loginRequest, (loginResponse: IuiLoginResponse) => {
+      console.log("user login, response", loginResponse);
       if (loginResponse.loginStatus === LOGIN_RESPONSE.ok && loginResponse.isAuthenticated) {
         window.localStorage.setItem("token", loginResponse.token ?? "");
         dispatch(setUserLoggedIn({loggedIn: true, name: loginRequest.userName}));
       } else {
         window.localStorage.removeItem("token");
         dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
+        switch (loginResponse.loginStatus) {
+          case LOGIN_RESPONSE.passwordFails: {
+            setLoginFormValidationError("Check your password!");
+            break;
+          }
+          case LOGIN_RESPONSE.password2Empty: {
+            setLoginFormValidationError("New user, type password again in second field!");
+            break;
+          }
+          default: {
+            setLoginFormValidationError("Check your password!");
+            break;
+          }
+        }
       }
     });
   };
 
-  const onLoginSubmit = ({userName, password}: IAdminLoginForm) => {
-    const loginRequest: IuiLoginRequest = {
-      uuid: getMyId(),
-      userName: userName,
-      token: getToken(),
-      password1: password,
-    };
-    socket.emit("admin login", loginRequest, (loginResponse: IuiLoginResponse) => {
-      console.log("loginResponse", loginResponse);
-      if (loginResponse.loginStatus === LOGIN_RESPONSE.ok) {
-        dispatch(setAdminLoggedIn(true));
-        setAdminUserName(loginRequest.userName);
-      } else {
-        dispatch(setAdminLoggedIn(false));
-        setAdminUserName("");
-      }
-    });
+  const logOutUser = () => {
+    console.log("user want's to log out");
+    window.localStorage.removeItem("token");
+    dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
+  };
+
+  const onLoginAdminSubmit = ({userName, password}: IAdminLoginForm) => {
+    if (user.isUserLoggedIn) {
+      const loginRequest: IuiLoginRequest = {
+        uuid: getMyId(),
+        userName: userName,
+        token: getToken(),
+        password1: password,
+      };
+      socket.emit("admin login", loginRequest, (loginResponse: IuiLoginResponse) => {
+        console.log("loginResponse", loginResponse);
+        if (loginResponse.loginStatus === LOGIN_RESPONSE.ok) {
+          dispatch(setAdminLoggedIn(true));
+          setAdminUserName(loginRequest.userName);
+        } else {
+          dispatch(setAdminLoggedIn(false));
+          setAdminUserName("");
+        }
+      });
+    }
+  };
+
+  const renderPlayedGamesReport = () => {
+    if (user.isUserLoggedIn) {
+      return (<PlayedGamesReport />);
+    } else {
+      return null;
+    }
   };
 
   return(
@@ -138,14 +182,16 @@ const HomeScreen = ({onJoin}: IProps) => {
         </Accordion.Item>
       </Accordion>
 
-      <PlayedGamesReport />
+      {renderPlayedGamesReport()}
 
       <div className="adminButtonDiv">
+        <Button variant="warning" onClick={() => logOutUser()} disabled={!user.isUserLoggedIn}>Log Out <i>{user.userName}</i></Button>
+        &nbsp;
         <Button onClick={() => setShowLoginAdminModal(true)}>Admin</Button>
       </div>
 
       <Modal
-        show={!userLoggedIn}
+        show={!user.isUserLoggedIn}
         onHide={() => closeLoginUserModal()}
       >
         <Modal.Header>
@@ -154,6 +200,7 @@ const HomeScreen = ({onJoin}: IProps) => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {renderLoginError()}
           <Form
             onSubmit={onLoginUserSubmit}
             validate={validateLoginUserForm}
@@ -203,8 +250,8 @@ const HomeScreen = ({onJoin}: IProps) => {
         </Modal.Header>
         <Modal.Body>
           <Form
-            onSubmit={onLoginSubmit}
-            validate={validateLoginForm}
+            onSubmit={onLoginAdminSubmit}
+            validate={validateLoginAdminForm}
             render={({handleSubmit, submitting}) => (
               <form onSubmit={handleSubmit}>
                 <Field<string>
@@ -269,7 +316,7 @@ const validateLoginUserForm = (values: IUserLoginForm) => {
   }
 
   if (!values.password1 || values.password1?.length < 4) {
-    errors.password1 = "Password doesn't match!";
+    errors.password1 = "Not valid password!";
   }
 
   if (values.password2 && (values.password1 !== values.password2)) {
@@ -283,7 +330,7 @@ const validateLoginUserForm = (values: IUserLoginForm) => {
   return errors;
 };
 
-const validateLoginForm = (values: IAdminLoginForm) => {
+const validateLoginAdminForm = (values: IAdminLoginForm) => {
   // console.log("validating form");
   const errors: IAdminLoginFormValidationFields = {};
 
@@ -292,7 +339,7 @@ const validateLoginForm = (values: IAdminLoginForm) => {
   }
 
   if (!values.password || values.password?.length < 4) {
-    errors.password = "Password doesn't match!";
+    errors.password = "Not valid password!";
   }
 
   return errors;

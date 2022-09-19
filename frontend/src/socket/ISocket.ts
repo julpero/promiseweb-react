@@ -18,7 +18,7 @@ import {
   IuiPromiseMadeNotification,
 } from "../interfaces/IuiPlayingGame";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "../interfaces/IuiReports";
-import { IuiLoginRequest, IuiLoginResponse, IuiUserData } from "../interfaces/IuiUser";
+import { IuiLoginRequest, IuiLoginResponse, IuiRefreshLoginResponse, IuiUserData } from "../interfaces/IuiUser";
 
 export interface ServerToClientEvents {
   "new game created": (newGameId: string) => void;
@@ -32,6 +32,7 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
   "user login": (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => void;
+  "do refresh login": (loginRequest: IuiUserData, fn: (loginResponse: IuiRefreshLoginResponse) => void) => void;
   "check if ongoing game": (checkGameRequest: IuiUserData, fn: (response: IuiCheckIfOngoingGameResponse) => void) => void;
   "create game": (createGameRequest: IuiCreateGameRequest, fn: (createGameResponse: IuiCreateGameResponse) => void) => void;
   "leave ongoing game": (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest, fn: (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => void) => void;
