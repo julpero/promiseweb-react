@@ -46,15 +46,15 @@ export const isUserAuthenticated = (token: string | string[] | undefined, userNa
 };
 
 export const getValidToken = (token: string | string[] | undefined): IToken | null => {
-  // console.log("getValidToken, token", token);
+  console.log("getValidToken, token", token);
   // valid token is always set
   if (!token || token === undefined) return null;
 
   // our token is always string
   if (typeof token !== "string") return null;
 
-  // JWT must be splitted into four parts by full stop (.)
-  if (token.split(".").length !== 4) return null;
+  // JWT must be splitted into three parts by full stop (.)
+  if (token.split(".").length !== 3) return null;
 
   const checked = verify(token, process.env.AUTH_SECRET ?? "MUST_SET_THIS");
   // console.log("checked", checked);
