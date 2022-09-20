@@ -17,7 +17,7 @@ import { getUser } from "../store/userSlice";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 
 interface IFormFields {
-  gamePassword?: string,
+  gamepassword?: string,
 }
 
 type MethodType = null | "join" | "leave";
@@ -188,7 +188,7 @@ const OpenGamesList = () => {
         token: getToken(),
         gameId: gameId,
         userName: user.userName,
-        gamePassword: values.gamePassword ?? "",
+        gamePassword: values.gamepassword ?? "",
         method: method,
       };
       switch (method) {
