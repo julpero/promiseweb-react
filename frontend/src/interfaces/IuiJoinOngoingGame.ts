@@ -1,6 +1,6 @@
-import { IuiAuth } from "./IuiUser";
+import { IuiAuth, IuiUserData } from "./IuiUser";
 
-export interface IuiJoinOngoingGame {
+export interface IuiJoinOngoingGame extends IuiUserData {
   gameId: string,
   playerId: string,
 }

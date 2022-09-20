@@ -14,7 +14,7 @@ import { FormApi } from "final-form";
 import { IuiUserData, LOGIN_RESPONSE } from "../interfaces/IuiUser";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../store/userSlice";
-import { handleUnauthenticatedRequest } from "../common/userFunctions";
+import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 
 interface IFormFields {
   gamePassword?: string,
@@ -49,7 +49,7 @@ const OpenGamesList = () => {
       socket.emit("get open games", gameListRequest, (gameList: IuiGetGameListResponse) => {
         console.log("gameList", gameList);
         if (gameList.isAuthenticated) {
-          window.localStorage.setItem("token", gameList.token ?? "");
+          handleAuthenticatedRequest(gameList.token);
           setGameItemList(gameList.games);
         } else {
           handleUnauthenticatedRequest(dispatch);
@@ -130,7 +130,7 @@ const OpenGamesList = () => {
     socket.emit("join game", joinGameRequest, (response: IuiJoinLeaveGameResponse) => {
       console.log("join response", response);
       if (response.isAuthenticated) {
-        window.localStorage.setItem("token", response.token ?? "");
+        handleAuthenticatedRequest(response.token);
         setLoginStatus(response.loginStatus);
         setJoinLeaveStatus(response.joinLeaveResult);
         if (response.loginStatus !== LOGIN_RESPONSE.ok || response.joinLeaveResult === JOIN_LEAVE_RESULT.notOk) {
@@ -146,7 +146,7 @@ const OpenGamesList = () => {
     socket.emit("leave game", leaveGameRequest, (response: IuiJoinLeaveGameResponse) => {
       console.log("leave response", response);
       if (response.isAuthenticated) {
-        window.localStorage.setItem("token", response.token ?? "");
+        handleAuthenticatedRequest(response.token);
         setLoginStatus(response.loginStatus);
         setJoinLeaveStatus(response.joinLeaveResult);
         if (response.loginStatus !== LOGIN_RESPONSE.ok || response.joinLeaveResult === JOIN_LEAVE_RESULT.notOk) {

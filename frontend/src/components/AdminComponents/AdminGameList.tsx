@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../../common/userFunctions";
 import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../../interfaces/IuiAdminOperations";
 import { IuiUserData } from "../../interfaces/IuiUser";
 import { useSocket } from "../../socket";
@@ -33,7 +34,12 @@ const AdminGameList = ({userName}: IProps) => {
     };
     socket.emit("get games for admin", getGamesRequest, (getGamesResponse: IuiGetGamesResponse) => {
       console.log(getGamesResponse);
-      dispatch(setAdminGameList(getGamesResponse.gameList));
+      if (getGamesResponse.isAuthenticated) {
+        handleAuthenticatedRequest(getGamesResponse.token);
+        dispatch(setAdminGameList(getGamesResponse.gameList));
+      } else {
+        handleUnauthenticatedRequest(dispatch);
+      }
     });
   }, [userName, socket, dispatch]);
 
@@ -69,7 +75,12 @@ const AdminGameList = ({userName}: IProps) => {
     };
     socket.emit("re-create game statistics", reCreateGameStatisticsRequest, (getGamesResponse: IuiGetGamesResponse) => {
       console.log(getGamesResponse);
-      dispatch(setAdminGameList(getGamesResponse.gameList));
+      if (getGamesResponse.isAuthenticated) {
+        handleAuthenticatedRequest(getGamesResponse.token);
+        dispatch(setAdminGameList(getGamesResponse.gameList));
+      } else {
+        handleUnauthenticatedRequest(dispatch);
+      }
       setButtonsActive(true);
     });
   };

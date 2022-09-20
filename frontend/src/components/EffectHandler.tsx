@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { handleUnauthenticatedRequest } from "../common/userFunctions";
+import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 import { GAME_STATUS, ROUND_STATUS } from "../interfaces/IuiGameOptions";
 import { IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, ROUND_PHASE } from "../interfaces/IuiPlayingGame";
 import { useSocket } from "../socket";
@@ -40,7 +40,7 @@ const EffectHandler = ({gameId}: IProps) => {
       socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
         console.log("roundResponse", roundResponse);
         if (roundResponse.isAuthenticated) {
-          window.localStorage.setItem("token", roundResponse.token ?? "");
+          handleAuthenticatedRequest(roundResponse.token);
           dispatch(setRoundInfo(roundResponse));
           dispatch(setActionsAvailable(roundResponse.roundToPlayer.isMyPromiseTurn || roundResponse.roundToPlayer.isMyTurn));
         } else {
@@ -115,7 +115,7 @@ const EffectHandler = ({gameId}: IProps) => {
       socket.emit("check game", getGameInfoRequest, (gameInfoResponse: IuiGetGameInfoResponse) => {
         console.log("gameInfoResponse", gameInfoResponse);
         if (gameInfoResponse.isAuthenticated) {
-          window.localStorage.setItem("token", gameInfoResponse.token ?? "");
+          handleAuthenticatedRequest(gameInfoResponse.token);
           dispatch(setGameInfo(gameInfoResponse));
         } else {
           handleUnauthenticatedRequest(dispatch);
@@ -150,7 +150,7 @@ const EffectHandler = ({gameId}: IProps) => {
       socket.emit("play card", playCardRequest, (playCardResponse: IuiPlayCardResponse) => {
         console.log("playCardResponse (store)", playCardResponse);
         if (playCardResponse.isAuthenticated) {
-          window.localStorage.setItem("token", playCardResponse.token ?? "");
+          handleAuthenticatedRequest(playCardResponse.token);
           dispatch(setPlayedCard(null));
           dispatch(setActionsAvailable(true));
         } else {

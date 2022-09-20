@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { handleUnauthenticatedRequest } from "../common/userFunctions";
+import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "../interfaces/IuiReports";
 import { useSocket } from "../socket";
 import { getUser } from "../store/userSlice";
@@ -35,7 +35,7 @@ const OneGameReport = ({gameId}: IProps) => {
       };
       socket.emit("get game report", reportRequest, (reportResponse: IuiOneGameReport) => {
         if (reportResponse.isAuthenticated) {
-          window.localStorage.setItem("token", reportResponse.token ?? "");
+          handleAuthenticatedRequest(reportResponse.token);
           setGameReportData(reportResponse);
         } else {
           handleUnauthenticatedRequest(dispatch);

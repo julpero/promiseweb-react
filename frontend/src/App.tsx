@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCurrentGameId, setGameId } from "./store/gameInfoSlice";
 import { getUser, setUserLoggedIn } from "./store/userSlice";
 import { IuiRefreshLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./interfaces/IuiUser";
-import { handleUnauthenticatedRequest } from "./common/userFunctions";
+import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "./common/userFunctions";
 
 const App = () => {
   const [gameStatus, setGameStatus] = useState(CHECK_GAME_STATUS.noGame);
@@ -29,10 +29,11 @@ const App = () => {
   const handleOnGoingResponse = useCallback((response: IuiCheckIfOngoingGameResponse) => {
     console.log("check response", response);
     if (response.isAuthenticated) {
-      window.localStorage.setItem("token", response.token ?? "");
+      handleAuthenticatedRequest(response.token);
       setGameStatus(response.checkStatus);
-      dispatch(setGameId(response.gameId ?? ""));
-      dispatch(setUserLoggedIn({loggedIn: response.isAuthenticated ?? false, name: response.asAPlayer ?? ""}));
+      if (response.gameId && response.asAPlayer) {
+        dispatch(setGameId(response.gameId ?? ""));
+      }
     } else {
       handleUnauthenticatedRequest(dispatch);
     }
@@ -56,8 +57,9 @@ const App = () => {
 
     if (user.isUserLoggedIn) {
       const checkGameRequest: IuiUserData = {
-        uuid: window.localStorage.getItem("uUID") ?? "",
+        uuid: getMyId(),
         userName: user.userName,
+        token: getToken(),
       };
       socket.emit("check if ongoing game", checkGameRequest, handleOnGoingResponse);
     } else {
@@ -72,7 +74,7 @@ const App = () => {
         };
         socket.emit("do refresh login", loginRequest, (loginResponse: IuiRefreshLoginResponse) => {
           if (loginResponse.loginStatus === LOGIN_RESPONSE.ok && loginResponse.isAuthenticated) {
-            window.localStorage.setItem("token", loginResponse.token ?? "");
+            handleAuthenticatedRequest(loginResponse.token);
             dispatch(setUserLoggedIn({loggedIn: loginResponse.isAuthenticated ?? false, name: loginResponse.myName ?? ""}));
           }
         });

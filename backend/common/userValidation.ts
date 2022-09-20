@@ -7,6 +7,15 @@ export interface IToken {
   timestamp: number,
 }
 
+// our timestamp can be only one hour old (60 min * 60 sec * 1000 ms)
+const ALLOWED_INTERVAL = 60 * 60 * 1000;
+
+/**
+ * This method does simple check to given parameters and checks if user name is in admin list.
+ * @param userName string
+ * @param uuid string
+ * @returns boolean
+ */
 export const isValidAdminUser = (userName: string, uuid: string): boolean => {
   if (!userName || !uuid) return false;
   if (userName.length < 3) return false;
@@ -25,6 +34,14 @@ export const isValidAdminUser = (userName: string, uuid: string): boolean => {
   return true;
 };
 
+/**
+ * This method only validates that given parameters are "valid".
+ * There is no any authentication processes in this method.
+ * @param userName string
+ * @param password string
+ * @param uuid string
+ * @returns boolean
+ */
 export const isValidUser = (userName: string, password: string, uuid: string): boolean => {
   if (!userName || !password || !uuid) return false;
   if (userName.length < 3) return false;
@@ -34,19 +51,37 @@ export const isValidUser = (userName: string, password: string, uuid: string): b
   return true;
 };
 
-export const isUserAuthenticated = (token: string | string[] | undefined, userName: string, uuid: string): boolean => {
+/**
+ * This method checks if given token is valid and it contains correct user name and uuid.
+ * Timestamp must be in defined interval.
+ * @param token
+ * @param userName string
+ * @param uuid string
+ * @param timestamp number
+ * @returns boolean
+ */
+export const isUserAuthenticated = (token: string | string[] | undefined, userName: string, uuid: string, timestamp: number | null): boolean => {
   // console.log("isUserAuthenticated");
 
   const parsedToken = getValidToken(token);
   if (parsedToken) {
-    return (parsedToken.userName === userName && parsedToken.uuid === uuid);
+    const timeStampOk = (timestamp ?? 0) + ALLOWED_INTERVAL > Date.now();
+    const authenticationOk = (parsedToken.userName === userName && parsedToken.uuid === uuid && timeStampOk);
+    console.log("authenticationOk", authenticationOk);
+    return authenticationOk;
   } else {
     return false;
   }
 };
 
+/**
+ * This method only checks if the given token is formally valid in Promise Web.
+ * This does not check if data in the token is valid except timestamp.
+ * @param token
+ * @returns IToken if token is valid, else null
+ */
 export const getValidToken = (token: string | string[] | undefined): IToken | null => {
-  console.log("getValidToken, token", token);
+  // console.log("getValidToken, token", token);
   // valid token is always set
   if (!token || token === undefined) return null;
 
@@ -67,8 +102,6 @@ export const getValidToken = (token: string | string[] | undefined): IToken | nu
   if (!checked.userName) return null;
   if (!checked.timestamp) return null;
   const parsedTimeStamp = parseInt(checked.timestamp, 10);
-  // our timestamp can be only one hour old (60 min * 60 sec * 1000 ms)
-  const ALLOWED_INTERVAL = 60 * 60 * 1000;
   if (parsedTimeStamp + ALLOWED_INTERVAL < Date.now()) return null;
 
   return {
@@ -78,11 +111,11 @@ export const getValidToken = (token: string | string[] | undefined): IToken | nu
   } as IToken;
 };
 
-export const signUserToken = (userName: string, uuid: string): string => {
+export const signUserToken = (userName: string, uuid: string, timestamp: number): string => {
   const tokenBody: IToken = {
     userName: userName,
     uuid: uuid,
-    timestamp: Date.now(),
+    timestamp: timestamp,
   };
   return sign(tokenBody, process.env.AUTH_SECRET ?? "SET_THIS_NOW");
 };

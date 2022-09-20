@@ -15,7 +15,7 @@ import { IuiNewGameForm, initialNewGameValues, IuiCreateGameRequest, IuiCreateGa
 import { LOGIN_RESPONSE } from "../interfaces/IuiUser";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../store/userSlice";
-import { handleUnauthenticatedRequest } from "../common/userFunctions";
+import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 
 interface IFormValidationFields {
   newGameHumanPlayersCount?: string,
@@ -46,7 +46,7 @@ const CreateGame = (props: IProps) => {
       const newGameRequest: IuiCreateGameRequest = {...values, uuid, userName: user.userName, token: getToken() };
       socket.emit("create game", newGameRequest, (createGameResponse: IuiCreateGameResponse) => {
         if (createGameResponse.isAuthenticated) {
-          window.localStorage.setItem("token", createGameResponse.token ?? "");
+          handleAuthenticatedRequest(createGameResponse.token);
           setLoginStatus(createGameResponse.loginStatus);
           setCreateGameStatus(createGameResponse.responseStatus);
           if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {

@@ -8,7 +8,7 @@ import { ReactTabulator, ColumnDefinition } from "react-tabulator";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../store/userSlice";
 import { IuiUserData } from "../interfaces/IuiUser";
-import { handleUnauthenticatedRequest } from "../common/userFunctions";
+import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 
 const PlayedGamesReport = () => {
   console.log("PlayedGamesReport");
@@ -196,7 +196,7 @@ const PlayedGamesReport = () => {
       socket.emit("get report data", request, (reportData: IuiPlayedGamesReport) => {
         console.log("report data", reportData);
         if (reportData.isAuthenticated) {
-          window.localStorage.setItem("token", reportData.token ?? "");
+          handleAuthenticatedRequest(reportData.token);
           setReportData(reportData);
         } else {
           handleUnauthenticatedRequest(dispatch);

@@ -6,7 +6,7 @@ import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentGameInfo } from "../store/gameInfoSlice";
 import { getUser } from "../store/userSlice";
-import { handleUnauthenticatedRequest } from "../common/userFunctions";
+import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 
 /**
  * GameMenu
@@ -49,7 +49,7 @@ const GameMenu = () => {
       socket.emit("leave ongoing game", leaveOngoingGameRequest, (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => {
         console.log("leaveOngoingGameResponse", leaveOngoingGameResponse);
         if (leaveOngoingGameResponse.isAuthenticated) {
-          window.localStorage.setItem("token", leaveOngoingGameResponse.token ?? "");
+          handleAuthenticatedRequest(leaveOngoingGameResponse.token);
           if (leaveOngoingGameResponse.leaveStatus === LEAVE_ONGOING_GAME_RESULT.leaveOk) {
             setLeftGameModal(true);
             setLeaveGameModal(false);

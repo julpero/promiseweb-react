@@ -16,6 +16,7 @@ import AdminGameList from "../components/AdminComponents/AdminGameList";
 import { isAdminLoggedIn, setAdminLoggedIn } from "../store/adminSlice";
 import AdminMassOperations from "../components/AdminComponents/AdminMassOperations";
 import { getUser, setUserLoggedIn } from "../store/userSlice";
+import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 
 interface IUserLoginFormValidationFields {
   userName?: string,
@@ -101,7 +102,7 @@ const HomeScreen = ({onJoin}: IProps) => {
     socket.emit("user login", loginRequest, (loginResponse: IuiLoginResponse) => {
       console.log("user login, response", loginResponse);
       if (loginResponse.loginStatus === LOGIN_RESPONSE.ok && loginResponse.isAuthenticated) {
-        window.localStorage.setItem("token", loginResponse.token ?? "");
+        handleAuthenticatedRequest(loginResponse.token);
         dispatch(setUserLoggedIn({loggedIn: true, name: loginRequest.userName}));
       } else {
         window.localStorage.removeItem("token");
@@ -140,12 +141,17 @@ const HomeScreen = ({onJoin}: IProps) => {
       };
       socket.emit("admin login", loginRequest, (loginResponse: IuiLoginResponse) => {
         console.log("loginResponse", loginResponse);
-        if (loginResponse.loginStatus === LOGIN_RESPONSE.ok) {
-          dispatch(setAdminLoggedIn(true));
-          setAdminUserName(loginRequest.userName);
+        if (loginResponse.isAuthenticated) {
+          handleAuthenticatedRequest(loginResponse.token);
+          if (loginResponse.loginStatus === LOGIN_RESPONSE.ok) {
+            dispatch(setAdminLoggedIn(true));
+            setAdminUserName(loginRequest.userName);
+          } else {
+            dispatch(setAdminLoggedIn(false));
+            setAdminUserName("");
+          }
         } else {
-          dispatch(setAdminLoggedIn(false));
-          setAdminUserName("");
+          handleUnauthenticatedRequest(dispatch);
         }
       });
     }

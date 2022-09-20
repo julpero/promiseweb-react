@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { Field, Form } from "react-final-form";
 import { useDispatch } from "react-redux";
-import { handleUnauthenticatedRequest } from "../common/userFunctions";
+import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "../interfaces/IuiJoinOngoingGame";
 import { useSocket } from "../socket";
 import TextInput from "./FormComponents/TextInput";
@@ -27,7 +27,7 @@ const JoinGameById = ({onJoin}: IProps) => {
     socket.emit("join ongoing game", values, (joinResponse: IuiJoinOngoingGameResponse) => {
       console.log("join response", joinResponse);
       if (joinResponse.isAuthenticated) {
-        window.localStorage.setItem("token", joinResponse.token ?? "");
+        handleAuthenticatedRequest(joinResponse.token);
         if (joinResponse.joinOk) {
           window.localStorage.setItem("uUID", joinResponse.playerId);
           setPlayerName(joinResponse.playerName);

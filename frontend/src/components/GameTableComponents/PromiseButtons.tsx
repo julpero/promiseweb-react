@@ -11,7 +11,7 @@ import { isRuleActive } from "../../common/commonFunctions";
 import { currentTotalPromise } from "../../common/playingGame";
 import { RULE } from "../../interfaces/IuiGameOptions";
 import { getUser } from "../../store/userSlice";
-import { handleUnauthenticatedRequest } from "../../common/userFunctions";
+import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../../common/userFunctions";
 
 const PromiseButtons = () => {
   const [clicked, setClicked] = useState(false);
@@ -69,7 +69,7 @@ const PromiseButtons = () => {
       socket.emit("make promise", promiseRequest, (promiseResponse: IuiMakePromiseResponse) => {
         console.log("promiseResponse", promiseResponse);
         if (promiseResponse.isAuthenticated) {
-          window.localStorage.setItem("token", promiseResponse.token ?? "");
+          handleAuthenticatedRequest(promiseResponse.token);
           if (promiseResponse.promiseResponse !== PROMISE_RESPONSE.promiseOk) {
             setClicked(false);
           }

@@ -1,5 +1,6 @@
-export interface IuiChatObj {
+import { IuiUserData } from "./IuiUser";
+
+export interface IuiChatObj extends IuiUserData {
   gameId: string,
-  userName: string,
   chatLine: string,
 }

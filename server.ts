@@ -61,26 +61,6 @@ connectDB().then(() => {
     console.log("server listening on *:" + PORT);
   });
 
-  // io.use((socket: Socket, next) => {
-  //   // console.log("!middleware starts!", socket.handshake);
-  //   if (socket.handshake.query && socket.handshake.query.token) {
-  //     const token = socket.handshake.query.token;
-  //     const validToken = getValidToken(token);
-  //     // console.log("validToken", validToken);
-  //     // console.log("socket.data", socket.data);
-  //     if (validToken && validToken.userName && validToken.uuid) {
-  //       // this means only that there is a "valid" token in headers
-  //       socket.data.claimsToBeAuthenticated = true;
-  //     } else {
-  //       socket.data.claimsToBeAuthenticated = false;
-  //     }
-  //     // console.log("socket.data", socket.data);
-  //   } else {
-  //     // console.log("no token");
-  //   }
-  //   // console.log("!middleware ends!");
-  //   next();
-  // }).
   io.on("connection", (socket: Socket) => {
     console.log("connected!", socket.id);
 
@@ -97,7 +77,7 @@ connectDB().then(() => {
       if (gameIdStr !== null) {
         io.to(gameIdStr).emit("new chat line", chatLine);
       }
-      csm.removeUserFromMap(userName, socket.id, gameIdStr ?? "");
+      csm.removeUserSocketsAndGames(userName);
     });
 
     socket.on("user login", async (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => {
@@ -107,9 +87,11 @@ connectDB().then(() => {
 
       const loginResponse = await handleLoginRequest(loginRequest, false);
       if (loginResponse.loginStatus === LOGIN_RESPONSE.ok) {
-        const newToken = signUserToken(userName, uuid);
+        const timestamp = Date.now();
+        const newToken = signUserToken(userName, uuid, timestamp);
         loginResponse.token = newToken;
         loginResponse.isAuthenticated = true;
+        csm.addUserToMap(userName, socket.id, timestamp);
       } else {
         loginResponse.isAuthenticated = false;
       }
@@ -117,11 +99,17 @@ connectDB().then(() => {
     });
 
     socket.on("do refresh login", async (loginRequest: IuiUserData, fn: (loginResponse: IuiRefreshLoginResponse) => void) => {
+      console.log("do refresh login", loginRequest);
       const {uuid, userName, token} = loginRequest;
       const validToken = getValidToken(token);
-      if (validToken && validToken.uuid === uuid && userName === "dummy") {
+      console.log("validToken?.timestamp", validToken?.timestamp);
+      console.log("username", validToken?.userName ?? "");
+      console.log("timestamp fo username", csm.getLastTimestamp(validToken?.userName ?? ""));
+      if (validToken && validToken.uuid === uuid && userName === "dummy" && validToken.timestamp === csm.getLastTimestamp(validToken.userName)) {
         const userNameFromToken = validToken.userName;
-        const newToken = signUserToken(userNameFromToken, uuid);
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userNameFromToken, socket.id, timestamp);
+        const newToken = signUserToken(userNameFromToken, uuid, timestamp);
         const loginResponse: IuiRefreshLoginResponse = {
           isAuthenticated: true,
           myName: userNameFromToken,
@@ -129,137 +117,235 @@ connectDB().then(() => {
           token: newToken,
         };
         fn(loginResponse);
+      } else {
+        return null;
       }
     });
 
     socket.on("admin login", async (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => {
       console.log("admin login", loginRequest);
-      const {uuid, userName, password1} = loginRequest;
+      const {uuid, userName, password1, token} = loginRequest;
       if (!isValidAdminUser(userName, uuid)) return null;
       if (password1.length < 3) return null;
+      const lastTimestamp = csm.getLastTimestamp(userName);
 
-      const loginResponse = await handleLoginRequest(loginRequest, true);
-      if (loginResponse.loginStatus === LOGIN_RESPONSE.ok) {
-        csm.setUserAsAdmin(userName, socket.id, uuid);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+      if (isAuthenticated) {
+        const loginResponse = await handleLoginRequest(loginRequest, true);
+        if (loginResponse.loginStatus === LOGIN_RESPONSE.ok) {
+          const timestamp = Date.now();
+          csm.setUserAsAdmin(userName, socket.id, uuid, timestamp);
+          const newToken = signUserToken(userName, uuid, timestamp);
+          loginResponse.isAuthenticated = true;
+          loginResponse.token = newToken;
+        } else {
+          csm.unsetUserAsAdmin(userName);
+        }
+        fn(loginResponse);
       } else {
-        csm.unsetUserAsAdmin(userName);
+        fn({
+          loginStatus: LOGIN_RESPONSE.passwordFails,
+          isAuthenticated: false,
+        } as IuiLoginResponse);
+        return null;
       }
-      fn(loginResponse);
     });
 
     socket.on("get games for admin", async (getGamesRequest: IuiUserData, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
       console.log("get games for admin", getGamesRequest);
-      const {uuid, userName} = getGamesRequest;
+      const {uuid, userName, token} = getGamesRequest;
       if (!isValidAdminUser(userName, uuid)) return null;
       if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
-      const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(userName);
-      fn(getGamesResponse);
+      if (isAuthenticated) {
+        const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(userName);
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        getGamesResponse.isAuthenticated = true;
+        getGamesResponse.token = newToken;
+        fn(getGamesResponse);
+      } else {
+        fn({
+          isAuthenticated: false,
+          gameList: [],
+        } as IuiGetGamesResponse);
+      }
     });
 
     socket.on("re-create game statistics", async (reCreateGameStatisticsRequest: IuiReCreateGameStatisticsRequest, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
       console.log("re-create game statistics", reCreateGameStatisticsRequest);
-      const {uuid, userName} = reCreateGameStatisticsRequest;
+      const {uuid, userName, token} = reCreateGameStatisticsRequest;
       if (!isValidAdminUser(userName, uuid)) return null;
       if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
-      await reCreateGameStats(reCreateGameStatisticsRequest);
-      const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(userName);
-      fn(getGamesResponse);
+      if (isAuthenticated) {
+        await reCreateGameStats(reCreateGameStatisticsRequest);
+        const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(userName);
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        getGamesResponse.isAuthenticated = true;
+        getGamesResponse.token = newToken;
+        fn(getGamesResponse);
+      } else {
+        fn({
+          isAuthenticated: false,
+          gameList: [],
+        } as IuiGetGamesResponse);
+        return null;
+      }
     });
 
     socket.on("re-create all game statistics", async (reCreateAllGameStatisticsRequest: IuiUserData, fn: (getGamesResponse: IuiGetGamesResponse) => void) => {
       console.log("re-create all game statistics", reCreateAllGameStatisticsRequest);
-      const {uuid, userName} = reCreateAllGameStatisticsRequest;
+      const {uuid, userName, token} = reCreateAllGameStatisticsRequest;
       if (!isValidAdminUser(userName, uuid)) return null;
       if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
-      await reCreateAllGameStats(userName);
-      const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(userName);
-      fn(getGamesResponse);
+      if (isAuthenticated) {
+        await reCreateAllGameStats(userName);
+        const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(userName);
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        getGamesResponse.isAuthenticated = true;
+        getGamesResponse.token = newToken;
+        fn(getGamesResponse);
+      } else {
+        fn({
+          isAuthenticated: false,
+          gameList: [],
+        } as IuiGetGamesResponse);
+        return null;
+      }
     });
 
     socket.on("convert old data", async (convertRequest: IuiUserData, fn: (response: string[]) => void) => {
       console.log("convert old data", convertRequest);
-      const {uuid, userName} = convertRequest;
+      const {uuid, userName, token} = convertRequest;
       if (!isValidAdminUser(userName, uuid)) return null;
       if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
-      const response = await convertOldData(userName);
-      fn(response);
+      if (isAuthenticated) {
+        const response = await convertOldData(userName);
+        fn(response);
+      } else {
+        return null;
+      }
     });
 
     socket.on("create game", async (createGameRequest: IuiCreateGameRequest, fn: (createGameResponse: IuiCreateGameResponse) => void) => {
       const {uuid, userName, token} = createGameRequest;
-      const isAuthenticated = isUserAuthenticated(token, userName, uuid);
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
       if (isAuthenticated) {
         const createGameResponse: IuiCreateGameResponse = await createGame(createGameRequest);
+        const timestamp = Date.now();
         if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
           const gameIdStr = createGameResponse.newGameId;
           socket.join(gameIdStr);
-          csm.addUserToMap(createGameRequest.userName, socket.id, gameIdStr);
+          csm.addUserToMap(createGameRequest.userName, socket.id, timestamp, gameIdStr);
           io.emit("new game created", gameIdStr);
         }
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
         createGameResponse.isAuthenticated = true;
-        createGameResponse.token = signUserToken(userName, uuid);
+        createGameResponse.token = newToken;
         fn(createGameResponse);
       } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiCreateGameResponse);
         return null;
       }
     });
 
     socket.on("get open games", async (getGameListRequest: IuiUserData, fn: (getGameListResponse: IuiGetGameListResponse) => void) => {
       const {userName, uuid, token} = getGameListRequest;
-      const isAuthenticated = isUserAuthenticated(token, userName, uuid);
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
       if (isAuthenticated) {
         const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(getGameListRequest);
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
         getGameListResponse.isAuthenticated = true;
-        getGameListResponse.token = signUserToken(userName, uuid);
+        getGameListResponse.token = newToken;
         fn(getGameListResponse);
       } else {
+        fn({
+          isAuthenticated: false,
+          games: [],
+        } as IuiGetGameListResponse);
         return null;
       }
     });
 
     socket.on("join game", async (joinGameRequest: IuiJoinLeaveGameRequest, fn: (joinResponse: IuiJoinLeaveGameResponse) => void) => {
-      const {userName, uuid, token} = joinGameRequest;
-      const isAuthenticated = isUserAuthenticated(token, userName, uuid);
+      const {gameId, userName, uuid, token} = joinGameRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
       if (isAuthenticated) {
-        const gameIdStr = joinGameRequest.gameId;
         const joinResponse: IuiJoinLeaveGameResponse = await joinGame(joinGameRequest);
+        const timestamp = Date.now();
         if (joinResponse.joinLeaveResult !== JOIN_LEAVE_RESULT.notOk) {
-          socket.join(gameIdStr);
-          csm.addUserToMap(joinGameRequest.userName, socket.id, gameIdStr);
+          socket.join(gameId);
+          csm.addUserToMap(userName, socket.id, timestamp, gameId);
           // notify other users
           io.emit("game list updated");
         }
         if (joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.lastOk) {
           // notify all games players about game start
-          io.to(gameIdStr).emit("game begins", gameIdStr);
+          io.to(gameId).emit("game begins", gameId);
         }
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
         joinResponse.isAuthenticated = true;
-        joinResponse.token = signUserToken(userName, uuid);
+        joinResponse.token = newToken;
         fn(joinResponse);
       } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiJoinLeaveGameResponse);
         return null;
       }
     });
 
     socket.on("leave game", async (leaveGameRequest: IuiJoinLeaveGameRequest, fn: (leaveResponse: IuiJoinLeaveGameResponse) => void) => {
-      const {userName, uuid, token} = leaveGameRequest;
-      const isAuthenticated = isUserAuthenticated(token, userName, uuid);
+      const {gameId, userName, uuid, token} = leaveGameRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
       if (isAuthenticated) {
         const leaveResponse: IuiJoinLeaveGameResponse = await leaveGame(leaveGameRequest);
         if (leaveResponse.joinLeaveResult === JOIN_LEAVE_RESULT.ok) {
-          socket.leave(leaveGameRequest.gameId);
-          csm.removeUserFromGame(userName, leaveGameRequest.gameId);
+          socket.leave(gameId);
+          csm.removeUserFromGame(userName, gameId);
           // notify other users
           io.emit("game list updated");
         }
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
         leaveResponse.isAuthenticated = true;
-        leaveResponse.token = signUserToken(userName, uuid);
+        leaveResponse.token = newToken;
         fn(leaveResponse);
       } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiJoinLeaveGameResponse);
         return null;
       }
     });
@@ -267,9 +353,12 @@ connectDB().then(() => {
     socket.on("check if ongoing game", async (checkIfOngoingGameRequest: IuiUserData, fn: (checkResponse: IuiCheckIfOngoingGameResponse) => void) => {
       console.log("check if ongoing game", checkIfOngoingGameRequest);
       const {userName, uuid, token} = checkIfOngoingGameRequest;
-      const isAuthenticated = isUserAuthenticated(token, userName, uuid);
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
       if (isAuthenticated) {
         const checkResponse: IuiCheckIfOngoingGameResponse = await checkIfOngoingGame(checkIfOngoingGameRequest);
+        const timestamp = Date.now();
         switch (checkResponse.checkStatus) {
           case CHECK_GAME_STATUS.joinedGame:
           case CHECK_GAME_STATUS.onGoingGame:
@@ -277,7 +366,7 @@ connectDB().then(() => {
             const gameIdStr = checkResponse.gameId ?? "";
             const playerName = checkResponse.asAPlayer ?? "";
             socket.join(gameIdStr);
-            csm.addUserToMap(playerName, socket.id, gameIdStr);
+            csm.addUserToMap(playerName, socket.id, timestamp, gameIdStr);
             const chatLine = playerName + " joined game!";
             console.log("sending new chat line", chatLine, gameIdStr);
             io.to(gameIdStr).emit("new chat line", chatLine);
@@ -285,256 +374,386 @@ connectDB().then(() => {
             break;
           }
         }
-        checkResponse.isAuthenticated = isAuthenticated;
-        checkResponse.token = signUserToken(userName, uuid);
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        checkResponse.isAuthenticated = true;
+        checkResponse.token = newToken;
         fn(checkResponse);
       } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiCheckIfOngoingGameResponse);
         return null;
       }
     });
 
     socket.on("check game", async (getGameInfoRequest: IuiGetGameInfoRequest, fn: (gameInfoResponse: IuiGetGameInfoResponse) => void) => {
       // console.log("check game", getGameInfoRequest);
-      if (getGameInfoRequest.gameId === "" || getGameInfoRequest.uuid === "") {
-        return null;
-      }
-      const gameInfoResponse: IuiGetGameInfoResponse | null = await getGameInfo(getGameInfoRequest);
-      // console.log("gameInfoResponse", gameInfoResponse);
-      if (gameInfoResponse === null) {
-        return null;
-      }
+      const {gameId, uuid, userName, token} = getGameInfoRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
-      fn(gameInfoResponse);
+      if (isAuthenticated) {
+        if (gameId === "" || uuid === "") {
+          return null;
+        }
+        const gameInfoResponse: IuiGetGameInfoResponse | null = await getGameInfo(getGameInfoRequest);
+        // console.log("gameInfoResponse", gameInfoResponse);
+        if (gameInfoResponse === null) {
+          return null;
+        }
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        gameInfoResponse.isAuthenticated = true;
+        gameInfoResponse.token = newToken;
+
+        fn(gameInfoResponse);
+      } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiGetGameInfoResponse);
+        return null;
+      }
     });
 
     socket.on("get round", async (getRoundObj: IuiGetRoundRequest, fn: (roundResponse: IuiGetRoundResponse) => void) => {
       console.log("get round", getRoundObj);
-      if (getRoundObj.gameId === "") {
-        return null;
-      }
-      const roundResponse: IuiGetRoundResponse | null = await getRound(getRoundObj);
-      // console.log("roundResponse", roundResponse);
-      if (roundResponse === null) {
-        return null;
-      }
+      const {gameId, userName, uuid, token} = getRoundObj;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
-      fn(roundResponse);
+      if (isAuthenticated) {
+        if (gameId === "") {
+          return null;
+        }
+        const roundResponse: IuiGetRoundResponse | null = await getRound(getRoundObj);
+        // console.log("roundResponse", roundResponse);
+        if (roundResponse === null) {
+          return null;
+        }
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        roundResponse.isAuthenticated = true;
+        roundResponse.token = newToken;
+
+        fn(roundResponse);
+      } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiGetRoundResponse);
+        return null;
+      }
     });
 
     socket.on("make promise", async (makePromiseRequest: IuiMakePromiseRequest, fn: (promiseResponse: IuiMakePromiseResponse) => void) => {
       console.log("make promise", makePromiseRequest);
-      const { gameId: gameIdStr, roundInd } = makePromiseRequest;
-      if (!gameIdStr || !makePromiseRequest.uuid) {
+      const { gameId: gameIdStr, roundInd, token, uuid, userName } = makePromiseRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        if (!gameIdStr || !uuid) {
+          return null;
+        }
+
+        const promiseResponse: IuiMakePromiseResponse = await makePromise(makePromiseRequest);
+        if (promiseResponse.promiseResponse === PROMISE_RESPONSE.evenPromiseNotAllowed) {
+          const chatLine = "You can't promise " + promiseResponse.promise + " because even promises are not allowed!";
+          socket.emit("new chat line", chatLine);
+        } else if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
+          const { promiser, promise, promiseTime } = promiseResponse;
+          const promiseNotification: IuiPromiseMadeNotification = {
+            playerName: promiser,
+            promise: promise,
+            currentRoundIndex: roundInd,
+          };
+          io.to(gameIdStr).emit("promise made", promiseNotification);
+
+          const chatLine = `${promiser} promised ${promise} in ${(promiseTime/1000).toFixed(1)} seconds`;
+          io.to(gameIdStr).emit("new chat line", chatLine);
+        }
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        promiseResponse.isAuthenticated = true;
+        promiseResponse.token = newToken;
+        fn(promiseResponse);
+      } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiMakePromiseResponse);
         return null;
       }
-
-      const promiseResponse: IuiMakePromiseResponse = await makePromise(makePromiseRequest);
-      if (promiseResponse.promiseResponse === PROMISE_RESPONSE.evenPromiseNotAllowed) {
-        const chatLine = "You can't promise " + promiseResponse.promise + " because even promises are not allowed!";
-        socket.emit("new chat line", chatLine);
-      } else if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
-        const { promiser, promise, promiseTime } = promiseResponse;
-        const promiseNotification: IuiPromiseMadeNotification = {
-          playerName: promiser,
-          promise: promise,
-          currentRoundIndex: roundInd,
-        };
-        io.to(gameIdStr).emit("promise made", promiseNotification);
-
-        const chatLine = `${promiser} promised ${promise} in ${(promiseTime/1000).toFixed(1)} seconds`;
-        io.to(gameIdStr).emit("new chat line", chatLine);
-      }
-      fn(promiseResponse);
     });
 
     socket.on("play card", async (playCardRequest: IuiPlayCardRequest, fn: (playCardResponse: IuiPlayCardResponse) => void) => {
       console.log("play card", playCardRequest);
-      const { gameId: gameIdStr, roundInd } = playCardRequest;
-      if (!gameIdStr || !playCardRequest.uuid) {
+      const { gameId: gameIdStr, roundInd, userName, uuid, token } = playCardRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        if (!gameIdStr || !uuid) {
+          return null;
+        }
+
+        const playCardResponse: IuiPlayCardResponse = await playCard(playCardRequest);
+        if (playCardResponse.playResponse === PLAY_CARD_RESPONSE.playOk) {
+          const {
+            playerName,
+            playedFromSlot,
+            card,
+            newPlayAfterHit,
+            gameStatusAfterPlay,
+            roundStatusAfterPlay,
+            playTime,
+            winnerOfPlay,
+            winCount,
+            newDealer,
+            winnerOfGame,
+          } = playCardResponse;
+          const chatLine = `${playerName} hit card in ${(playTime/1000).toFixed(1)} seconds`;
+          io.to(gameIdStr).emit("new chat line", chatLine);
+
+          const cardPlayedNotificationToMySelf: IuiCardPlayedNotification = {
+            playerName: playerName,
+            playedFromSlot: playCardRequest.card.originalIndex ?? 0,
+            playedCard: card,
+            currentRoundIndex: roundInd,
+            newPlayAfterHit: newPlayAfterHit,
+            gameStatusAfterPlay: gameStatusAfterPlay,
+            roundStatusAfterPlay: roundStatusAfterPlay,
+            winnerOfPlay: winnerOfPlay,
+            winCount: winCount,
+          };
+          const cardPlayedNotification: IuiCardPlayedNotification = {
+            playerName: playerName,
+            playedFromSlot: playedFromSlot,
+            playedCard: card,
+            currentRoundIndex: roundInd,
+            newPlayAfterHit: newPlayAfterHit,
+            gameStatusAfterPlay: gameStatusAfterPlay,
+            roundStatusAfterPlay: roundStatusAfterPlay,
+            winnerOfPlay: winnerOfPlay,
+            winCount: winCount,
+          };
+
+          socket.emit("card played", cardPlayedNotificationToMySelf);
+          socket.to(gameIdStr).emit("card played", cardPlayedNotification);
+
+          if (newPlayAfterHit) {
+            const chatLine = `${winnerOfPlay} won this play`;
+            io.to(gameIdStr).emit("new chat line", chatLine);
+          }
+
+          if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.onGoing) {
+            const chatLine = `Round ${roundInd + 2} starts...`;
+            io.to(gameIdStr).emit("new chat line", chatLine);
+            const chatLine2 = `... and ${newDealer} is a dealer!`;
+            io.to(gameIdStr).emit("new chat line", chatLine2);
+          }
+
+          if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.played) {
+            const chatLine = "GAME OVER!";
+            io.to(gameIdStr).emit("new chat line", chatLine);
+            const chatLine2 = `${winnerOfGame} won the Game!`;
+            io.to(gameIdStr).emit("new chat line", chatLine2);
+          }
+        }
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        playCardResponse.isAuthenticated = true;
+        playCardResponse.token = newToken;
+
+        fn(playCardResponse);
+      } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiPlayCardResponse);
         return null;
       }
-
-      const playCardResponse: IuiPlayCardResponse = await playCard(playCardRequest);
-      if (playCardResponse.playResponse === PLAY_CARD_RESPONSE.playOk) {
-        const {
-          playerName,
-          playedFromSlot,
-          card,
-          newPlayAfterHit,
-          gameStatusAfterPlay,
-          roundStatusAfterPlay,
-          playTime,
-          winnerOfPlay,
-          winCount,
-          newDealer,
-          winnerOfGame,
-        } = playCardResponse;
-        const chatLine = `${playerName} hit card in ${(playTime/1000).toFixed(1)} seconds`;
-        io.to(gameIdStr).emit("new chat line", chatLine);
-
-        const cardPlayedNotificationToMySelf: IuiCardPlayedNotification = {
-          playerName: playerName,
-          playedFromSlot: playCardRequest.card.originalIndex ?? 0,
-          playedCard: card,
-          currentRoundIndex: roundInd,
-          newPlayAfterHit: newPlayAfterHit,
-          gameStatusAfterPlay: gameStatusAfterPlay,
-          roundStatusAfterPlay: roundStatusAfterPlay,
-          winnerOfPlay: winnerOfPlay,
-          winCount: winCount,
-        };
-        const cardPlayedNotification: IuiCardPlayedNotification = {
-          playerName: playerName,
-          playedFromSlot: playedFromSlot,
-          playedCard: card,
-          currentRoundIndex: roundInd,
-          newPlayAfterHit: newPlayAfterHit,
-          gameStatusAfterPlay: gameStatusAfterPlay,
-          roundStatusAfterPlay: roundStatusAfterPlay,
-          winnerOfPlay: winnerOfPlay,
-          winCount: winCount,
-        };
-
-        socket.emit("card played", cardPlayedNotificationToMySelf);
-        socket.to(gameIdStr).emit("card played", cardPlayedNotification);
-
-        if (newPlayAfterHit) {
-          const chatLine = `${winnerOfPlay} won this play`;
-          io.to(gameIdStr).emit("new chat line", chatLine);
-        }
-
-        if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.onGoing) {
-          const chatLine = `Round ${roundInd + 2} starts...`;
-          io.to(gameIdStr).emit("new chat line", chatLine);
-          const chatLine2 = `... and ${newDealer} is a dealer!`;
-          io.to(gameIdStr).emit("new chat line", chatLine2);
-        }
-
-        if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.played) {
-          const chatLine = "GAME OVER!";
-          io.to(gameIdStr).emit("new chat line", chatLine);
-          const chatLine2 = `${winnerOfGame} won the Game!`;
-          io.to(gameIdStr).emit("new chat line", chatLine2);
-        }
-      }
-
-      fn(playCardResponse);
     });
 
     socket.on("write chat", async (chatObj: IuiChatObj ) => {
-      const gameIdStr = chatObj.gameId;
-      const chatLine = chatObj.userName + ": " + chatObj.chatLine;
-      console.log("sending new chat line", chatLine, gameIdStr);
-      io.to(gameIdStr).emit("new chat line", chatLine);
+      const {userName, gameId, uuid, token, chatLine} = chatObj;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        const chat = userName + ": " + chatLine;
+        console.log("sending new chat line", chat, gameId);
+        io.to(gameId).emit("new chat line", chat);
+      } else {
+        return null;
+      }
     });
 
     socket.on("leave ongoing game", async (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest, fn: (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => void) => {
-      const {gameId: gameIdStr, uuid} = leaveOngoingGameRequest;
-
       console.log("leaveOngoingGameRequest", leaveOngoingGameRequest);
-      if (gameIdStr === "" || uuid === "") {
-        return null;
-      }
+      const {gameId, uuid, userName, token} = leaveOngoingGameRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
-      const leaveOngoingGameResponse = await leaveOngoingGame(leaveOngoingGameRequest);
-      const { leaveStatus, leaverName } = leaveOngoingGameResponse;
-      if (leaveStatus !== LEAVE_ONGOING_GAME_RESULT.notOk) {
-        if (leaveStatus !== LEAVE_ONGOING_GAME_RESULT.gameDismissed) {
-          let chatLine = `${leaverName} has left the game!`;
-          io.to(gameIdStr).emit("new chat line", chatLine);
-          chatLine = `You can invite a new player to continue ${leaverName}'s game with these id's:`;
-          io.to(gameIdStr).emit("new chat line", chatLine);
-          chatLine = `GameId: ${gameIdStr}`;
-          io.to(gameIdStr).emit("new chat line", chatLine);
-          chatLine = `PlayerId: ${uuid}`;
-          io.to(gameIdStr).emit("new chat line", chatLine);
+      if (isAuthenticated) {
+        if (gameId === "" || uuid === "") {
+          return null;
         }
 
-        socket.leave(gameIdStr);
-        csm.removeUserFromMap(leaverName, socket.id, gameIdStr);
+        const leaveOngoingGameResponse = await leaveOngoingGame(leaveOngoingGameRequest);
+        const { leaveStatus, leaverName } = leaveOngoingGameResponse;
+        if (leaveStatus !== LEAVE_ONGOING_GAME_RESULT.notOk) {
+          if (leaveStatus !== LEAVE_ONGOING_GAME_RESULT.gameDismissed) {
+            let chatLine = `${leaverName} has left the game!`;
+            io.to(gameId).emit("new chat line", chatLine);
+            chatLine = `You can invite a new player to continue ${leaverName}'s game with these id's:`;
+            io.to(gameId).emit("new chat line", chatLine);
+            chatLine = `GameId: ${gameId}`;
+            io.to(gameId).emit("new chat line", chatLine);
+            chatLine = `PlayerId: ${uuid}`;
+            io.to(gameId).emit("new chat line", chatLine);
+          }
+
+          socket.leave(gameId);
+          csm.removeUserFromMap(leaverName, socket.id, gameId);
+        }
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        leaveOngoingGameResponse.isAuthenticated = true;
+        leaveOngoingGameResponse.token = newToken;
+        fn(leaveOngoingGameResponse);
+      } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiLeaveOngoingGameResponse);
+        return null;
       }
-      fn(leaveOngoingGameResponse);
     });
 
     socket.on("join ongoing game", async (joinRequest: IuiJoinOngoingGame, fn: (joinResponse: IuiJoinOngoingGameResponse) => void) => {
-      const {gameId: gameIdStr, playerId} = joinRequest;
-
       console.log("joinRequest", joinRequest);
-      if (gameIdStr === "" || playerId === "") {
-        return null;
-      }
+      const {gameId, playerId, userName, uuid, token} = joinRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
-      const playerToJoin = await getHumanPlayer(gameIdStr, playerId);
-      if (playerToJoin) {
-        const playAsName = playerToJoin.name;
-        const playerIsActive = playerToJoin.active;
-        if (playerIsActive) {
-          // check socket status
-          // don't let to join if socket active and it still responses
-          if (csm.isUserConnected(playAsName)) {
-            // ping sockets
-            let pingOk = false;
-            const sockets = csm.getUserSocketsFromMap(playAsName);
-            if (sockets) {
-              // eslint-disable-next-line no-cond-assign
-              for (let it = sockets.values(), val = null; val=it.next().value;) {
-                if (val !== undefined) {
-                  const socketId = val;
-                  pingOk = io.to(socketId).emit("hey");
-                  console.log("join game by id - pinged socket "+socketId+" and result was: ", pingOk, gameIdStr, playAsName);
+      if (isAuthenticated) {
+        if (gameId === "" || playerId === "") {
+          return null;
+        }
+
+        const playerToJoin = await getHumanPlayer(gameId, playerId);
+        const timestamp = Date.now();
+        if (playerToJoin) {
+          const playAsName = playerToJoin.name;
+          const playerIsActive = playerToJoin.active;
+          if (playerIsActive) {
+            // check socket status
+            // don't let to join if socket active and it still responses
+            if (csm.isUserConnected(playAsName)) {
+              // ping sockets
+              let pingOk = false;
+              const sockets = csm.getUserSocketsFromMap(playAsName);
+              if (sockets) {
+                // eslint-disable-next-line no-cond-assign
+                for (let it = sockets.values(), val = null; val=it.next().value;) {
+                  if (val !== undefined) {
+                    const socketId = val;
+                    pingOk = io.to(socketId).emit("hey");
+                    console.log("join game by id - pinged socket "+socketId+" and result was: ", pingOk, gameId, playAsName);
+                  }
                 }
               }
-            }
 
-            if (pingOk) {
-              console.log("join game by id - joining failed because user was still active", gameIdStr, playAsName);
-              return null;
+              if (pingOk) {
+                console.log("join game by id - joining failed because user was still active", gameId, playAsName);
+                return null;
+              }
             }
           }
+
+          // player has left the game or is disconnected -> let join
+          const joinResponse = await joinOngoingGame(joinRequest);
+          if (joinResponse.joinOk) {
+            // remove previous player from game
+            csm.removeUserFromMap(playAsName, "-1", gameId);
+
+            // join in the game
+            socket.join(gameId);
+            csm.addUserToMap(playAsName, socket.id, timestamp, gameId);
+
+            const chatLine = `player ${playAsName} connected again as new player`;
+            io.to(gameId).emit("new chat line", chatLine);
+          }
+          csm.setLastTimestamp(userName, socket.id, timestamp);
+          const newToken = signUserToken(userName, uuid, timestamp);
+          joinResponse.isAuthenticated = true;
+          joinResponse.token = newToken;
+
+          fn(joinResponse);
+        } else {
+          csm.setLastTimestamp(userName, socket.id, timestamp);
+          const newToken = signUserToken(userName, uuid, timestamp);
+          fn({
+            joinOk: false,
+            isAuthenticated: true,
+            token: newToken,
+          } as IuiJoinOngoingGameResponse);
         }
-
-        // player has left the game or is disconnected -> let join
-        const joinResponse = await joinOngoingGame(joinRequest);
-        if (joinResponse.joinOk) {
-          // remove previous player from game
-          csm.removeUserFromMap(playAsName, "-1", gameIdStr);
-
-          // join in the game
-          socket.join(gameIdStr);
-          csm.addUserToMap(playAsName, socket.id, gameIdStr);
-
-          const chatLine = `player ${playAsName} connected again as new player`;
-          io.to(gameIdStr).emit("new chat line", chatLine);
-        }
-
-        fn(joinResponse);
       } else {
         fn({
-          joinOk: false,
+          isAuthenticated: false,
         } as IuiJoinOngoingGameResponse);
+        return null;
       }
     });
 
     socket.on("get report data", async (request: IuiUserData, fn: (reportResponse: IuiPlayedGamesReport) => void) => {
       console.log("get report data", request);
       const {userName, uuid, token} = request;
-      const isAuthenticated = isUserAuthenticated(token, userName, uuid);
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
       if (isAuthenticated) {
         const reportData = await getReportData();
-        reportData.isAuthenticated = isAuthenticated;
-        reportData.token = signUserToken(userName, uuid);
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        reportData.isAuthenticated = true;
+        reportData.token = newToken;
         fn(reportData);
       } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiPlayedGamesReport);
         return null;
       }
     });
 
     socket.on("get game report", async (reportRequest: IuiGetOneGameReportRequest, fn: (reportResponse: IuiOneGameReport) => void) => {
       console.log("get game report", reportRequest);
-      const reportData = await getOneGameReportData(reportRequest);
-      if (!reportData) return null;
+      const {uuid, userName, token} = reportRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
-      fn(reportData);
+      if (isAuthenticated) {
+        const reportData = await getOneGameReportData(reportRequest);
+        if (!reportData) return null;
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        reportData.isAuthenticated = true;
+        reportData.token = newToken;
+
+        fn(reportData);
+      } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiOneGameReport);
+        return null;
+      }
     });
   });
 }).catch((e: unknown) => {

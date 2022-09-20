@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../../common/userFunctions";
 import { IuiGetGamesResponse } from "../../interfaces/IuiAdminOperations";
 import { IuiUserData } from "../../interfaces/IuiUser";
 import { useSocket } from "../../socket";
@@ -35,7 +36,12 @@ const AdminMassOperations = ({userName}: IProps) => {
     };
     socket.emit("re-create all game statistics", request, (getGamesResponse: IuiGetGamesResponse) => {
       console.log(getGamesResponse);
-      dispatch(setAdminGameList(getGamesResponse.gameList));
+      if (getGamesResponse.isAuthenticated) {
+        handleAuthenticatedRequest(getGamesResponse.token);
+        dispatch(setAdminGameList(getGamesResponse.gameList));
+      } else {
+        handleUnauthenticatedRequest(dispatch);
+      }
       setOperationInProgress(false);
     });
   };
