@@ -168,12 +168,13 @@ const starterOfThisPlay = (round: IRound, playInd: number): string => {
 };
 
 const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, playerId: string): IuiRoundToPlayer => {
+  const gameIsPlayed = gameInDb.gameStatus === GAME_STATUS.played;
   const round = gameInDb.game.rounds[roundInd];
   const playIndex = getCurrentPlayIndex(round);
-  const playerInTurn = getPlayerInTurn(round);
+  const playerInTurn = gameIsPlayed ? null : getPlayerInTurn(round);
   const isNowMyTurn = playerInTurn?.playerId === playerId;
   const myCards = getMyCards(playerId, round, false);
-  const playerInCharge = starterOfThisPlay(round, playIndex);
+  const playerInCharge = gameIsPlayed ? "" : starterOfThisPlay(round, playIndex);
   const cardInCharge = getCurrentCardInCharge(round.cardsPlayed);
   const myPlayedCard = round.cardsPlayed[playIndex].find(playedCard => playedCard.playerId === playerId)?.card;
 
