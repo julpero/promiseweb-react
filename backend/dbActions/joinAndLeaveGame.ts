@@ -90,10 +90,12 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
     console.log("player name is not in game", leaveGameRequest.userName);
     return JOIN_LEAVE_RESULT.notOk;
   }
-  if (!game.humanPlayers.find(player => player.playerId === leaveGameRequest.uuid)) {
-    console.log("player id is not in game", leaveGameRequest.uuid);
-    return JOIN_LEAVE_RESULT.notOk;
-  }
+
+  // use now only username because of login form
+  // if (!game.humanPlayers.find(player => player.playerId === leaveGameRequest.uuid)) {
+  //   console.log("player id is not in game", leaveGameRequest.uuid);
+  //   return JOIN_LEAVE_RESULT.notOk;
+  // }
 
   // remove player from humanPlayers
   game.humanPlayers = game.humanPlayers.filter(player => player.name !== leaveGameRequest.userName);

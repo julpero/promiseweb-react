@@ -17,7 +17,7 @@ export const getOpenGamesList = async (getGameListRequest: IuiUserData): Promise
       id: openGame.id,
       rules: rulesToRuleObj(openGame),
       humanPlayers: playersToArr(openGame.humanPlayers),
-      imInTheGame: openGame.humanPlayers.filter((player) => player.playerId === getGameListRequest.uuid).length !== 0,
+      imInTheGame: openGame.humanPlayers.some((player) => player.name === getGameListRequest.userName),
       playerCount: openGame.humanPlayersCount,
       gameHasPassword: openGame.password.length > 0,
     } as IuiGameListItem);
