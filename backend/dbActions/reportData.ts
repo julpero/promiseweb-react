@@ -130,7 +130,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
 export const oneGameReportData = async (gameIdStr: string): Promise<IuiGameReport | null> => {
   if (!mongoose.isValidObjectId(gameIdStr)) return null;
   const gameInDb = await GameOptions.findById(gameIdStr);
-  if (gameInDb) {
+  if (gameInDb && gameInDb.gameStatus === GAME_STATUS.played) {
     return getGameReport(gameInDb);
   } else {
     return null;
