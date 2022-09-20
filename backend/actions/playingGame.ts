@@ -25,7 +25,6 @@ import {
   getMyCards,
   getPlayableCardIndexes,
   getPlayerInTurn,
-  getPlayerNameById,
   getPromiser,
   winnerOfPlay,
 } from "../common/common";
@@ -34,14 +33,12 @@ import { getGame, getGameWithPlayer, makePromiseToPlayer, playerPlaysCard } from
 import { ICardPlayed, IGameOptions, IRound } from "../interfaces/IGameOptions";
 
 export const getRound = async (getRoundObj: IuiGetRoundRequest): Promise<IuiGetRoundResponse | null> => {
-  const {gameId, uuid, roundInd} = getRoundObj;
+  const {gameId, userName, uuid, roundInd} = getRoundObj;
   const gameInDb = await getGame(gameId);
 
-  if (!gameInDb || !gameInDb.humanPlayers.find(player => player.playerId === uuid)) {
+  if (!gameInDb || !gameInDb.humanPlayers.find(player => player.name === userName)) {
     return null;
   }
-
-  const userName = getPlayerNameById(gameInDb.humanPlayers, uuid);
 
   const roundResponse: IuiGetRoundResponse = {
     gameId: gameId,
@@ -53,8 +50,8 @@ export const getRound = async (getRoundObj: IuiGetRoundRequest): Promise<IuiGetR
 };
 
 export const getGameInfo = async (getGameInfoRequest: IuiGetGameInfoRequest): Promise<IuiGetGameInfoResponse | null> => {
-  const gameId = getGameInfoRequest.gameId;
-  const gameInDb = await getGameWithPlayer(gameId, getGameInfoRequest.uuid);
+  const {gameId, userName} = getGameInfoRequest;
+  const gameInDb = await getGameWithPlayer(gameId, userName);
   if (gameInDb) {
     return gameToGameInfo(gameId, gameInDb);
   } else {

@@ -39,6 +39,7 @@ export interface ClientToServerEvents {
   "join ongoing game": (joinOngoingGameRequest: IuiJoinOngoingGame, fn: (joinOngoingGameResponse: IuiJoinOngoingGameResponse) => void) => void;
   "make promise": (promiseRequest: IuiMakePromiseRequest, fn: (promiseResponse: IuiMakePromiseResponse) => void) => void;
   "get open games": (gameListRequest: IuiUserData, fn: (gameList: IuiGetGameListResponse) => void) => void;
+  "get on going games": (gameListRequest: IuiUserData, fn: (gameList: IuiGetGameListResponse) => void) => void;
   "join game": (joinGameRequest: IuiJoinLeaveGameRequest, fn: (response: IuiJoinLeaveGameResponse) => void) => void;
   "leave game": (leaveGameRequest: IuiJoinLeaveGameRequest, fn: (response: IuiJoinLeaveGameResponse) => void) => void;
   "check game": (getGameInfoRequest: IuiGetGameInfoRequest, fn: (gameInfo: IuiGetGameInfoResponse) => void) => void;

@@ -16,8 +16,8 @@ export const addUserToMap = (userName: string, socketId: string, timestamp: numb
   const user = userSocketIdMap.get(userName);
   if (user) {
     //user had already joined from one client and now joining using another client
-    user.sockets.add(socketId);
-    if (gameId) {
+    if (!user.sockets.has(socketId)) user.sockets.add(socketId);
+    if (gameId && !user.games.has(gameId)) {
       user.games.add(gameId);
     }
     user.lastTimestamp = timestamp;
@@ -143,6 +143,14 @@ export const getLastTimestamp = (userName: string): number | null => {
     return user.lastTimestamp;
   }
   return null;
+};
+
+export const getPlayersOfTheGame = (gameId: string): string[] => {
+  const players: string[] = [];
+  userSocketIdMap.forEach((val, key) => {
+    if (val.games.has(gameId)) players.push(key);
+  });
+  return players;
 };
 
 // export default userSocketIdMap;

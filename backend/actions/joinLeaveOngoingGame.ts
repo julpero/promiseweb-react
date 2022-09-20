@@ -16,10 +16,10 @@ export const joinOngoingGame = async (joinRequest: IuiJoinOngoingGame): Promise<
   return joinOngoingGameResponse;
 };
 
-export const getHumanPlayer = async (gameId: string, playerId: string): Promise<IHumanPlayer | null> => {
+export const getHumanPlayer = async (gameId: string, playerName: string): Promise<IHumanPlayer | null> => {
   const gameInDb = await getGame(gameId);
   if (gameInDb) {
-    return gameInDb.humanPlayers.find(player => player.playerId === playerId) ?? null;
+    return gameInDb.humanPlayers.find(player => player.name === playerName) ?? null;
   }
   return null;
 };

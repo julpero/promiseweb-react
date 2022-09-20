@@ -21,7 +21,7 @@ const createGameOptions = (values: IuiCreateGameRequest): IGameOptions => {
     turnRound: parseInt(values.newGameTurnRound, 10),
     endRound: parseInt(values.newGameEndRound, 10),
     adminName: values.userName,
-    password: values.newGamePassword,
+    password: values.newGamePassword ?? "",
     gameStatus: GAME_STATUS.created,
     humanPlayers: [{name: values.userName, playerId: values.uuid, active: true}],
     createDateTime: new Date(),
@@ -40,13 +40,14 @@ const createGameOptions = (values: IuiCreateGameRequest): IGameOptions => {
 };
 
 export const createGame = async (createGameRequest: IuiCreateGameRequest): Promise<IuiCreateGameResponse> => {
+  const {userName} = createGameRequest;
   const response: IuiCreateGameResponse = {
     responseStatus: CREATE_GAME_STATUS.notOk,
     newGameId: "",
     loginStatus: LOGIN_RESPONSE.ok
   };
 
-  const okToCreate = !(await hasOngoingOrCreatedGame(createGameRequest.uuid));
+  const okToCreate = !(await hasOngoingOrCreatedGame(userName));
   if (!okToCreate) {
     console.log("hasOngoingOrCreatedGame");
     return response;

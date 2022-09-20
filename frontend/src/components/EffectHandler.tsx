@@ -111,7 +111,7 @@ const EffectHandler = ({gameId}: IProps) => {
         token: getToken(),
         gameId: gameId,
       };
-      // console.log("getGameInfoRequest", getGameInfoRequest);
+      console.log("INITIAL getGameInfoRequest", getGameInfoRequest);
       socket.emit("check game", getGameInfoRequest, (gameInfoResponse: IuiGetGameInfoResponse) => {
         console.log("gameInfoResponse", gameInfoResponse);
         if (gameInfoResponse.isAuthenticated) {
@@ -164,7 +164,7 @@ const EffectHandler = ({gameId}: IProps) => {
 
   useEffect(() => {
     console.log("currentGameInfo updated", currentGameInfo);
-    if (user.isUserLoggedIn && currentGameInfo.currentRound !== null && currentGameInfo.currentRound >= 0) {
+    if (user.isUserLoggedIn && currentGameInfo.gameId !== "" && currentGameInfo.currentRound !== null && currentGameInfo.currentRound >= 0) {
       const getRoundRequest: IuiGetRoundRequest = {
         uuid: getMyId(),
         userName: user.userName,

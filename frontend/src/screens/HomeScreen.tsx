@@ -181,7 +181,7 @@ const HomeScreen = ({onJoin}: IProps) => {
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="2">
-          <Accordion.Header>Join Game by Id</Accordion.Header>
+          <Accordion.Header>On Going Games</Accordion.Header>
           <Accordion.Body>
             <JoinGameById onJoin={onJoin} />
           </Accordion.Body>

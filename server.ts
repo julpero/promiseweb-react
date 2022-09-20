@@ -78,6 +78,7 @@ connectDB().then(() => {
         io.to(gameIdStr).emit("new chat line", chatLine);
       }
       csm.removeUserSocketsAndGames(userName);
+      csm.unsetUserAsAdmin(userName);
     });
 
     socket.on("user login", async (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => {
@@ -108,6 +109,7 @@ connectDB().then(() => {
       if (validToken && validToken.uuid === uuid && userName === "dummy" && validToken.timestamp === csm.getLastTimestamp(validToken.userName)) {
         const userNameFromToken = validToken.userName;
         const timestamp = Date.now();
+        csm.removeUserSocketsAndGames(userNameFromToken);
         csm.setLastTimestamp(userNameFromToken, socket.id, timestamp);
         const newToken = signUserToken(userNameFromToken, uuid, timestamp);
         const loginResponse: IuiRefreshLoginResponse = {
@@ -254,7 +256,7 @@ connectDB().then(() => {
         if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
           const gameIdStr = createGameResponse.newGameId;
           socket.join(gameIdStr);
-          csm.addUserToMap(createGameRequest.userName, socket.id, timestamp, gameIdStr);
+          csm.addUserToMap(userName, socket.id, timestamp, gameIdStr);
           io.emit("new game created", gameIdStr);
         }
         csm.setLastTimestamp(userName, socket.id, timestamp);
@@ -276,7 +278,34 @@ connectDB().then(() => {
       const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
       if (isAuthenticated) {
-        const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(getGameListRequest);
+        const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(getGameListRequest, GAME_STATUS.created);
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        getGameListResponse.isAuthenticated = true;
+        getGameListResponse.token = newToken;
+        fn(getGameListResponse);
+      } else {
+        fn({
+          isAuthenticated: false,
+          games: [],
+        } as IuiGetGameListResponse);
+        return null;
+      }
+    });
+
+    socket.on("get on going games", async (getGameListRequest: IuiUserData, fn: (getGameListResponse: IuiGetGameListResponse) => void) => {
+      const {userName, uuid, token} = getGameListRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(getGameListRequest, GAME_STATUS.onGoing);
+        for (let i = 0; i < getGameListResponse.games.length; i++) {
+          const game = getGameListResponse.games[i];
+          const players = csm.getPlayersOfTheGame(game.id);
+          game.inActivePlayerSockets = game.humanPlayers.filter(player => !players.includes(player));
+        }
         const timestamp = Date.now();
         csm.setLastTimestamp(userName, socket.id, timestamp);
         const newToken = signUserToken(userName, uuid, timestamp);
@@ -617,7 +646,7 @@ connectDB().then(() => {
           }
 
           socket.leave(gameId);
-          csm.removeUserFromMap(leaverName, socket.id, gameId);
+          csm.removeUserFromGame(leaverName, gameId);
         }
         const timestamp = Date.now();
         csm.setLastTimestamp(userName, socket.id, timestamp);
@@ -635,16 +664,21 @@ connectDB().then(() => {
 
     socket.on("join ongoing game", async (joinRequest: IuiJoinOngoingGame, fn: (joinResponse: IuiJoinOngoingGameResponse) => void) => {
       console.log("joinRequest", joinRequest);
-      const {gameId, playerId, userName, uuid, token} = joinRequest;
+      const {gameId, playAsPlayer, userName, uuid, token} = joinRequest;
       const lastTimestamp = csm.getLastTimestamp(userName);
       const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
       if (isAuthenticated) {
-        if (gameId === "" || playerId === "") {
+        if (gameId === "" || playAsPlayer === "") {
+          fn({
+            isAuthenticated: true,
+            joinOk: false,
+            token: token,
+          } as IuiJoinOngoingGameResponse);
           return null;
         }
 
-        const playerToJoin = await getHumanPlayer(gameId, playerId);
+        const playerToJoin = await getHumanPlayer(gameId, playAsPlayer);
         const timestamp = Date.now();
         if (playerToJoin) {
           const playAsName = playerToJoin.name;

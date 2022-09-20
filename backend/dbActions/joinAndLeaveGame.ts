@@ -153,7 +153,7 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
 };
 
 export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame): Promise<IuiJoinOngoingGameResponse> => {
-  const { gameId, playerId } = joinRequest;
+  const { gameId, playAsPlayer } = joinRequest;
   const joinOngoingGameResponse: IuiJoinOngoingGameResponse = {
     joinOk: false,
     playerId: "",
@@ -165,12 +165,12 @@ export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame): Promi
 
   const query = GameOptions.where({
     _id: gameId,
-    "humanPlayers.playerId": {$eq: playerId},
+    "humanPlayers.name": {$eq: playAsPlayer},
     gameStatus: GAME_STATUS.onGoing,
   });
   const gameInDb = await query.findOne();
   if (gameInDb) {
-    const player = gameInDb.humanPlayers.find(Player => Player.playerId === playerId);
+    const player = gameInDb.humanPlayers.find(player => player.name === playAsPlayer);
     if (player) {
       player.active = true;
       const gameAfter = await gameInDb.save();

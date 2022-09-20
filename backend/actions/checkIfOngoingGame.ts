@@ -5,7 +5,7 @@ import { getLastGameByStatus, ILastGameStatusResponse } from "../dbActions/promi
 
 export const checkIfOngoingGame = async (checkRequest: IuiUserData): Promise<IuiCheckIfOngoingGameResponse> => {
   // console.log("checkRequest", checkRequest);
-  const playerId = checkRequest.uuid;
+  const {userName} = checkRequest;
 
   const response: IuiCheckIfOngoingGameResponse = {
     checkStatus: CHECK_GAME_STATUS.noGame,
@@ -14,7 +14,7 @@ export const checkIfOngoingGame = async (checkRequest: IuiUserData): Promise<Iui
     currentRound: null,
   };
 
-  const ongoingGameResponse: ILastGameStatusResponse | null = await getLastGameByStatus(playerId, GAME_STATUS.onGoing);
+  const ongoingGameResponse: ILastGameStatusResponse | null = await getLastGameByStatus(userName, GAME_STATUS.onGoing);
   if (ongoingGameResponse) {
     response.checkStatus = CHECK_GAME_STATUS.onGoingGame;
     response.gameId = ongoingGameResponse.gameId;
@@ -22,7 +22,7 @@ export const checkIfOngoingGame = async (checkRequest: IuiUserData): Promise<Iui
     response.currentRound = ongoingGameResponse.currentRound;
     return response;
   }
-  const joinedGameResponse: ILastGameStatusResponse | null= await getLastGameByStatus(playerId, GAME_STATUS.created);
+  const joinedGameResponse: ILastGameStatusResponse | null= await getLastGameByStatus(userName, GAME_STATUS.created);
   if (joinedGameResponse) {
     response.checkStatus = CHECK_GAME_STATUS.joinedGame;
     response.gameId = joinedGameResponse.gameId;

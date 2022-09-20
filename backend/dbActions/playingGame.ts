@@ -38,12 +38,12 @@ export const getGame = async (gameIdStr: string): Promise<IGameOptions | null> =
   return gameInDb;
 };
 
-export const getGameWithPlayer = async (gameIdStr: string, playerId: string): Promise<IGameOptions | null> => {
+export const getGameWithPlayer = async (gameIdStr: string, playerName: string): Promise<IGameOptions | null> => {
   if (!mongoose.isValidObjectId(gameIdStr)) return null;
 
   const query = GameOptions.where({
     _id: gameIdStr,
-    "humanPlayers.playerId": {$eq: playerId},
+    "humanPlayers.name": {$eq: playerName},
   });
   const gameInDb = await query.findOne();
   return gameInDb;

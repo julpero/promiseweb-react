@@ -2,7 +2,7 @@ import { IuiAuth, IuiUserData } from "./IuiUser";
 
 export interface IuiJoinOngoingGame extends IuiUserData {
   gameId: string,
-  playerId: string,
+  playAsPlayer: string,
 }
 
 export interface IuiJoinOngoingGameResponse extends IuiAuth {
