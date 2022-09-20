@@ -5,8 +5,6 @@ import { IuiCreateGameRequest, IuiCreateGameResponse, CREATE_GAME_STATUS } from 
 import { GAME_STATUS, HIDDEN_CARDS_MODE } from "../../frontend/src/interfaces/IuiGameOptions";
 import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
 
-import { validate as uuidValidate } from "uuid";
-
 const hiddenCardsModeToEnum = (selected: string): HIDDEN_CARDS_MODE => {
   switch (selected) {
     case "1": return HIDDEN_CARDS_MODE.onlyCardInCharge;
