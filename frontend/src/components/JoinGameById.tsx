@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { Field, Form } from "react-final-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "../interfaces/IuiJoinOngoingGame";
 import { useSocket } from "../socket";
+import { getUser } from "../store/userSlice";
 import TextInput from "./FormComponents/TextInput";
 
 interface IFormValidationFields {
@@ -19,10 +20,17 @@ interface IProps {
 const JoinGameById = ({onJoin}: IProps) => {
   const [ joinOk, setJoinOk ] = useState(false);
   const [ playerName, setPlayerName ] = useState("");
+  const user = useSelector(getUser);
   const dispatch = useDispatch();
   const { socket } = useSocket();
 
+  const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
+  const getToken = (): string => window.localStorage.getItem("token") ?? "";
+
   const onSubmit = (values: IuiJoinOngoingGame): void => {
+    values.uuid = getMyId();
+    values.userName = user.userName;
+    values.token = getToken();
     console.log("onSubmit", values);
     socket.emit("join ongoing game", values, (joinResponse: IuiJoinOngoingGameResponse) => {
       console.log("join response", joinResponse);
