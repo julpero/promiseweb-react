@@ -33,7 +33,7 @@ import { getGame, getGameWithPlayer, makePromiseToPlayer, playerPlaysCard } from
 import { ICardPlayed, IGameOptions, IRound } from "../interfaces/IGameOptions";
 
 export const getRound = async (getRoundObj: IuiGetRoundRequest): Promise<IuiGetRoundResponse | null> => {
-  const {gameId, userName, uuid, roundInd} = getRoundObj;
+  const {gameId, userName, roundInd} = getRoundObj;
   const gameInDb = await getGame(gameId);
 
   if (!gameInDb || !gameInDb.humanPlayers.find(player => player.name === userName)) {
@@ -44,7 +44,7 @@ export const getRound = async (getRoundObj: IuiGetRoundRequest): Promise<IuiGetR
     gameId: gameId,
     roundInd: roundInd,
     userName: userName,
-    roundToPlayer: roundToPlayer(gameInDb, roundInd, uuid),
+    roundToPlayer: roundToPlayer(gameInDb, roundInd, userName),
   };
   return roundResponse;
 };
