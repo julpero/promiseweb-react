@@ -4,7 +4,6 @@ import roundSchema from "./Round";
 
 const playerOrderPlayerSchema = new Schema<IPlayer>({
   name: {type: String, required: true},
-  playerId: {type: String, required: false},
   type: {type: String, required: true},
 });
 

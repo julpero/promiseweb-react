@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import mongoose from "mongoose";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { generateGameStats } from "../common/statsFunctions";
@@ -40,19 +39,17 @@ export const reCreateAllGamesStatistic = async (): Promise<boolean> => {
   return true;
 };
 
-const convertOldPlayerOrderToNew = (old: string[] | IPlayer[], nameIdMap: Map<string, string>): IPlayer[] => {
+const convertOldPlayerOrderToNew = (old: string[] | IPlayer[]): IPlayer[] => {
   const playerOrder: IPlayer[] = [];
   old.forEach(o => {
     if (typeof o === "string") {
       playerOrder.push({
         name: o,
-        playerId: nameIdMap.get(o) ?? randomUUID(),
         type: "human",
       } as IPlayer);
     } else {
       playerOrder.push({
         name: o.name,
-        playerId: o.playerId ?? nameIdMap.get(o.name) ?? randomUUID(),
         type: "human",
       } as IPlayer);
     }
@@ -65,7 +62,6 @@ const convertOldHumanPlayersToNew = (old: IHumanPlayer[]): IHumanPlayer[] => {
   old.forEach(o => {
     humanPlayers.push({
       name: o.name,
-      playerId: o.playerId ?? randomUUID(),
       active: true,
     } as IHumanPlayer);
   });
@@ -84,12 +80,11 @@ const convertOldCardToNew = (old: {suit: string, rank: number}): ICard => {
   return {suite: old.suit, value: old.rank, rank: valueToRank(old.rank) } as ICard;
 };
 
-const convertOldRoundPlayersToNew = (old: IDummy[], nameIdMap: Map<string, string>): IRoundPlayer[] => {
+const convertOldRoundPlayersToNew = (old: IDummy[]): IRoundPlayer[] => {
   const newPlayers: IRoundPlayer[] = [];
   old.forEach(oldPlayer => {
     newPlayers.push({
       name: oldPlayer.name,
-      playerId: oldPlayer.playerId ?? nameIdMap.get(oldPlayer.name) ?? randomUUID(),
       type: "human",
       cards: oldPlayer.cards.map((card: {suit: string, rank: number}) => convertOldCardToNew(card)),
       cardsToDebug: oldPlayer.cardsToDebug.map((card: {suit: string, rank: number}) => convertOldCardToNew(card)),
@@ -105,12 +100,11 @@ const convertOldRoundPlayersToNew = (old: IDummy[], nameIdMap: Map<string, strin
   return newPlayers;
 };
 
-const convertOneRoundPlayToNew = (old: IDummy[], nameIdMap: Map<string, string>): ICardPlayed[] => {
+const convertOneRoundPlayToNew = (old: IDummy[]): ICardPlayed[] => {
   const oneRoundPlay: ICardPlayed[] = [];
   old.forEach(hit => {
     oneRoundPlay.push({
       name: hit.name,
-      playerId: nameIdMap.get(hit.name) ?? randomUUID(),
       card: convertOldCardToNew(hit.card),
       playedTime: hit.playedTime ?? 0,
       playStarted: hit.playStarted ?? 0,
@@ -119,15 +113,15 @@ const convertOneRoundPlayToNew = (old: IDummy[], nameIdMap: Map<string, string>)
   return oneRoundPlay;
 };
 
-const convertOldCardsPlayedToNew = (old: IDummy[][], nameIdMap: Map<string, string>): ICardPlayed[][] => {
+const convertOldCardsPlayedToNew = (old: IDummy[][]): ICardPlayed[][] => {
   const retArr: ICardPlayed[][] = [];
   old.forEach(roundPlay => {
-    retArr.push(convertOneRoundPlayToNew(roundPlay, nameIdMap));
+    retArr.push(convertOneRoundPlayToNew(roundPlay));
   });
   return retArr;
 };
 
-const convertOldRoundsToNew = (old: IDummy[], nameIdMap: Map<string, string>): IRound[] => {
+const convertOldRoundsToNew = (old: IDummy[]): IRound[] => {
   const rounds: IRound[] = [];
   old.forEach(oldRound => {
     rounds.push({
@@ -138,18 +132,18 @@ const convertOldRoundsToNew = (old: IDummy[], nameIdMap: Map<string, string>): I
       trumpCard: convertOldCardToNew(oldRound.trumpCard),
       totalPromise: oldRound.totalPromise,
       roundStatus: oldRound.roundStatus,
-      roundPlayers: convertOldRoundPlayersToNew(oldRound.roundPlayers, nameIdMap),
-      cardsPlayed: convertOldCardsPlayedToNew(oldRound.cardsPlayed, nameIdMap),
+      roundPlayers: convertOldRoundPlayersToNew(oldRound.roundPlayers),
+      cardsPlayed: convertOldCardsPlayedToNew(oldRound.cardsPlayed),
     } as IRound);
   });
   return rounds;
 };
 
-const convertOldGameToNew = (game: IDummy, nameIdMap: Map<string, string>): IGame => {
+const convertOldGameToNew = (game: IDummy): IGame => {
   const newGame: IGame = {
-    playerOrder: convertOldPlayerOrderToNew(game.playerOrder, nameIdMap),
+    playerOrder: convertOldPlayerOrderToNew(game.playerOrder),
     lastTimeStamp: Date.now(),
-    rounds: convertOldRoundsToNew(game.rounds, nameIdMap),
+    rounds: convertOldRoundsToNew(game.rounds),
   };
   return newGame;
 };
@@ -183,11 +177,7 @@ export const convertOldDataToNew = async (): Promise<string[]> => {
     const oldId = oldGame._id.toString();
     console.log(oldId);
     const newHumanPlayers = convertOldHumanPlayersToNew(oldGame.humanPlayers);
-    const nameIdMap = new Map<string, string>();
-    newHumanPlayers.forEach(player => {
-      nameIdMap.set(player.name, player.playerId);
-    });
-    const newGame = convertOldGameToNew(oldGame.game, nameIdMap);
+    const newGame = convertOldGameToNew(oldGame.game);
     const newStats = generateGameStats(newGame, true);
     const convertedGame = new GameOptions({
       oldId: oldId,

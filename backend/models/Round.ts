@@ -4,7 +4,6 @@ import cardSchema from "./Card";
 import roundPlayerSchema from "./RoundPlayer";
 
 const cardPlayedSchema = new Schema<ICardPlayed>({
-  playerId: {type: String, required: true},
   name: {type: String, required: true},
   card: cardSchema,
   playedTime: {type: Number, required: false},

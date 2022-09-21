@@ -62,7 +62,6 @@ const JoinGameById = ({onJoin}: IProps) => {
       if (joinResponse.isAuthenticated) {
         handleAuthenticatedRequest(joinResponse.token);
         if (joinResponse.joinOk) {
-          // window.localStorage.setItem("uUID", joinResponse.playerId);
           setPlayerName(joinResponse.playerName);
           setJoinOk(joinResponse.joinOk);
         } else {

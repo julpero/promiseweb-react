@@ -23,7 +23,7 @@ const createGameOptions = (values: IuiCreateGameRequest): IGameOptions => {
     adminName: values.userName,
     password: values.newGamePassword ?? "",
     gameStatus: GAME_STATUS.created,
-    humanPlayers: [{name: values.userName, playerId: values.uuid, active: true}],
+    humanPlayers: [{name: values.userName, active: true}],
     createDateTime: new Date(),
     evenPromisesAllowed: !values.noEvenPromises,
     visiblePromiseRound: !values.hidePromiseRound,

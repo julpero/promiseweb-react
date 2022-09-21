@@ -2,7 +2,7 @@ import { Suite } from "card-games-typescript";
 import { ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { IuiCard } from "../../frontend/src/interfaces/IuiPlayingGame";
 import { getPlayerAvgPoints } from "../dbActions/promiseweb";
-import { ICard, ICardPlayed, IGame, IGameOptions, IHumanPlayer, IPlayer, IPlayerInTurn, IPlayerStats, IPromiser, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
+import { ICard, ICardPlayed, IGame, IGameOptions, IPlayer, IPlayerInTurn, IPlayerStats, IPromiser, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 import { ICardToIuiCard } from "./model";
 
 export const getPlayerStats = async (gameInDb: IGameOptions, playerName: string): Promise<IPlayerStats> => {
@@ -11,10 +11,6 @@ export const getPlayerStats = async (gameInDb: IGameOptions, playerName: string)
     playerAvgPointsInRounds: await getPlayerAvgPoints(playerName, startRound, turnRound, endRound)
   };
   return statsGamesObj;
-};
-
-export const getPlayerNameById = (players: IHumanPlayer[], playerId: string): string => {
-  return players.find(player => player.playerId == playerId)?.name ?? "";
 };
 
 export const getDealerNameForRound = (round: IRound): string => {
@@ -40,7 +36,6 @@ export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
     return {
       name: round.roundPlayers[round.starterPositionIndex].name,
       type: round.roundPlayers[round.starterPositionIndex].type,
-      playerId: round.roundPlayers[round.starterPositionIndex].playerId,
       index: round.starterPositionIndex,
     } as IPlayerInTurn;
   } else if (round.cardsPlayed[currentPlayInd].length < playerCount && round.cardsPlayed[currentPlayInd].length > 0) {
@@ -51,7 +46,7 @@ export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
       // starter was last play winner
       const prevWinner = winnerOfPlay(round.cardsPlayed[currentPlayInd-1], round.trumpCard.suite);
       if (prevWinner) {
-        starterIndex = round.roundPlayers.findIndex(player => player.playerId === prevWinner.playerId);
+        starterIndex = round.roundPlayers.findIndex(player => player.name === prevWinner.name);
       }
     }
     let checkInd = starterIndex + round.cardsPlayed[currentPlayInd].length;
@@ -59,7 +54,6 @@ export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
     return {
       name: round.roundPlayers[checkInd].name,
       type: round.roundPlayers[checkInd].type,
-      playerId: round.roundPlayers[checkInd].playerId,
       index: checkInd,
     } as IPlayerInTurn;
   } else {
@@ -67,11 +61,10 @@ export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
     console.log("getPlayerInTurn play complete");
     const prevWinner = winnerOfPlay(round.cardsPlayed[currentPlayInd-1], round.trumpCard.suite);
     if (prevWinner) {
-      const winnerIndex = round.roundPlayers.findIndex(player => player.playerId === prevWinner.playerId);
+      const winnerIndex = round.roundPlayers.findIndex(player => player.name === prevWinner.name);
       return {
         name: round.roundPlayers[winnerIndex].name,
         type: round.roundPlayers[winnerIndex].type,
-        playerId: round.roundPlayers[winnerIndex].playerId,
         index: winnerIndex,
       } as IPlayerInTurn;
     }
@@ -89,7 +82,6 @@ export const getPromiser = (round: IRound): IPromiser | null => {
         return {
           name: round.roundPlayers[checkInd].name,
           type: round.roundPlayers[checkInd].type,
-          playerId: round.roundPlayers[checkInd].playerId,
           index: checkInd,
         } as IPromiser;
       }
@@ -116,9 +108,9 @@ const showSpeedPromiseCards = (): boolean => {
   return true;
 };
 
-export const getMyCards = (uuid: string, round: IRound, speedPromise: boolean): IuiCard[] => {
+export const getMyCards = (name: string, round: IRound, speedPromise: boolean): IuiCard[] => {
   if (!speedPromise || showSpeedPromiseCards()) {
-    const player = round.roundPlayers.find(player => player.playerId === uuid);
+    const player = round.roundPlayers.find(player => player.name === name);
     return player?.cards.map(card => {
       const uiCard = ICardToIuiCard(card);
       uiCard.originalIndex = player.cardsToDebug.findIndex(dCard => dCard.value === card.value && dCard.suite === card.suite);
@@ -162,7 +154,6 @@ export const winnerOfPlay = (cardsPlayed: ICardPlayed[], trumpSuit: Suite): IPla
 
   let winner = {
     name:  cardsPlayed[0].name,
-    playerId:  cardsPlayed[0].playerId,
   } as IPlayer;
   let winningCard = cardsPlayed[0].card;
   for (let i = 1; i < cardsPlayed.length; i++) {
@@ -181,7 +172,6 @@ export const winnerOfPlay = (cardsPlayed: ICardPlayed[], trumpSuit: Suite): IPla
     if (thisWins) {
       winner = {
         name:  cardsPlayed[i].name,
-        playerId:  cardsPlayed[i].playerId,
       } as IPlayer;
       winningCard = thisCard;
     }
@@ -194,9 +184,9 @@ export const getCurrentCardInCharge = (cardsPlayed: ICardPlayed[][]): ICard | nu
   return cardsPlayed[cardsPlayed.length - 1][0].card;
 };
 
-export const getPlayerIndexFromRoundById = (roundPlayers: IRoundPlayer[], id: string | null): number => {
-  if (!id) return -1;
-  return roundPlayers.findIndex(player => player.playerId === id);
+export const getPlayerIndexFromRoundByName = (roundPlayers: IRoundPlayer[], name: string | null): number => {
+  if (!name) return -1;
+  return roundPlayers.findIndex(player => player.name === name);
 };
 
 export const countRoundPoints = (roundPlayers: IRoundPlayer[], bigRound: boolean): void => {

@@ -31,12 +31,11 @@ const getDealerPositionIndex = (roundIndex: number, totalPlayers: number): numbe
 };
 
 const initPlayers = (gameInDb: IGameOptions): void => {
-  const players: IPlayer[] = gameInDb.humanPlayers.map(player => { return { name: player.name, playerId: player.playerId } as IPlayer; });
+  const players: IPlayer[] = gameInDb.humanPlayers.map(player => { return { name: player.name } as IPlayer; });
   gameInDb.game.playerOrder = knuthShuffle(players).map((player) => {
     return {
       name: player.name,
       type: "human",
-      playerId: player.playerId,
     } as IPlayer;
   });
   console.log(gameInDb.game.playerOrder);
@@ -73,7 +72,6 @@ const initRound = (roundIndex: number, cardsInRound: number, players: IPlayer[],
     const sortedCards = sortCards(playerCards);
     roundPlayers.push({
       name: player.name,
-      playerId: player.playerId,
       cards: sortedCards,
       promise: null,
       promiseStarted: null,

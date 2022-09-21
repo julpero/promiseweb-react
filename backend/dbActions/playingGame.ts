@@ -18,9 +18,8 @@ import {
   getDealerNameForRound,
   getMyCards,
   getPlayableCardIndexes,
-  getPlayerIndexFromRoundById,
+  getPlayerIndexFromRoundByName,
   getPlayerInTurn,
-  getPlayerNameById,
   getPromiser,
   isRoundsLastPromiser,
   winnerOfPlay,
@@ -50,7 +49,7 @@ export const getGameWithPlayer = async (gameIdStr: string, playerName: string): 
 };
 
 export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequest): Promise<IuiMakePromiseResponse> => {
-  const { gameId, uuid, roundInd, promise } = makePromiseRequest;
+  const { gameId, userName, roundInd, promise } = makePromiseRequest;
   const promiseResponse: IuiMakePromiseResponse = {
     promiseResponse: PROMISE_RESPONSE.unknownError,
     promise: promise,
@@ -62,7 +61,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
 
   const query = GameOptions.where({
     _id: gameId,
-    "humanPlayers.playerId": {$eq: uuid},
+    "humanPlayers.name": {$eq: userName},
     gameStatus: GAME_STATUS.onGoing,
   });
   const gameInDb = await query.findOne();
@@ -85,7 +84,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
       console.warn("promising, possible not promising phase");
       return promiseResponse;
     }
-    if (uuid !== promiser.playerId) {
+    if (userName !== promiser.name) {
       console.warn("promising, wrong promiser turn");
       promiseResponse.promiseResponse = PROMISE_RESPONSE.notMyTurn;
       return promiseResponse;
@@ -122,7 +121,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
 };
 
 export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Promise<IuiPlayCardResponse> => {
-  const { card, gameId, roundInd, uuid } = playCardRequest;
+  const { card, gameId, roundInd, userName } = playCardRequest;
   const response: IuiPlayCardResponse = {
     playResponse: PLAY_CARD_RESPONSE.notOk,
     playerName: "",
@@ -139,7 +138,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
 
   const query = GameOptions.where({
     _id: gameId,
-    "humanPlayers.playerId": {$eq: uuid},
+    "humanPlayers.name": {$eq: userName},
     gameStatus: GAME_STATUS.onGoing,
   });
   const gameInDb = await query.findOne();
@@ -158,12 +157,12 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     }
 
     const playerInTurn = getPlayerInTurn(round);
-    if (playerInTurn?.playerId !== uuid) {
+    if (playerInTurn?.name !== userName) {
       console.warn("playing card, not my turn");
       response.playResponse = PLAY_CARD_RESPONSE.notMyTurn;
       return response;
     }
-    const playerCards = getMyCards(uuid, round, false);
+    const playerCards = getMyCards(userName, round, false);
     const playedCardIndex = playerCards.findIndex(cardInDb => cardInDb.suite === card.suite && cardInDb.value === card.value);
     if (playedCardIndex === -1) {
       response.playResponse = PLAY_CARD_RESPONSE.invalidCard;
@@ -177,11 +176,9 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     }
 
     // All checks made, let's play card
-    const myIndexInRound = getPlayerIndexFromRoundById(round.roundPlayers, uuid);
-    const userName = getPlayerNameById(gameInDb.humanPlayers, uuid);
+    const myIndexInRound = getPlayerIndexFromRoundByName(round.roundPlayers, userName);
     const playTime = Date.now() - gameInDb.game.lastTimeStamp;
     round.cardsPlayed[playIndex].push({
-      playerId: uuid,
       name: userName,
       card: IuiCardToICard(card),
       playedTime: Date.now(),
@@ -199,7 +196,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
       // let's see who wins this play and will be starter of the next play
       const winner = winnerOfPlay(round.cardsPlayed[playIndex], round.trumpCard.suite);
       if (winner) {
-        const winnerIndexInRound = getPlayerIndexFromRoundById(round.roundPlayers, winner.playerId);
+        const winnerIndexInRound = getPlayerIndexFromRoundByName(round.roundPlayers, winner.name);
         round.roundPlayers[winnerIndexInRound].keeps++;
         response.winnerOfPlay = winner.name;
         response.winCount = round.roundPlayers[winnerIndexInRound].keeps;

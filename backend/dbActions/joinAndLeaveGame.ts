@@ -37,15 +37,10 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
     console.log("player name is already in game", joinGameRequest.userName);
     return JOIN_LEAVE_RESULT.notOk;
   }
-  if (gameInDb.humanPlayers.find(player => player.playerId === joinGameRequest.uuid) !== undefined) {
-    console.log("player id is already in game", joinGameRequest.uuid);
-    return JOIN_LEAVE_RESULT.notOk;
-  }
 
   const newPlayerStats = await getPlayerStats(gameInDb, joinGameRequest.userName);
   const newPlayer: IHumanPlayer = {
     name: joinGameRequest.userName,
-    playerId: joinGameRequest.uuid,
     active: true,
     playerStats: newPlayerStats,
   };
@@ -91,12 +86,6 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
     return JOIN_LEAVE_RESULT.notOk;
   }
 
-  // use now only username because of login form
-  // if (!game.humanPlayers.find(player => player.playerId === leaveGameRequest.uuid)) {
-  //   console.log("player id is not in game", leaveGameRequest.uuid);
-  //   return JOIN_LEAVE_RESULT.notOk;
-  // }
-
   // remove player from humanPlayers
   game.humanPlayers = game.humanPlayers.filter(player => player.name !== leaveGameRequest.userName);
 
@@ -110,10 +99,9 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
 };
 
 export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest): Promise<IuiLeaveOngoingGameResponse> => {
-  const {gameId, uuid} = leaveOngoingGameRequest;
+  const {gameId, userName} = leaveOngoingGameRequest;
   const leaveOngoingGameResponse: IuiLeaveOngoingGameResponse = {
     gameId: "",
-    uuid: "",
     leaverName: "",
     leaveStatus: LEAVE_ONGOING_GAME_RESULT.notOk,
   };
@@ -123,12 +111,12 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
 
   const query = GameOptions.where({
     _id: gameId,
-    "humanPlayers.playerId": {$eq: uuid},
+    "humanPlayers.name": {$eq: userName},
     gameStatus: GAME_STATUS.onGoing,
   });
   const gameInDb = await query.findOne();
   if (gameInDb) {
-    const leaver = gameInDb.humanPlayers.find(player => player.playerId === uuid);
+    const leaver = gameInDb.humanPlayers.find(player => player.name === userName);
     if (leaver) {
       leaveOngoingGameResponse.leaverName = leaver.name;
       leaver.active = false;
@@ -140,7 +128,6 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
       } else {
         leaveOngoingGameResponse.leaveStatus = LEAVE_ONGOING_GAME_RESULT.leaveOk;
         leaveOngoingGameResponse.gameId = gameId;
-        leaveOngoingGameResponse.uuid = uuid;
       }
     }
 
@@ -156,7 +143,6 @@ export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame): Promi
   const { gameId, playAsPlayer } = joinRequest;
   const joinOngoingGameResponse: IuiJoinOngoingGameResponse = {
     joinOk: false,
-    playerId: "",
     playerName: "",
   };
   if (!mongoose.isValidObjectId(gameId)) {
@@ -176,7 +162,6 @@ export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame): Promi
       const gameAfter = await gameInDb.save();
       if (gameAfter) {
         joinOngoingGameResponse.joinOk = true;
-        joinOngoingGameResponse.playerId = player.playerId;
         joinOngoingGameResponse.playerName = player.name;
         return joinOngoingGameResponse;
       }

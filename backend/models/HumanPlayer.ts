@@ -6,10 +6,6 @@ const humanPlayerSchema = new Schema<IHumanPlayer>({
     type: String,
     required: true,
   },
-  playerId: {
-    type: String,
-    required: true,
-  },
   active: {
     type: Boolean,
     required: true,

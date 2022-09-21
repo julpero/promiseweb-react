@@ -16,7 +16,6 @@ const GameMenu = () => {
   const [leftGameModal, setLeftGameModal] = useState(false);
 
   const [leftGameId, setLeftGameId] = useState("");
-  const [leftMMyId, setLeftMyId] = useState("");
 
   const currentGameInfo = useSelector(getCurrentGameInfo);
   const user = useSelector(getUser);
@@ -54,7 +53,6 @@ const GameMenu = () => {
             setLeftGameModal(true);
             setLeaveGameModal(false);
             setLeftGameId(leaveOngoingGameResponse.gameId);
-            setLeftMyId(leaveOngoingGameResponse.uuid);
             const uuid = uuidv4();
             window.localStorage.setItem("uUID", uuid);
           }
@@ -68,7 +66,6 @@ const GameMenu = () => {
   const closeLeftModal = () => {
     setLeftGameModal(false);
     setLeftGameId("");
-    setLeftMyId("");
   };
 
   return (
@@ -114,7 +111,7 @@ const GameMenu = () => {
 
             <Form.Group className="mb-3" controlId="formLeftMyId">
               <Form.Label>My ID</Form.Label>
-              <Form.Control value={leftMMyId} readOnly type="text" placeholder="my id" />
+              <Form.Control readOnly type="text" placeholder="my id" />
             </Form.Group>
           </Form>
         </Modal.Body>

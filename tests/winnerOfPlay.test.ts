@@ -7,7 +7,6 @@ describe("testing winner of play", () => {
     const trumpSuite: Suite = "hearts";
     const playedCards: ICardPlayed[] = [
       {
-        playerId: "player-1",
         name: "player1",
         card: {
           suite: "hearts",
@@ -19,7 +18,6 @@ describe("testing winner of play", () => {
       } as ICardPlayed
     ];
     const expectedWinner = {
-      playerId: "player-1",
       name: "player1",
     } as IPlayer;
     expect(winnerOfPlay(playedCards, trumpSuite)).toStrictEqual(expectedWinner);
@@ -29,7 +27,6 @@ describe("testing winner of play", () => {
     const trumpSuite = "hearts";
     const playedCards: ICardPlayed[] = [
       {
-        playerId: "player-1",
         name: "player1",
         card: {
           suite: "spades",
@@ -40,7 +37,6 @@ describe("testing winner of play", () => {
         playStarted: 1,
       },
       {
-        playerId: "player-2",
         name: "player2",
         card: {
           suite: "hearts",
@@ -52,7 +48,6 @@ describe("testing winner of play", () => {
       },
     ];
     const expectedWinner = {
-      playerId: "player-2",
       name: "player2",
     };
     expect(winnerOfPlay(playedCards, trumpSuite)).toStrictEqual(expectedWinner);
@@ -62,7 +57,6 @@ describe("testing winner of play", () => {
     const trumpSuite = "hearts";
     const playedCards: ICardPlayed[] = [
       {
-        playerId: "player-1",
         name: "player1",
         card: {
           suite: "spades",
@@ -73,7 +67,6 @@ describe("testing winner of play", () => {
         playStarted: 1,
       },
       {
-        playerId: "player-2",
         name: "player2",
         card: {
           suite: "spades",
@@ -84,7 +77,6 @@ describe("testing winner of play", () => {
         playStarted: 1,
       },
       {
-        playerId: "player-3",
         name: "player3",
         card: {
           suite: "spades",
@@ -96,7 +88,6 @@ describe("testing winner of play", () => {
       },
     ];
     const expectedWinner = {
-      playerId: "player-2",
       name: "player2",
     };
     expect(winnerOfPlay(playedCards, trumpSuite)).toStrictEqual(expectedWinner);
@@ -106,7 +97,6 @@ describe("testing winner of play", () => {
     const trumpSuite = "hearts";
     const playedCards: ICardPlayed[] = [
       {
-        playerId: "player-1",
         name: "player1",
         card: {
           suite: "spades",
@@ -117,7 +107,6 @@ describe("testing winner of play", () => {
         playStarted: 1,
       },
       {
-        playerId: "player-2",
         name: "player2",
         card: {
           suite: "spades",
@@ -128,7 +117,6 @@ describe("testing winner of play", () => {
         playStarted: 1,
       },
       {
-        playerId: "player-3",
         name: "player3",
         card: {
           suite: "diamonds",
@@ -140,7 +128,6 @@ describe("testing winner of play", () => {
       },
     ];
     const expectedWinner = {
-      playerId: "player-2",
       name: "player2",
     };
     expect(winnerOfPlay(playedCards, trumpSuite)).toStrictEqual(expectedWinner);
@@ -150,7 +137,6 @@ describe("testing winner of play", () => {
     const trumpSuite = "hearts";
     const playedCards: ICardPlayed[] = [
       {
-        playerId: "player-1",
         name: "player1",
         card: {
           suite: "spades",
@@ -161,7 +147,6 @@ describe("testing winner of play", () => {
         playStarted: 1,
       },
       {
-        playerId: "player-2",
         name: "player2",
         card: {
           suite: "hearts",
@@ -172,7 +157,6 @@ describe("testing winner of play", () => {
         playStarted: 1,
       },
       {
-        playerId: "player-3",
         name: "player3",
         card: {
           suite: "spades",
@@ -183,7 +167,6 @@ describe("testing winner of play", () => {
         playStarted: 1,
       },
       {
-        playerId: "player-4",
         name: "player4",
         card: {
           suite: "hearts",
@@ -194,7 +177,6 @@ describe("testing winner of play", () => {
         playStarted: 1,
       },
       {
-        playerId: "player-5",
         name: "player5",
         card: {
           suite: "spades",
@@ -206,7 +188,6 @@ describe("testing winner of play", () => {
       },
     ];
     const expectedWinner = {
-      playerId: "player-4",
       name: "player4",
     };
     expect(winnerOfPlay(playedCards, trumpSuite)).toStrictEqual(expectedWinner);

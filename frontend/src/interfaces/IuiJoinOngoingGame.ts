@@ -7,6 +7,5 @@ export interface IuiJoinOngoingGame extends IuiUserData {
 
 export interface IuiJoinOngoingGameResponse extends IuiAuth {
   joinOk: boolean,
-  playerId: string,
   playerName: string,
 }

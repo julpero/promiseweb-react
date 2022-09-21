@@ -35,7 +35,6 @@ export interface IGameOptions {
 
 export interface IHumanPlayer {
   name: string,
-  playerId: string,
   active: boolean,
   playerStats: IPlayerStats,
 }
@@ -53,7 +52,6 @@ export interface IGame {
 // IPlayerOrderPlayer
 export interface IPlayer {
   name: string,
-  playerId: string,
   type?: PlayerType,
 }
 
@@ -141,7 +139,6 @@ export interface IRoundPlayer extends IPlayer {
 }
 
 export interface ICardPlayed {
-  playerId: string,
   name: string,
   card: ICard,
   playedTime: number,
