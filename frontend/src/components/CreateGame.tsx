@@ -381,7 +381,6 @@ const CreateGame = (props: IProps) => {
                   <div className="row">
                     <div className="col">
                       <Field
-                        disabled
                         name="thisIsDemoGame"
                         type="checkbox"
                         component={CheckboxInput}
