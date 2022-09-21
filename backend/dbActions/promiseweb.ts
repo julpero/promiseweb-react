@@ -19,7 +19,7 @@ export const insertNewGame = async (gameModel: IGameOptions): Promise<string> =>
 export const hasOngoingOrCreatedGame = async (playerName: string): Promise<boolean> => {
   const onGoingOrCreatedGameCount = await GameOptions.countDocuments({
     gameStatus: { $lte: GAME_STATUS.onGoing },
-    "humanPlayers.name": { $eq: playerName },
+    $or: [{"humanPlayers.name": { $eq: playerName }},{"humanPlayers.playedBy": { $eq: playerName }}],
   });
   console.log("onGoingOrCreatedGameCount", onGoingOrCreatedGameCount);
   return onGoingOrCreatedGameCount > 0;
@@ -29,18 +29,22 @@ export const getLastGameByStatus = async (playerName: string, status: GAME_STATU
   try {
     const gamesInDb = await GameOptions.find({
       gameStatus: { $eq: status },
-      "humanPlayers.name": { $eq: playerName },
+      $or: [{"humanPlayers.name": { $eq: playerName }},{"humanPlayers.playedBy": { $eq: playerName }}],
     });
     if (gamesInDb && gamesInDb.length > 0) {
       const gameInDb = gamesInDb.pop();
-      return {
-        gameId: gameInDb?._id.toString() ?? "",
-        asAPlayer: gameInDb?.humanPlayers.find(player => player.name === playerName)?.name ?? "",
-        currentRound: gameInDb && gameInDb.game ? getCurrentRoundInd(gameInDb.game) : -1,
-      } as ILastGameStatusResponse;
-    } else {
-      return null;
+      if (gameInDb) {
+        const player = gameInDb.humanPlayers.find(player => player.name === playerName || player.playedBy === playerName);
+        if (player && player.active && ((player.name === playerName && !player.playedBy) || (player.playedBy === playerName))) {
+          return {
+            gameId: gameInDb._id.toString() ?? "",
+            asAPlayer: player.name ?? "",
+            currentRound: gameInDb.game ? getCurrentRoundInd(gameInDb.game) : -1,
+          } as ILastGameStatusResponse;
+        }
+      }
     }
+    return null;
   } catch (error: unknown) {
     console.log(error);
     return null;

@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { useSocket } from "../socket";
-import { v4 as uuidv4 } from "uuid";
-import { Form, Button, Modal } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "../interfaces/IuiLeaveOngoingGame";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentGameInfo } from "../store/gameInfoSlice";
+import { getCurrentGameInfo, setGameId } from "../store/gameInfoSlice";
 import { getUser } from "../store/userSlice";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 
@@ -14,8 +13,6 @@ import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../com
 const GameMenu = () => {
   const [leaveGameModal, setLeaveGameModal] = useState(false);
   const [leftGameModal, setLeftGameModal] = useState(false);
-
-  const [leftGameId, setLeftGameId] = useState("");
 
   const currentGameInfo = useSelector(getCurrentGameInfo);
   const user = useSelector(getUser);
@@ -52,9 +49,6 @@ const GameMenu = () => {
           if (leaveOngoingGameResponse.leaveStatus === LEAVE_ONGOING_GAME_RESULT.leaveOk) {
             setLeftGameModal(true);
             setLeaveGameModal(false);
-            setLeftGameId(leaveOngoingGameResponse.gameId);
-            const uuid = uuidv4();
-            window.localStorage.setItem("uUID", uuid);
           }
         } else {
           handleUnauthenticatedRequest(dispatch);
@@ -65,7 +59,7 @@ const GameMenu = () => {
 
   const closeLeftModal = () => {
     setLeftGameModal(false);
-    setLeftGameId("");
+    dispatch(setGameId(""));
   };
 
   return (
@@ -101,19 +95,7 @@ const GameMenu = () => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Copy Paste these values to someone else who can continue playing as you.
-          <hr />
-          <Form>
-            <Form.Group className="mb-3" controlId="formLeftGameId">
-              <Form.Label>Game ID</Form.Label>
-              <Form.Control value={leftGameId} readOnly type="text" placeholder="game id" />
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="formLeftMyId">
-              <Form.Label>My ID</Form.Label>
-              <Form.Control readOnly type="text" placeholder="my id" />
-            </Form.Group>
-          </Form>
+          You can re-join this game in On Going Games.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={closeLeftModal}>CLOSE</Button>

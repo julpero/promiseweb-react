@@ -37,6 +37,7 @@ export interface IHumanPlayer {
   name: string,
   active: boolean,
   playerStats: IPlayerStats,
+  playedBy?: string,
 }
 
 export interface IPlayerStats {

@@ -163,7 +163,7 @@ const EffectHandler = ({gameId}: IProps) => {
   }, [gameId, user, currentRoundInfo, playedCard, socket, dispatch]);
 
   useEffect(() => {
-    console.log("currentGameInfo updated", currentGameInfo);
+    // console.log("currentGameInfo updated", currentGameInfo);
     if (user.isUserLoggedIn && currentGameInfo.gameId !== "" && currentGameInfo.currentRound !== null && currentGameInfo.currentRound >= 0) {
       const getRoundRequest: IuiGetRoundRequest = {
         uuid: getMyId(),

@@ -303,14 +303,23 @@ connectDB().then(() => {
         const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(getGameListRequest, GAME_STATUS.onGoing);
         for (let i = 0; i < getGameListResponse.games.length; i++) {
           const game = getGameListResponse.games[i];
-          const players = csm.getPlayersOfTheGame(game.id);
-          game.inActivePlayerSockets = game.humanPlayers.filter(player => !players.includes(player));
+          const playersInSockets = csm.getPlayersOfTheGame(game.id);
+          if (game.playedBy) {
+            const playedByMap = new Map<string, string>(JSON.parse(game.playedBy));
+            const otherPlayers = Array.from(playedByMap.keys());
+            if (otherPlayers.some(player => player === userName)) {
+              // some one is playing as me -> do not add this into free sockets, so fake that i'm there too
+              playersInSockets.push(userName);
+            }
+          }
+          game.inActivePlayerSockets = game.humanPlayers.filter(player => !playersInSockets.includes(player));
         }
         const timestamp = Date.now();
         csm.setLastTimestamp(userName, socket.id, timestamp);
         const newToken = signUserToken(userName, uuid, timestamp);
         getGameListResponse.isAuthenticated = true;
         getGameListResponse.token = newToken;
+        console.log("getGameListResponse", getGameListResponse);
         fn(getGameListResponse);
       } else {
         fn({
@@ -393,12 +402,19 @@ connectDB().then(() => {
           case CHECK_GAME_STATUS.onGoingGame:
           case CHECK_GAME_STATUS.observedGame: {
             const gameIdStr = checkResponse.gameId ?? "";
-            const playerName = checkResponse.asAPlayer ?? "";
+            const playAsName = checkResponse.asAPlayer ?? "";
             socket.join(gameIdStr);
-            csm.addUserToMap(playerName, socket.id, timestamp, gameIdStr);
-            const chatLine = playerName + " joined game!";
-            console.log("sending new chat line", chatLine, gameIdStr);
+            csm.addUserToMap(userName, socket.id, timestamp, gameIdStr);
+            const chatLine = `${playAsName} joined game!`;
+            // console.log("sending new chat line", chatLine, gameIdStr);
             io.to(gameIdStr).emit("new chat line", chatLine);
+
+            if (playAsName !== userName) {
+              // add also this user name to map
+              // csm.addUserToMap(playAsName, socket.id, timestamp, gameIdStr);
+              const chatLine2 = `${playAsName} played by ${userName}`;
+              io.to(gameIdStr).emit("new chat line", chatLine2);
+            }
 
             break;
           }
@@ -423,7 +439,7 @@ connectDB().then(() => {
       const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
       if (isAuthenticated) {
-        if (gameId === "" || uuid === "") {
+        if (gameId === "") {
           return null;
         }
         const gameInfoResponse: IuiGetGameInfoResponse | null = await getGameInfo(getGameInfoRequest);
@@ -478,12 +494,12 @@ connectDB().then(() => {
 
     socket.on("make promise", async (makePromiseRequest: IuiMakePromiseRequest, fn: (promiseResponse: IuiMakePromiseResponse) => void) => {
       console.log("make promise", makePromiseRequest);
-      const { gameId: gameIdStr, roundInd, token, uuid, userName } = makePromiseRequest;
+      const { gameId, roundInd, token, uuid, userName } = makePromiseRequest;
       const lastTimestamp = csm.getLastTimestamp(userName);
       const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
       if (isAuthenticated) {
-        if (!gameIdStr || !uuid) {
+        if (!gameId) {
           return null;
         }
 
@@ -498,10 +514,10 @@ connectDB().then(() => {
             promise: promise,
             currentRoundIndex: roundInd,
           };
-          io.to(gameIdStr).emit("promise made", promiseNotification);
+          io.to(gameId).emit("promise made", promiseNotification);
 
           const chatLine = `${promiser} promised ${promise} in ${(promiseTime/1000).toFixed(1)} seconds`;
-          io.to(gameIdStr).emit("new chat line", chatLine);
+          io.to(gameId).emit("new chat line", chatLine);
         }
         const timestamp = Date.now();
         csm.setLastTimestamp(userName, socket.id, timestamp);
@@ -519,12 +535,12 @@ connectDB().then(() => {
 
     socket.on("play card", async (playCardRequest: IuiPlayCardRequest, fn: (playCardResponse: IuiPlayCardResponse) => void) => {
       console.log("play card", playCardRequest);
-      const { gameId: gameIdStr, roundInd, userName, uuid, token } = playCardRequest;
+      const { gameId, roundInd, userName, uuid, token } = playCardRequest;
       const lastTimestamp = csm.getLastTimestamp(userName);
       const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
       if (isAuthenticated) {
-        if (!gameIdStr || !uuid) {
+        if (!gameId) {
           return null;
         }
 
@@ -544,7 +560,7 @@ connectDB().then(() => {
             winnerOfGame,
           } = playCardResponse;
           const chatLine = `${playerName} hit card in ${(playTime/1000).toFixed(1)} seconds`;
-          io.to(gameIdStr).emit("new chat line", chatLine);
+          io.to(gameId).emit("new chat line", chatLine);
 
           const cardPlayedNotificationToMySelf: IuiCardPlayedNotification = {
             playerName: playerName,
@@ -570,25 +586,25 @@ connectDB().then(() => {
           };
 
           socket.emit("card played", cardPlayedNotificationToMySelf);
-          socket.to(gameIdStr).emit("card played", cardPlayedNotification);
+          socket.to(gameId).emit("card played", cardPlayedNotification);
 
           if (newPlayAfterHit) {
             const chatLine = `${winnerOfPlay} won this play`;
-            io.to(gameIdStr).emit("new chat line", chatLine);
+            io.to(gameId).emit("new chat line", chatLine);
           }
 
           if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.onGoing) {
             const chatLine = `Round ${roundInd + 2} starts...`;
-            io.to(gameIdStr).emit("new chat line", chatLine);
+            io.to(gameId).emit("new chat line", chatLine);
             const chatLine2 = `... and ${newDealer} is a dealer!`;
-            io.to(gameIdStr).emit("new chat line", chatLine2);
+            io.to(gameId).emit("new chat line", chatLine2);
           }
 
           if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.played) {
             const chatLine = "GAME OVER!";
-            io.to(gameIdStr).emit("new chat line", chatLine);
+            io.to(gameId).emit("new chat line", chatLine);
             const chatLine2 = `${winnerOfGame} won the Game!`;
-            io.to(gameIdStr).emit("new chat line", chatLine2);
+            io.to(gameId).emit("new chat line", chatLine2);
           }
         }
         const timestamp = Date.now();
@@ -627,7 +643,7 @@ connectDB().then(() => {
       const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
       if (isAuthenticated) {
-        if (gameId === "" || uuid === "") {
+        if (!gameId) {
           return null;
         }
 
@@ -635,18 +651,12 @@ connectDB().then(() => {
         const { leaveStatus, leaverName } = leaveOngoingGameResponse;
         if (leaveStatus !== LEAVE_ONGOING_GAME_RESULT.notOk) {
           if (leaveStatus !== LEAVE_ONGOING_GAME_RESULT.gameDismissed) {
-            let chatLine = `${leaverName} has left the game!`;
-            io.to(gameId).emit("new chat line", chatLine);
-            chatLine = `You can invite a new player to continue ${leaverName}'s game with these id's:`;
-            io.to(gameId).emit("new chat line", chatLine);
-            chatLine = `GameId: ${gameId}`;
-            io.to(gameId).emit("new chat line", chatLine);
-            chatLine = `PlayerId: ${uuid}`;
+            const chatLine = `${leaverName} has left the game!`;
             io.to(gameId).emit("new chat line", chatLine);
           }
 
           socket.leave(gameId);
-          csm.removeUserFromGame(leaverName, gameId);
+          csm.removeUserFromGame(userName, gameId);
         }
         const timestamp = Date.now();
         csm.setLastTimestamp(userName, socket.id, timestamp);
@@ -712,11 +722,11 @@ connectDB().then(() => {
           const joinResponse = await joinOngoingGame(joinRequest);
           if (joinResponse.joinOk) {
             // remove previous player from game
-            csm.removeUserFromMap(playAsName, "-1", gameId);
+            csm.removeUserFromGame(playAsName, gameId);
 
             // join in the game
             socket.join(gameId);
-            csm.addUserToMap(playAsName, socket.id, timestamp, gameId);
+            csm.addUserToMap(userName, socket.id, timestamp, gameId);
 
             const chatLine = `player ${playAsName} connected again as new player`;
             io.to(gameId).emit("new chat line", chatLine);

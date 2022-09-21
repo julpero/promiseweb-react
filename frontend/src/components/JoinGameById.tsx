@@ -87,18 +87,42 @@ const JoinGameById = ({onJoin}: IProps) => {
     const dateAsDate = new Date(dateAsStr);
     return dateAsDate.toLocaleString("fi-FI", dateFormatOptions);
   };
-  const renderPlayerList = (humanPlayers: string[]) => {
+
+  const renderPlayerList = (humanPlayers: string[], playedBy?: string) => {
+    const playedByMap: Map<string, string> | null = playedBy ? new Map(JSON.parse(playedBy)) : null;
     return humanPlayers.map(player => {
-      return <li key={player}>{player}</li>;
+      const playedByPlayer = playedByMap?.get(player) ?? "";
+      const playedByPlayerStr = playedByPlayer ? ` (${playedByPlayer})` : "";
+      return <li key={player}>{player}{playedByPlayerStr}</li>;
     });
   };
 
-  const renderActions = (gameId: string, imInTheGame: boolean) => {
+  const canJoinImmediately = (imInTheGame: boolean, inActivePlayers?: string[], inActivePlayerSockets? : string[]): boolean => {
+    if (!imInTheGame) return false;
+    if (inActivePlayers && inActivePlayers.some(player => player === user.userName)) return true;
+    if (inActivePlayerSockets && inActivePlayerSockets.some(player => player === user.userName)) return true;
+    return false;
+  };
+
+  const renderOtherJoinButtons = (gameId: string, inActivePlayers?: string[], inActivePlayerSockets? : string[]) => {
+    const buttonsArr: JSX.Element[] = [];
+    const freePlayers = Array.from(new Set([ ...inActivePlayers ?? [], ...inActivePlayerSockets ?? [] ]));
+    freePlayers.forEach(player => {
+      buttonsArr.push(<Button key={`joinAs${player}`} size="sm" onClick={() => joinGame(gameId, player)} disabled={submitting}>Join as {player}</Button>);
+    });
+    return buttonsArr;
+  };
+
+  const renderActions = (gameId: string, imInTheGame: boolean, inActivePlayers?: string[], inActivePlayerSockets?: string[]) => {
     const actionArr: JSX.Element[] = [];
-    if (imInTheGame) {
+    if (canJoinImmediately(imInTheGame, inActivePlayers, inActivePlayerSockets)) {
       actionArr.push(
-        <Button key="joinButton" size="sm" onClick={() => joinGame(gameId, user.userName)} disabled={submitting}>Re-Join</Button>
+        <Button key="joinAsMySelfButton" size="sm" onClick={() => joinGame(gameId, user.userName)} disabled={submitting}>Re-Join as my self</Button>
       );
+    } else if (!imInTheGame) {
+      renderOtherJoinButtons(gameId, inActivePlayers, inActivePlayerSockets).forEach(button => {
+        actionArr.push(button);
+      });
     }
     return actionArr;
   };
@@ -107,17 +131,17 @@ const JoinGameById = ({onJoin}: IProps) => {
     if (gameItemList.length === 0) {
       return "No on going games at the moment, why don't you just create one by your self?";
     }
-    return gameItemList.map(({created, id, humanPlayers, imInTheGame}: IuiGameListItem, ind) => {
+    return gameItemList.map(({created, id, humanPlayers, imInTheGame, inActivePlayers, inActivePlayerSockets, playedBy}: IuiGameListItem, ind) => {
       return(
         <div key={ind} className="row">
           <div className="col">
             {renderDateStr(created.toString())}
           </div>
           <div className="col">
-            {renderPlayerList(humanPlayers)}
+            {renderPlayerList(humanPlayers, playedBy)}
           </div>
           <div className="col">
-            {renderActions(id, imInTheGame)}
+            {renderActions(id, imInTheGame, inActivePlayers, inActivePlayerSockets)}
           </div>
         </div>
       );
@@ -126,6 +150,10 @@ const JoinGameById = ({onJoin}: IProps) => {
 
   return (
     <React.Fragment>
+      <div>
+        <Button onClick={() => fetchGameItemList()}>Refresh</Button>
+      </div>
+      <hr />
       <div>
         {renderGameItems()}
       </div>

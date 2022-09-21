@@ -42,7 +42,7 @@ export const getGameWithPlayer = async (gameIdStr: string, playerName: string): 
 
   const query = GameOptions.where({
     _id: gameIdStr,
-    "humanPlayers.name": {$eq: playerName},
+    $or: [{"humanPlayers.name": { $eq: playerName }},{"humanPlayers.playedBy": { $eq: playerName }}],
   });
   const gameInDb = await query.findOne();
   return gameInDb;
@@ -61,7 +61,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
 
   const query = GameOptions.where({
     _id: gameId,
-    "humanPlayers.name": {$eq: userName},
+    $or: [{"humanPlayers.name": { $eq: userName }},{"humanPlayers.playedBy": { $eq: userName }}],
     gameStatus: GAME_STATUS.onGoing,
   });
   const gameInDb = await query.findOne();
@@ -84,7 +84,8 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
       console.warn("promising, possible not promising phase");
       return promiseResponse;
     }
-    if (userName !== promiser.name) {
+    const originalPlayerName = gameInDb.humanPlayers.find(player => player.playedBy === userName)?.name;
+    if (promiser.name !== userName && promiser.name !== originalPlayerName) {
       console.warn("promising, wrong promiser turn");
       promiseResponse.promiseResponse = PROMISE_RESPONSE.notMyTurn;
       return promiseResponse;
@@ -138,7 +139,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
 
   const query = GameOptions.where({
     _id: gameId,
-    "humanPlayers.name": {$eq: userName},
+    $or: [{"humanPlayers.name": { $eq: userName }},{"humanPlayers.playedBy": { $eq: userName }}],
     gameStatus: GAME_STATUS.onGoing,
   });
   const gameInDb = await query.findOne();
@@ -157,12 +158,19 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     }
 
     const playerInTurn = getPlayerInTurn(round);
-    if (playerInTurn?.name !== userName) {
+    if (!playerInTurn) {
+      console.warn("playing card, but no anyone's turn");
+      response.playResponse = PLAY_CARD_RESPONSE.notMyTurn;
+      return response;
+    }
+
+    const originalPlayerName = gameInDb.humanPlayers.find(player => player.playedBy === userName)?.name;
+    if (playerInTurn.name !== userName && playerInTurn.name !== originalPlayerName) {
       console.warn("playing card, not my turn");
       response.playResponse = PLAY_CARD_RESPONSE.notMyTurn;
       return response;
     }
-    const playerCards = getMyCards(userName, round, false);
+    const playerCards = getMyCards(userName, round, false, originalPlayerName);
     const playedCardIndex = playerCards.findIndex(cardInDb => cardInDb.suite === card.suite && cardInDb.value === card.value);
     if (playedCardIndex === -1) {
       response.playResponse = PLAY_CARD_RESPONSE.invalidCard;
@@ -176,10 +184,10 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     }
 
     // All checks made, let's play card
-    const myIndexInRound = getPlayerIndexFromRoundByName(round.roundPlayers, userName);
+    const myIndexInRound = getPlayerIndexFromRoundByName(round.roundPlayers, userName, originalPlayerName);
     const playTime = Date.now() - gameInDb.game.lastTimeStamp;
     round.cardsPlayed[playIndex].push({
-      name: userName,
+      name: originalPlayerName ?? userName,
       card: IuiCardToICard(card),
       playedTime: Date.now(),
       playStarted: gameInDb.game.lastTimeStamp,
@@ -237,7 +245,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
 
     const gameAfter = await gameInDb.save();
     if (gameAfter) {
-      response.playerName = userName;
+      response.playerName = originalPlayerName ?? userName;
       response.playTime = playTime;
       response.playResponse = PLAY_CARD_RESPONSE.playOk;
       return response;

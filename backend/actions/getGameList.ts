@@ -1,9 +1,17 @@
 import { IuiGameListItem, IuiGetGameListResponse } from "../../frontend/src/interfaces/IuiGameList";
-import { IGameOptions } from "../interfaces/IGameOptions";
+import { IGameOptions, IHumanPlayer } from "../interfaces/IGameOptions";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { getGamesByStatus } from "../dbActions/games";
 import { playersToArr, rulesToRuleObj } from "../common/model";
 import { IuiUserData } from "../../frontend/src/interfaces/IuiUser";
+
+const playedByMap = (players: IHumanPlayer[]): string | undefined => {
+  const retMap = new Map<string, string>();
+  players.filter(player => player.playedBy).forEach(player => {
+    retMap.set(player.name, player.playedBy ?? "");
+  });
+  return retMap.size > 0 ? JSON.stringify(Array.from(retMap)) : undefined;
+};
 
 export const getOpenGamesList = async (getGameListRequest: IuiUserData, gameStatus: GAME_STATUS): Promise<IuiGetGameListResponse> => {
   const response: IuiGetGameListResponse = {
@@ -21,6 +29,7 @@ export const getOpenGamesList = async (getGameListRequest: IuiUserData, gameStat
       playerCount: openGame.humanPlayersCount,
       gameHasPassword: openGame.password.length > 0,
       inActivePlayers: openGame.humanPlayers.filter(player => !player.active).map(player => player.name) ?? [],
+      playedBy: playedByMap(openGame.humanPlayers),
     } as IuiGameListItem);
   });
   // console.log("response", response);

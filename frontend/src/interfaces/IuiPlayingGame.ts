@@ -59,6 +59,7 @@ export interface IuiParsedHumanPlayer {
   name: string,
   type: "human",
   playerStats: IuiPlayerStats,
+  playedBy?: string,
 }
 
 export interface IuiGetGameInfoResponse extends IuiAuth {

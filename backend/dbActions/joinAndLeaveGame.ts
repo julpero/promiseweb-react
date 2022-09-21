@@ -111,15 +111,16 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
 
   const query = GameOptions.where({
     _id: gameId,
-    "humanPlayers.name": {$eq: userName},
+    $or: [{"humanPlayers.name": { $eq: userName }},{"humanPlayers.playedBy": { $eq: userName }}],
     gameStatus: GAME_STATUS.onGoing,
   });
   const gameInDb = await query.findOne();
   if (gameInDb) {
-    const leaver = gameInDb.humanPlayers.find(player => player.name === userName);
+    const leaver = gameInDb.humanPlayers.find(player => player.name === userName || player.playedBy === userName);
     if (leaver) {
       leaveOngoingGameResponse.leaverName = leaver.name;
       leaver.active = false;
+      leaver.playedBy = undefined;
 
       if (!gameInDb.humanPlayers.some(player => player.active)) {
         // all players have left the game -> dismiss it
@@ -140,7 +141,7 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
 };
 
 export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame): Promise<IuiJoinOngoingGameResponse> => {
-  const { gameId, playAsPlayer } = joinRequest;
+  const { gameId, playAsPlayer, userName } = joinRequest;
   const joinOngoingGameResponse: IuiJoinOngoingGameResponse = {
     joinOk: false,
     playerName: "",
@@ -156,9 +157,18 @@ export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame): Promi
   });
   const gameInDb = await query.findOne();
   if (gameInDb) {
+    // if joining player is an original game player, then he/she can join only to that original player
+    const myOwnPlayerExists = gameInDb.humanPlayers.some(player => player.name === userName);
+    if (myOwnPlayerExists && userName !== playAsPlayer) {
+      return joinOngoingGameResponse;
+    }
+
     const player = gameInDb.humanPlayers.find(player => player.name === playAsPlayer);
     if (player) {
       player.active = true;
+      if (userName !== playAsPlayer) {
+        player.playedBy = userName;
+      }
       const gameAfter = await gameInDb.save();
       if (gameAfter) {
         joinOngoingGameResponse.joinOk = true;

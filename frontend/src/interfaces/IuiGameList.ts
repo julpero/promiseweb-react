@@ -17,6 +17,7 @@ export interface IuiGameListItem {
   gameHasPassword: boolean,
   inActivePlayers?: string[],
   inActivePlayerSockets?: string[],
+  playedBy?: string,
 }
 
 export interface IuiGetGameListResponse extends IuiAuth {

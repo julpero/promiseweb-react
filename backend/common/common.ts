@@ -26,45 +26,46 @@ const getCurrentPlayInd = (round: IRound): number => {
 };
 
 export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
+  const {roundPlayers, cardsPlayed, starterPositionIndex, trumpCard} = round;
   const currentPlayInd = getCurrentPlayInd(round);
-  const playerCount = round.roundPlayers.length;
+  const playerCount = roundPlayers.length;
   console.log("getPlayerInTurn currentPlayInd", currentPlayInd);
 
-  if (currentPlayInd === 0 && round.cardsPlayed[0].length === 0) {
+  if (currentPlayInd === 0 && cardsPlayed[0].length === 0) {
     // first card of the round -> starter
     console.log("getPlayerInTurn starter");
     return {
-      name: round.roundPlayers[round.starterPositionIndex].name,
-      type: round.roundPlayers[round.starterPositionIndex].type,
-      index: round.starterPositionIndex,
+      name: roundPlayers[starterPositionIndex].name,
+      type: roundPlayers[starterPositionIndex].type,
+      index: starterPositionIndex,
     } as IPlayerInTurn;
-  } else if (round.cardsPlayed[currentPlayInd].length < playerCount && round.cardsPlayed[currentPlayInd].length > 0) {
+  } else if (cardsPlayed[currentPlayInd].length < playerCount && cardsPlayed[currentPlayInd].length > 0) {
     // all players haven't hit the card -> next player who hasn't hit the card
     console.log("getPlayerInTurn in play");
-    let starterIndex = round.starterPositionIndex;
+    let starterIndex = starterPositionIndex;
     if (currentPlayInd !== 0) {
       // starter was last play winner
-      const prevWinner = winnerOfPlay(round.cardsPlayed[currentPlayInd-1], round.trumpCard.suite);
+      const prevWinner = winnerOfPlay(cardsPlayed[currentPlayInd-1], trumpCard.suite);
       if (prevWinner) {
-        starterIndex = round.roundPlayers.findIndex(player => player.name === prevWinner.name);
+        starterIndex = roundPlayers.findIndex(player => player.name === prevWinner.name);
       }
     }
-    let checkInd = starterIndex + round.cardsPlayed[currentPlayInd].length;
+    let checkInd = starterIndex + cardsPlayed[currentPlayInd].length;
     if (checkInd >= playerCount) checkInd-= playerCount;
     return {
-      name: round.roundPlayers[checkInd].name,
-      type: round.roundPlayers[checkInd].type,
+      name: roundPlayers[checkInd].name,
+      type: roundPlayers[checkInd].type,
       index: checkInd,
     } as IPlayerInTurn;
   } else {
     // play is complete, take winner of the previous play
     console.log("getPlayerInTurn play complete");
-    const prevWinner = winnerOfPlay(round.cardsPlayed[currentPlayInd-1], round.trumpCard.suite);
+    const prevWinner = winnerOfPlay(cardsPlayed[currentPlayInd-1], trumpCard.suite);
     if (prevWinner) {
-      const winnerIndex = round.roundPlayers.findIndex(player => player.name === prevWinner.name);
+      const winnerIndex = roundPlayers.findIndex(player => player.name === prevWinner.name);
       return {
-        name: round.roundPlayers[winnerIndex].name,
-        type: round.roundPlayers[winnerIndex].type,
+        name: roundPlayers[winnerIndex].name,
+        type: roundPlayers[winnerIndex].type,
         index: winnerIndex,
       } as IPlayerInTurn;
     }
@@ -73,15 +74,15 @@ export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
 };
 
 export const getPromiser = (round: IRound): IPromiser | null => {
-  if (round.roundPlayers.some(player => player.promise === null)) {
-    const playerCount = round.roundPlayers.length;
-    const { starterPositionIndex } = round;
+  const {roundPlayers, starterPositionIndex} = round;
+  if (roundPlayers.some(player => player.promise === null)) {
+    const playerCount = roundPlayers.length;
     for (let i = starterPositionIndex; i < starterPositionIndex + playerCount; i++) {
       const checkInd = i >= playerCount ? i - playerCount : i;
-      if (round.roundPlayers[checkInd].promise === null) {
+      if (roundPlayers[checkInd].promise === null) {
         return {
-          name: round.roundPlayers[checkInd].name,
-          type: round.roundPlayers[checkInd].type,
+          name: roundPlayers[checkInd].name,
+          type: roundPlayers[checkInd].type,
           index: checkInd,
         } as IPromiser;
       }
@@ -108,9 +109,9 @@ const showSpeedPromiseCards = (): boolean => {
   return true;
 };
 
-export const getMyCards = (name: string, round: IRound, speedPromise: boolean): IuiCard[] => {
+export const getMyCards = (name: string, round: IRound, speedPromise: boolean, originalPlayerName?: string): IuiCard[] => {
   if (!speedPromise || showSpeedPromiseCards()) {
-    const player = round.roundPlayers.find(player => player.name === name);
+    const player = round.roundPlayers.find(player => player.name === name || player.name === originalPlayerName);
     return player?.cards.map(card => {
       const uiCard = ICardToIuiCard(card);
       uiCard.originalIndex = player.cardsToDebug.findIndex(dCard => dCard.value === card.value && dCard.suite === card.suite);
@@ -184,9 +185,9 @@ export const getCurrentCardInCharge = (cardsPlayed: ICardPlayed[][]): ICard | nu
   return cardsPlayed[cardsPlayed.length - 1][0].card;
 };
 
-export const getPlayerIndexFromRoundByName = (roundPlayers: IRoundPlayer[], name: string | null): number => {
+export const getPlayerIndexFromRoundByName = (roundPlayers: IRoundPlayer[], name: string | null, originalPlayerName?: string): number => {
   if (!name) return -1;
-  return roundPlayers.findIndex(player => player.name === name);
+  return roundPlayers.findIndex(player => player.name === name || player.name === originalPlayerName);
 };
 
 export const countRoundPoints = (roundPlayers: IRoundPlayer[], bigRound: boolean): void => {
