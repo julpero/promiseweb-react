@@ -73,7 +73,13 @@ const ScoreBoard = () => {
   };
 
   const playerAvgPoint = (playerInd: number, roundInd: number): number | null => {
-    return currentGameInfo.humanPlayers[playerInd]?.playerStats.playerAvgPointsInRounds[roundInd] ?? null;
+    const thisPlayerName = currentRoundInfo.roundToPlayer.players[playerInd].name;
+    const avgStatsPlayer = currentGameInfo.humanPlayers.find(player => player.name === thisPlayerName);
+    if (avgStatsPlayer) {
+      return avgStatsPlayer.playerStats.playerAvgPointsInRounds[roundInd] ?? null;
+    } else {
+      return null;
+    }
   };
 
   const playerScoreClass = (pointStr: string): string => {
