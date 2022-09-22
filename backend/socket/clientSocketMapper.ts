@@ -5,7 +5,7 @@ interface ISocketAdminData {
 
 interface ISocketMap {
   sockets: Set<string>,
-  games: Set<string>,
+  game?: string,
   adminSocket?: ISocketAdminData,
   lastTimestamp: number,
 }
@@ -17,49 +17,49 @@ export const addUserToMap = (userName: string, socketId: string, timestamp: numb
   if (user) {
     //user had already joined from one client and now joining using another client
     if (!user.sockets.has(socketId)) user.sockets.add(socketId);
-    if (gameId && !user.games.has(gameId)) {
-      user.games.add(gameId);
-    }
+    user.game = gameId ?? undefined;
     user.lastTimestamp = timestamp;
   } else {
     //when user is joining first time
     userSocketIdMap.set(userName, {
       sockets: new Set([socketId]),
-      games: new Set(gameId ? [gameId] : []),
+      game: gameId ?? undefined,
       lastTimestamp: timestamp,
     });
   }
   // console.log(userSocketIdMap);
 };
 
-export const removeUserFromMap = (userName: string, socketId: string, gameId?: string | null): void => {
-  const userSocketIdSet = userSocketIdMap.get(userName);
-  if (userSocketIdSet) {
-    userSocketIdSet.sockets.delete(socketId);
-    if (gameId) {
-      userSocketIdSet.games.delete(gameId);
-    }
-    userSocketIdSet.adminSocket = undefined;
+// export const removeUserFromMap = (userName: string, socketId: string, gameId?: string | null): void => {
+//   const userSocketIdSet = userSocketIdMap.get(userName);
+//   if (userSocketIdSet) {
+//     userSocketIdSet.sockets.delete(socketId);
+//     if (gameId === null) {
+//       userSocketIdSet.game = undefined;
+//     } else if (gameId !== undefined) {
+//       userSocketIdSet.game = gameId;
+//     }
+//     userSocketIdSet.adminSocket = undefined;
 
-    //if there are no clients for a user, remove that user from online list (map)
-    if (userSocketIdSet.sockets.size === 0) {
-      userSocketIdMap.delete(userName);
-    }
-  }
-};
+//     //if there are no clients for a user, remove that user from online list (map)
+//     if (userSocketIdSet.sockets.size === 0) {
+//       userSocketIdMap.delete(userName);
+//     }
+//   }
+// };
 
 export const removeUserSocketsAndGames = (userName: string) => {
   const user = userSocketIdMap.get(userName);
   if (user) {
-    user.games = new Set([]);
+    user.game = undefined;
     user.sockets = new Set([]);
   }
 };
 
 export const removeUserFromGame = (userName: string, gameId: string): void => {
   const user = userSocketIdMap.get(userName);
-  if (user) {
-    user.games.delete(gameId);
+  if (user && user.game === gameId) {
+    user.game = undefined;
   }
 };
 
@@ -82,10 +82,10 @@ export const getUserSocketsFromMap = (userName: string): Set<string> | undefined
   }
 };
 
-export const getUserGamesFromMap = (userName: string): Set<string> | undefined => {
+export const getUserGameFromMap = (userName: string): string | undefined => {
   const user = userSocketIdMap.get(userName);
   if (user) {
-    return user.games;
+    return user.game;
   }
 };
 
@@ -101,7 +101,7 @@ export const setUserAsAdmin = (userName: string, socketId: string, uuid: string,
   } else {
     userSocketIdMap.set(userName, {
       sockets: new Set([socketId]),
-      games: new Set(),
+      game: undefined,
       adminSocket: { socketId: socketId, uuid: uuid } as ISocketAdminData,
       lastTimestamp: timestamp,
     });
@@ -130,7 +130,7 @@ export const setLastTimestamp = (userName: string, socketId: string, timestamp: 
   } else {
     userSocketIdMap.set(userName, {
       sockets: new Set([socketId]),
-      games: new Set(),
+      game: undefined,
       adminSocket: undefined,
       lastTimestamp: timestamp,
     });
@@ -148,7 +148,7 @@ export const getLastTimestamp = (userName: string): number | null => {
 export const getPlayersOfTheGame = (gameId: string): string[] => {
   const players: string[] = [];
   userSocketIdMap.forEach((val, key) => {
-    if (val.games.has(gameId)) players.push(key);
+    if (val.game === gameId) players.push(key);
   });
   return players;
 };

@@ -66,15 +66,15 @@ connectDB().then(() => {
 
     socket.on("disconnect", () => {
       console.warn("user disconnected", socket.id);
-      let gameIdStr: string | null = null;
+      let gameIdStr: string | undefined = undefined;
       const userName = csm.getUserNameFromMapBySocket(socket.id) ?? "unknown";
       if (userName !== "unknown") {
-        gameIdStr = csm.getUserGamesFromMap(userName)?.values().next().value as string;
+        gameIdStr = csm.getUserGameFromMap(userName);
         console.log("mapped gameIdStr", gameIdStr);
       }
       const chatLine = "player " + userName + " disconnected";
       console.log("chat", chatLine);
-      if (gameIdStr !== null) {
+      if (gameIdStr) {
         io.to(gameIdStr).emit("new chat line", chatLine);
       }
       csm.removeUserSocketsAndGames(userName);
@@ -124,6 +124,7 @@ connectDB().then(() => {
       }
     });
 
+    //#region ADMIN SOCKETS
     socket.on("admin login", async (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => {
       console.log("admin login", loginRequest);
       const {uuid, userName, password1, token} = loginRequest;
@@ -244,6 +245,7 @@ connectDB().then(() => {
         return null;
       }
     });
+    //#endregion ADMIN SOCKETS
 
     socket.on("create game", async (createGameRequest: IuiCreateGameRequest, fn: (createGameResponse: IuiCreateGameResponse) => void) => {
       const {uuid, userName, token} = createGameRequest;
@@ -257,7 +259,7 @@ connectDB().then(() => {
           const gameIdStr = createGameResponse.newGameId;
           socket.join(gameIdStr);
           csm.addUserToMap(userName, socket.id, timestamp, gameIdStr);
-          io.emit("new game created", gameIdStr);
+          io.to("waiting lobby").emit("new game created", gameIdStr);
         }
         csm.setLastTimestamp(userName, socket.id, timestamp);
         const newToken = signUserToken(userName, uuid, timestamp);
@@ -347,6 +349,7 @@ connectDB().then(() => {
         if (joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.lastOk) {
           // notify all games players about game start
           io.to(gameId).emit("game begins", gameId);
+          io.to(gameId).socketsLeave("waiting lobby");
         }
         csm.setLastTimestamp(userName, socket.id, timestamp);
         const newToken = signUserToken(userName, uuid, timestamp);
@@ -398,9 +401,15 @@ connectDB().then(() => {
         const checkResponse: IuiCheckIfOngoingGameResponse = await checkIfOngoingGame(checkIfOngoingGameRequest);
         const timestamp = Date.now();
         switch (checkResponse.checkStatus) {
+          case CHECK_GAME_STATUS.noGame: {
+            // join waiting rooms
+            socket.join("waiting lobby");
+            break;
+          }
           case CHECK_GAME_STATUS.joinedGame:
           case CHECK_GAME_STATUS.onGoingGame:
           case CHECK_GAME_STATUS.observedGame: {
+            socket.leave("waiting lobby");
             const gameIdStr = checkResponse.gameId ?? "";
             const playAsName = checkResponse.asAPlayer ?? "";
             socket.join(gameIdStr);
@@ -425,6 +434,7 @@ connectDB().then(() => {
         checkResponse.token = newToken;
         fn(checkResponse);
       } else {
+        socket.leave("waiting lobby");
         fn({
           isAuthenticated: false,
         } as IuiCheckIfOngoingGameResponse);
@@ -605,6 +615,7 @@ connectDB().then(() => {
             io.to(gameId).emit("new chat line", chatLine);
             const chatLine2 = `${winnerOfGame} won the Game!`;
             io.to(gameId).emit("new chat line", chatLine2);
+            io.to(gameId).socketsJoin("waiting lobby");
           }
         }
         const timestamp = Date.now();
@@ -657,6 +668,7 @@ connectDB().then(() => {
 
           socket.leave(gameId);
           csm.removeUserFromGame(userName, gameId);
+          socket.join("waiting lobby");
         }
         const timestamp = Date.now();
         csm.setLastTimestamp(userName, socket.id, timestamp);
@@ -725,8 +737,8 @@ connectDB().then(() => {
             const otherPlayer = joinResponse.playedBy;
             if (reJoiningMySelf && otherPlayer) {
               // send notification to player who probably plays as me
-              const otherPlayerGames = csm.getUserGamesFromMap(otherPlayer);
-              if (otherPlayerGames?.has(gameId)) {
+              const otherPlayerGame = csm.getUserGameFromMap(otherPlayer);
+              if (otherPlayerGame === gameId) {
                 const playerJoinedNotification: IuiPlayerJoinedOnGoingGameNotification = {
                   gameId: gameId,
                   replacedPlayer: otherPlayer,
@@ -741,6 +753,7 @@ connectDB().then(() => {
                       // console.log("kick off notification", playerJoinedNotification, socketId);
                       io.to(socketId).emit("player joined on going game", playerJoinedNotification);
                       io.in(socketId).socketsLeave(gameId);
+                      io.in(socketId).socketsJoin("waiting lobby");
                     }
                   }
                 }
@@ -752,6 +765,8 @@ connectDB().then(() => {
             // join in the game
             socket.join(gameId);
             csm.addUserToMap(userName, socket.id, timestamp, gameId);
+
+            socket.leave("waiting lobby");
 
             const chatLine = `player ${playAsPlayer} connected again as played by ${userName}`;
             io.to(gameId).emit("new chat line", chatLine);
