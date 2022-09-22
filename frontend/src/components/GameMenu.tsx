@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCurrentGameInfo, setGameId } from "../store/gameInfoSlice";
 import { getUser } from "../store/userSlice";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
-import { IuiPlayerJoinedOnGoingGameNotification } from "../interfaces/IuiJoinOngoingGame";
+import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification } from "../interfaces/IuiJoinOngoingGame";
 
 /**
  * GameMenu
@@ -16,6 +16,8 @@ const GameMenu = () => {
   const [leftGameModal, setLeftGameModal] = useState(false);
   const [otherPlayerJoined, setOtherPlayerJoined] = useState(false);
   const [otherPlayerName, setOtherPlayerName] = useState("");
+  const [requestPlayerName, setRequestPlayerName] = useState("");
+  const [activeJoinRequest, setActiveJoinRequest] = useState(false);
 
   const currentGameInfo = useSelector(getCurrentGameInfo);
   const user = useSelector(getUser);
@@ -37,12 +39,23 @@ const GameMenu = () => {
       }
     };
 
+    const handlePlayerJoining = (playerWantsToJoinNotification: IuiPlayerWantsToJoinNotification) => {
+      console.log("playerWantsToJoinNotification", playerWantsToJoinNotification);
+      const {replacedPlayer, joinerName} = playerWantsToJoinNotification;
+      setRequestPlayerName(joinerName);
+      setOtherPlayerName(replacedPlayer);
+      setActiveJoinRequest(true);
+    };
+
     socket.on("player joined on going game", handleOtherPlayerReplacingMe);
+    socket.on("player wants to join", handlePlayerJoining);
 
     return () => {
       socket.off("player joined on going game");
     };
   }, [user, currentGameInfo, socket]);
+
+  if (!currentGameInfo.gameId) return null;
 
   const showLeaveModal = (): boolean => {
     return leaveGameModal && !leftGameModal;
@@ -51,7 +64,26 @@ const GameMenu = () => {
     return !leaveGameModal && leftGameModal;
   };
 
-  if (!currentGameInfo.gameId) return null;
+  const allowPlayerToJoin = (allow: boolean) => {
+    if (otherPlayerName && requestPlayerName && currentGameInfo.gameId) {
+      const playerToJoinRequest: IuiAllowPlayerToJoinRequest = {
+        replacedPlayer: otherPlayerName,
+        joinerName: requestPlayerName,
+        allow: allow,
+        gameId: currentGameInfo.gameId,
+        uuid: getMyId(),
+        userName: user.userName,
+        token: getToken(),
+      };
+      socket.emit("allow to join game", playerToJoinRequest, (allowPlayerToJoinResponse: IuiAllowPlayerToJoinResponse) => {
+        console.log("allowPlayerToJoinResponse", allowPlayerToJoinResponse);
+      });
+    } else {
+      setRequestPlayerName("");
+      setOtherPlayerName("");
+      setActiveJoinRequest(false);
+    }
+  };
 
   const leaveGameClick = () => {
     if (user.isUserLoggedIn) {
@@ -82,15 +114,35 @@ const GameMenu = () => {
     dispatch(setGameId(""));
   };
 
+  const renderRequest = () => {
+    if (activeJoinRequest) {
+      return (
+        <React.Fragment>
+          <div><i>{requestPlayerName}</i> want to play as <i>{otherPlayerName}</i>, is this ok?</div>
+          <div>
+            <Button variant="success" onClick={() => allowPlayerToJoin(true)}>Allow</Button>
+            &nbsp;
+            <Button variant="danger" onClick={() => allowPlayerToJoin(false)}>Reject</Button>
+          </div>
+        </React.Fragment>
+      );
+    }
+    return null;
+  };
+
   return (
     <div id="menuArea">
-      <Button
-        size="sm"
-        variant="danger"
-        onClick={() => setLeaveGameModal(!leaveGameModal)}
-      >
-        Leaving Game?
-      </Button>
+      <div>
+        <Button
+          size="sm"
+          variant="danger"
+          onClick={() => setLeaveGameModal(!leaveGameModal)}
+        >
+          Leaving Game?
+        </Button>
+      </div>
+
+      {renderRequest()}
 
       <Modal show={showLeaveModal()} onHide={() => setLeaveGameModal(false)}>
         <Modal.Header closeButton>

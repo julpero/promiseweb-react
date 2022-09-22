@@ -60,8 +60,8 @@ const OpenGamesList = () => {
 
   useEffect(() => {
     fetchGameItemList();
-    socket.on("new game created", (id) => {
-      console.log("new game id", id);
+
+    socket.on("new game created", () => {
       fetchGameItemList();
     });
 

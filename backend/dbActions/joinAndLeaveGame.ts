@@ -140,11 +140,18 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
   return leaveOngoingGameResponse;
 };
 
-export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame): Promise<IuiJoinOngoingGameResponse> => {
+/**
+ *
+ * @param joinRequest IuiJoinOngoingGame
+ * @param forceJoin set true when allowing someone to join
+ * @returns
+ */
+export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame, forceJoin: boolean): Promise<IuiJoinOngoingGameResponse> => {
   const { gameId, playAsPlayer, userName } = joinRequest;
   const joinOngoingGameResponse: IuiJoinOngoingGameResponse = {
     joinOk: false,
     playerName: "",
+    haveToWait: false,
   };
   if (!mongoose.isValidObjectId(gameId)) {
     return joinOngoingGameResponse;
@@ -165,22 +172,30 @@ export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame): Promi
 
     const player = gameInDb.humanPlayers.find(player => player.name === playAsPlayer);
     if (player) {
+      const reJoiningMySelf = playAsPlayer === userName;
       if (player.playedBy) {
         joinOngoingGameResponse.playedBy = player.playedBy;
       }
       player.active = true;
-      if (userName !== playAsPlayer) {
-        player.playedBy = userName;
-      } else {
+      if (reJoiningMySelf) {
         player.playedBy = undefined;
+        joinOngoingGameResponse.haveToWait = false;
+      } else if (!forceJoin) {
+        joinOngoingGameResponse.haveToWait = true;
+        joinOngoingGameResponse.playedBy = userName;
+        player.playedBy = userName;
       }
-      const gameAfter = await gameInDb.save();
-      if (gameAfter) {
-        joinOngoingGameResponse.joinOk = true;
-        joinOngoingGameResponse.playerName = player.name;
+      if (joinOngoingGameResponse.haveToWait) {
         return joinOngoingGameResponse;
       } else {
-        joinOngoingGameResponse.playedBy = undefined;
+        const gameAfter = await gameInDb.save();
+        if (gameAfter) {
+          joinOngoingGameResponse.joinOk = true;
+          joinOngoingGameResponse.playerName = player.name;
+          return joinOngoingGameResponse;
+        } else {
+          joinOngoingGameResponse.playedBy = undefined;
+        }
       }
     }
   }

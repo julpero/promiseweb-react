@@ -10,8 +10,8 @@ export const leaveOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoingG
   return leaveOngoingGameResponse;
 };
 
-export const joinOngoingGame = async (joinRequest: IuiJoinOngoingGame): Promise<IuiJoinOngoingGameResponse> => {
-  const joinOngoingGameResponse: IuiJoinOngoingGameResponse = await joinTheOngoingGame(joinRequest);
+export const joinOngoingGame = async (joinRequest: IuiJoinOngoingGame, forceJoin: boolean): Promise<IuiJoinOngoingGameResponse> => {
+  const joinOngoingGameResponse: IuiJoinOngoingGameResponse = await joinTheOngoingGame(joinRequest, forceJoin);
 
   return joinOngoingGameResponse;
 };

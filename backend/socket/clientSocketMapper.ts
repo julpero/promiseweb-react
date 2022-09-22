@@ -3,11 +3,18 @@ interface ISocketAdminData {
   uuid: string,
 }
 
+interface ISocketWaitingToJoin {
+  socketId: string,
+  gameId: string,
+  asAPlayer: string,
+}
+
 interface ISocketMap {
   sockets: Set<string>,
   game?: string,
   adminSocket?: ISocketAdminData,
   lastTimestamp: number,
+  waitingToJoin?: ISocketWaitingToJoin,
 }
 
 const userSocketIdMap = new Map<string, ISocketMap>(); //a map of online usernames and their clients
@@ -29,24 +36,6 @@ export const addUserToMap = (userName: string, socketId: string, timestamp: numb
   }
   // console.log(userSocketIdMap);
 };
-
-// export const removeUserFromMap = (userName: string, socketId: string, gameId?: string | null): void => {
-//   const userSocketIdSet = userSocketIdMap.get(userName);
-//   if (userSocketIdSet) {
-//     userSocketIdSet.sockets.delete(socketId);
-//     if (gameId === null) {
-//       userSocketIdSet.game = undefined;
-//     } else if (gameId !== undefined) {
-//       userSocketIdSet.game = gameId;
-//     }
-//     userSocketIdSet.adminSocket = undefined;
-
-//     //if there are no clients for a user, remove that user from online list (map)
-//     if (userSocketIdSet.sockets.size === 0) {
-//       userSocketIdMap.delete(userName);
-//     }
-//   }
-// };
 
 export const removeUserSocketsAndGames = (userName: string) => {
   const user = userSocketIdMap.get(userName);
@@ -127,6 +116,7 @@ export const setLastTimestamp = (userName: string, socketId: string, timestamp: 
   const user = userSocketIdMap.get(userName);
   if (user) {
     user.lastTimestamp = timestamp;
+    if (!user.sockets.has(socketId)) user.sockets.add(socketId);
   } else {
     userSocketIdMap.set(userName, {
       sockets: new Set([socketId]),
@@ -153,4 +143,41 @@ export const getPlayersOfTheGame = (gameId: string): string[] => {
   return players;
 };
 
-// export default userSocketIdMap;
+export const setWaiting = (userName: string, timestamp: number, socketId: string, asAPlayer: string, gameId: string) =>  {
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    user.waitingToJoin = {
+      socketId: socketId,
+      asAPlayer: asAPlayer,
+      gameId: gameId,
+    } as ISocketWaitingToJoin;
+    if (!user.sockets.has(socketId)) user.sockets.add(socketId);
+  } else {
+    userSocketIdMap.set(userName, {
+      sockets: new Set([socketId]),
+      game: undefined,
+      adminSocket: undefined,
+      lastTimestamp: timestamp,
+      waitingToJoin: {
+        socketId: socketId,
+        asAPlayer: asAPlayer,
+        gameId: gameId,
+      } as ISocketWaitingToJoin,
+    });
+  }
+};
+
+export const isWaitingGame = (userName: string, socketId: string, asAPlayer: string, gameId: string): boolean => {
+  const user = userSocketIdMap.get(userName);
+  if (user && user.waitingToJoin) {
+    return user.waitingToJoin.socketId === socketId && user.waitingToJoin.asAPlayer == asAPlayer && user.waitingToJoin.gameId === gameId;
+  }
+  return false;
+};
+
+export const clearWaiting = (userName: string) => {
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    user.waitingToJoin = undefined;
+  }
+};
