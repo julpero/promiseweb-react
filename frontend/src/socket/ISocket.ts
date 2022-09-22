@@ -2,7 +2,7 @@ import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../interf
 import { IuiCheckIfOngoingGameResponse } from "../interfaces/IuiCheckIfOngoingGame";
 import { IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse } from "../interfaces/IuiGameList";
 import { IuiPlayedGamesReport } from "../interfaces/IuiGameReports";
-import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "../interfaces/IuiJoinOngoingGame";
+import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiPlayerJoinedOnGoingGameNotification } from "../interfaces/IuiJoinOngoingGame";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse } from "../interfaces/IuiLeaveOngoingGame";
 import { IuiCreateGameRequest, IuiCreateGameResponse } from "../interfaces/IuiNewGame";
 import {
@@ -27,6 +27,7 @@ export interface ServerToClientEvents {
   "new chat line": (chatLine: string) => void;
   "promise made": (promiseNotification: IuiPromiseMadeNotification) => void;
   "card played": (cardPlayedNotification: IuiCardPlayedNotification) => void;
+  "player joined on going game": (playerJoinedNotification: IuiPlayerJoinedOnGoingGameNotification) => void;
   "hey": () => void;
 }
 

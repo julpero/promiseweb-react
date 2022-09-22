@@ -36,6 +36,7 @@ const JoinGameById = ({onJoin}: IProps) => {
         if (gameList.isAuthenticated) {
           handleAuthenticatedRequest(gameList.token);
           setGameItemList(gameList.games);
+          setSubmitting(false);
         } else {
           handleUnauthenticatedRequest(dispatch);
         }
@@ -97,12 +98,12 @@ const JoinGameById = ({onJoin}: IProps) => {
     });
   };
 
-  const canJoinImmediately = (imInTheGame: boolean, inActivePlayers?: string[], inActivePlayerSockets? : string[]): boolean => {
-    if (!imInTheGame) return false;
-    if (inActivePlayers && inActivePlayers.some(player => player === user.userName)) return true;
-    if (inActivePlayerSockets && inActivePlayerSockets.some(player => player === user.userName)) return true;
-    return false;
-  };
+  // const canJoinImmediately = (imInTheGame: boolean, inActivePlayers?: string[], inActivePlayerSockets? : string[]): boolean => {
+  //   if (!imInTheGame) return false;
+  //   if (inActivePlayers && inActivePlayers.some(player => player === user.userName)) return true;
+  //   if (inActivePlayerSockets && inActivePlayerSockets.some(player => player === user.userName)) return true;
+  //   return false;
+  // };
 
   const renderOtherJoinButtons = (gameId: string, inActivePlayers?: string[], inActivePlayerSockets? : string[]) => {
     const buttonsArr: JSX.Element[] = [];
@@ -115,7 +116,8 @@ const JoinGameById = ({onJoin}: IProps) => {
 
   const renderActions = (gameId: string, imInTheGame: boolean, inActivePlayers?: string[], inActivePlayerSockets?: string[]) => {
     const actionArr: JSX.Element[] = [];
-    if (canJoinImmediately(imInTheGame, inActivePlayers, inActivePlayerSockets)) {
+    // if (canJoinImmediately(imInTheGame, inActivePlayers, inActivePlayerSockets)) {
+    if (imInTheGame) {
       actionArr.push(
         <Button key="joinAsMySelfButton" size="sm" onClick={() => joinGame(gameId, user.userName)} disabled={submitting}>Re-Join as my self</Button>
       );

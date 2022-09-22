@@ -165,15 +165,22 @@ export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame): Promi
 
     const player = gameInDb.humanPlayers.find(player => player.name === playAsPlayer);
     if (player) {
+      if (player.playedBy) {
+        joinOngoingGameResponse.playedBy = player.playedBy;
+      }
       player.active = true;
       if (userName !== playAsPlayer) {
         player.playedBy = userName;
+      } else {
+        player.playedBy = undefined;
       }
       const gameAfter = await gameInDb.save();
       if (gameAfter) {
         joinOngoingGameResponse.joinOk = true;
         joinOngoingGameResponse.playerName = player.name;
         return joinOngoingGameResponse;
+      } else {
+        joinOngoingGameResponse.playedBy = undefined;
       }
     }
   }
