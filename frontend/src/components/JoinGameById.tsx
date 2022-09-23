@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 import { IuiGameListItem, IuiGetGameListResponse } from "../interfaces/IuiGameList";
-import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "../interfaces/IuiJoinOngoingGame";
+import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse, JOIN_GAME_STATUS } from "../interfaces/IuiJoinOngoingGame";
 import { IuiUserData } from "../interfaces/IuiUser";
 import { useSocket } from "../socket";
 import { getUser } from "../store/userSlice";
@@ -16,7 +16,8 @@ const JoinGameById = ({onJoin}: IProps) => {
   const [ submitting, setSubmitting ] = useState(false);
   const [ joinOk, setJoinOk ] = useState(false);
   const [ showRejection, setShowRejection ] = useState(false);
-  const [ waitingResponseFromGame, setWaitingResponseFromGame ] = useState("");
+  const [ showWaiting, setShowWaiting ] = useState(false);
+  const [ showError, setShowError ] = useState(false);
   const [ playerName, setPlayerName ] = useState("");
   const [ gameItemList, setGameItemList ] = useState<IuiGameListItem[]>([]);
   const user = useSelector(getUser);
@@ -39,6 +40,9 @@ const JoinGameById = ({onJoin}: IProps) => {
           handleAuthenticatedRequest(gameList.token);
           setGameItemList(gameList.games);
           setSubmitting(false);
+          setShowRejection(false);
+          setShowError(false);
+          setShowWaiting(false);
         } else {
           handleUnauthenticatedRequest(dispatch);
         }
@@ -59,7 +63,7 @@ const JoinGameById = ({onJoin}: IProps) => {
     return () => {
       socket.off("changes in game players");
     };
-  }, [fetchGameItemList, waitingResponseFromGame, socket]);
+  }, [fetchGameItemList, socket]);
 
   const joinGame = (gameId: string, playAsPlayer: string, mySelf: boolean): void => {
     setSubmitting(true);
@@ -71,18 +75,20 @@ const JoinGameById = ({onJoin}: IProps) => {
       token: getToken(),
     };
     if (!mySelf) {
-      setWaitingResponseFromGame(gameId);
+      setShowWaiting(true);
     }
     setPlayerName(playAsPlayer);
     socket.emit("join ongoing game", joinGameRequest, (joinResponse: IuiJoinOngoingGameResponse) => {
       console.log("join response", joinResponse);
       if (joinResponse.isAuthenticated) {
         handleAuthenticatedRequest(joinResponse.token);
-        if (joinResponse.joinOk) {
-          setJoinOk(joinResponse.joinOk);
-        } else if (!mySelf) {
+        if (joinResponse.joinStatus === JOIN_GAME_STATUS.ok) {
+          setJoinOk(true);
+        } else if (joinResponse.joinStatus === JOIN_GAME_STATUS.failed) {
+          setShowError(true);
+          setShowWaiting(false);
+        } else if (mySelf) {
           fetchGameItemList();
-          setSubmitting(false);
         }
       } else {
         handleUnauthenticatedRequest(dispatch);
@@ -96,13 +102,20 @@ const JoinGameById = ({onJoin}: IProps) => {
   };
 
   const cancelWaiting = () => {
-    setWaitingResponseFromGame("");
-    setShowRejection(false);
-    setSubmitting(false);
-  };
-
-  const showWaitingModal = (): boolean => {
-    return waitingResponseFromGame !== undefined && waitingResponseFromGame !== "";
+    const cancelRequest: IuiUserData = {
+      uuid: getMyId(),
+      userName: user.userName,
+      token: getToken(),
+    };
+    socket.emit("cancel my join request", cancelRequest, (simpleResponse) => {
+      console.log("cancelled my join request", simpleResponse);
+      if (simpleResponse.isAuthenticated) {
+        handleAuthenticatedRequest(simpleResponse.token);
+        fetchGameItemList();
+      } else {
+        handleUnauthenticatedRequest(dispatch);
+      }
+    });
   };
 
   const dateFormatOptions: Intl.DateTimeFormatOptions = {
@@ -170,7 +183,7 @@ const JoinGameById = ({onJoin}: IProps) => {
   return (
     <React.Fragment>
       <div>
-        <Button onClick={() => fetchGameItemList()}>Refresh</Button>
+        <Button onClick={() => fetchGameItemList()} disabled={submitting}>Refresh</Button>
       </div>
       <hr />
       <div>
@@ -192,7 +205,7 @@ const JoinGameById = ({onJoin}: IProps) => {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={showWaitingModal()} onHide={cancelWaiting}>
+      <Modal show={showWaiting} onHide={cancelWaiting}>
         <Modal.Header>
           <Modal.Title>
             Waiting to join game...
@@ -203,7 +216,15 @@ const JoinGameById = ({onJoin}: IProps) => {
           <p>Someone active player in the game must accept your request so please wait...</p>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="warning" onClick={cancelWaiting}>Cancel</Button>
+          <Button variant="warning" onClick={cancelWaiting}>
+            <Spinner
+              as="span"
+              animation="border"
+              size="sm"
+            />
+            &nbsp;
+            Cancel
+          </Button>
         </Modal.Footer>
       </Modal>
 
@@ -216,6 +237,21 @@ const JoinGameById = ({onJoin}: IProps) => {
         <Modal.Body>
           <p>You have requested to join game as a player <i>{playerName}</i>.</p>
           <p>Someone active player in the game just rejected your request.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" onClick={cancelWaiting}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showError} onHide={cancelWaiting}>
+        <Modal.Header>
+          <Modal.Title>
+            Request failed
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>You have requested to join game as a player <i>{playerName}</i>.</p>
+          <p>For some reason that request has failed.</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="warning" onClick={cancelWaiting}>Close</Button>

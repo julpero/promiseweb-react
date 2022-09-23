@@ -15,7 +15,6 @@ export interface IuiLoginRequest extends IuiUserData {
 
 export interface IuiLoginResponse extends IuiAuth {
   loginStatus: LOGIN_RESPONSE,
-  token?: string,
 }
 
 export interface IuiRefreshLoginResponse extends IuiLoginResponse {

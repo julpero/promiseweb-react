@@ -18,7 +18,7 @@ import {
   IuiPromiseMadeNotification,
 } from "../interfaces/IuiPlayingGame";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "../interfaces/IuiReports";
-import { IuiLoginRequest, IuiLoginResponse, IuiRefreshLoginResponse, IuiUserData } from "../interfaces/IuiUser";
+import { IuiAuth, IuiLoginRequest, IuiLoginResponse, IuiRefreshLoginResponse, IuiUserData } from "../interfaces/IuiUser";
 
 export interface ServerToClientEvents {
   "new game created": () => void;
@@ -39,19 +39,24 @@ export interface ClientToServerEvents {
   "do refresh login": (loginRequest: IuiUserData, fn: (loginResponse: IuiRefreshLoginResponse) => void) => void;
   "check if ongoing game": (checkGameRequest: IuiUserData, fn: (response: IuiCheckIfOngoingGameResponse) => void) => void;
   "create game": (createGameRequest: IuiCreateGameRequest, fn: (createGameResponse: IuiCreateGameResponse) => void) => void;
+
   "leave ongoing game": (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest, fn: (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => void) => void;
   "join ongoing game": (joinOngoingGameRequest: IuiJoinOngoingGame, fn: (joinOngoingGameResponse: IuiJoinOngoingGameResponse) => void) => void;
   "allow to join game": (playerToJoinRequest: IuiAllowPlayerToJoinRequest, fn: (allowPlayerToJoinResponse: IuiAllowPlayerToJoinResponse) => void) => void,
-  "make promise": (promiseRequest: IuiMakePromiseRequest, fn: (promiseResponse: IuiMakePromiseResponse) => void) => void;
+  "cancel my join request": (cancelRequest: IuiUserData, fn: (simpleResponse: IuiAuth) => void) => void,
+
   "get open games": (gameListRequest: IuiUserData, fn: (gameList: IuiGetGameListResponse) => void) => void;
   "get on going games": (gameListRequest: IuiUserData, fn: (gameList: IuiGetGameListResponse) => void) => void;
   "join game": (joinGameRequest: IuiJoinLeaveGameRequest, fn: (response: IuiJoinLeaveGameResponse) => void) => void;
   "leave game": (leaveGameRequest: IuiJoinLeaveGameRequest, fn: (response: IuiJoinLeaveGameResponse) => void) => void;
   "check game": (getGameInfoRequest: IuiGetGameInfoRequest, fn: (gameInfo: IuiGetGameInfoResponse) => void) => void;
+
   "get round": (getRoundRequest: IuiGetRoundRequest, fn: (roundResponse: IuiGetRoundResponse) => void) => void;
+  "make promise": (promiseRequest: IuiMakePromiseRequest, fn: (promiseResponse: IuiMakePromiseResponse) => void) => void;
   "play card": (playCardRequest: IuiPlayCardRequest, fn: (playCardResponse: IuiPlayCardResponse) => void) => void;
   "get report data": (request: IuiUserData, fn: (reportResponse: IuiPlayedGamesReport) => void) => void;
   "get game report": (reportRequest: IuiGetOneGameReportRequest, fn: (reportResponse: IuiOneGameReport) => void) => void;
+
   "admin login": (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => void;
   "get games for admin": (getGamesRequest: IuiUserData, fn: (gamesResponse: IuiGetGamesResponse) => void) => void,
   "re-create game statistics": (reCreateGameStatisticsRequest: IuiReCreateGameStatisticsRequest, fn: (gamesResponse: IuiGetGamesResponse) => void) => void,

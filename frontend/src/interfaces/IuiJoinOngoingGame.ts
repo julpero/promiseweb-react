@@ -1,13 +1,18 @@
 import { IuiAuth, IuiUserData } from "./IuiUser";
 
+export enum JOIN_GAME_STATUS {
+  ok,
+  failed,
+  waiting,
+}
+
 export interface IuiJoinOngoingGame extends IuiUserData {
   gameId: string,
   playAsPlayer: string,
 }
 
 export interface IuiJoinOngoingGameResponse extends IuiAuth {
-  joinOk: boolean,
-  haveToWait: boolean,
+  joinStatus: JOIN_GAME_STATUS,
   playerName: string,
   playedBy?: string,
 }

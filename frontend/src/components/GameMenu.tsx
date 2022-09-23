@@ -44,7 +44,7 @@ const GameMenu = () => {
       const {replacedPlayer, joinerName} = playerWantsToJoinNotification;
       setRequestPlayerName(joinerName);
       setOtherPlayerName(replacedPlayer);
-      setActiveJoinRequest(true);
+      setActiveJoinRequest(joinerName.length > 0 && replacedPlayer.length > 0);
     };
 
     socket.on("player joined on going game", handleOtherPlayerReplacingMe);
@@ -77,6 +77,11 @@ const GameMenu = () => {
       };
       socket.emit("allow to join game", playerToJoinRequest, (allowPlayerToJoinResponse: IuiAllowPlayerToJoinResponse) => {
         console.log("allowPlayerToJoinResponse", allowPlayerToJoinResponse);
+        if (allowPlayerToJoinResponse.isAuthenticated) {
+          handleAuthenticatedRequest(allowPlayerToJoinResponse.token);
+        } else {
+          handleUnauthenticatedRequest(dispatch);
+        }
       });
     } else {
       setRequestPlayerName("");

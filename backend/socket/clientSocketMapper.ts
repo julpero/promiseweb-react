@@ -175,6 +175,14 @@ export const isWaitingGame = (userName: string, socketId: string, asAPlayer: str
   return false;
 };
 
+export const getWaitingGame = (userName: string) => {
+  const user = userSocketIdMap.get(userName);
+  if (user && user.waitingToJoin) {
+    return user.waitingToJoin.gameId;
+  }
+  return null;
+};
+
 export const clearWaiting = (userName: string) => {
   const user = userSocketIdMap.get(userName);
   if (user) {

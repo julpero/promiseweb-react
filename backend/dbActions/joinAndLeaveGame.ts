@@ -5,7 +5,7 @@ import GameOptions from "../models/GameOptions";
 import { getPlayerStats } from "../common/common";
 import { startGame } from "../common/initGame";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "../../frontend/src/interfaces/IuiLeaveOngoingGame";
-import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse } from "../../frontend/src/interfaces/IuiJoinOngoingGame";
+import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse, JOIN_GAME_STATUS } from "../../frontend/src/interfaces/IuiJoinOngoingGame";
 import mongoose from "mongoose";
 
 export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Promise<JOIN_LEAVE_RESULT> => {
@@ -149,9 +149,8 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
 export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame, forceJoin: boolean): Promise<IuiJoinOngoingGameResponse> => {
   const { gameId, playAsPlayer, userName } = joinRequest;
   const joinOngoingGameResponse: IuiJoinOngoingGameResponse = {
-    joinOk: false,
+    joinStatus: JOIN_GAME_STATUS.failed,
     playerName: "",
-    haveToWait: false,
   };
   if (!mongoose.isValidObjectId(gameId)) {
     return joinOngoingGameResponse;
@@ -179,18 +178,17 @@ export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame, forceJ
       player.active = true;
       if (reJoiningMySelf) {
         player.playedBy = undefined;
-        joinOngoingGameResponse.haveToWait = false;
       } else if (!forceJoin) {
-        joinOngoingGameResponse.haveToWait = true;
+        joinOngoingGameResponse.joinStatus = JOIN_GAME_STATUS.waiting;
         joinOngoingGameResponse.playedBy = userName;
         player.playedBy = userName;
       }
-      if (joinOngoingGameResponse.haveToWait) {
+      if (joinOngoingGameResponse.joinStatus === JOIN_GAME_STATUS.waiting) {
         return joinOngoingGameResponse;
       } else {
         const gameAfter = await gameInDb.save();
         if (gameAfter) {
-          joinOngoingGameResponse.joinOk = true;
+          joinOngoingGameResponse.joinStatus = JOIN_GAME_STATUS.ok;
           joinOngoingGameResponse.playerName = player.name;
           return joinOngoingGameResponse;
         } else {

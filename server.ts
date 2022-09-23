@@ -4,7 +4,7 @@ import http from "http";
 import { Server, Socket } from "socket.io";
 import cors from "cors";
 import dotenv from "dotenv";
-import path, { join } from "path";
+import path from "path";
 import connectDB from "./backend/config/db";
 import { ClientToServerEvents, ServerToClientEvents } from "./frontend/src/socket/ISocket";
 import * as csm from "./backend/socket/clientSocketMapper";
@@ -23,11 +23,11 @@ import { getGameInfo, getRound, makePromise, playCard } from "./backend/actions/
 import { GAME_STATUS, ROUND_STATUS } from "./frontend/src/interfaces/IuiGameOptions";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "./frontend/src/interfaces/IuiLeaveOngoingGame";
 import { leaveOngoingGame, joinOngoingGame, getHumanPlayer } from "./backend/actions/joinLeaveOngoingGame";
-import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification } from "./frontend/src/interfaces/IuiJoinOngoingGame";
+import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification, JOIN_GAME_STATUS } from "./frontend/src/interfaces/IuiJoinOngoingGame";
 import { IuiPlayedGamesReport } from "./frontend/src/interfaces/IuiGameReports";
 import { getOneGameReportData, getReportData } from "./backend/actions/reports";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "./frontend/src/interfaces/IuiReports";
-import { IuiLoginRequest, IuiLoginResponse, IuiRefreshLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./frontend/src/interfaces/IuiUser";
+import { IuiAuth, IuiLoginRequest, IuiLoginResponse, IuiRefreshLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./frontend/src/interfaces/IuiUser";
 import { handleLoginRequest } from "./backend/actions/login";
 import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "./frontend/src/interfaces/IuiAdminOperations";
 import { convertOldData, getGamesForAdmin, reCreateAllGameStats, reCreateGameStats } from "./backend/actions/adminActions";
@@ -79,6 +79,7 @@ connectDB().then(() => {
       }
       csm.removeUserSocketsAndGames(userName);
       csm.unsetUserAsAdmin(userName);
+      csm.clearWaiting(userName);
     });
 
     socket.on("user login", async (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => {
@@ -697,7 +698,7 @@ connectDB().then(() => {
         if (gameId === "" || playAsPlayer === "") {
           fn({
             isAuthenticated: true,
-            joinOk: false,
+            joinStatus: JOIN_GAME_STATUS.failed,
             token: token,
           } as IuiJoinOngoingGameResponse);
           return null;
@@ -720,16 +721,23 @@ connectDB().then(() => {
                 // eslint-disable-next-line no-cond-assign
                 for (let it = sockets.values(), val = null; val=it.next().value;) {
                   if (val !== undefined) {
-                    // TODO pingOk is always true
+                    pingOk = true;
                     const socketId = val;
-                    pingOk = io.to(socketId).emit("hey");
-                    console.log("join game by id - pinged socket "+socketId+" and result was: ", pingOk, gameId, playAsPlayer);
+                    io.to(socketId).emit("hey"); // TODO this is just to notify that someone tried to play
+                    console.log(`join game by id - pinged socket ${socketId}`, gameId, playAsPlayer);
                   }
                 }
               }
 
               if (pingOk) {
                 console.log("join game by id - joining failed because user was still active", gameId, playAsPlayer);
+                csm.setLastTimestamp(userName, socket.id, timestamp);
+                const newToken = signUserToken(userName, uuid, timestamp);
+                fn({
+                  isAuthenticated: true,
+                  joinStatus: JOIN_GAME_STATUS.failed,
+                  token: newToken,
+                } as IuiJoinOngoingGameResponse);
                 return null;
               }
             }
@@ -739,7 +747,7 @@ connectDB().then(() => {
           const joinResponse = await joinOngoingGame(joinRequest, false);
           console.log("joinResponse", joinResponse);
           const otherPlayer = joinResponse.playedBy;
-          if (joinResponse.haveToWait && otherPlayer) {
+          if (joinResponse.joinStatus === JOIN_GAME_STATUS.waiting && otherPlayer) {
             // show want to join notification
             const playerWantsToJoinNotification: IuiPlayerWantsToJoinNotification = {
               replacedPlayer: playAsPlayer,
@@ -747,7 +755,9 @@ connectDB().then(() => {
             };
             io.to(gameId).emit("player wants to join", playerWantsToJoinNotification);
             csm.setWaiting(userName, timestamp, socket.id, playAsPlayer, gameId);
-          } else if (joinResponse.joinOk) {
+            const chatLine = `player ${userName} want's to play as ${playAsPlayer}`;
+            io.to(gameId).emit("new chat line", chatLine);
+          } else if (joinResponse.joinStatus === JOIN_GAME_STATUS.ok) {
             if (reJoiningMySelf && otherPlayer) {
               // send notification to player who probably plays as me
               const otherPlayerGame = csm.getUserGameFromMap(otherPlayer);
@@ -795,7 +805,7 @@ connectDB().then(() => {
           csm.setLastTimestamp(userName, socket.id, timestamp);
           const newToken = signUserToken(userName, uuid, timestamp);
           fn({
-            joinOk: false,
+            joinStatus: JOIN_GAME_STATUS.failed,
             isAuthenticated: true,
             token: newToken,
           } as IuiJoinOngoingGameResponse);
@@ -872,7 +882,7 @@ connectDB().then(() => {
             if (allow) {
               const joinResponse = await joinOngoingGame(joinRequest, true);
               console.log("joinResponse", joinResponse);
-              if (joinResponse.joinOk) {
+              if (joinResponse.joinStatus === JOIN_GAME_STATUS.ok) {
                 // remove previous player from game
                 csm.removeUserFromGame(replacedPlayer, gameId);
                 csm.clearWaiting(joinerName);
@@ -892,6 +902,7 @@ connectDB().then(() => {
             if (!joinOk) {
               const chatLine = `player ${userName} rejected ${joinerName} request to join game and play as ${replacedPlayer}`;
               io.to(gameId).emit("new chat line", chatLine);
+              io.to(gameId).emit("player wants to join", { joinerName: "", replacedPlayer: "" } as IuiPlayerWantsToJoinNotification);
 
               io.to(socketId).emit("join request rejected", gameId);
             }
@@ -920,6 +931,36 @@ connectDB().then(() => {
         fn({
           isAuthenticated: false,
         } as IuiAllowPlayerToJoinResponse);
+        return null;
+      }
+    });
+
+    socket.on("cancel my join request", (cancelRequest: IuiUserData, fn: (cancelResponse: IuiAuth) => void) => {
+      console.log("cancel my join request", cancelRequest);
+      const { userName, uuid, token } = cancelRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        const timestamp = Date.now();
+        const waitingToGame = csm.getWaitingGame(userName);
+        csm.clearWaiting(userName);
+        if (waitingToGame) {
+          io.to(waitingToGame).emit("player wants to join", { joinerName: "", replacedPlayer: "" } as IuiPlayerWantsToJoinNotification);
+          const chatLine = `player ${userName} cancelled his/her join request`;
+          io.to(waitingToGame).emit("new chat line", chatLine);
+        }
+
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        fn({
+          isAuthenticated: true,
+          token: newToken,
+        } as IuiAuth);
+      } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiAuth);
         return null;
       }
     });
