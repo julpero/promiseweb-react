@@ -411,9 +411,16 @@ connectDB().then(() => {
           case CHECK_GAME_STATUS.joinedGame:
           case CHECK_GAME_STATUS.onGoingGame:
           case CHECK_GAME_STATUS.observedGame: {
-            socket.leave("waiting lobby");
             const gameIdStr = checkResponse.gameId ?? "";
             const playAsName = checkResponse.asAPlayer ?? "";
+            socket.leave("waiting lobby");
+
+            // check if i was not in game players
+            const playersInSockets = csm.getPlayersOfTheGame(gameIdStr);
+            if (!playersInSockets.some(player => player === userName)) {
+              io.to("waiting lobby").emit("changes in game players");
+            }
+
             socket.join(gameIdStr);
             csm.addUserToMap(userName, socket.id, timestamp, gameIdStr);
             csm.clearWaiting(userName);
