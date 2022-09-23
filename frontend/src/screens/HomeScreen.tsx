@@ -8,7 +8,7 @@ import { Field, Form } from "react-final-form";
 
 import OpenGamesList from "../components/OpenGamesList";
 import CreateGame from "../components/CreateGame";
-import JoinGameById from "../components/JoinGameById";
+import JoinOnGoingGame from "../components/JoinOnGoingGame";
 import PlayedGamesReport from "../components/PlayedGamesReport";
 import TextInput from "../components/FormComponents/TextInput";
 import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "../interfaces/IuiUser";
@@ -183,7 +183,7 @@ const HomeScreen = ({onJoin}: IProps) => {
         <Accordion.Item eventKey="2">
           <Accordion.Header>On Going Games</Accordion.Header>
           <Accordion.Body>
-            <JoinGameById onJoin={onJoin} />
+            <JoinOnGoingGame onJoin={onJoin} />
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>

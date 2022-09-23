@@ -12,7 +12,7 @@ interface IProps {
   onJoin: () => void,
 }
 
-const JoinGameById = ({onJoin}: IProps) => {
+const JoinOnGoingGame = ({onJoin}: IProps) => {
   const [ submitting, setSubmitting ] = useState(false);
   const [ joinOk, setJoinOk ] = useState(false);
   const [ showRejection, setShowRejection ] = useState(false);
@@ -261,4 +261,4 @@ const JoinGameById = ({onJoin}: IProps) => {
   );
 };
 
-export default JoinGameById;
+export default JoinOnGoingGame;
