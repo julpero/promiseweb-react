@@ -166,33 +166,6 @@ const CreateGame = (props: IProps) => {
                 </Field>
               </div>
             </div>
-            {/* <div className="row">
-              <div className="col">
-                <Field<string>
-                  name="userName"
-                  component={TextInput}
-                  label="My (nick)name in the game"
-                  value={globalUserName}
-                  disabled={true}
-                />
-              </div>
-              <div className="col">
-                <Field<string>
-                  name="password1"
-                  component={TextInput}
-                  label="Password"
-                  ispassword="true"
-                />
-              </div>
-              <div className="col">
-                <Field<string>
-                  name="password2"
-                  component={TextInput}
-                  label="Re-type password if first time user"
-                  ispassword="true"
-                />
-              </div>
-            </div> */}
             <Card>
               <Card.Header>
                 Game Rules
@@ -214,7 +187,6 @@ const CreateGame = (props: IProps) => {
                     </div>
                     <div className="col">
                       <Field
-                        disabled
                         name="hidePromiseRound"
                         type="checkbox"
                         component={CheckboxInput}
