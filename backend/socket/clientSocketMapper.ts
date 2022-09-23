@@ -45,6 +45,14 @@ export const removeUserSocketsAndGames = (userName: string) => {
   }
 };
 
+export const addUserToGame = (userName: string, socketId: string, gameId: string): void => {
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    if (!user.sockets.has(socketId)) user.sockets.add(socketId);
+    user.game = gameId;
+  }
+};
+
 export const removeUserFromGame = (userName: string, gameId: string): void => {
   const user = userSocketIdMap.get(userName);
   if (user && user.game === gameId) {

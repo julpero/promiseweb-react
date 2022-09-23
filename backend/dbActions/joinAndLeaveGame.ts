@@ -172,28 +172,24 @@ export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame, forceJ
     const player = gameInDb.humanPlayers.find(player => player.name === playAsPlayer);
     if (player) {
       const reJoiningMySelf = playAsPlayer === userName;
-      if (player.playedBy) {
-        joinOngoingGameResponse.playedBy = player.playedBy;
-      }
+      joinOngoingGameResponse.playerName = player.name;
       player.active = true;
       if (reJoiningMySelf) {
         player.playedBy = undefined;
+      } else if (forceJoin) {
+        player.playedBy = userName;
       } else if (!forceJoin) {
         joinOngoingGameResponse.joinStatus = JOIN_GAME_STATUS.waiting;
         joinOngoingGameResponse.playedBy = userName;
-        player.playedBy = userName;
+        return joinOngoingGameResponse;
       }
-      if (joinOngoingGameResponse.joinStatus === JOIN_GAME_STATUS.waiting) {
+
+      const gameAfter = await gameInDb.save();
+      if (gameAfter) {
+        joinOngoingGameResponse.joinStatus = JOIN_GAME_STATUS.ok;
         return joinOngoingGameResponse;
       } else {
-        const gameAfter = await gameInDb.save();
-        if (gameAfter) {
-          joinOngoingGameResponse.joinStatus = JOIN_GAME_STATUS.ok;
-          joinOngoingGameResponse.playerName = player.name;
-          return joinOngoingGameResponse;
-        } else {
-          joinOngoingGameResponse.playedBy = undefined;
-        }
+        joinOngoingGameResponse.playedBy = undefined;
       }
     }
   }

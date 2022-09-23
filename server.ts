@@ -853,7 +853,7 @@ connectDB().then(() => {
                   socketId = val;
                   if (csm.isWaitingGame(joinerName, socketId, replacedPlayer, gameId)) {
                     pingOk = true;
-                    console.log("allow to join game - pinged socket "+socketId+" and result was: ", pingOk, gameId, joinerName);
+                    console.log(`allow to join game - socket ${socketId} : ${gameId} : ${replacedPlayer} : ${joinerName}`);
                     break;
                   }
                 }
@@ -861,7 +861,7 @@ connectDB().then(() => {
             }
 
             if (!pingOk) {
-              console.log("allow to join game - joining failed because user was not waiting active", gameId, joinerName);
+              console.log(`allow to join game - joining failed because user was not waiting active ${gameId} : ${joinerName}`);
               fn({
                 isAuthenticated: true,
                 joinOk: false,
@@ -886,9 +886,11 @@ connectDB().then(() => {
                 // remove previous player from game
                 csm.removeUserFromGame(replacedPlayer, gameId);
                 csm.clearWaiting(joinerName);
+                csm.addUserToGame(joinerName, socketId, gameId);
 
                 const chatLine = `player ${userName} allowed ${joinerName} to join game and play as ${replacedPlayer}`;
                 io.to(gameId).emit("new chat line", chatLine);
+                io.to(gameId).emit("player wants to join", { joinerName: "", replacedPlayer: "" } as IuiPlayerWantsToJoinNotification);
 
                 io.to(socketId).socketsJoin(gameId);
                 io.to(socketId).socketsLeave("waiting lobby");
