@@ -14,6 +14,7 @@ import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiPlayerJoi
 const GameMenu = () => {
   const [leaveGameModal, setLeaveGameModal] = useState(false);
   const [leftGameModal, setLeftGameModal] = useState(false);
+  const [gameDismissedModal, setGameDismissedModal] = useState(false);
   const [otherPlayerJoined, setOtherPlayerJoined] = useState(false);
   const [otherPlayerName, setOtherPlayerName] = useState("");
   const [requestPlayerName, setRequestPlayerName] = useState("");
@@ -52,6 +53,7 @@ const GameMenu = () => {
 
     return () => {
       socket.off("player joined on going game");
+      socket.off("player wants to join");
     };
   }, [user, currentGameInfo, socket]);
 
@@ -106,6 +108,9 @@ const GameMenu = () => {
           if (leaveOngoingGameResponse.leaveStatus === LEAVE_ONGOING_GAME_RESULT.leaveOk) {
             setLeftGameModal(true);
             setLeaveGameModal(false);
+          } else if (leaveOngoingGameResponse.leaveStatus === LEAVE_ONGOING_GAME_RESULT.gameDismissed) {
+            setGameDismissedModal(true);
+            setLeaveGameModal(false);
           }
         } else {
           handleUnauthenticatedRequest(dispatch);
@@ -116,6 +121,8 @@ const GameMenu = () => {
 
   const closeLeftModal = () => {
     setLeftGameModal(false);
+    setGameDismissedModal(false);
+    setLeaveGameModal(false);
     dispatch(setGameId(""));
   };
 
@@ -173,6 +180,21 @@ const GameMenu = () => {
         </Modal.Header>
         <Modal.Body>
           You can re-join this game in On Going Games.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={closeLeftModal}>CLOSE</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={gameDismissedModal} onHide={closeLeftModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+          You have just left the game...
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>You were the last player in the game and now there is no more players in the game.</p>
+          <p>The game is now dismissed and can&amp;t be played anymore.</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={closeLeftModal}>CLOSE</Button>

@@ -175,6 +175,7 @@ export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame, forceJ
       joinOngoingGameResponse.playerName = player.name;
       player.active = true;
       if (reJoiningMySelf) {
+        joinOngoingGameResponse.playedBy = player.playedBy;
         player.playedBy = undefined;
       } else if (forceJoin) {
         player.playedBy = userName;

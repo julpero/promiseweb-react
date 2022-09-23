@@ -352,6 +352,7 @@ connectDB().then(() => {
           // notify all games players about game start
           io.to(gameId).emit("game begins", gameId);
           io.to(gameId).socketsLeave("waiting lobby");
+          io.to("waiting lobby").emit("changes in game players");
         }
         csm.setLastTimestamp(userName, socket.id, timestamp);
         const newToken = signUserToken(userName, uuid, timestamp);
@@ -626,6 +627,7 @@ connectDB().then(() => {
             const chatLine2 = `${winnerOfGame} won the Game!`;
             io.to(gameId).emit("new chat line", chatLine2);
             io.to(gameId).socketsJoin("waiting lobby");
+            io.to("waiting lobby").emit("changes in game players");
           }
         }
         const timestamp = Date.now();
@@ -674,8 +676,8 @@ connectDB().then(() => {
           if (leaveStatus !== LEAVE_ONGOING_GAME_RESULT.gameDismissed) {
             const chatLine = `${leaverName} has left the game!`;
             io.to(gameId).emit("new chat line", chatLine);
-            io.to("waiting lobby").emit("changes in game players");
           }
+          io.to("waiting lobby").emit("changes in game players");
 
           socket.leave(gameId);
           csm.removeUserFromGame(userName, gameId);
