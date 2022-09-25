@@ -40,12 +40,26 @@ const createGameOptions = (values: IuiCreateGameRequest): IGameOptions => {
 };
 
 export const createGame = async (createGameRequest: IuiCreateGameRequest): Promise<IuiCreateGameResponse> => {
-  const {userName} = createGameRequest;
+  const {userName, newGameStartRound, newGameTurnRound, newGameEndRound, newGameHumanPlayersCount} = createGameRequest;
   const response: IuiCreateGameResponse = {
     responseStatus: CREATE_GAME_STATUS.notOk,
     newGameId: "",
     loginStatus: LOGIN_RESPONSE.ok
   };
+
+  const startRound = parseInt(newGameStartRound, 10);
+  const turnRound = parseInt(newGameTurnRound, 10);
+  const endRound = parseInt(newGameEndRound, 10);
+  if (turnRound > startRound) {
+    return response;
+  }
+  if (endRound < turnRound) {
+    return response;
+  }
+
+  if (parseInt(newGameHumanPlayersCount, 10) > 5 && (startRound > 8 || endRound > 8)) {
+    return response;
+  }
 
   const okToCreate = !(await hasOngoingOrCreatedGame(userName));
   if (!okToCreate) {

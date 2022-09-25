@@ -30,6 +30,7 @@ interface IProps {
 const CreateGame = (props: IProps) => {
   const [ loginStatus, setLoginStatus ] = useState<LOGIN_RESPONSE | null>(null);
   const [ createGameStatus, setCreateGameStatus ] = useState<CREATE_GAME_STATUS | null>(null);
+  const [ isSubmitting, setIsSubmitting ] = useState(false);
   const user = useSelector(getUser);
   const dispatch = useDispatch();
 
@@ -42,6 +43,7 @@ const CreateGame = (props: IProps) => {
 
   const onSubmit = (values: IuiNewGameForm) => {
     if (user.isUserLoggedIn) {
+      setIsSubmitting(true);
       const uuid: string = getMyId();
       const newGameRequest: IuiCreateGameRequest = {...values, uuid, userName: user.userName, token: getToken() };
       socket.emit("create game", newGameRequest, (createGameResponse: IuiCreateGameResponse) => {
@@ -53,6 +55,7 @@ const CreateGame = (props: IProps) => {
             // created new game
             props.onCreateGame();
           }
+          setIsSubmitting(false);
         } else {
           handleUnauthenticatedRequest(dispatch);
         }
@@ -136,7 +139,7 @@ const CreateGame = (props: IProps) => {
         onSubmit={onSubmit}
         initialValues={initialValues}
         validate={validateForm}
-        render={({handleSubmit, form, submitting}) => (
+        render={({handleSubmit, form}) => (
           <form onSubmit={handleSubmit}>
             <div className="row">
               <div className="col">
@@ -407,7 +410,7 @@ const CreateGame = (props: IProps) => {
             <div className="row">
               <div className="col">
                 <hr />
-                <Button variant="success" type="submit" disabled={submitting}>Create Game</Button>
+                <Button variant="success" type="submit" disabled={isSubmitting}>Create Game</Button>
               </div>
             </div>
           </form>
@@ -443,6 +446,10 @@ const validateForm = (values: IuiNewGameForm) => {
   }
   if (endRound < turnRound) {
     errors.newGameEndRound = "End round must be equal or greater than turn round";
+  }
+
+  if (parseInt(values.newGameHumanPlayersCount, 10) > 5 && (startRound > 8 || endRound > 8)) {
+    errors.newGameHumanPlayersCount = "For six players eight is maximum start and end round";
   }
 
   return errors;
