@@ -8,6 +8,10 @@ export type CardValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 
 export type Suite = "hearts" | "spades" | "diamonds" | "clubs" | "dummy";
 export type PromiseValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
+export const ANIMATION_TIMES = {
+  collectDelay: 100,
+};
+
 export enum PLAY_CARD_RESPONSE {
   playOk,
   notMyTurn,
