@@ -44,11 +44,10 @@ export interface IuiCreateGameRequest extends IuiNewGameForm, IuiUserData {
 export enum CREATE_GAME_STATUS {
   ok,
   notOk,
-  notValidPlayerId,
+  onGoingGame,
 }
 
 export interface IuiCreateGameResponse extends IuiAuth {
   responseStatus: CREATE_GAME_STATUS,
-  loginStatus: LOGIN_RESPONSE,
   newGameId: string,
 }

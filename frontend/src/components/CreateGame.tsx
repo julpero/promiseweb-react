@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useSocket } from "../socket";
 import { Form, Field } from "react-final-form";
-import { v4 as uuidv4 } from "uuid";
 
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
@@ -12,7 +11,6 @@ import TextInput from "./FormComponents/TextInput";
 import CheckboxInput from "./FormComponents/CheckBoxInput";
 
 import { IuiNewGameForm, initialNewGameValues, IuiCreateGameRequest, IuiCreateGameResponse, CREATE_GAME_STATUS } from "../interfaces/IuiNewGame";
-import { LOGIN_RESPONSE } from "../interfaces/IuiUser";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../store/userSlice";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
@@ -28,7 +26,6 @@ interface IProps {
 }
 
 const CreateGame = (props: IProps) => {
-  const [ loginStatus, setLoginStatus ] = useState<LOGIN_RESPONSE | null>(null);
   const [ createGameStatus, setCreateGameStatus ] = useState<CREATE_GAME_STATUS | null>(null);
   const [ isSubmitting, setIsSubmitting ] = useState(false);
   const user = useSelector(getUser);
@@ -49,7 +46,6 @@ const CreateGame = (props: IProps) => {
       socket.emit("create game", newGameRequest, (createGameResponse: IuiCreateGameResponse) => {
         if (createGameResponse.isAuthenticated) {
           handleAuthenticatedRequest(createGameResponse.token);
-          setLoginStatus(createGameResponse.loginStatus);
           setCreateGameStatus(createGameResponse.responseStatus);
           if (createGameResponse.responseStatus === CREATE_GAME_STATUS.ok) {
             // created new game
@@ -64,71 +60,30 @@ const CreateGame = (props: IProps) => {
   };
 
   const createGameErrorHeaderStr = (): string => {
-    if (loginStatus) {
-      return "Check your password";
-    }
     if (createGameStatus) {
-      return "User or browser error";
+      return "User error";
     }
     return "Error";
   };
 
   const createGameErrorStr = (): string => {
-    switch (loginStatus) {
-      case LOGIN_RESPONSE.passwordFails: {
-        return "Password doesn't match!";
-      }
-      case LOGIN_RESPONSE.passwordMismatch: {
-        return "Password doesn't match!";
-      }
-      case LOGIN_RESPONSE.password2Empty: {
-        return "New username, enter password to both fields!";
-      }
-      case LOGIN_RESPONSE.passwordShort: {
-        return "Password must be at least four characters long!";
-      }
-    }
     switch (createGameStatus) {
-      case CREATE_GAME_STATUS.notValidPlayerId: {
-        return "Player id is not valid. Try to use different browser, reset your local storage (click button below), browsers cache or use incognito-mode.";
-      }
       case CREATE_GAME_STATUS.notOk: {
-        return "You have already created game!";
+        return "Something went wrong. Check new game settings and try again and / or refresh this page.";
+      }
+      case CREATE_GAME_STATUS.onGoingGame: {
+        return "You have already created game! Leave from it before you can create new one.";
       }
     }
     return "Unexpected error";
   };
 
-  const resetLocalStorage = () => {
-    console.log("old uuid", window.localStorage.getItem("uUID"));
-    window.localStorage.removeItem("uUID");
-    const uuid = uuidv4();
-    window.localStorage.setItem("uUID", uuid);
-    console.log("new uuid", window.localStorage.getItem("uUID"));
-    handleErrorClose();
-  };
-
-  const renderResetUuidButton = () => {
-    if (createGameStatus === CREATE_GAME_STATUS.notValidPlayerId) {
-      return (
-        <Modal.Footer>
-          <Button variant="warning" onClick={resetLocalStorage}>Reset local storage</Button>
-        </Modal.Footer>
-      );
-    } else {
-      return null;
-    }
-  };
-
   const handleErrorClose = (): void => {
-    setLoginStatus(null);
     setCreateGameStatus(null);
   };
 
   const showModal = (): boolean => {
     return (
-      (loginStatus !== null && loginStatus !== LOGIN_RESPONSE.ok)
-      ||
       (createGameStatus !== null && createGameStatus !== CREATE_GAME_STATUS.ok)
     );
   };
@@ -429,7 +384,6 @@ const CreateGame = (props: IProps) => {
         <Modal.Body>
           {createGameErrorStr()}
         </Modal.Body>
-        {renderResetUuidButton()}
       </Modal>
     </React.Fragment>
   );

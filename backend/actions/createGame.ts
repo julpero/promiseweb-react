@@ -44,7 +44,6 @@ export const createGame = async (createGameRequest: IuiCreateGameRequest): Promi
   const response: IuiCreateGameResponse = {
     responseStatus: CREATE_GAME_STATUS.notOk,
     newGameId: "",
-    loginStatus: LOGIN_RESPONSE.ok
   };
 
   const startRound = parseInt(newGameStartRound, 10);
@@ -63,6 +62,7 @@ export const createGame = async (createGameRequest: IuiCreateGameRequest): Promi
 
   const okToCreate = !(await hasOngoingOrCreatedGame(userName));
   if (!okToCreate) {
+    response.responseStatus = CREATE_GAME_STATUS.onGoingGame;
     console.log("hasOngoingOrCreatedGame");
     return response;
   }
