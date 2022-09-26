@@ -537,7 +537,9 @@ connectDB().then(() => {
           };
           io.to(gameId).emit("promise made", promiseNotification);
 
-          const chatLine = `${promiser} promised ${promise} in ${(promiseTime/1000).toFixed(1)} seconds`;
+          const chatLine = (promiseResponse.promise === -1)
+            ? `${promiser} promised in ${(promiseTime/1000).toFixed(1)} seconds`
+            : `${promiser} promised ${promise} in ${(promiseTime/1000).toFixed(1)} seconds`;
           io.to(gameId).emit("new chat line", chatLine);
         }
         const timestamp = Date.now();
