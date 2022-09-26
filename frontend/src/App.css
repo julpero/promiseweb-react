@@ -62,10 +62,14 @@ body {
 
 .playerInfoDiv,
 .trumpCardSlotDiv,
-.ownCardsDiv,
 .myPlayedCardDiv,
 .animatedCardPlayedSlot {
   position: absolute;
+}
+
+.ownCardsDiv {
+  position: absolute;
+  z-index: 9999;
 }
 
 .playerInfoDiv {

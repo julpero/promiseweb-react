@@ -148,7 +148,7 @@ const TableLayout6 = () => {
         styleProps={{bottom: "2%", left: "27%", width: "65%"}}
       />
       <div
-        className="smallMyPlayedCardDiv"
+        className="myPlayedCardDiv"
         style={{
           bottom: "150px",
           left: "50%",

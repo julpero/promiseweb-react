@@ -515,7 +515,7 @@ connectDB().then(() => {
 
     socket.on("make promise", async (makePromiseRequest: IuiMakePromiseRequest, fn: (promiseResponse: IuiMakePromiseResponse) => void) => {
       console.log("make promise", makePromiseRequest);
-      const { gameId, roundInd, token, uuid, userName } = makePromiseRequest;
+      const { gameId, roundInd, token, uuid, userName, promise } = makePromiseRequest;
       const lastTimestamp = csm.getLastTimestamp(userName);
       const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
@@ -526,7 +526,7 @@ connectDB().then(() => {
 
         const promiseResponse: IuiMakePromiseResponse = await makePromise(makePromiseRequest);
         if (promiseResponse.promiseResponse === PROMISE_RESPONSE.evenPromiseNotAllowed) {
-          const chatLine = "You can't promise " + promiseResponse.promise + " because even promises are not allowed!";
+          const chatLine = "You can't promise " + promise + " because even promises are not allowed!";
           socket.emit("new chat line", chatLine);
         } else if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
           const { promiser, promise, promiseTime } = promiseResponse;
