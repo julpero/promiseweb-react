@@ -9,7 +9,10 @@ export type Suite = "hearts" | "spades" | "diamonds" | "clubs" | "dummy";
 export type PromiseValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 export const ANIMATION_TIMES = {
-  collectDelay: 100,
+  collectDelay: 400,
+  collectDuration: 900,
+  playDelay: 300,
+  playDuration: 800,
 };
 
 export enum PLAY_CARD_RESPONSE {

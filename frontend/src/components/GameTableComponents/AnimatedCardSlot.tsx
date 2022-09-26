@@ -10,6 +10,7 @@ import { useSpring, animated, easings } from "react-spring";
 import { cardAsString, randomNegToPos } from "../../common/commonFunctions";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { IuiSpringObject } from "../../interfaces/IuiAnimation";
+import { ANIMATION_TIMES } from "../../interfaces/IuiPlayingGame";
 
 interface IProps {
   containerId: string,
@@ -58,8 +59,8 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
         const fromY = playedTo.top- playedFrom.top;
         const springObject = {
           from: { },
-          config: { duration: 1200, easing: easings.easeOutQuint },
-          delay: 400,
+          config: { duration: ANIMATION_TIMES.collectDuration, easing: easings.easeOutQuint },
+          delay: ANIMATION_TIMES.collectDelay,
           to: [{
             x: fromX,
             y: fromY,
@@ -121,8 +122,8 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
 
         const springObject = {
           from: { x: fromX, y: fromY },
-          config: { duration: 1500, easing: easings.easeOutQuint },
-          delay: 100,
+          config: { duration: ANIMATION_TIMES.playDuration, easing: easings.easeOutQuint },
+          delay: ANIMATION_TIMES.playDelay,
           to: [{
             x: randomNegToPos(2),
             y: randomNegToPos(2),
