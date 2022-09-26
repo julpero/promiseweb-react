@@ -1,6 +1,6 @@
 import { Suite } from "card-games-typescript";
 import { ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
-import { IuiCard } from "../../frontend/src/interfaces/IuiPlayingGame";
+import { ANIMATION_TIMES, IuiCard } from "../../frontend/src/interfaces/IuiPlayingGame";
 import { getPlayerAvgPoints } from "../dbActions/promiseweb";
 import { ICard, ICardPlayed, IGame, IGameOptions, IPlayer, IPlayerInTurn, IPlayerStats, IPromiser, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 import { ICardToIuiCard } from "./model";
@@ -103,6 +103,38 @@ export const getCurrentPromiseTotal = (round: IRound): number => {
 
 export const getCurrentPlayIndex = (round: IRound): number => {
   return round.cardsPlayed.length - 1;
+};
+
+export const getAdditionalTimeToPromise = (roundPlayers: IRoundPlayer[]): number => {
+  let animationTime = 0;
+  if (roundPlayers.filter(player => player.promise !== null)) {
+    animationTime+= ANIMATION_TIMES.playDelay + ANIMATION_TIMES.playDuration + ANIMATION_TIMES.collectDelay + ANIMATION_TIMES.collectDuration;
+  }
+
+  if (animationTime < 0) {
+    console.log("promise too fast animationTime", animationTime);
+    animationTime = 0;
+  }
+
+  // console.log("promise animationTime", animationTime);
+  return animationTime;
+};
+
+export const getCurrentAnimationTime = (round: IRound, playIndex: number): number => {
+  let animationTime = 0;
+
+  if (playIndex === 0 && round.cardsPlayed[playIndex].length === 0) {
+    // first card in round, previous action was the last promise -> no animations
+  } else {
+    // animation time is at least play delay and duration
+    animationTime+= ANIMATION_TIMES.playDelay + ANIMATION_TIMES.playDuration;
+
+    // first card in new hit round, previous action was hit and collecting cards -> add also collect durations
+    if (playIndex > 0 && round.cardsPlayed[playIndex].length === 0) animationTime+= ANIMATION_TIMES.collectDelay + ANIMATION_TIMES.collectDuration;
+  }
+
+  // console.log("card animationTime", animationTime);
+  return animationTime;
 };
 
 const showSpeedPromiseCards = (): boolean => {

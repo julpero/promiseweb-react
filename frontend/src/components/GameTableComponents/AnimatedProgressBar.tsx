@@ -18,7 +18,7 @@ const AnimatedProgressBar = ({pbKey, min, max, initialX, variant, isChild}: IPro
     reverse: flip,
     from: { x: 0 },
     x: initialX,
-    config: config.wobbly,
+    config: config.slow,
     delay: 100,
     onRest: () => setFlip(!flip),
   });

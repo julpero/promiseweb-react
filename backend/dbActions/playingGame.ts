@@ -12,6 +12,8 @@ import {
 import { getRoundPhase } from "../actions/playingGame";
 import {
   countRoundPoints,
+  getAdditionalTimeToPromise,
+  getCurrentAnimationTime,
   getCurrentPlayIndex,
   getCurrentPromiseTotal,
   getCurrentRoundInd,
@@ -103,11 +105,19 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
     } else {
       round.totalPromise+= promise;
     }
-    const promiseTime = Date.now() - gameInDb.game.lastTimeStamp;
-    round.roundPlayers[promiser.index].promiseStarted = gameInDb.game.lastTimeStamp;
-    round.roundPlayers[promiser.index].promiseMade = Date.now();
+
+    const now = Date.now();
+
+    // before first promiser there is animation delay of playing and collecting last play of previous round
+    // technically there is no such animation delay in the very first promiser of the game,
+    // but we can add same time because there is some waiting time when redirecting players to cardboard
+    // and rendering it
+    const animationTime = getAdditionalTimeToPromise(round.roundPlayers);
+    const promiseTime = now - (gameInDb.game.lastTimeStamp + animationTime);
+    round.roundPlayers[promiser.index].promiseStarted = gameInDb.game.lastTimeStamp + animationTime;
+    round.roundPlayers[promiser.index].promiseMade = now;
     // TODO Speed promise points
-    gameInDb.game.lastTimeStamp = Date.now();
+    gameInDb.game.lastTimeStamp = now;
 
     const gameAfter = await gameInDb.save();
     if (gameAfter) {
@@ -185,15 +195,18 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
 
     // All checks made, let's play card
     const myIndexInRound = getPlayerIndexFromRoundByName(round.roundPlayers, userName, originalPlayerName);
-    const playTime = Date.now() - gameInDb.game.lastTimeStamp;
+    const now = Date.now();
+
+    const animationTime = getCurrentAnimationTime(round, playIndex);
+    const playTime = now - (gameInDb.game.lastTimeStamp + animationTime);
     round.cardsPlayed[playIndex].push({
       name: originalPlayerName ?? userName,
       card: IuiCardToICard(card),
-      playedTime: Date.now(),
-      playStarted: gameInDb.game.lastTimeStamp,
+      playedTime: now,
+      playStarted: gameInDb.game.lastTimeStamp + animationTime,
     } as ICardPlayed);
     round.roundPlayers[myIndexInRound].cards.splice(playedCardIndex, 1);
-    gameInDb.game.lastTimeStamp = Date.now();
+    gameInDb.game.lastTimeStamp = now;
 
     response.playedFromSlot = round.cardsInRound - round.cardsPlayed.length; // cardsPlayed array has always at least one element
 
