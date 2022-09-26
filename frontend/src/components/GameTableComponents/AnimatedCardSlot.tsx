@@ -17,12 +17,11 @@ interface IProps {
   classStr?: string,
   animationObject: IuiSpringObject,
   onPlayCard?: () => void,
-  isSmall?: boolean,
   isCardInCharge?: boolean,
   isWinningCard?: boolean,
 }
 
-const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onPlayCard, isSmall, isCardInCharge, isWinningCard}: IProps) => {
+const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onPlayCard, isCardInCharge, isWinningCard}: IProps) => {
   const [child, setChild] = useState<JSX.Element | undefined>(undefined);
   const initialChildren = useRef<JSX.Element | undefined>(children);
   const initialEffect = useRef(true);
@@ -106,7 +105,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
       // this is the slot where card is played to, so it should handle the animation
       // console.log("animateCard, to slot, set children", animateCard);
       const newChildren = animateCard.cardFace;
-      const cardFace = getCardFace(cardAsString(newChildren ?? { rank: "0", suite: "dummy", value: 0 }), CARD_PLAYABLE.played, isSmall);
+      const cardFace = getCardFace(cardAsString(newChildren ?? { rank: "0", suite: "dummy", value: 0 }), CARD_PLAYABLE.played);
       // console.log("animateCard, to slot, new card face", cardFace);
 
       const fromContainerStr = `cardsToPlaySlotsX${animateCard.fromPlayer}X${animateCard.fromSlot}`;
@@ -150,7 +149,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
         setAnimation(springObject);
       }
     }
-  }, [isSmall, animateCard, containerId, dispatch]);
+  }, [animateCard, containerId, dispatch]);
 
   useEffect(() => {
     if (api && animation) {
@@ -173,7 +172,6 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
   } else if (isWinningCard) {
     finalClassStr+= " winningCard";
   }
-  if (isSmall) finalClassStr = finalClassStr.replace("cardCol", "smallCardCol");
 
   return (
     <div onClick={() => handleClick()} id={containerId} className={finalClassStr}>

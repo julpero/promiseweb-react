@@ -22,18 +22,16 @@ const AnimatedPlayedCardSlot = ({index, styleProps}: IProps) => {
 
   const thisIsCardInCharge = roundToPlayer.playerInCharge === player.name && roundToPlayer.cardsPlayed.length > 0;
   const thisIsWinningCard = roundToPlayer.playerGoingToWinThisPlay === player.name;
-  const isSmall = roundToPlayer.players.length === 6 && !player.thisIsMe;
 
   const renderAnimatedCardPlayedSlot = () => {
     const cardPlayedCard = player.cardPlayed ?? undefined;
-    const cardFace = cardPlayedCard ? getCardFace(cardAsString(cardPlayedCard), CARD_PLAYABLE.played, isSmall) : undefined;
+    const cardFace = cardPlayedCard ? getCardFace(cardAsString(cardPlayedCard), CARD_PLAYABLE.played) : undefined;
     // const animationObject = cardFace ? commonAnimationObject() : plainAnimationObject;
     const animationObject = commonAnimationObject();
     return (
       <AnimatedCardSlot
         containerId={`cardPlayedDivX${player.name}`}
         animationObject={animationObject}
-        isSmall={isSmall}
         isCardInCharge={thisIsCardInCharge}
         isWinningCard={thisIsWinningCard}
       >
@@ -42,7 +40,7 @@ const AnimatedPlayedCardSlot = ({index, styleProps}: IProps) => {
     );
   };
 
-  const classStr = isSmall ? "smallAnimatedCardPlayedSlot" : "animatedCardPlayedSlot";
+  const classStr = "animatedCardPlayedSlot";
 
   return (
     <div className={classStr} style={styleProps}>

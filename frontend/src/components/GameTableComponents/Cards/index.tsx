@@ -70,9 +70,9 @@ const playableToClass = (playableStatus: CARD_PLAYABLE): string => {
   }
 };
 
-const getCardFace = (cardStr: string, playableStatus: CARD_PLAYABLE, isSmall?: boolean) => {
+const getCardFace = (cardStr: string, playableStatus: CARD_PLAYABLE) => {
   // console.log(cardStr);
-  const backSideClassStr = isSmall ? "smallBackSide" : "backSide";
+  const backSideClassStr = "backSide";
   switch (cardStr) {
     case "spadesA": return <SpadesAce text="A" title="SpadesAce" playableClass={playableToClass(playableStatus)} suite="spades" />;
     case "spades2": return <SpadesTwo text="2" title="SpadesTwo" playableClass={playableToClass(playableStatus)} suite="spades" />;
