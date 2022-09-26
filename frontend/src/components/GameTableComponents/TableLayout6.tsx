@@ -160,7 +160,6 @@ const TableLayout6 = () => {
           containerId={`cardPlayedDivX${userName}`}
           classStr={classStr}
           animationObject={animationObject}
-          isSmall={true}
           isCardInCharge={iAmStarter && roundToPlayer.cardsPlayed.length > 0}
           isWinningCard={iHaveWinningCard}
         >

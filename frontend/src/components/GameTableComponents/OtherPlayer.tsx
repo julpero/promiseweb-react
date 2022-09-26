@@ -23,10 +23,8 @@ interface IProps {
 const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   if (!currentRoundInfo.gameId) return null;
-  const {roundToPlayer, userName} = currentRoundInfo;
 
   const player: IuiRoundPlayer = playerFromIndex(currentRoundInfo, index);
-  const isSmall = roundToPlayer.players.length === 6 && player.name !== userName;
   console.log("OtherPlayer, player", player);
 
   const renderCardsRow = () => {
@@ -55,7 +53,7 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
     const cols: JSX.Element[] = [];
     for (let i = 0; i < maxCards; i++) {
       if (i + 1 <= player.keeps) {
-        const cardFace = getCardFace("backSide", CARD_PLAYABLE.ok, isSmall);
+        const cardFace = getCardFace("backSide", CARD_PLAYABLE.ok);
         const animationObject = commonAnimationObject();
         cols.push(
           <div
@@ -66,7 +64,6 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
             <AnimatedCardSlot
               containerId={`cardsWonSlotsX${player.name}X${i}`}
               animationObject={animationObject}
-              isSmall={currentRoundInfo.roundToPlayer.players.length === 6}
             >
               {cardFace}
             </AnimatedCardSlot>
@@ -113,7 +110,7 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
       );
     }
   } else {
-    const rowClassName = isSmall ? "smallWonCardsRow" : "wonCardsRow";
+    const rowClassName = "wonCardsRow";
     return (
       <div className="playerInfoDiv" style={styleProps}>
         <PlayerInfo index={index} />

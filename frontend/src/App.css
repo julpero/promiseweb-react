@@ -1,6 +1,4 @@
 #root {
-  --small-container-height: 98px;
-  --small-container-width: 77px;
   --normal-container-height: 112px;
   --normal-container-width: 88px;
 }
@@ -66,9 +64,7 @@ body {
 .trumpCardSlotDiv,
 .ownCardsDiv,
 .myPlayedCardDiv,
-.animatedCardPlayedSlot,
-.smallMyPlayedCardDiv,
-.smallAnimatedCardPlayedSlot {
+.animatedCardPlayedSlot {
   position: absolute;
 }
 
@@ -80,18 +76,11 @@ body {
   height: var(--normal-container-height);
   width: var(--normal-container-width);
 }
-.smallMyPlayedCardDiv, .smallAnimatedCardPlayedSlot {
-  height: var(--small-container-height);
-  width: var(--small-container-width);
-}
 .animatedCardPlayedSlot.cardTop:hover {
   z-index: 9999;
 }
 .wonCardsRow {
   height: var(--normal-container-height);
-}
-.smallWonCardsRow {
-  height: var(--small-container-height);
 }
 
 .winningCard {
@@ -161,11 +150,6 @@ body {
   height: var(--normal-container-height);
   width: 100%;
 }
-.smallCardsRow {
-  margin: 5px 0px;
-  height: var(--small-container-height);
-  width: 100%;
-}
 .ownPlayedCardRow {
   margin: 5px 0px;
 }
@@ -203,11 +187,6 @@ body {
   width: var(--normal-container-width);
   padding: 0px;
 }
-.smallCardCol {
-  height: var(--small-container-height);
-  width: var(--small-container-width);
-  padding: 0px;
-}
 .stackedCards {
   position: absolute;
   left: 50%;
@@ -240,26 +219,11 @@ body {
   width: var(--normal-container-width);
   position: absolute;
 }
-.smallCardWonCol {
-  padding-left: 1px;
-  padding-right: 1px;
-  height: var(--small-container-height);
-  width: var(--small-container-width);
-  position: absolute;
-}
 .backSide {
   background-color: white;
   border: black 1px solid;
   max-height: var(--normal-container-height);
   max-width: var(--normal-container-width);
-  border-radius: 5%;
-  position: absolute;
-}
-.smallBackSide {
-  background-color: white;
-  border: black 1px solid;
-  max-height: var(--small-container-height);
-  max-width: var(--small-container-width);
   border-radius: 5%;
   position: absolute;
 }
