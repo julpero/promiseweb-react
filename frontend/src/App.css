@@ -35,16 +35,19 @@ body {
 #scoretableArea {
   grid-area: scoretable;
   position: relative;
+  z-index: -1;
 }
 
 #promisetableArea {
   grid-area: promisetable;
   position: relative;
+  z-index: -1;
 }
 
 #chatArea {
   grid-area: chat;
   position: relative;
+  z-index: -1;
 }
 
 #menuArea {
