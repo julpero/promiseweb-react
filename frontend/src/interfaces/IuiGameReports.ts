@@ -27,7 +27,7 @@ export interface IuiPlayedGamesReport extends IuiAuth {
   // avgKeepsPerPlayer: null, this is obsolete
   // vanillaGamesCount: number,
   // usedRulesCount: null,
-  // playerCount: null,
+  playerCount: number,
   // meltingGame: null,
   // spurtingGame: null,
   // cardsInHandCount: null,

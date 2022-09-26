@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
-import { IuiGamesByPlayer, IuiPlayedGamesReport } from "../../frontend/src/interfaces/IuiGameReports";
+import { IuiGamesByPlayer, IuiPlayedGamesReport, IuiPlayersInGameReport } from "../../frontend/src/interfaces/IuiGameReports";
 import { IuiGameReport } from "../../frontend/src/interfaces/IuiReports";
 import { getGameReport } from "../common/reportFunctions";
 import GameOptions from "../models/GameOptions";
@@ -8,16 +8,20 @@ import GameOptions from "../models/GameOptions";
 export const reportData = async (): Promise<IuiPlayedGamesReport> => {
   const gamesPlayed = await GameOptions.countDocuments({
     gameStatus: { $eq: GAME_STATUS.played },
+    thisIsDemoGame: {$in: [null, false]},
   });
 
-  const roundsAndCards = await GameOptions.aggregate([
+  interface roundsAndCardsAgg {_id: string, roundsPlayed: number, totalCardsHit: number, playerCount: number}
+  const roundsAndCards = await GameOptions.aggregate<roundsAndCardsAgg>([
     {$match: {
       gameStatus: {$eq: GAME_STATUS.played},
+      thisIsDemoGame: {$in: [null, false]},
     }},
     {$group: {
       _id: null,
       roundsPlayed: {$sum: "$gameStatistics.roundsPlayed"},
       totalCardsHit: {$sum: "$gameStatistics.cardsHit"},
+      playerCount: {$sum: "$humanPlayersCount"},
     }}
   ]);
 
@@ -27,7 +31,8 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
   interface playersAgg {_id: string, count: number, totalPoints: number, wins: number, avgScorePoints: number, avgPercentagePoints: number}
   const players = await GameOptions.aggregate<playersAgg>([
     {$match: {
-      "gameStatus": {$eq: GAME_STATUS.played}
+      "gameStatus": {$eq: GAME_STATUS.played},
+      "thisIsDemoGame": {$in: [null, false]},
     }},
     {$unwind: {
       path: "$gameStatistics.playersStatistics",
@@ -67,6 +72,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
     {$match: {
       "gameStatus": { $eq: GAME_STATUS.played},
       "gameStatistics.roundsPlayed": {$eq: 19},
+      "thisIsDemoGame": {$in: [null, false]},
     }},
     {$unwind: {
       path: "$gameStatistics.playersStatistics",
@@ -91,6 +97,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
       "gameStatus": {$eq: GAME_STATUS.played},
       "gameStatistics.roundsPlayed": {$gte: 0},
       "gameStatistics.playersStatistics.totalKeeps": {$gte: 0},
+      "thisIsDemoGame": {$in: [null, false]},
     }},
     {$addFields: {
       "gameStatistics.playersStatistics.roundsPlayed": "$gameStatistics.roundsPlayed"
@@ -116,11 +123,32 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
     }
   });
 
+  // player count in games
+  const playersTotalArr: IuiPlayersInGameReport[] = [];
+  interface playersTotalAgg {_id: number, playersTotal: number}
+  const playersTotal = await GameOptions.aggregate<playersTotalAgg>([
+    {$match: {
+      "gameStatus": {$eq: GAME_STATUS.played},
+      "thisIsDemoGame": {$in: [null, false]},
+    }},
+    {$group: {
+      _id: "$humanPlayersCount",
+      playersTotal: {$sum: 1}
+    }},
+  ]);
+  playersTotal.forEach(total => {
+    playersTotalArr.push({
+      playersInGame: total._id,
+      count: total.playersTotal,
+    } as IuiPlayersInGameReport);
+  });
+
   const reportDataObj: IuiPlayedGamesReport = {
     gamesPlayed: gamesPlayed,
-    playersTotal: [],
+    playersTotal: playersTotalArr,
     totalCardsHit: roundsAndCards[0]?.totalCardsHit ?? 0,
     roundsPlayed: roundsAndCards[0]?.roundsPlayed ?? 0,
+    playerCount: roundsAndCards[0]?.playerCount ?? 0,
     gamesByPlayer: Array.from(playerReport.values()),
   };
 

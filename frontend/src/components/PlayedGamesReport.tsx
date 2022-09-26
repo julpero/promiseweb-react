@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../store/userSlice";
 import { IuiUserData } from "../interfaces/IuiUser";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
+import PlayedGamesByPlayerCount from "./ReportComponents/PlayedGamesByPlayerCount";
 
 const PlayedGamesReport = () => {
   console.log("PlayedGamesReport");
@@ -185,14 +186,13 @@ const PlayedGamesReport = () => {
   ];
 
   useEffect(() => {
-    console.log("PlayedGamesReport A");
+    // console.log("PlayedGamesReport A");
     if (user.isUserLoggedIn) {
       const request: IuiUserData = {
         uuid: getMyId(),
         userName: user.userName,
         token: getToken(),
       };
-      console.log("A", request);
       socket.emit("get report data", request, (reportData: IuiPlayedGamesReport) => {
         console.log("report data", reportData);
         if (reportData.isAuthenticated) {
@@ -207,6 +207,9 @@ const PlayedGamesReport = () => {
 
   return (
     <div>
+      <hr />
+      <p>Total of {reportData?.gamesPlayed} games and {reportData?.roundsPlayed} rounds played so far...</p>
+      <p>... and there were {reportData?.playerCount} players in those games and they hit {reportData?.totalCardsHit} cards while playing.</p>
       <ReactTabulator
         columns={columns}
         data={reportData?.gamesByPlayer ?? []}
@@ -217,6 +220,7 @@ const PlayedGamesReport = () => {
           layout: "fitColumns",
         }}
       />
+      <PlayedGamesByPlayerCount gameReportData={reportData?.playersTotal} max={reportData?.gamesPlayed ?? 0} />
     </div>
   );
 };
