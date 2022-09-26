@@ -10,6 +10,8 @@ import SelectInput from "./FormComponents/SelectInput";
 import TextInput from "./FormComponents/TextInput";
 import CheckboxInput from "./FormComponents/CheckBoxInput";
 
+import ReactTooltip from "react-tooltip";
+
 import { IuiNewGameForm, initialNewGameValues, IuiCreateGameRequest, IuiCreateGameResponse, CREATE_GAME_STATUS } from "../interfaces/IuiNewGame";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../store/userSlice";
@@ -86,6 +88,27 @@ const CreateGame = (props: IProps) => {
     return (
       (createGameStatus !== null && createGameStatus !== CREATE_GAME_STATUS.ok)
     );
+  };
+
+  const renderRuleTooltip = (rule: string) => {
+    switch (rule) {
+      case "noEvenPromises": {
+        return (
+          <div>Sum of round promises must be different than card count of players.</div>
+        );
+      }
+      case "hidePromiseRound": {
+        return (
+          <div>Promises of the other players are visible only after all promises are made.</div>
+        );
+      }
+      case "thisIsDemoGame": {
+        return (
+          <div>This game won&apos;t affect stats.</div>
+        );
+      }
+    }
+    return null;
   };
 
   return (
@@ -183,6 +206,8 @@ const CreateGame = (props: IProps) => {
                         onChange={(checked: boolean) => {
                           form.change("noEvenPromises", checked);
                         }}
+                        data-for="ruleInfoTooltip"
+                        data-tip="noEvenPromises"
                       />
                     </div>
                     <div className="col">
@@ -195,6 +220,8 @@ const CreateGame = (props: IProps) => {
                         onChange={(checked: boolean) => {
                           form.change("hidePromiseRound", checked);
                         }}
+                        data-for="ruleInfoTooltip"
+                        data-tip="hidePromiseRound"
                       />
                     </div>
                   </div>
@@ -319,6 +346,8 @@ const CreateGame = (props: IProps) => {
                         onChange={(checked: boolean) => {
                           form.change("thisIsDemoGame", checked);
                         }}
+                        data-for="ruleInfoTooltip"
+                        data-tip="thisIsDemoGame"
                       />
                     </div>
                   </div>
@@ -357,6 +386,7 @@ const CreateGame = (props: IProps) => {
           {createGameErrorStr()}
         </Modal.Body>
       </Modal>
+      <ReactTooltip place="bottom" id="ruleInfoTooltip" getContent={(dataTip) => renderRuleTooltip(dataTip)} />
     </React.Fragment>
   );
 };
