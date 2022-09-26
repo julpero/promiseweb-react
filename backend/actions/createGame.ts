@@ -3,7 +3,6 @@ import { getPlayerStats } from "../common/common";
 import { IGameOptions} from "../interfaces/IGameOptions";
 import { IuiCreateGameRequest, IuiCreateGameResponse, CREATE_GAME_STATUS } from "../../frontend/src/interfaces/IuiNewGame";
 import { GAME_STATUS, HIDDEN_CARDS_MODE } from "../../frontend/src/interfaces/IuiGameOptions";
-import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
 
 const hiddenCardsModeToEnum = (selected: string): HIDDEN_CARDS_MODE => {
   switch (selected) {

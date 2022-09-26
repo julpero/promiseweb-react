@@ -1,4 +1,4 @@
-import { IuiAuth, IuiUserData, LOGIN_RESPONSE } from "./IuiUser";
+import { IuiAuth, IuiUserData } from "./IuiUser";
 
 export interface IuiNewGameForm {
   newGameHumanPlayersCount: string;
