@@ -107,8 +107,7 @@ const getPromisesByPlayers = (gameInDb: IGameOptions): IuiPlayerPromise[][] => {
     for (let j = 0; j < game.rounds.length; j++) {
       const roundPlayer = game.rounds[j].roundPlayers[i];
       playerPromises.push({
-        // TODO promise: showPromisesNow('player', thisGame, j) ? game.rounds[j].roundPlayers[i].promise : null,
-        promise: roundPlayer.promise,
+        promise: !isRuleActive(gameInDb, RULE.hiddenPromiseRound) || game.rounds[j].roundPlayers.every(player => player.promise !== null) ? roundPlayer.promise : null,
         keep: roundPlayer.keeps,
         points: roundPlayer.points,
         speedPromisePoints: roundPlayer.speedPromisePoints,
@@ -128,7 +127,7 @@ const getPromiseTable = (gameInDb: IGameOptions): IuiPromiseTable => {
     rounds: game.rounds.map(round => {
       return {
         cardsInRound: round.cardsInRound,
-        totalPromise: round.totalPromise, // TODO showPromisesNow('total', thisGame, j)
+        totalPromise: !isRuleActive(gameInDb, RULE.hiddenPromiseRound) || round.roundPlayers.every(player => player.promise !== null) ? round.totalPromise : null,
       } as IuiRoundTotalPromise;
     }),
   } as IuiPromiseTable;
@@ -181,6 +180,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, o
   const playerInCharge = gameIsPlayed ? "" : starterOfThisPlay(round, playIndex);
   const cardInCharge = getCurrentCardInCharge(round.cardsPlayed);
   const myPlayedCard = round.cardsPlayed[playIndex].find(playedCard => playedCard.name === name || playedCard.name === originalPlayerName)?.card;
+  const roundPhase = getRoundPhase(round);
 
   return {
     cardsInRound: round.cardsInRound,
@@ -188,7 +188,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, o
     starterPositionIndex: round.starterPositionIndex,
     myCards: myCards, // TODO speed promise
     playableCards: isNowMyTurn ? getPlayableCardIndexes(myCards, round, playIndex) : [],
-    players: getRoundPlayers(name, round, playIndex, !isRuleActive(gameInDb, RULE.hiddenPromiseRound), originalPlayerName), // TODO showPromisesNow
+    players: getRoundPlayers(name, round, playIndex, !isRuleActive(gameInDb, RULE.hiddenPromiseRound) || roundPhase === ROUND_PHASE.onPlay, originalPlayerName), // TODO showPromisesNow
     trumpCard: ICardToIuiCard(round.trumpCard), // TODO hidden trump mode
     myPlayedCard: myPlayedCard ? ICardToIuiCard(myPlayedCard) : null,
     playerInCharge: playerInCharge,
@@ -202,7 +202,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, o
     handValues: null, // TODO getHandValues(thisGame, roundInd),
     obsGame: null, // TODO obsGameToRoundObj
     promiseTable: getPromiseTable(gameInDb),
-    roundPhase: getRoundPhase(round),
+    roundPhase: roundPhase,
   } as IuiRoundToPlayer;
 };
 

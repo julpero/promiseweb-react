@@ -54,7 +54,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
   const { gameId, userName, roundInd, promise } = makePromiseRequest;
   const promiseResponse: IuiMakePromiseResponse = {
     promiseResponse: PROMISE_RESPONSE.unknownError,
-    promise: promise,
+    promise: -1,
     promiser: "",
     promiseTime: -1,
   };
@@ -121,6 +121,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
 
     const gameAfter = await gameInDb.save();
     if (gameAfter) {
+      if (!isRuleActive(gameAfter, RULE.hiddenPromiseRound)) promiseResponse.promise = promise;
       promiseResponse.promiseResponse = PROMISE_RESPONSE.promiseOk;
       promiseResponse.promiser = promiser.name;
       promiseResponse.promiseTime = promiseTime;
