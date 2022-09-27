@@ -5,6 +5,8 @@ import { Server, Socket } from "socket.io";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
+import rateLimit from "express-rate-limit";
+
 import connectDB from "./backend/config/db";
 import { ClientToServerEvents, ServerToClientEvents } from "./frontend/src/socket/ISocket";
 import * as csm from "./backend/socket/clientSocketMapper";
@@ -39,8 +41,16 @@ const app: Application = express();
 const server = http.createServer(app);
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server);
 
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // one minute
+  max: 15, // limit each IP to max requests in window (here one minute)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
 app.use(cors());
 app.use(express.json());
+app.use(limiter);
 
 // app.use("/", express.static(path.join(__dirname, "/build")));
 // app.use(express.static(path.join(__dirname, "../build")));
