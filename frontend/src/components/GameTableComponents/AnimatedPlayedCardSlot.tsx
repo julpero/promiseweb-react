@@ -18,7 +18,7 @@ const AnimatedPlayedCardSlot = ({index, styleProps}: IProps) => {
   if (!currentRoundInfo.gameId) return null;
   const { roundToPlayer } = currentRoundInfo;
   const player: IuiRoundPlayer = playerFromIndex(currentRoundInfo, index);
-  console.log("AnimatedPlayedCardSlot, player", player);
+  // console.log("AnimatedPlayedCardSlot, player", player);
 
   const thisIsCardInCharge = roundToPlayer.playerInCharge === player.name && roundToPlayer.cardsPlayed.length > 0;
   const thisIsWinningCard = roundToPlayer.playerGoingToWinThisPlay === player.name;

@@ -14,7 +14,7 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
     return JOIN_LEAVE_RESULT.notOk;
   }
   const gameInDb = await GameOptions.findById(gameIdStr);
-  console.log("gameInDb", gameInDb);
+  // console.log("gameInDb", gameInDb);
   if (!gameInDb) return JOIN_LEAVE_RESULT.notOk;
 
   if (gameInDb.password) {
@@ -24,17 +24,17 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
   }
 
   if (gameInDb.gameStatus !== GAME_STATUS.created) {
-    console.log("wrong game status", gameInDb.gameStatus);
+    console.warn("wrong game status", gameInDb.gameStatus);
     return JOIN_LEAVE_RESULT.notOk;
   }
 
   if (gameInDb.humanPlayers.length === gameInDb.humanPlayersCount) {
-    console.log("wrong human players length", gameInDb.humanPlayers.length, gameInDb.humanPlayersCount);
+    console.warn("wrong human players length", gameInDb.humanPlayers.length, gameInDb.humanPlayersCount);
     return JOIN_LEAVE_RESULT.notOk;
   }
 
   if (gameInDb.humanPlayers.find(player => player.name === joinGameRequest.userName) !== undefined) {
-    console.log("player name is already in game", joinGameRequest.userName);
+    console.warn("player name is already in game", joinGameRequest.userName);
     return JOIN_LEAVE_RESULT.notOk;
   }
 
@@ -53,7 +53,7 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
     console.log("start game!");
     gameStartOk = startGame(gameInDb);
     if (gameStartOk) {
-      console.log("started game", gameInDb);
+      console.log("started game");
     }
   }
 
@@ -73,16 +73,16 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
     return JOIN_LEAVE_RESULT.notOk;
   }
   const game = await GameOptions.findById(gameIdStr);
-  console.log("game", game);
+  // console.log("game", game);
   if (!game) return JOIN_LEAVE_RESULT.notOk;
 
   if (game.gameStatus !== GAME_STATUS.created) {
-    console.log("wrong game status", game.gameStatus);
+    console.warn("wrong game status", game.gameStatus);
     return JOIN_LEAVE_RESULT.notOk;
   }
 
   if (!game.humanPlayers.find(player => player.name === leaveGameRequest.userName)) {
-    console.log("player name is not in game", leaveGameRequest.userName);
+    console.warn("player name is not in game", leaveGameRequest.userName);
     return JOIN_LEAVE_RESULT.notOk;
   }
 

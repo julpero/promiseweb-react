@@ -100,7 +100,7 @@ const HomeScreen = ({onJoin}: IProps) => {
       email: email,
     };
     socket.emit("user login", loginRequest, (loginResponse: IuiLoginResponse) => {
-      console.log("user login, response", loginResponse);
+      // console.log("user login, response", loginResponse);
       if (loginResponse.loginStatus === LOGIN_RESPONSE.ok && loginResponse.isAuthenticated) {
         handleAuthenticatedRequest(loginResponse.token);
         dispatch(setUserLoggedIn({loggedIn: true, name: loginRequest.userName}));
@@ -126,7 +126,7 @@ const HomeScreen = ({onJoin}: IProps) => {
   };
 
   const logOutUser = () => {
-    console.log("user want's to log out");
+    // console.log("user want's to log out");
     window.localStorage.removeItem("token");
     dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
   };
@@ -140,7 +140,7 @@ const HomeScreen = ({onJoin}: IProps) => {
         password1: password,
       };
       socket.emit("admin login", loginRequest, (loginResponse: IuiLoginResponse) => {
-        console.log("loginResponse", loginResponse);
+        // console.log("loginResponse", loginResponse);
         if (loginResponse.isAuthenticated) {
           handleAuthenticatedRequest(loginResponse.token);
           if (loginResponse.loginStatus === LOGIN_RESPONSE.ok) {

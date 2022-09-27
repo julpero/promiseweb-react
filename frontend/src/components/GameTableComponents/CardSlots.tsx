@@ -25,7 +25,7 @@ interface IProps {
 const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
   const currentRoundInfo: IuiGetRoundResponse = useSelector(getCurrentRoundInfo);
   const dispatch = useDispatch();
-  console.log("CardSlots");
+  // console.log("CardSlots");
 
   if (!currentRoundInfo.gameId) return null;
 
@@ -50,7 +50,7 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
 
   const playCard = (card: IuiCard | null): void => {
     if (card) {
-      console.log("play card (reducer)", card);
+      // console.log("play card (reducer)", card);
       dispatch(setPlayedCard(card));
       dispatch(setActionsAvailable(false));
     }

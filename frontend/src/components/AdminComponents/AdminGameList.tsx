@@ -13,7 +13,7 @@ interface IProps {
 }
 
 const AdminGameList = ({userName}: IProps) => {
-  console.log("AdminGameList");
+  // console.log("AdminGameList");
   const adminLoggedIn = useSelector(isAdminLoggedIn);
   const adminGameList = useSelector(getAdminGameList);
   const [buttonsActive, setButtonsActive] = useState(true);
@@ -33,7 +33,7 @@ const AdminGameList = ({userName}: IProps) => {
       token: getToken(),
     };
     socket.emit("get games for admin", getGamesRequest, (getGamesResponse: IuiGetGamesResponse) => {
-      console.log(getGamesResponse);
+      // console.log(getGamesResponse);
       if (getGamesResponse.isAuthenticated) {
         handleAuthenticatedRequest(getGamesResponse.token);
         dispatch(setAdminGameList(getGamesResponse.gameList));
@@ -74,7 +74,7 @@ const AdminGameList = ({userName}: IProps) => {
       gameId: gameId,
     };
     socket.emit("re-create game statistics", reCreateGameStatisticsRequest, (getGamesResponse: IuiGetGamesResponse) => {
-      console.log(getGamesResponse);
+      // console.log(getGamesResponse);
       if (getGamesResponse.isAuthenticated) {
         handleAuthenticatedRequest(getGamesResponse.token);
         dispatch(setAdminGameList(getGamesResponse.gameList));

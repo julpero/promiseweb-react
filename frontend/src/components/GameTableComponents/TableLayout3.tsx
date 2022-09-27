@@ -14,7 +14,7 @@ import AnimatedPlayedCardSlot from "./AnimatedPlayedCardSlot";
 import { CARD_ALIGN_TYPE } from "../../interfaces/IuiPlayingGame";
 
 const TableLayout3 = () => {
-  console.log("TableLayout3");
+  // console.log("TableLayout3");
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   if (!currentRoundInfo || !currentRoundInfo.gameId) return null;
   const { roundToPlayer, userName } = currentRoundInfo;

@@ -21,7 +21,7 @@ export const hasOngoingOrCreatedGame = async (playerName: string): Promise<boole
     gameStatus: { $lte: GAME_STATUS.onGoing },
     $or: [{"humanPlayers.name": { $eq: playerName }},{"humanPlayers.playedBy": { $eq: playerName }}],
   });
-  console.log("onGoingOrCreatedGameCount", onGoingOrCreatedGameCount);
+  // console.log("onGoingOrCreatedGameCount", onGoingOrCreatedGameCount);
   return onGoingOrCreatedGameCount > 0;
 };
 
@@ -46,7 +46,7 @@ export const getLastGameByStatus = async (playerName: string, status: GAME_STATU
     }
     return null;
   } catch (error: unknown) {
-    console.log(error);
+    console.warn(error);
     return null;
   }
 };
@@ -67,10 +67,10 @@ export const getPlayerAvgPoints = async (playerName: string, startRound: number,
       }
     }
   ]);
-  console.log("getPlayerAvgPoints gamesInDb", gamesInDb);
+  // console.log("getPlayerAvgPoints gamesInDb", gamesInDb);
 
   gamesInDb.forEach((gameInDb) => {
-    const playerStats = gameInDb.gameStatistics.playersStatistics.find(playerStatistics => playerStatistics.playerName === playerName);
+    const playerStats = gameInDb.gameStatistics?.playersStatistics.find(playerStatistics => playerStatistics.playerName === playerName);
     if (playerStats) {
       const cumulativePoints = playerStats.cumulativePointsPerRound;
       for (let i = 0; i < cumulativePoints.length; i++) {

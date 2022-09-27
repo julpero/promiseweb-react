@@ -35,7 +35,7 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
         token: getToken(),
       };
       socket.emit("get on going games", gameListRequest, (gameList: IuiGetGameListResponse) => {
-        console.log("on going gameList", gameList);
+        // console.log("on going gameList", gameList);
         if (gameList.isAuthenticated) {
           handleAuthenticatedRequest(gameList.token);
           setGameItemList(gameList.games);
@@ -79,7 +79,7 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
     }
     setPlayerName(playAsPlayer);
     socket.emit("join ongoing game", joinGameRequest, (joinResponse: IuiJoinOngoingGameResponse) => {
-      console.log("join response", joinResponse);
+      // console.log("join response", joinResponse);
       if (joinResponse.isAuthenticated) {
         handleAuthenticatedRequest(joinResponse.token);
         if (joinResponse.joinStatus === JOIN_GAME_STATUS.ok) {
@@ -108,7 +108,7 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
       token: getToken(),
     };
     socket.emit("cancel my join request", cancelRequest, (simpleResponse) => {
-      console.log("cancelled my join request", simpleResponse);
+      // console.log("cancelled my join request", simpleResponse);
       if (simpleResponse.isAuthenticated) {
         handleAuthenticatedRequest(simpleResponse.token);
         fetchGameItemList();

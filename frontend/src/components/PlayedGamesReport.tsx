@@ -12,7 +12,7 @@ import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../com
 import PlayedGamesByPlayerCount from "./ReportComponents/PlayedGamesByPlayerCount";
 
 const PlayedGamesReport = () => {
-  console.log("PlayedGamesReport");
+  // console.log("PlayedGamesReport");
   const [reportData, setReportData] = useState<IuiPlayedGamesReport>();
   const user = useSelector(getUser);
 
@@ -194,7 +194,7 @@ const PlayedGamesReport = () => {
         token: getToken(),
       };
       socket.emit("get report data", request, (reportData: IuiPlayedGamesReport) => {
-        console.log("report data", reportData);
+        // console.log("report data", reportData);
         if (reportData.isAuthenticated) {
           handleAuthenticatedRequest(reportData.token);
           setReportData(reportData);

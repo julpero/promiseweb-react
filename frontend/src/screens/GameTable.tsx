@@ -13,7 +13,7 @@ interface IProps {
 }
 
 const GameTable = ({gameId}: IProps) => {
-  console.log("GameTable");
+  // console.log("GameTable");
 
   return (
     <div id="gameTableContainer">

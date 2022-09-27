@@ -29,7 +29,7 @@ export interface IGameOptions {
   hiddenCardsMode: HIDDEN_CARDS_MODE,
   game: IGame,
   gameStarted: Date,
-  gameStatistics: IGameStatistics,
+  gameStatistics?: IGameStatistics,
   oldId?: string,
 }
 

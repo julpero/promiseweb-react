@@ -15,7 +15,7 @@ export const getRoundInfoSlice = createSlice({
   initialState,
   reducers: {
     setGetRoundInfo: (state, action: PayloadAction<IuiGetRoundRequest | null>) => {
-      console.log("STORE setGetRoundInfo", action);
+      // console.log("STORE setGetRoundInfo", action);
       state.value = action.payload;
     }
   }

@@ -21,19 +21,15 @@ export const getCurrentRoundInd = (game: IGame): number => {
   return game.rounds.find(round => round.roundStatus === ROUND_STATUS.onGoing)?.roundIndex ?? -1;
 };
 
-const getCurrentPlayInd = (round: IRound): number => {
-  return round.cardsPlayed.length - 1;
-};
-
 export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
   const {roundPlayers, cardsPlayed, starterPositionIndex, trumpCard} = round;
-  const currentPlayInd = getCurrentPlayInd(round);
+  const currentPlayInd = getCurrentPlayIndex(round);
   const playerCount = roundPlayers.length;
-  console.log("getPlayerInTurn currentPlayInd", currentPlayInd);
+  // console.log("getPlayerInTurn currentPlayInd", currentPlayInd);
 
   if (currentPlayInd === 0 && cardsPlayed[0].length === 0) {
     // first card of the round -> starter
-    console.log("getPlayerInTurn starter");
+    // console.log("getPlayerInTurn starter");
     return {
       name: roundPlayers[starterPositionIndex].name,
       type: roundPlayers[starterPositionIndex].type,
@@ -41,7 +37,7 @@ export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
     } as IPlayerInTurn;
   } else if (cardsPlayed[currentPlayInd].length < playerCount && cardsPlayed[currentPlayInd].length > 0) {
     // all players haven't hit the card -> next player who hasn't hit the card
-    console.log("getPlayerInTurn in play");
+    // console.log("getPlayerInTurn in play");
     let starterIndex = starterPositionIndex;
     if (currentPlayInd !== 0) {
       // starter was last play winner
@@ -59,7 +55,7 @@ export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
     } as IPlayerInTurn;
   } else {
     // play is complete, take winner of the previous play
-    console.log("getPlayerInTurn play complete");
+    // console.log("getPlayerInTurn play complete");
     const prevWinner = winnerOfPlay(cardsPlayed[currentPlayInd-1], trumpCard.suite);
     if (prevWinner) {
       const winnerIndex = roundPlayers.findIndex(player => player.name === prevWinner.name);

@@ -46,11 +46,11 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
 
   useEffect(() => {
     if (collectCards && containerId.startsWith("cardPlayedDivX")) {
-      console.log("collectCards", collectCards);
+      // console.log("collectCards", collectCards);
       const fromContainer = document.getElementById(containerId);
       const toContainer = document.getElementById(`cardsWonSlotsX${collectCards.winner}X${collectCards.winCount-1}`);
       if (fromContainer && toContainer) {
-        console.log(fromContainer.classList);
+        // console.log(fromContainer.classList);
         const playedFrom = fromContainer.getBoundingClientRect();
         const playedTo = toContainer.getBoundingClientRect();
         // console.log("collect from", playedFrom);
@@ -66,7 +66,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
             y: fromY,
             rotate: randomNegToPos(5),
             onStart: () => {
-              console.log("started to animate");
+              // console.log("started to animate");
               fromContainer.classList.remove("winningCard");
               fromContainer.classList.remove("cardInCharge");
             },
@@ -78,7 +78,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
               }
               setAnimation(null);
               setChild(undefined);
-              console.log("onRest");
+              // console.log("onRest");
             }
           }],
         } as IuiSpringObject;
@@ -129,7 +129,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
             y: randomNegToPos(2),
             rotate: randomNegToPos(5),
             onStart: () => {
-              console.log("started to animate");
+              // console.log("started to animate");
               setChild(cardFace);
               dispatch(setEmptySlot(fromContainerStr));
             },
@@ -142,7 +142,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
                 dispatch(setCollectCards(animateCard.collectCards));
               }
               setAnimation(null);
-              console.log("onRest");
+              // console.log("onRest");
             }
           }],
         } as IuiSpringObject;
@@ -154,7 +154,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
 
   useEffect(() => {
     if (api && animation) {
-      console.log("animating", animation);
+      // console.log("animating", animation);
       api.update(animation);
       api.start();
     }

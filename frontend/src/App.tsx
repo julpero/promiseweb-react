@@ -41,17 +41,17 @@ const App = () => {
 
   useEffect(() => {
     if (window.localStorage.getItem("uUID")) {
-      console.log("has uUid:", window.localStorage.getItem("uUID"));
+      // console.log("has uUid:", window.localStorage.getItem("uUID"));
     } else {
       const uuid = uuidv4();
-      console.log("uUID set: ", uuid);
+      // console.log("uUID set: ", uuid);
       window.localStorage.setItem("uUID", uuid);
     }
 
     if (window.localStorage.getItem("token")) {
-      console.log("has token:", window.localStorage.getItem("token"));
+      // console.log("has token:", window.localStorage.getItem("token"));
     } else {
-      console.log("no token");
+      // console.log("no token");
       dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
     }
 
@@ -82,7 +82,7 @@ const App = () => {
     }
 
     socket.on("game begins", (gameId: string) => {
-      console.log("game begins call");
+      // console.log("game begins call");
       if (gameId !== "" && user.isUserLoggedIn) {
         setGameStatus(CHECK_GAME_STATUS.onGoingGame);
         dispatch(setGameId(gameId));
@@ -105,7 +105,7 @@ const App = () => {
     }
   };
 
-  console.log("render app...");
+  // console.log("render app...");
 
   if (gameStatus === CHECK_GAME_STATUS.onGoingGame && gameId !== "" && user.isUserLoggedIn) {
     return <GameTable gameId={gameId ?? ""} />;

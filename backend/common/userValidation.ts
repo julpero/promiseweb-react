@@ -67,7 +67,7 @@ export const isUserAuthenticated = (token: string | string[] | undefined, userNa
   if (parsedToken) {
     const timeStampOk = (timestamp ?? 0) + ALLOWED_INTERVAL > Date.now();
     const authenticationOk = (parsedToken.userName === userName && parsedToken.uuid === uuid && timeStampOk);
-    console.log("authenticationOk", authenticationOk);
+    // console.log("authenticationOk", authenticationOk);
     return authenticationOk;
   } else {
     return false;

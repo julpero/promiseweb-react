@@ -19,7 +19,7 @@ const CardBoard = () => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const dispatch = useDispatch();
   if (!currentGameInfo || !currentRoundInfo) return null;
-  console.log("CardBoard");
+  // console.log("CardBoard");
 
   const closeReportModal = () => {
     dispatch(setGameId(""));

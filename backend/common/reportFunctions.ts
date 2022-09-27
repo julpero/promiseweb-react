@@ -49,6 +49,8 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
     roundType: "",
   };
 
+  if (!gameStats) return retObj;
+
   const players: string[] = [];
   const roundsArr: number[] = [];
   const pointsBigArr: number[] = [];
