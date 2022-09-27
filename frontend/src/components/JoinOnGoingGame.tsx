@@ -3,7 +3,7 @@ import { Button, Modal, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 import { IuiGameListItem, IuiGetGameListResponse } from "../interfaces/IuiGameList";
-import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse, JOIN_GAME_STATUS } from "../interfaces/IuiJoinOngoingGame";
+import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiObserveGameRequest, IuiObserveGameResponse, JOIN_GAME_STATUS, OBSERVE_RESPONSE } from "../interfaces/IuiJoinOngoingGame";
 import { IuiUserData } from "../interfaces/IuiUser";
 import { useSocket } from "../socket";
 import { getUser } from "../store/userSlice";
@@ -17,6 +17,7 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
   const [ joinOk, setJoinOk ] = useState(false);
   const [ showRejection, setShowRejection ] = useState(false);
   const [ showWaiting, setShowWaiting ] = useState(false);
+  const [ showObserveWaiting, setShowObserveWaiting ] = useState(false);
   const [ showError, setShowError ] = useState(false);
   const [ playerName, setPlayerName ] = useState("");
   const [ gameItemList, setGameItemList ] = useState<IuiGameListItem[]>([]);
@@ -96,6 +97,30 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
     });
   };
 
+  const observeGame = (gameId: string): void => {
+    setSubmitting(true);
+    const observeGameRequest: IuiObserveGameRequest = {
+      gameId: gameId,
+      uuid: getMyId(),
+      userName: user.userName,
+      token: getToken(),
+    };
+    socket.emit("observe game", observeGameRequest, (observeGameResponse: IuiObserveGameResponse) => {
+      // console.log("observe response", observeGameResponse);
+      if (observeGameResponse.isAuthenticated) {
+        handleAuthenticatedRequest(observeGameResponse.token);
+        if (observeGameResponse.observeResponse === OBSERVE_RESPONSE.waiting) {
+          setShowObserveWaiting(true);
+        } else if (observeGameResponse.observeResponse === OBSERVE_RESPONSE.onGoingGameExists) {
+          setShowError(true);
+          setShowWaiting(false);
+        }
+      } else {
+        handleUnauthenticatedRequest(dispatch);
+      }
+    });
+  };
+
   const closeAndPlay = () =>  {
     setJoinOk(false);
     onJoin();
@@ -159,6 +184,13 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
     return actionArr;
   };
 
+  const renderObserveButton = (gameId: string, imInTheGame: boolean) => {
+    if (imInTheGame) return null;
+    return (
+      <Button disabled={submitting} size="sm" onClick={() => observeGame(gameId)}>Observe Game</Button>
+    );
+  };
+
   const renderGameItems = () => {
     if (gameItemList.length === 0) {
       return "No on going games at the moment, why don't you just create one by your self?";
@@ -174,6 +206,9 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
           </div>
           <div className="col">
             {renderActions(id, imInTheGame, inActivePlayers, inActivePlayerSockets)}
+          </div>
+          <div className="col">
+            {renderObserveButton(id, imInTheGame)}
           </div>
         </div>
       );
@@ -257,6 +292,30 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
           <Button variant="warning" onClick={cancelWaiting}>Close</Button>
         </Modal.Footer>
       </Modal>
+
+      <Modal show={showObserveWaiting} onHide={cancelWaiting}>
+        <Modal.Header>
+          <Modal.Title>
+            Waiting to observe game...
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>You have requested to observe game.</p>
+          <p>Someone active player in the game must accept your request so please wait...</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" onClick={cancelWaiting}>
+            <Spinner
+              as="span"
+              animation="border"
+              size="sm"
+            />
+            &nbsp;
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
     </React.Fragment>
   );
 };

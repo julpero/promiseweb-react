@@ -6,6 +6,12 @@ export enum JOIN_GAME_STATUS {
   waiting,
 }
 
+export enum OBSERVE_RESPONSE {
+  waiting,
+  failed,
+  onGoingGameExists,
+}
+
 export interface IuiJoinOngoingGame extends IuiUserData {
   gameId: string,
   playAsPlayer: string,
@@ -39,4 +45,26 @@ export interface IuiAllowPlayerToJoinResponse extends IuiAuth {
   joinOk: boolean,
   joinerName: string,
   replacedPlayer: string,
+}
+
+export interface IuiObserveGameRequest extends IuiUserData {
+  gameId: string,
+}
+
+export interface IuiObserveGameResponse extends IuiAuth {
+  observeResponse: OBSERVE_RESPONSE,
+}
+
+export interface IuiAllowPlayerToObserveRequest extends IuiUserData {
+  observerName: string,
+  allow: boolean,
+}
+
+export interface IuiAllowPlayerToObserveResponse extends IuiAuth {
+  observerName: string,
+  observeOk: boolean,
+}
+
+export interface IuiPlayerWantsToObserveNotification {
+  observerName: string,
 }

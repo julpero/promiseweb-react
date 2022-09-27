@@ -9,12 +9,19 @@ interface ISocketWaitingToJoin {
   asAPlayer: string,
 }
 
+interface ISocketObserving {
+  socketId: string,
+  gameId: string,
+  isWaiting: boolean,
+}
+
 interface ISocketMap {
   sockets: Set<string>,
   game?: string,
   adminSocket?: ISocketAdminData,
   lastTimestamp: number,
   waitingToJoin?: ISocketWaitingToJoin,
+  observing?: ISocketObserving,
 }
 
 const userSocketIdMap = new Map<string, ISocketMap>(); //a map of online usernames and their clients
@@ -196,4 +203,50 @@ export const clearWaiting = (userName: string) => {
   if (user) {
     user.waitingToJoin = undefined;
   }
+};
+
+export const setObserving = (userName: string, timestamp: number, socketId: string, gameId: string, waiting: boolean): void => {
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    user.observing = {
+      socketId: socketId,
+      gameId: gameId,
+      isWaiting: waiting,
+    } as ISocketObserving;
+  } else {
+    userSocketIdMap.set(userName, {
+      sockets: new Set([socketId]),
+      game: undefined,
+      adminSocket: undefined,
+      lastTimestamp: timestamp,
+      observing: {
+        socketId: socketId,
+        gameId: gameId,
+        isWaiting: waiting,
+      } as ISocketObserving,
+    });
+  }
+};
+
+export const clearObserving = (userName: string): void => {
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    user.observing = undefined;
+  }
+};
+
+export const getGameObservers = (gameId: string): string[] => {
+  const obsArr: string[] = [];
+  userSocketIdMap.forEach((val, key) => {
+    if (val.observing?.gameId === gameId) obsArr.push(key);
+  });
+  return obsArr;
+};
+
+export const getObservingGame = (userName: string): string | null => {
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    return user.observing?.gameId ?? null;
+  }
+  return null;
 };

@@ -2,7 +2,7 @@ import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../interf
 import { IuiCheckIfOngoingGameResponse } from "../interfaces/IuiCheckIfOngoingGame";
 import { IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse } from "../interfaces/IuiGameList";
 import { IuiPlayedGamesReport } from "../interfaces/IuiGameReports";
-import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification } from "../interfaces/IuiJoinOngoingGame";
+import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiObserveGameRequest, IuiObserveGameResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification, IuiPlayerWantsToObserveNotification } from "../interfaces/IuiJoinOngoingGame";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse } from "../interfaces/IuiLeaveOngoingGame";
 import { IuiCreateGameRequest, IuiCreateGameResponse } from "../interfaces/IuiNewGame";
 import {
@@ -29,6 +29,7 @@ export interface ServerToClientEvents {
   "promise made": (promiseNotification: IuiPromiseMadeNotification) => void;
   "card played": (cardPlayedNotification: IuiCardPlayedNotification) => void;
   "player wants to join": (playerWantsToJoinNotification: IuiPlayerWantsToJoinNotification) => void;
+  "player wants to observe": (playerWantsToObserveNotification: IuiPlayerWantsToObserveNotification) => void;
   "player joined on going game": (playerJoinedNotification: IuiPlayerJoinedOnGoingGameNotification) => void;
   "join request rejected": (gameId: string) => void;
   "hey": () => void;
@@ -44,6 +45,9 @@ export interface ClientToServerEvents {
   "join ongoing game": (joinOngoingGameRequest: IuiJoinOngoingGame, fn: (joinOngoingGameResponse: IuiJoinOngoingGameResponse) => void) => void;
   "allow to join game": (playerToJoinRequest: IuiAllowPlayerToJoinRequest, fn: (allowPlayerToJoinResponse: IuiAllowPlayerToJoinResponse) => void) => void,
   "cancel my join request": (cancelRequest: IuiUserData, fn: (simpleResponse: IuiAuth) => void) => void,
+
+  "observe game": (observeGameRequest: IuiObserveGameRequest, fn: (observeGameResponse: IuiObserveGameResponse) => void) => void,
+  "allow to observe game": (observeGameRequest: IuiObserveGameRequest, fn: (observeGameResponse: IuiObserveGameResponse) => void) => void,
 
   "get open games": (gameListRequest: IuiUserData, fn: (gameList: IuiGetGameListResponse) => void) => void;
   "get on going games": (gameListRequest: IuiUserData, fn: (gameList: IuiGetGameListResponse) => void) => void;

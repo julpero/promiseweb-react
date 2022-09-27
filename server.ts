@@ -25,7 +25,7 @@ import { getGameInfo, getRound, makePromise, playCard } from "./backend/actions/
 import { GAME_STATUS, ROUND_STATUS } from "./frontend/src/interfaces/IuiGameOptions";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "./frontend/src/interfaces/IuiLeaveOngoingGame";
 import { leaveOngoingGame, joinOngoingGame, getHumanPlayer } from "./backend/actions/joinLeaveOngoingGame";
-import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification, JOIN_GAME_STATUS } from "./frontend/src/interfaces/IuiJoinOngoingGame";
+import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiObserveGameRequest, IuiObserveGameResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification, IuiPlayerWantsToObserveNotification, JOIN_GAME_STATUS, OBSERVE_RESPONSE } from "./frontend/src/interfaces/IuiJoinOngoingGame";
 import { IuiPlayedGamesReport } from "./frontend/src/interfaces/IuiGameReports";
 import { getOneGameReportData, getReportData } from "./backend/actions/reports";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "./frontend/src/interfaces/IuiReports";
@@ -411,7 +411,7 @@ connectDB().then(() => {
       const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
       if (isAuthenticated) {
-        const checkResponse: IuiCheckIfOngoingGameResponse = await checkIfOngoingGame(checkIfOngoingGameRequest);
+        const checkResponse: IuiCheckIfOngoingGameResponse = await checkIfOngoingGame(userName);
         const timestamp = Date.now();
         switch (checkResponse.checkStatus) {
           case CHECK_GAME_STATUS.noGame: {
@@ -984,6 +984,57 @@ connectDB().then(() => {
         fn({
           isAuthenticated: false,
         } as IuiAuth);
+        return null;
+      }
+    });
+
+    socket.on("observe game", async (observeGameRequest: IuiObserveGameRequest, fn: (observeGameResponse: IuiObserveGameResponse) => void) => {
+      // console.log("joinRequest", joinRequest);
+      const {gameId, userName, uuid, token} = observeGameRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        if (gameId === "") {
+          fn({
+            isAuthenticated: true,
+            observeResponse: OBSERVE_RESPONSE.failed,
+            token: token,
+          } as IuiObserveGameResponse);
+          return null;
+        }
+
+        const timestamp = Date.now();
+        const onGoingResponse: IuiCheckIfOngoingGameResponse = await checkIfOngoingGame(userName);
+        if (onGoingResponse.checkStatus === CHECK_GAME_STATUS.noGame && csm.getObservingGame(userName) === null) {
+          csm.setObserving(userName, timestamp, socket.id, gameId, true);
+          const observeNotification: IuiPlayerWantsToObserveNotification = {
+            observerName: userName,
+          };
+          io.to(gameId).emit("player wants to observe", observeNotification);
+          const chatLine = `player ${userName} want's to observe this game`;
+          io.to(gameId).emit("new chat line", chatLine);
+
+          csm.setLastTimestamp(userName, socket.id, timestamp);
+          const newToken = signUserToken(userName, uuid, timestamp);
+          fn({
+            isAuthenticated: true,
+            token: newToken,
+            observeResponse: OBSERVE_RESPONSE.waiting,
+          } as IuiObserveGameResponse);
+          return null;
+        } else {
+          fn({
+            isAuthenticated: true,
+            observeResponse: OBSERVE_RESPONSE.onGoingGameExists,
+            token: token,
+          } as IuiObserveGameResponse);
+          return null;
+        }
+      } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiObserveGameResponse);
         return null;
       }
     });
