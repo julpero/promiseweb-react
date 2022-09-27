@@ -21,13 +21,9 @@ export const getCurrentRoundInd = (game: IGame): number => {
   return game.rounds.find(round => round.roundStatus === ROUND_STATUS.onGoing)?.roundIndex ?? -1;
 };
 
-const getCurrentPlayInd = (round: IRound): number => {
-  return round.cardsPlayed.length - 1;
-};
-
 export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
   const {roundPlayers, cardsPlayed, starterPositionIndex, trumpCard} = round;
-  const currentPlayInd = getCurrentPlayInd(round);
+  const currentPlayInd = getCurrentPlayIndex(round);
   const playerCount = roundPlayers.length;
   console.log("getPlayerInTurn currentPlayInd", currentPlayInd);
 
