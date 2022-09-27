@@ -70,7 +70,7 @@ export const getPlayerAvgPoints = async (playerName: string, startRound: number,
   console.log("getPlayerAvgPoints gamesInDb", gamesInDb);
 
   gamesInDb.forEach((gameInDb) => {
-    const playerStats = gameInDb.gameStatistics.playersStatistics.find(playerStatistics => playerStatistics.playerName === playerName);
+    const playerStats = gameInDb.gameStatistics?.playersStatistics.find(playerStatistics => playerStatistics.playerName === playerName);
     if (playerStats) {
       const cumulativePoints = playerStats.cumulativePointsPerRound;
       for (let i = 0; i < cumulativePoints.length; i++) {

@@ -28,8 +28,8 @@ export const getGamesForAdmin = async (adminUserName: string): Promise<IuiGetGam
       response.gameList.push({
         gameId: playedGame.id,
         played: playedGame.createDateTime,
-        players: playedGame.gameStatistics.playersStatistics.map(player => player.playerName),
-        statsGenerated: playedGame.gameStatistics.generated,
+        players: playedGame.gameStatistics?.playersStatistics.map(player => player.playerName) ?? [],
+        statsGenerated: playedGame.gameStatistics?.generated ?? 0,
       } as IuiAdminGame);
     });
   }
