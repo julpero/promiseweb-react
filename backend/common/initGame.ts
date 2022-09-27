@@ -38,7 +38,7 @@ const initPlayers = (gameInDb: IGameOptions): void => {
       type: "human",
     } as IPlayer;
   });
-  console.log(gameInDb.game.playerOrder);
+  // console.log(gameInDb.game.playerOrder);
 };
 
 const initDeck = (): DeckOfCards => {

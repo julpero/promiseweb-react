@@ -67,7 +67,7 @@ const PromiseButtons = () => {
         isSpeedPromise: false,
       };
       socket.emit("make promise", promiseRequest, (promiseResponse: IuiMakePromiseResponse) => {
-        console.log("promiseResponse", promiseResponse);
+        // console.log("promiseResponse", promiseResponse);
         if (promiseResponse.isAuthenticated) {
           handleAuthenticatedRequest(promiseResponse.token);
           if (promiseResponse.promiseResponse !== PROMISE_RESPONSE.promiseOk) {

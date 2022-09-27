@@ -16,6 +16,6 @@ export const getGamesByStatus = async (gameStatus: GAME_STATUS): Promise<(IGameO
     });
   });
 
-  console.log("gameList", gameList);
+  // console.log("gameList", gameList);
   return gameList;
 };

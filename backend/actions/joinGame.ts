@@ -3,7 +3,7 @@ import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
 import { joinOnGame } from "../dbActions/joinAndLeaveGame";
 
 export const joinGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Promise<IuiJoinLeaveGameResponse> => {
-  console.log("joinGameRequest", joinGameRequest);
+  // console.log("joinGameRequest", joinGameRequest);
   const response: IuiJoinLeaveGameResponse = {
     joinLeaveResult: JOIN_LEAVE_RESULT.notOk,
     loginStatus: LOGIN_RESPONSE.ok,

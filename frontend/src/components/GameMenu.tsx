@@ -33,7 +33,7 @@ const GameMenu = () => {
   useEffect(() => {
     const handleOtherPlayerReplacingMe = (playerJoinedNotification: IuiPlayerJoinedOnGoingGameNotification) => {
       const {replacedPlayer, gameId, joinerName} = playerJoinedNotification;
-      console.log(`I (${replacedPlayer}) am replaced by ${joinerName}`);
+      // console.log(`I (${replacedPlayer}) am replaced by ${joinerName}`);
       if (currentGameInfo.gameId === gameId && user.isUserLoggedIn && user.userName === replacedPlayer) {
         setOtherPlayerName(joinerName);
         setOtherPlayerJoined(true);
@@ -41,7 +41,7 @@ const GameMenu = () => {
     };
 
     const handlePlayerJoining = (playerWantsToJoinNotification: IuiPlayerWantsToJoinNotification) => {
-      console.log("playerWantsToJoinNotification", playerWantsToJoinNotification);
+      // console.log("playerWantsToJoinNotification", playerWantsToJoinNotification);
       const {replacedPlayer, joinerName} = playerWantsToJoinNotification;
       setRequestPlayerName(joinerName);
       setOtherPlayerName(replacedPlayer);
@@ -78,7 +78,7 @@ const GameMenu = () => {
         token: getToken(),
       };
       socket.emit("allow to join game", playerToJoinRequest, (allowPlayerToJoinResponse: IuiAllowPlayerToJoinResponse) => {
-        console.log("allowPlayerToJoinResponse", allowPlayerToJoinResponse);
+        // console.log("allowPlayerToJoinResponse", allowPlayerToJoinResponse);
         if (allowPlayerToJoinResponse.isAuthenticated) {
           handleAuthenticatedRequest(allowPlayerToJoinResponse.token);
         } else {
@@ -102,7 +102,7 @@ const GameMenu = () => {
       };
 
       socket.emit("leave ongoing game", leaveOngoingGameRequest, (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => {
-        console.log("leaveOngoingGameResponse", leaveOngoingGameResponse);
+        // console.log("leaveOngoingGameResponse", leaveOngoingGameResponse);
         if (leaveOngoingGameResponse.isAuthenticated) {
           handleAuthenticatedRequest(leaveOngoingGameResponse.token);
           if (leaveOngoingGameResponse.leaveStatus === LEAVE_ONGOING_GAME_RESULT.leaveOk) {

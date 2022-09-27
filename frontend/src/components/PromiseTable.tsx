@@ -11,7 +11,7 @@ import ReactTooltip from "react-tooltip";
  * Promises made, table in bottom screen
  */
 const PromiseTable = () => {
-  console.log("PromiseTable");
+  // console.log("PromiseTable");
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
 
   useEffect(() => {

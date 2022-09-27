@@ -12,7 +12,7 @@ interface IProps {
 }
 
 const AdminMassOperations = ({userName}: IProps) => {
-  console.log("AdminMassOperations");
+  // console.log("AdminMassOperations");
   const adminLoggedIn = useSelector(isAdminLoggedIn);
   const [logArray, setLogArray] = useState<string[]>([]);
   const [operationInProgress, setOperationInProgress] = useState(false);
@@ -35,7 +35,7 @@ const AdminMassOperations = ({userName}: IProps) => {
       token: getToken(),
     };
     socket.emit("re-create all game statistics", request, (getGamesResponse: IuiGetGamesResponse) => {
-      console.log(getGamesResponse);
+      // console.log(getGamesResponse);
       if (getGamesResponse.isAuthenticated) {
         handleAuthenticatedRequest(getGamesResponse.token);
         dispatch(setAdminGameList(getGamesResponse.gameList));
@@ -54,7 +54,7 @@ const AdminMassOperations = ({userName}: IProps) => {
       token: getToken(),
     };
     socket.emit("convert old data", request, (convertReport: string[]) => {
-      console.log(convertReport);
+      // console.log(convertReport);
       setLogArray(convertReport);
       setOperationInProgress(false);
     });

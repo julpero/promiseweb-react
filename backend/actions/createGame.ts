@@ -68,11 +68,11 @@ export const createGame = async (createGameRequest: IuiCreateGameRequest): Promi
 
   if (okToCreate) {
     const gameOptions = createGameOptions(createGameRequest);
-    console.log("gameOptions", gameOptions);
+    // console.log("gameOptions", gameOptions);
 
     gameOptions.humanPlayers[0].playerStats = await getPlayerStats(gameOptions, gameOptions.adminName);
     const createdGameIdStr = await insertNewGame(gameOptions);
-    console.log("create game - gameOptions inserted with _id: " + createdGameIdStr);
+    // console.log("create game - gameOptions inserted with _id: " + createdGameIdStr);
     response.responseStatus = CREATE_GAME_STATUS.ok;
     response.newGameId = createdGameIdStr;
   }

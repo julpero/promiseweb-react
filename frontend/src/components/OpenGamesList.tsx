@@ -47,7 +47,7 @@ const OpenGamesList = () => {
         token: getToken(),
       };
       socket.emit("get open games", gameListRequest, (gameList: IuiGetGameListResponse) => {
-        console.log("gameList", gameList);
+        // console.log("gameList", gameList);
         if (gameList.isAuthenticated) {
           handleAuthenticatedRequest(gameList.token);
           setGameItemList(gameList.games);
@@ -77,7 +77,7 @@ const OpenGamesList = () => {
 
   useEffect(() => {
     if (method !== null) {
-      console.log("method", method);
+      // console.log("method", method);
       callBackList.current.forEach(cb => cb());
       callBackList.current = [];
     }
@@ -128,7 +128,7 @@ const OpenGamesList = () => {
 
   const joinGame = (joinGameRequest: IuiJoinLeaveGameRequest) => {
     socket.emit("join game", joinGameRequest, (response: IuiJoinLeaveGameResponse) => {
-      console.log("join response", response);
+      // console.log("join response", response);
       if (response.isAuthenticated) {
         handleAuthenticatedRequest(response.token);
         setLoginStatus(response.loginStatus);
@@ -144,7 +144,7 @@ const OpenGamesList = () => {
 
   const leaveGame = (leaveGameRequest: IuiJoinLeaveGameRequest) => {
     socket.emit("leave game", leaveGameRequest, (response: IuiJoinLeaveGameResponse) => {
-      console.log("leave response", response);
+      // console.log("leave response", response);
       if (response.isAuthenticated) {
         handleAuthenticatedRequest(response.token);
         setLoginStatus(response.loginStatus);
@@ -181,7 +181,7 @@ const OpenGamesList = () => {
   };
 
   const onSubmit = (values: IFormFields) => {
-    console.log("onSubmit", values);
+    // console.log("onSubmit", values);
     if (user.isUserLoggedIn && gameId.length > 0 && method !== null) {
       const request: IuiJoinLeaveGameRequest = {
         uuid: getMyId(),

@@ -12,7 +12,7 @@ const Chat = () => {
 
   useEffect(() => {
     socket.on("new chat line", (chatLine: string) => {
-      console.log("new chat line", chatLine);
+      // console.log("new chat line", chatLine);
       setTextRows((prevState) => ([...prevState, chatLine]));
     });
 

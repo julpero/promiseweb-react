@@ -53,7 +53,7 @@ export const checkLogin = async ({userName, userPass1, userPass2, email, needsTo
       loginObj.result = LOGIN_RESPONSE.ok;
     }
   } else {
-    console.log("is user", user);
+    // console.log("is user", user);
     if (needsToBeAdmin && userPass1 === process.env.ADMIN_DUMMY_PASS) {
       // this is internal check
       console.log("... and login ok with dummy admin pass!");
