@@ -73,7 +73,7 @@ body {
 
 .ownCardsDiv {
   position: absolute;
-  z-index: 9999;
+  z-index: 999;
 }
 
 .playerInfoDiv {
@@ -85,7 +85,7 @@ body {
   width: var(--normal-container-width);
 }
 .animatedCardPlayedSlot.cardTop:hover {
-  z-index: 9999;
+  z-index: 999;
 }
 .wonCardsRow {
   height: var(--normal-container-height);
