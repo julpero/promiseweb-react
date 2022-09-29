@@ -18,6 +18,7 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
   const [ showRejection, setShowRejection ] = useState(false);
   const [ showWaiting, setShowWaiting ] = useState(false);
   const [ showObserveWaiting, setShowObserveWaiting ] = useState(false);
+  const [ showObserveRejection, setShowObserveRejection ] = useState(false);
   const [ showError, setShowError ] = useState(false);
   const [ playerName, setPlayerName ] = useState("");
   const [ gameItemList, setGameItemList ] = useState<IuiGameListItem[]>([]);
@@ -58,11 +59,18 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
       setShowRejection(true);
     };
 
+    const handleObserveRejection = () => {
+      setShowObserveRejection(true);
+    };
+
     socket.on("changes in game players", fetchGameItemList);
     socket.on("join request rejected", handleJoinRejection);
+    socket.on("observe request rejected", handleObserveRejection);
 
     return () => {
       socket.off("changes in game players");
+      socket.off("join request rejected");
+      socket.off("observe request rejected");
     };
   }, [fetchGameItemList, socket]);
 
@@ -113,7 +121,6 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
           setShowObserveWaiting(true);
         } else if (observeGameResponse.observeResponse === OBSERVE_RESPONSE.onGoingGameExists) {
           setShowError(true);
-          setShowWaiting(false);
         }
       } else {
         handleUnauthenticatedRequest(dispatch);
@@ -155,6 +162,7 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
       if (simpleResponse.isAuthenticated) {
         handleAuthenticatedRequest(simpleResponse.token);
         setShowObserveWaiting(false);
+        setShowObserveRejection(false);
         fetchGameItemList();
       } else {
         handleUnauthenticatedRequest(dispatch);
@@ -333,6 +341,21 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
             &nbsp;
             Cancel
           </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showObserveRejection} onHide={cancelObserveWaiting}>
+        <Modal.Header>
+          <Modal.Title>
+            Observing request is rejected
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>You have requested to observe game.</p>
+          <p>Someone active player in the game just rejected your request.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" onClick={cancelObserveWaiting}>Close</Button>
         </Modal.Footer>
       </Modal>
 

@@ -237,15 +237,25 @@ export const clearObserving = (userName: string): void => {
   }
 };
 
-export const getGameObservers = (gameId: string): IuiObserver[] => {
+export const getGameObserversForUi = (gameId: string): IuiObserver[] => {
   const obsArr: IuiObserver[] = [];
-  userSocketIdMap.forEach((val, key) => {
-    if (val.observing?.gameId === gameId) obsArr.push({
+  getGameObservers(gameId).forEach((val, key) => {
+    obsArr.push({
       name: key,
-      waiting: val.observing.isWaiting,
+      waiting: val.isWaiting,
     } as IuiObserver);
   });
   return obsArr;
+};
+
+export const getGameObservers = (gameId: string): Map<string, ISocketObserving> => {
+  const observers = new Map<string, ISocketObserving>();
+  userSocketIdMap.forEach((val, key) => {
+    if (val.observing?.gameId === gameId) {
+      observers.set(key, val.observing);
+    }
+  });
+  return observers;
 };
 
 export const getObservingGame = (userName: string): string | null => {

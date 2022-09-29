@@ -57,6 +57,7 @@ export interface IuiObserveGameResponse extends IuiAuth {
 
 export interface IuiAllowPlayerToObserveRequest extends IuiUserData {
   observerName: string,
+  gameId: string,
   allow: boolean,
 }
 

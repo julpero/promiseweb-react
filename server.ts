@@ -25,7 +25,7 @@ import { getGameInfo, getRound, makePromise, playCard } from "./backend/actions/
 import { GAME_STATUS, ROUND_STATUS } from "./frontend/src/interfaces/IuiGameOptions";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "./frontend/src/interfaces/IuiLeaveOngoingGame";
 import { leaveOngoingGame, joinOngoingGame, getHumanPlayer } from "./backend/actions/joinLeaveOngoingGame";
-import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiObserveGameRequest, IuiObserveGameResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification, IuiPlayersWantsToObserveNotification, JOIN_GAME_STATUS, OBSERVE_RESPONSE } from "./frontend/src/interfaces/IuiJoinOngoingGame";
+import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiObserveGameRequest, IuiObserveGameResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification, JOIN_GAME_STATUS, OBSERVE_RESPONSE, IuiAllowPlayerToObserveRequest, IuiAllowPlayerToObserveResponse } from "./frontend/src/interfaces/IuiJoinOngoingGame";
 import { IuiPlayedGamesReport } from "./frontend/src/interfaces/IuiGameReports";
 import { getOneGameReportData, getReportData } from "./backend/actions/reports";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "./frontend/src/interfaces/IuiReports";
@@ -509,7 +509,7 @@ connectDB().then(() => {
           return null;
         }
 
-        roundResponse.observers = csm.getGameObservers(gameId);
+        roundResponse.observers = csm.getGameObserversForUi(gameId);
 
         const timestamp = Date.now();
         csm.setLastTimestamp(userName, socket.id, timestamp);
@@ -1035,6 +1035,40 @@ connectDB().then(() => {
         fn({
           isAuthenticated: false,
         } as IuiObserveGameResponse);
+        return null;
+      }
+    });
+
+    socket.on("allow to observe game", async (playerToObserveRequest: IuiAllowPlayerToObserveRequest, fn: (observeGameResponse: IuiAllowPlayerToObserveResponse) => void) => {
+      // console.log("playerToObserveRequest", playerToObserveRequest);
+      const {gameId, observerName, allow, userName, uuid, token} = playerToObserveRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        if (!gameId || !observerName) {
+          fn({
+            isAuthenticated: true,
+            observeOk: false,
+            token: token,
+          } as IuiAllowPlayerToObserveResponse);
+          return null;
+        }
+
+        const observer = csm.getGameObservers(gameId).get(observerName);
+        if (observer) {
+          const observerSocket = observer.socketId;
+          if (!allow) {
+            csm.clearObserving(observerName);
+            io.to(observerSocket).socketsLeave(gameId);
+            io.to(observerSocket).emit("observe request rejected", gameId);
+          }
+        }
+
+      } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiAllowPlayerToObserveResponse);
         return null;
       }
     });

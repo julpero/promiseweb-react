@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCurrentGameInfo, setGameId } from "../store/gameInfoSlice";
 import { getUser } from "../store/userSlice";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
-import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification } from "../interfaces/IuiJoinOngoingGame";
+import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiAllowPlayerToObserveRequest, IuiAllowPlayerToObserveResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification } from "../interfaces/IuiJoinOngoingGame";
 import { getCurrentRoundInfo } from "../store/roundInfoSlice";
 import { IuiGetRoundRequest } from "../interfaces/IuiPlayingGame";
 import { setGetRoundInfo } from "../store/getRoundInfoSlice";
@@ -151,18 +151,69 @@ const GameMenu = () => {
     return currentRoundInfo.observers?.some(observer => !observer.waiting) ?? false;
   };
 
-  const renderActiveObserveRequests = () => {
-    return (
-      currentRoundInfo.observers?.map((observer, ind) => {
-        return (
-          <div key={ind} className="row">
-            <div className="col">
-              {observer.name}
+  const allowPlayerToObserve = (observerName: string, allow: boolean) => {
+    const playerToObserveRequest: IuiAllowPlayerToObserveRequest = {
+      observerName: observerName,
+      allow: allow,
+      gameId: currentGameInfo.gameId,
+      uuid: getMyId(),
+      userName: user.userName,
+      token: getToken(),
+    };
+    socket.emit("allow to observe game", playerToObserveRequest, (observeGameResponse: IuiAllowPlayerToObserveResponse) => {
+      // console.log("observeGameResponse", observeGameResponse);
+      if (observeGameResponse.isAuthenticated) {
+        handleAuthenticatedRequest(observeGameResponse.token);
+      } else {
+        handleUnauthenticatedRequest(dispatch);
+      }
+
+    });
+  };
+
+  const renderActiveObservers = () => {
+    if (isActiveObservers()) {
+      return (
+        currentRoundInfo.observers?.filter(observer => !observer.waiting).map((observer, ind) => {
+          return (
+            <div key={ind} className="row">
+              <div className="col">
+                {observer.name}
+              </div>
             </div>
-          </div>
-        );
-      })
-    );
+          );
+        })
+      );
+    } else {
+      return "No active observers";
+    }
+  };
+
+  const renderObserveRequests = () => {
+    if (isActiveObserveRequest()) {
+      return (
+        currentRoundInfo.observers?.filter(observer => observer.waiting).map((observer, ind) => {
+          return (
+            <div key={ind} className="row">
+              <div className="col">
+                {observer.name}
+              </div>
+              <div className="col">
+                <Button size="sm" variant="success" onClick={() => allowPlayerToObserve(observer.name, true)}>
+                  Allow
+                </Button>
+                &nbsp;
+                <Button size="sm" variant="warning" onClick={() => allowPlayerToObserve(observer.name, false)}>
+                  Reject
+                </Button>
+              </div>
+            </div>
+          );
+        })
+      );
+    } else {
+      return "No active requests";
+    }
   };
 
   const renderRequest = () => {
@@ -269,7 +320,10 @@ const GameMenu = () => {
         </Modal.Header>
         <Modal.Body>
           <h5>Active</h5>
-          {renderActiveObserveRequests()}
+          {renderActiveObservers()}
+          <hr />
+          <h5>Requests</h5>
+          {renderObserveRequests()}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={() => toggleObserveModal(!showObserveModal)}>CLOSE</Button>
