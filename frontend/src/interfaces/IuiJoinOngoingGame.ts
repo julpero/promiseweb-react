@@ -65,6 +65,10 @@ export interface IuiAllowPlayerToObserveResponse extends IuiAuth {
   observeOk: boolean,
 }
 
-export interface IuiPlayerWantsToObserveNotification {
+export interface IuiPlayersWantsToObserveNotification {
+  observerNames: string[],
+}
+
+export interface IuiPlayerObservingNotification {
   observerName: string,
 }

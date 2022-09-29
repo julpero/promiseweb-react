@@ -25,7 +25,7 @@ import { getGameInfo, getRound, makePromise, playCard } from "./backend/actions/
 import { GAME_STATUS, ROUND_STATUS } from "./frontend/src/interfaces/IuiGameOptions";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "./frontend/src/interfaces/IuiLeaveOngoingGame";
 import { leaveOngoingGame, joinOngoingGame, getHumanPlayer } from "./backend/actions/joinLeaveOngoingGame";
-import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiObserveGameRequest, IuiObserveGameResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification, IuiPlayerWantsToObserveNotification, JOIN_GAME_STATUS, OBSERVE_RESPONSE } from "./frontend/src/interfaces/IuiJoinOngoingGame";
+import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiObserveGameRequest, IuiObserveGameResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification, IuiPlayersWantsToObserveNotification, JOIN_GAME_STATUS, OBSERVE_RESPONSE } from "./frontend/src/interfaces/IuiJoinOngoingGame";
 import { IuiPlayedGamesReport } from "./frontend/src/interfaces/IuiGameReports";
 import { getOneGameReportData, getReportData } from "./backend/actions/reports";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "./frontend/src/interfaces/IuiReports";
@@ -508,6 +508,9 @@ connectDB().then(() => {
         if (roundResponse === null) {
           return null;
         }
+
+        roundResponse.observers = csm.getGameObservers(gameId);
+
         const timestamp = Date.now();
         csm.setLastTimestamp(userName, socket.id, timestamp);
         const newToken = signUserToken(userName, uuid, timestamp);
@@ -989,7 +992,7 @@ connectDB().then(() => {
     });
 
     socket.on("observe game", async (observeGameRequest: IuiObserveGameRequest, fn: (observeGameResponse: IuiObserveGameResponse) => void) => {
-      // console.log("joinRequest", joinRequest);
+      // console.log("observeGameRequest", observeGameRequest);
       const {gameId, userName, uuid, token} = observeGameRequest;
       const lastTimestamp = csm.getLastTimestamp(userName);
       const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
@@ -1008,10 +1011,7 @@ connectDB().then(() => {
         const onGoingResponse: IuiCheckIfOngoingGameResponse = await checkIfOngoingGame(userName);
         if (onGoingResponse.checkStatus === CHECK_GAME_STATUS.noGame && csm.getObservingGame(userName) === null) {
           csm.setObserving(userName, timestamp, socket.id, gameId, true);
-          const observeNotification: IuiPlayerWantsToObserveNotification = {
-            observerName: userName,
-          };
-          io.to(gameId).emit("player wants to observe", observeNotification);
+          // io.to(gameId).emit("players wants to observe", { observerNames: csm.getWaitingGameObservers(gameId) } as IuiPlayersWantsToObserveNotification);
           const chatLine = `player ${userName} want's to observe this game`;
           io.to(gameId).emit("new chat line", chatLine);
 
@@ -1035,6 +1035,36 @@ connectDB().then(() => {
         fn({
           isAuthenticated: false,
         } as IuiObserveGameResponse);
+        return null;
+      }
+    });
+
+    socket.on("cancel my observe request", (cancelRequest: IuiUserData, fn: (cancelResponse: IuiAuth) => void) => {
+      // console.log("cancel my observe request", cancelRequest);
+      const { userName, uuid, token } = cancelRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        const timestamp = Date.now();
+        const waitingToGame = csm.getObservingGame(userName);
+        csm.clearObserving(userName);
+        if (waitingToGame) {
+          // io.to(waitingToGame).emit("players wants to observe", { observerNames: csm.getGameObservers(waitingToGame) } as IuiPlayersWantsToObserveNotification);
+          const chatLine = `player ${userName} cancelled his/her observe request`;
+          io.to(waitingToGame).emit("new chat line", chatLine);
+        }
+
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        fn({
+          isAuthenticated: true,
+          token: newToken,
+        } as IuiAuth);
+      } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiAuth);
         return null;
       }
     });

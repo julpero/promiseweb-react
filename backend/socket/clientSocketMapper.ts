@@ -1,3 +1,5 @@
+import { IuiObserver } from "../../frontend/src/interfaces/IuiPlayingGame";
+
 interface ISocketAdminData {
   socketId: string,
   uuid: string,
@@ -235,10 +237,13 @@ export const clearObserving = (userName: string): void => {
   }
 };
 
-export const getGameObservers = (gameId: string): string[] => {
-  const obsArr: string[] = [];
+export const getGameObservers = (gameId: string): IuiObserver[] => {
+  const obsArr: IuiObserver[] = [];
   userSocketIdMap.forEach((val, key) => {
-    if (val.observing?.gameId === gameId) obsArr.push(key);
+    if (val.observing?.gameId === gameId) obsArr.push({
+      name: key,
+      waiting: val.observing.isWaiting,
+    } as IuiObserver);
   });
   return obsArr;
 };

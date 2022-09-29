@@ -7,6 +7,9 @@ import { getCurrentGameInfo, setGameId } from "../store/gameInfoSlice";
 import { getUser } from "../store/userSlice";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification } from "../interfaces/IuiJoinOngoingGame";
+import { getCurrentRoundInfo } from "../store/roundInfoSlice";
+import { IuiGetRoundRequest } from "../interfaces/IuiPlayingGame";
+import { setGetRoundInfo } from "../store/getRoundInfoSlice";
 
 /**
  * GameMenu
@@ -19,7 +22,9 @@ const GameMenu = () => {
   const [otherPlayerName, setOtherPlayerName] = useState("");
   const [requestPlayerName, setRequestPlayerName] = useState("");
   const [activeJoinRequest, setActiveJoinRequest] = useState(false);
+  const [showObserveModal, setShowObserveModal] = useState(false);
 
+  const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const currentGameInfo = useSelector(getCurrentGameInfo);
   const user = useSelector(getUser);
 
@@ -126,6 +131,40 @@ const GameMenu = () => {
     dispatch(setGameId(""));
   };
 
+  const toggleObserveModal = (show: boolean): void => {
+    const getRoundRequest: IuiGetRoundRequest = {
+      uuid: getMyId(),
+      userName: user.userName,
+      token: getToken(),
+      gameId: currentGameInfo.gameId,
+      roundInd: currentRoundInfo.roundInd,
+    };
+    dispatch(setGetRoundInfo(getRoundRequest));
+    setShowObserveModal(show);
+  };
+
+  const isActiveObserveRequest = (): boolean => {
+    return currentRoundInfo.observers?.some(observer => observer.waiting) ?? false;
+  };
+
+  const isActiveObservers = (): boolean => {
+    return currentRoundInfo.observers?.some(observer => !observer.waiting) ?? false;
+  };
+
+  const renderActiveObserveRequests = () => {
+    return (
+      currentRoundInfo.observers?.map((observer, ind) => {
+        return (
+          <div key={ind} className="row">
+            <div className="col">
+              {observer.name}
+            </div>
+          </div>
+        );
+      })
+    );
+  };
+
   const renderRequest = () => {
     if (activeJoinRequest) {
       return (
@@ -144,7 +183,14 @@ const GameMenu = () => {
 
   return (
     <div id="menuArea">
-      <div>
+      <div className="d-grid gap-2">
+        <Button
+          size="sm"
+          variant={isActiveObserveRequest() ? "warning" : (isActiveObservers() ? "info" : "secondary")}
+          onClick={() => toggleObserveModal(!showObserveModal)}
+        >
+          Observers
+        </Button>
         <Button
           size="sm"
           variant="danger"
@@ -212,6 +258,21 @@ const GameMenu = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={closeLeftModal}>CLOSE</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showObserveModal} onHide={() => toggleObserveModal(!showObserveModal)}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Observers
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <h5>Active</h5>
+          {renderActiveObserveRequests()}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => toggleObserveModal(!showObserveModal)}>CLOSE</Button>
         </Modal.Footer>
       </Modal>
     </div>
