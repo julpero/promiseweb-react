@@ -61,6 +61,7 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
 
     const handleObserveRejection = () => {
       setShowObserveRejection(true);
+      setShowObserveWaiting(false);
     };
 
     socket.on("changes in game players", fetchGameItemList);

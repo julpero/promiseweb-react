@@ -124,6 +124,19 @@ const GameMenu = () => {
     }
   };
 
+  const refreshRoundInfo = () => {
+    if (currentGameInfo.gameId) {
+      const getRoundRequest: IuiGetRoundRequest = {
+        uuid: getMyId(),
+        userName: user.userName,
+        token: getToken(),
+        gameId: currentGameInfo.gameId,
+        roundInd: currentRoundInfo.roundInd,
+      };
+      dispatch(setGetRoundInfo(getRoundRequest));
+    }
+  };
+
   const closeLeftModal = () => {
     setLeftGameModal(false);
     setGameDismissedModal(false);
@@ -132,14 +145,7 @@ const GameMenu = () => {
   };
 
   const toggleObserveModal = (show: boolean): void => {
-    const getRoundRequest: IuiGetRoundRequest = {
-      uuid: getMyId(),
-      userName: user.userName,
-      token: getToken(),
-      gameId: currentGameInfo.gameId,
-      roundInd: currentRoundInfo.roundInd,
-    };
-    dispatch(setGetRoundInfo(getRoundRequest));
+    refreshRoundInfo();
     setShowObserveModal(show);
   };
 
@@ -326,6 +332,8 @@ const GameMenu = () => {
           {renderObserveRequests()}
         </Modal.Body>
         <Modal.Footer>
+          <Button variant="success" onClick={() => refreshRoundInfo()}>REFRESH</Button>
+          &nbsp;
           <Button variant="primary" onClick={() => toggleObserveModal(!showObserveModal)}>CLOSE</Button>
         </Modal.Footer>
       </Modal>
