@@ -186,6 +186,11 @@ const GameMenu = () => {
               <div className="col">
                 {observer.name}
               </div>
+              <div className="col">
+                <Button size="sm" variant="danger" onClick={() => allowPlayerToObserve(observer.name, false)}>
+                  Dismiss
+                </Button>
+              </div>
             </div>
           );
         })
