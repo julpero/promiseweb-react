@@ -5,6 +5,7 @@ import { playerFromIndex } from "../../common/playingGame";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 import { IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
+import { getUser } from "../../store/userSlice";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 
@@ -15,9 +16,13 @@ interface IProps {
 
 const AnimatedPlayedCardSlot = ({index, styleProps}: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
-  if (!currentRoundInfo.gameId) return null;
+  const user = useSelector(getUser);
+
+  if (!currentRoundInfo.gameId || !user.isUserLoggedIn) return null;
   const { roundToPlayer } = currentRoundInfo;
-  const player: IuiRoundPlayer = playerFromIndex(currentRoundInfo, index);
+  const iAmObserver = currentRoundInfo.observers?.some(observer => observer.name === user.userName && !observer.waiting) ?? false;
+
+  const player: IuiRoundPlayer = playerFromIndex(currentRoundInfo, index, iAmObserver);
   // console.log("AnimatedPlayedCardSlot, player", player);
 
   const thisIsCardInCharge = roundToPlayer.playerInCharge === player.name && roundToPlayer.cardsPlayed.length > 0;

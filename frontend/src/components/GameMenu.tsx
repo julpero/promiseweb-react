@@ -170,10 +170,10 @@ const GameMenu = () => {
       // console.log("observeGameResponse", observeGameResponse);
       if (observeGameResponse.isAuthenticated) {
         handleAuthenticatedRequest(observeGameResponse.token);
+        refreshRoundInfo();
       } else {
         handleUnauthenticatedRequest(dispatch);
       }
-
     });
   };
 

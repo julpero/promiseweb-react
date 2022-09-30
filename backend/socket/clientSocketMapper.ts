@@ -258,10 +258,22 @@ export const getGameObservers = (gameId: string): Map<string, ISocketObserving> 
   return observers;
 };
 
-export const getObservingGame = (userName: string): string | null => {
+export const getObservingGame = (userName: string): ISocketObserving | null => {
   const user = userSocketIdMap.get(userName);
   if (user) {
-    return user.observing?.gameId ?? null;
+    return user.observing ?? null;
   }
   return null;
+};
+
+export const userIsCurrentlyObserving = (userName: string, gameId?: string): boolean => {
+  const user = userSocketIdMap.get(userName);
+  if (user && user.observing?.isWaiting === false) {
+    if (gameId) {
+      return user.observing.gameId === gameId && !getPlayersOfTheGame(gameId).some(player => player === userName);
+    } else {
+      return true;
+    }
+  }
+  return false;
 };

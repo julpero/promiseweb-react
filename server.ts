@@ -20,7 +20,7 @@ import { CREATE_GAME_STATUS, IuiCreateGameRequest, IuiCreateGameResponse } from 
 import { IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IuiGameList";
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameResponse } from "./frontend/src/interfaces/IuiCheckIfOngoingGame";
 import { IuiChatObj } from "./frontend/src/interfaces/IuiChat";
-import { IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, PLAY_CARD_RESPONSE, PROMISE_RESPONSE } from "./frontend/src/interfaces/IuiPlayingGame";
+import { IuiCardPlayedNotification, IuiGameBeginsNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, PLAY_CARD_RESPONSE, PROMISE_RESPONSE } from "./frontend/src/interfaces/IuiPlayingGame";
 import { getGameInfo, getRound, makePromise, playCard } from "./backend/actions/playingGame";
 import { GAME_STATUS, ROUND_STATUS } from "./frontend/src/interfaces/IuiGameOptions";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "./frontend/src/interfaces/IuiLeaveOngoingGame";
@@ -90,6 +90,7 @@ connectDB().then(() => {
       csm.removeUserSocketsAndGames(userName);
       csm.unsetUserAsAdmin(userName);
       csm.clearWaiting(userName);
+      // disconnect must leave observing status as it was because we allow refresh login to observers too
     });
 
     socket.on("user login", async (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => {
@@ -360,7 +361,7 @@ connectDB().then(() => {
         }
         if (joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.lastOk) {
           // notify all games players about game start
-          io.to(gameId).emit("game begins", gameId);
+          io.to(gameId).emit("game begins", { gameId: gameId, asAObserver: false } as IuiGameBeginsNotification);
           io.to(gameId).socketsLeave("waiting lobby");
           io.to("waiting lobby").emit("changes in game players");
         }
@@ -415,13 +416,26 @@ connectDB().then(() => {
         const timestamp = Date.now();
         switch (checkResponse.checkStatus) {
           case CHECK_GAME_STATUS.noGame: {
+            // check if i am observer
+            if (csm.userIsCurrentlyObserving(userName)) {
+              const observingGame = csm.getObservingGame(userName);
+              if (observingGame) {
+                const {gameId} = observingGame;
+                socket.join(gameId);
+                csm.setObserving(userName, timestamp, socket.id, gameId, false);
+                const chatLine = `player ${userName} observing game`;
+                io.to(gameId).emit("new chat line", chatLine);
+                checkResponse.gameId = gameId;
+                checkResponse.checkStatus = CHECK_GAME_STATUS.onGoingGame;
+                break;
+              }
+            }
             // join waiting rooms
             socket.join("waiting lobby");
             break;
           }
           case CHECK_GAME_STATUS.joinedGame:
-          case CHECK_GAME_STATUS.onGoingGame:
-          case CHECK_GAME_STATUS.observedGame: {
+          case CHECK_GAME_STATUS.onGoingGame: {
             const gameIdStr = checkResponse.gameId ?? "";
             const playAsName = checkResponse.asAPlayer ?? "";
             socket.leave("waiting lobby");
@@ -473,7 +487,8 @@ connectDB().then(() => {
         if (gameId === "") {
           return null;
         }
-        const gameInfoResponse: IuiGetGameInfoResponse | null = await getGameInfo(getGameInfoRequest);
+        const iAmObserving = csm.userIsCurrentlyObserving(userName, gameId);
+        const gameInfoResponse: IuiGetGameInfoResponse | null = await getGameInfo(getGameInfoRequest, iAmObserving);
         // console.log("gameInfoResponse", gameInfoResponse);
         if (gameInfoResponse === null) {
           return null;
@@ -503,7 +518,8 @@ connectDB().then(() => {
         if (gameId === "") {
           return null;
         }
-        const roundResponse: IuiGetRoundResponse | null = await getRound(getRoundObj);
+        const iAmObserving = csm.getObservingGame(userName)?.isWaiting === false && !csm.getPlayersOfTheGame(gameId).some(player => player === userName);
+        const roundResponse: IuiGetRoundResponse | null = await getRound(getRoundObj, iAmObserving);
         // console.log("roundResponse", roundResponse);
         if (roundResponse === null) {
           return null;
@@ -849,7 +865,7 @@ connectDB().then(() => {
       const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
       if (isAuthenticated) {
-        if (!gameId || !replacedPlayer || !joinerName) {
+        if (!gameId || !replacedPlayer || !joinerName || !csm.isUserConnected(joinerName)) {
           fn({
             isAuthenticated: true,
             joinOk: false,
@@ -859,51 +875,51 @@ connectDB().then(() => {
         }
 
         const playerToJoin = await getHumanPlayer(gameId, replacedPlayer);
-        const timestamp = Date.now();
+        let joinOk = false;
+
         if (playerToJoin) {
           // console.log("playerToJoin", playerToJoin);
           // check socket status
           // user that is going to be noticed must be active
-          if (csm.isUserConnected(joinerName)) {
-            // ping sockets
-            let pingOk = false;
-            let socketId = "";
-            const sockets = csm.getUserSocketsFromMap(joinerName);
-            // console.log("waiter sockets", sockets);
-            if (sockets) {
-              // eslint-disable-next-line no-cond-assign
-              for (let it = sockets.values(), val = null; val=it.next().value;) {
-                if (val !== undefined) {
-                  socketId = val;
-                  if (csm.isWaitingGame(joinerName, socketId, replacedPlayer, gameId)) {
-                    pingOk = true;
-                    // console.log(`allow to join game - socket ${socketId} : ${gameId} : ${replacedPlayer} : ${joinerName}`);
-                    break;
-                  }
+          // ping sockets
+          let pingOk = false;
+          let socketId = "";
+          const sockets = csm.getUserSocketsFromMap(joinerName);
+          // console.log("waiter sockets", sockets);
+          if (sockets) {
+            // eslint-disable-next-line no-cond-assign
+            for (let it = sockets.values(), val = null; val=it.next().value;) {
+              if (val !== undefined) {
+                socketId = val;
+                if (csm.isWaitingGame(joinerName, socketId, replacedPlayer, gameId)) {
+                  pingOk = true;
+                  // console.log(`allow to join game - socket ${socketId} : ${gameId} : ${replacedPlayer} : ${joinerName}`);
+                  break;
                 }
               }
             }
+          }
 
-            if (!pingOk) {
-              // console.log(`allow to join game - joining failed because user was not waiting active ${gameId} : ${joinerName}`);
-              fn({
-                isAuthenticated: true,
-                joinOk: false,
-                token: token,
-              } as IuiAllowPlayerToJoinResponse);
-              return null;
-            }
+          if (!pingOk) {
+            // console.log(`allow to join game - joining failed because user was not waiting active ${gameId} : ${joinerName}`);
+            fn({
+              isAuthenticated: true,
+              joinOk: false,
+              token: token,
+            } as IuiAllowPlayerToJoinResponse);
+            return null;
+          }
 
-            const joinRequest: IuiJoinOngoingGame = {
-              gameId: gameId,
-              playAsPlayer: replacedPlayer,
-              userName: joinerName,
-              uuid: "",
-            };
+          const joinRequest: IuiJoinOngoingGame = {
+            gameId: gameId,
+            playAsPlayer: replacedPlayer,
+            userName: joinerName,
+            uuid: "",
+          };
 
-            let joinOk = false;
-
-            if (allow) {
+          if (allow) {
+            const checkResponse: IuiCheckIfOngoingGameResponse = await checkIfOngoingGame(joinerName);
+            if (checkResponse.checkStatus === CHECK_GAME_STATUS.noGame) {
               const joinResponse = await joinOngoingGame(joinRequest, true);
               // console.log("joinResponse", joinResponse);
               if (joinResponse.joinStatus === JOIN_GAME_STATUS.ok) {
@@ -918,37 +934,28 @@ connectDB().then(() => {
 
                 io.to(socketId).socketsJoin(gameId);
                 io.to(socketId).socketsLeave("waiting lobby");
-                io.to(socketId).emit("game begins", gameId);
+                io.to(socketId).emit("game begins", { gameId: gameId, asAObserver: false } as IuiGameBeginsNotification);
 
                 joinOk = true;
               }
             }
+          }
 
-            // not allowed or join response failed
-            if (!joinOk) {
-              const chatLine = `player ${userName} rejected ${joinerName} request to join game and play as ${replacedPlayer}`;
-              io.to(gameId).emit("new chat line", chatLine);
-              io.to(gameId).emit("player wants to join", { joinerName: "", replacedPlayer: "" } as IuiPlayerWantsToJoinNotification);
+          // not allowed or join response failed
+          if (!joinOk) {
+            const chatLine = `player ${userName} rejected ${joinerName} request to join game and play as ${replacedPlayer}`;
+            io.to(gameId).emit("new chat line", chatLine);
+            io.to(gameId).emit("player wants to join", { joinerName: "", replacedPlayer: "" } as IuiPlayerWantsToJoinNotification);
 
-              io.to(socketId).emit("join request rejected", gameId);
-            }
-
-            csm.setLastTimestamp(userName, socket.id, timestamp);
-            const newToken = signUserToken(userName, uuid, timestamp);
-            fn({
-              joinOk: joinOk,
-              isAuthenticated: true,
-              token: newToken,
-            } as IuiAllowPlayerToJoinResponse);
-            return null;
+            io.to(socketId).emit("join request rejected", gameId);
           }
         }
 
-        // else
+        const timestamp = Date.now();
         csm.setLastTimestamp(userName, socket.id, timestamp);
         const newToken = signUserToken(userName, uuid, timestamp);
         fn({
-          joinOk: false,
+          joinOk: joinOk,
           isAuthenticated: true,
           token: newToken,
         } as IuiAllowPlayerToJoinResponse);
@@ -1046,7 +1053,8 @@ connectDB().then(() => {
       const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
       if (isAuthenticated) {
-        if (!gameId || !observerName) {
+        const timestamp = Date.now();
+        if (!gameId || !observerName || !csm.isUserConnected(observerName)) {
           fn({
             isAuthenticated: true,
             observeOk: false,
@@ -1054,6 +1062,7 @@ connectDB().then(() => {
           } as IuiAllowPlayerToObserveResponse);
           return null;
         }
+        let observeOk = false;
 
         const observer = csm.getGameObservers(gameId).get(observerName);
         if (observer) {
@@ -1062,9 +1071,37 @@ connectDB().then(() => {
             csm.clearObserving(observerName);
             io.to(observerSocket).socketsLeave(gameId);
             io.to(observerSocket).emit("observe request rejected", gameId);
+          } else {
+            const checkResponse: IuiCheckIfOngoingGameResponse = await checkIfOngoingGame(observerName);
+            if (checkResponse.checkStatus === CHECK_GAME_STATUS.noGame) {
+              csm.clearWaiting(observerName);
+              // only real players are in game
+              // csm.addUserToGame(observerName, observerSocket, gameId);
+              csm.setObserving(observerName, timestamp, observerSocket, gameId, false);
+
+              const chatLine = `player ${userName} allowed ${observerName} to observe game`;
+              io.to(gameId).emit("new chat line", chatLine);
+
+              io.to(observerSocket).socketsJoin(gameId);
+              io.to(observerSocket).socketsLeave("waiting lobby");
+              io.to(observerSocket).emit("game begins", { gameId: gameId, asAObserver: true } as IuiGameBeginsNotification);
+
+              observeOk = true;
+            }
           }
+        } else {
+          // someone else or observer him/herself has rejected request
+          // there is no need to do anything
         }
 
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        fn({
+          isAuthenticated: true,
+          token: newToken,
+          observeOk: observeOk,
+        } as IuiAllowPlayerToObserveResponse);
+        return null;
       } else {
         fn({
           isAuthenticated: false,
@@ -1081,7 +1118,7 @@ connectDB().then(() => {
 
       if (isAuthenticated) {
         const timestamp = Date.now();
-        const waitingToGame = csm.getObservingGame(userName);
+        const waitingToGame = csm.getObservingGame(userName)?.gameId;
         csm.clearObserving(userName);
         if (waitingToGame) {
           // io.to(waitingToGame).emit("players wants to observe", { observerNames: csm.getGameObservers(waitingToGame) } as IuiPlayersWantsToObserveNotification);

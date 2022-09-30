@@ -4,8 +4,9 @@ import { useSelector } from "react-redux";
 
 import { colorize } from "../../common/commonFunctions";
 import { playerFromIndex } from "../../common/playingGame";
-import { IuiGetRoundResponse, ROUND_PHASE } from "../../interfaces/IuiPlayingGame";
+import { ROUND_PHASE } from "../../interfaces/IuiPlayingGame";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
+import { getUser } from "../../store/userSlice";
 import AnimatedProgressBar from "./AnimatedProgressBar";
 
 interface IProps {
@@ -14,10 +15,13 @@ interface IProps {
 }
 
 const PlayerInfo = ({index}: IProps) => {
-  const currentRoundInfo: IuiGetRoundResponse = useSelector(getCurrentRoundInfo);
-  if (!currentRoundInfo.gameId) return null;
+  const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  const user = useSelector(getUser);
 
-  const player = playerFromIndex(currentRoundInfo, index);
+  if (!currentRoundInfo.gameId || !user.isUserLoggedIn) return null;
+
+  const iAmObserver = currentRoundInfo.observers?.some(observer => observer.name === user.userName && !observer.waiting) ?? false;
+  const player = playerFromIndex(currentRoundInfo, index, iAmObserver);
   const max = currentRoundInfo.roundToPlayer.cardsInRound;
 
   const isThisPromiseTurn = (): boolean => {

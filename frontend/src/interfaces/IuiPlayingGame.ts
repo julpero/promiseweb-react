@@ -42,6 +42,11 @@ export enum CARD_ALIGN_TYPE {
   right,
 }
 
+export interface IuiGameBeginsNotification {
+  gameId: string,
+  asAObserver: boolean,
+}
+
 export interface IuiObserver {
   name: string,
   waiting: boolean,

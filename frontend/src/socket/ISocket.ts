@@ -7,6 +7,7 @@ import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse } from "../inte
 import { IuiCreateGameRequest, IuiCreateGameResponse } from "../interfaces/IuiNewGame";
 import {
   IuiCardPlayedNotification,
+  IuiGameBeginsNotification,
   IuiGetGameInfoRequest,
   IuiGetGameInfoResponse,
   IuiGetRoundRequest,
@@ -27,7 +28,7 @@ export interface ServerToClientEvents {
   "game list updated": () => void;
   "changes in game players": () => void;
 
-  "game begins": (gameIdStr: string) => void;
+  "game begins": (gameBeginsNotification: IuiGameBeginsNotification) => void;
   "promise made": (promiseNotification: IuiPromiseMadeNotification) => void;
   "card played": (cardPlayedNotification: IuiCardPlayedNotification) => void;
 

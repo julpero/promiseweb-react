@@ -12,19 +12,25 @@ import { cardAsString } from "../../common/commonFunctions";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 import { CARD_ALIGN_TYPE } from "../../interfaces/IuiPlayingGame";
 import AnimatedPlayedCardSlot from "./AnimatedPlayedCardSlot";
+import { getUser } from "../../store/userSlice";
 
 const TableLayout6 = () => {
   // console.log("TableLayout6");
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
-  if (!currentRoundInfo || !currentRoundInfo.gameId) return null;
+  const user = useSelector(getUser);
+
+  if (!currentRoundInfo || !currentRoundInfo.gameId || !user.isUserLoggedIn) return null;
   const { roundToPlayer, userName } = currentRoundInfo;
 
-  const myPlayedCard = roundToPlayer.myPlayedCard ?? undefined;
+  const iAmObserver = currentRoundInfo.observers?.some(observer => observer.name === user.userName && !observer.waiting) ?? false;
+  const myName = iAmObserver ? currentRoundInfo.roundToPlayer.players[0].name ?? "" : userName;
+
+  const myPlayedCard = (iAmObserver ? roundToPlayer.cardsPlayed.find(played => played.name === myName)?.card : roundToPlayer.myPlayedCard) ?? undefined;
   const cardFace = myPlayedCard ? getCardFace(cardAsString(myPlayedCard), CARD_PLAYABLE.played) : undefined;
   const animationObject = commonAnimationObject();
 
-  const iAmStarter = roundToPlayer.playerInCharge === userName;
-  const iHaveWinningCard = roundToPlayer.playerGoingToWinThisPlay === userName;
+  const iAmStarter = roundToPlayer.playerInCharge === myName;
+  const iHaveWinningCard = roundToPlayer.playerGoingToWinThisPlay === myName;
   const classStr = `myPlayedCard${iHaveWinningCard ? " winningCardSlot" : ""}`;
 
   return (
@@ -157,7 +163,7 @@ const TableLayout6 = () => {
         }}
       >
         <AnimatedCardSlot
-          containerId={`cardPlayedDivX${userName}`}
+          containerId={`cardPlayedDivX${myName}`}
           classStr={classStr}
           animationObject={animationObject}
           isCardInCharge={iAmStarter && roundToPlayer.cardsPlayed.length > 0}
