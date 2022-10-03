@@ -44,7 +44,7 @@ export const isValidAdminUser = (userName: string, uuid: string): boolean => {
  */
 export const isValidUser = (userName: string, password: string, uuid: string): boolean => {
   if (!userName || !password || !uuid) return false;
-  if (userName.length < 3) return false;
+  if (userName.trim().length < 3) return false;
   if (password.length < 4) return false;
   if (!uuidValidate(uuid)) return false;
 
@@ -62,6 +62,8 @@ export const isValidUser = (userName: string, password: string, uuid: string): b
  */
 export const isUserAuthenticated = (token: string | string[] | undefined, userName: string, uuid: string, timestamp: number | null): boolean => {
   // console.log("isUserAuthenticated");
+
+  if (userName !== userName.trim()) return false;
 
   const parsedToken = getValidToken(token);
   if (parsedToken) {

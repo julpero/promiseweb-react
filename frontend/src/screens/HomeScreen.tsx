@@ -321,6 +321,10 @@ const validateLoginUserForm = (values: IUserLoginForm) => {
     errors.userName = "Your (nick)name must be at least three characters long";
   }
 
+  if (values.userName && values.userName.length !== values.userName.trim().length) {
+    errors.userName = "Leading and ending white spaces are not allowed in (nick)name";
+  }
+
   if (!values.password1 || values.password1?.length < 4) {
     errors.password1 = "Not valid password!";
   }
