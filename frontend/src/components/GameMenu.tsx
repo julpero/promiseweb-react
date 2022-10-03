@@ -23,6 +23,7 @@ const GameMenu = () => {
   const [requestPlayerName, setRequestPlayerName] = useState("");
   const [activeJoinRequest, setActiveJoinRequest] = useState(false);
   const [showObserveModal, setShowObserveModal] = useState(false);
+  const [showObserveDismissedModal, setShowObserveDismissedModal] = useState(false);
 
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const currentGameInfo = useSelector(getCurrentGameInfo);
@@ -53,8 +54,15 @@ const GameMenu = () => {
       setActiveJoinRequest(joinerName.length > 0 && replacedPlayer.length > 0);
     };
 
+    const handleObserveDismissed = (gameId: string) => {
+      if (currentGameInfo.gameId === gameId) {
+        setShowObserveDismissedModal(true);
+      }
+    };
+
     socket.on("player joined on going game", handleOtherPlayerReplacingMe);
     socket.on("player wants to join", handlePlayerJoining);
+    socket.on("observe request rejected", handleObserveDismissed);
 
     return () => {
       socket.off("player joined on going game");
@@ -141,6 +149,7 @@ const GameMenu = () => {
     setLeftGameModal(false);
     setGameDismissedModal(false);
     setLeaveGameModal(false);
+    setShowObserveDismissedModal(false);
     dispatch(setGameId(""));
   };
 
@@ -340,6 +349,20 @@ const GameMenu = () => {
           <Button variant="success" onClick={() => refreshRoundInfo()}>REFRESH</Button>
           &nbsp;
           <Button variant="primary" onClick={() => toggleObserveModal(!showObserveModal)}>CLOSE</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showObserveDismissedModal} onHide={closeLeftModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            You have been kicked off from observing this game!
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Some player in the game just dismissed your observing permission.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={closeLeftModal}>CLOSE</Button>
         </Modal.Footer>
       </Modal>
     </div>
