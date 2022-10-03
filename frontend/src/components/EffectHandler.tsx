@@ -38,7 +38,7 @@ const EffectHandler = ({gameId}: IProps) => {
       // console.log("use effect, getRoundRequest", getRoundRequest);
 
       socket.emit("get round", getRoundRequest, (roundResponse: IuiGetRoundResponse) => {
-        // console.log("roundResponse", roundResponse);
+        console.log("roundResponse", roundResponse);
         if (roundResponse.isAuthenticated) {
           handleAuthenticatedRequest(roundResponse.token);
           dispatch(setRoundInfo(roundResponse));

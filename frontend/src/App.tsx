@@ -13,6 +13,7 @@ import { getCurrentGameId, setGameId } from "./store/gameInfoSlice";
 import { getUser, setUserLoggedIn } from "./store/userSlice";
 import { IuiRefreshLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./interfaces/IuiUser";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "./common/userFunctions";
+import { IuiGameBeginsNotification } from "./interfaces/IuiPlayingGame";
 
 const App = () => {
   const [gameStatus, setGameStatus] = useState(CHECK_GAME_STATUS.noGame);
@@ -31,7 +32,7 @@ const App = () => {
     if (response.isAuthenticated) {
       handleAuthenticatedRequest(response.token);
       setGameStatus(response.checkStatus);
-      if (response.gameId && response.asAPlayer) {
+      if (response.gameId) {
         dispatch(setGameId(response.gameId ?? ""));
       }
     } else {
@@ -81,11 +82,11 @@ const App = () => {
       }
     }
 
-    socket.on("game begins", (gameId: string) => {
+    socket.on("game begins", (gameBeginsNotification: IuiGameBeginsNotification) => {
       // console.log("game begins call");
-      if (gameId !== "" && user.isUserLoggedIn) {
-        setGameStatus(CHECK_GAME_STATUS.onGoingGame);
-        dispatch(setGameId(gameId));
+      if (gameBeginsNotification.gameId !== "" && user.isUserLoggedIn) {
+        setGameStatus(gameBeginsNotification.asAObserver ? CHECK_GAME_STATUS.observedGame : CHECK_GAME_STATUS.onGoingGame);
+        dispatch(setGameId(gameBeginsNotification.gameId));
       }
     });
 
@@ -107,7 +108,7 @@ const App = () => {
 
   // console.log("render app...");
 
-  if (gameStatus === CHECK_GAME_STATUS.onGoingGame && gameId !== "" && user.isUserLoggedIn) {
+  if ((gameStatus === CHECK_GAME_STATUS.onGoingGame || gameStatus === CHECK_GAME_STATUS.observedGame) && gameId !== "" && user.isUserLoggedIn) {
     return <GameTable gameId={gameId ?? ""} />;
   } else {
     return (

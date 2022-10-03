@@ -3,7 +3,7 @@ import { Button, Modal, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 import { IuiGameListItem, IuiGetGameListResponse } from "../interfaces/IuiGameList";
-import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse, JOIN_GAME_STATUS } from "../interfaces/IuiJoinOngoingGame";
+import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiObserveGameRequest, IuiObserveGameResponse, JOIN_GAME_STATUS, OBSERVE_RESPONSE } from "../interfaces/IuiJoinOngoingGame";
 import { IuiUserData } from "../interfaces/IuiUser";
 import { useSocket } from "../socket";
 import { getUser } from "../store/userSlice";
@@ -17,6 +17,8 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
   const [ joinOk, setJoinOk ] = useState(false);
   const [ showRejection, setShowRejection ] = useState(false);
   const [ showWaiting, setShowWaiting ] = useState(false);
+  const [ showObserveWaiting, setShowObserveWaiting ] = useState(false);
+  const [ showObserveRejection, setShowObserveRejection ] = useState(false);
   const [ showError, setShowError ] = useState(false);
   const [ playerName, setPlayerName ] = useState("");
   const [ gameItemList, setGameItemList ] = useState<IuiGameListItem[]>([]);
@@ -42,7 +44,7 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
           setSubmitting(false);
           setShowRejection(false);
           setShowError(false);
-          setShowWaiting(false);
+
         } else {
           handleUnauthenticatedRequest(dispatch);
         }
@@ -57,11 +59,19 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
       setShowRejection(true);
     };
 
+    const handleObserveRejection = () => {
+      setShowObserveRejection(true);
+      setShowObserveWaiting(false);
+    };
+
     socket.on("changes in game players", fetchGameItemList);
     socket.on("join request rejected", handleJoinRejection);
+    socket.on("observe request rejected", handleObserveRejection);
 
     return () => {
       socket.off("changes in game players");
+      socket.off("join request rejected");
+      socket.off("observe request rejected");
     };
   }, [fetchGameItemList, socket]);
 
@@ -96,6 +106,29 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
     });
   };
 
+  const observeGame = (gameId: string): void => {
+    setSubmitting(true);
+    const observeGameRequest: IuiObserveGameRequest = {
+      gameId: gameId,
+      uuid: getMyId(),
+      userName: user.userName,
+      token: getToken(),
+    };
+    socket.emit("observe game", observeGameRequest, (observeGameResponse: IuiObserveGameResponse) => {
+      // console.log("observe response", observeGameResponse);
+      if (observeGameResponse.isAuthenticated) {
+        handleAuthenticatedRequest(observeGameResponse.token);
+        if (observeGameResponse.observeResponse === OBSERVE_RESPONSE.waiting) {
+          setShowObserveWaiting(true);
+        } else if (observeGameResponse.observeResponse === OBSERVE_RESPONSE.onGoingGameExists) {
+          setShowError(true);
+        }
+      } else {
+        handleUnauthenticatedRequest(dispatch);
+      }
+    });
+  };
+
   const closeAndPlay = () =>  {
     setJoinOk(false);
     onJoin();
@@ -111,6 +144,26 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
       // console.log("cancelled my join request", simpleResponse);
       if (simpleResponse.isAuthenticated) {
         handleAuthenticatedRequest(simpleResponse.token);
+        setShowWaiting(false);
+        fetchGameItemList();
+      } else {
+        handleUnauthenticatedRequest(dispatch);
+      }
+    });
+  };
+
+  const cancelObserveWaiting = () => {
+    const cancelRequest: IuiUserData = {
+      uuid: getMyId(),
+      userName: user.userName,
+      token: getToken(),
+    };
+    socket.emit("cancel my observe request", cancelRequest, (simpleResponse) => {
+      // console.log("cancelled my join request", simpleResponse);
+      if (simpleResponse.isAuthenticated) {
+        handleAuthenticatedRequest(simpleResponse.token);
+        setShowObserveWaiting(false);
+        setShowObserveRejection(false);
         fetchGameItemList();
       } else {
         handleUnauthenticatedRequest(dispatch);
@@ -140,7 +193,7 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
     const buttonsArr: JSX.Element[] = [];
     const freePlayers = Array.from(new Set([ ...inActivePlayers ?? [], ...inActivePlayerSockets ?? [] ]));
     freePlayers.forEach(player => {
-      buttonsArr.push(<Button key={`joinAs${player}`} size="sm" onClick={() => joinGame(gameId, player, false)} disabled={submitting}>Join as {player}</Button>);
+      buttonsArr.push(<Button className="joinOtherButton" key={`joinAs${player}`} size="sm" onClick={() => joinGame(gameId, player, false)} disabled={submitting}>Join as {player}</Button>);
     });
     return buttonsArr;
   };
@@ -149,14 +202,22 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
     const actionArr: JSX.Element[] = [];
     if (imInTheGame) {
       actionArr.push(
-        <Button key="joinAsMySelfButton" size="sm" onClick={() => joinGame(gameId, user.userName, true)} disabled={submitting}>Re-Join as my self</Button>
+        <Button key="joinAsMySelfButton" variant="success" size="sm" onClick={() => joinGame(gameId, user.userName, true)} disabled={submitting}>Re-Join as my self</Button>
       );
     } else if (!imInTheGame) {
       renderOtherJoinButtons(gameId, inActivePlayers, inActivePlayerSockets).forEach(button => {
         actionArr.push(button);
+        actionArr.push();
       });
     }
     return actionArr;
+  };
+
+  const renderObserveButton = (gameId: string, imInTheGame: boolean) => {
+    if (imInTheGame) return null;
+    return (
+      <Button disabled={submitting} size="sm" onClick={() => observeGame(gameId)}>Observe Game</Button>
+    );
   };
 
   const renderGameItems = () => {
@@ -174,6 +235,9 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
           </div>
           <div className="col">
             {renderActions(id, imInTheGame, inActivePlayers, inActivePlayerSockets)}
+          </div>
+          <div className="col">
+            {renderObserveButton(id, imInTheGame)}
           </div>
         </div>
       );
@@ -257,6 +321,45 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
           <Button variant="warning" onClick={cancelWaiting}>Close</Button>
         </Modal.Footer>
       </Modal>
+
+      <Modal show={showObserveWaiting} onHide={cancelObserveWaiting}>
+        <Modal.Header>
+          <Modal.Title>
+            Waiting to observe game...
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>You have requested to observe game.</p>
+          <p>Someone active player in the game must accept your request so please wait...</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" onClick={cancelObserveWaiting}>
+            <Spinner
+              as="span"
+              animation="border"
+              size="sm"
+            />
+            &nbsp;
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showObserveRejection} onHide={cancelObserveWaiting}>
+        <Modal.Header>
+          <Modal.Title>
+            Observing request is rejected
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>You have requested to observe game.</p>
+          <p>Someone active player in the game just rejected your request.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" onClick={cancelObserveWaiting}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+
     </React.Fragment>
   );
 };

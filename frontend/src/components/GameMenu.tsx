@@ -6,7 +6,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCurrentGameInfo, setGameId } from "../store/gameInfoSlice";
 import { getUser } from "../store/userSlice";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
-import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification } from "../interfaces/IuiJoinOngoingGame";
+import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiAllowPlayerToObserveRequest, IuiAllowPlayerToObserveResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification } from "../interfaces/IuiJoinOngoingGame";
+import { getCurrentRoundInfo } from "../store/roundInfoSlice";
+import { IuiGetRoundRequest } from "../interfaces/IuiPlayingGame";
+import { setGetRoundInfo } from "../store/getRoundInfoSlice";
+import { IuiAuth, IuiUserData } from "../interfaces/IuiUser";
 
 /**
  * GameMenu
@@ -19,7 +23,10 @@ const GameMenu = () => {
   const [otherPlayerName, setOtherPlayerName] = useState("");
   const [requestPlayerName, setRequestPlayerName] = useState("");
   const [activeJoinRequest, setActiveJoinRequest] = useState(false);
+  const [showObserveModal, setShowObserveModal] = useState(false);
+  const [showObserveDismissedModal, setShowObserveDismissedModal] = useState(false);
 
+  const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const currentGameInfo = useSelector(getCurrentGameInfo);
   const user = useSelector(getUser);
 
@@ -29,6 +36,8 @@ const GameMenu = () => {
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
   const getToken = (): string => window.localStorage.getItem("token") ?? "";
+
+  const iAmObserver = currentRoundInfo.observers?.some(observer => observer.name === user.userName && !observer.waiting) ?? false;
 
   useEffect(() => {
     const handleOtherPlayerReplacingMe = (playerJoinedNotification: IuiPlayerJoinedOnGoingGameNotification) => {
@@ -48,8 +57,15 @@ const GameMenu = () => {
       setActiveJoinRequest(joinerName.length > 0 && replacedPlayer.length > 0);
     };
 
+    const handleObserveDismissed = (gameId: string) => {
+      if (currentGameInfo.gameId === gameId) {
+        setShowObserveDismissedModal(true);
+      }
+    };
+
     socket.on("player joined on going game", handleOtherPlayerReplacingMe);
     socket.on("player wants to join", handlePlayerJoining);
+    socket.on("observe request rejected", handleObserveDismissed);
 
     return () => {
       socket.off("player joined on going game");
@@ -119,15 +135,130 @@ const GameMenu = () => {
     }
   };
 
+  const leaveObservingClick = () => {
+    if (user.isUserLoggedIn) {
+      const cancelRequest: IuiUserData = {
+        uuid: getMyId(),
+        userName: user.userName,
+        token: getToken(),
+      };
+      socket.emit("stop observing", cancelRequest, (response: IuiAuth) => {
+        if (response.isAuthenticated) {
+          handleAuthenticatedRequest(response.token);
+          closeLeftModal();
+        } else {
+          handleUnauthenticatedRequest(dispatch);
+        }
+      });
+    }
+  };
+
+  const refreshRoundInfo = () => {
+    if (currentGameInfo.gameId) {
+      const getRoundRequest: IuiGetRoundRequest = {
+        uuid: getMyId(),
+        userName: user.userName,
+        token: getToken(),
+        gameId: currentGameInfo.gameId,
+        roundInd: currentRoundInfo.roundInd,
+      };
+      dispatch(setGetRoundInfo(getRoundRequest));
+    }
+  };
+
   const closeLeftModal = () => {
     setLeftGameModal(false);
     setGameDismissedModal(false);
     setLeaveGameModal(false);
+    setShowObserveDismissedModal(false);
     dispatch(setGameId(""));
   };
 
+  const toggleObserveModal = (show: boolean): void => {
+    refreshRoundInfo();
+    setShowObserveModal(show);
+  };
+
+  const isActiveObserveRequest = (): boolean => {
+    return currentRoundInfo.observers?.some(observer => observer.waiting) ?? false;
+  };
+
+  const isActiveObservers = (): boolean => {
+    return currentRoundInfo.observers?.some(observer => !observer.waiting) ?? false;
+  };
+
+  const allowPlayerToObserve = (observerName: string, allow: boolean) => {
+    const playerToObserveRequest: IuiAllowPlayerToObserveRequest = {
+      observerName: observerName,
+      allow: allow,
+      gameId: currentGameInfo.gameId,
+      uuid: getMyId(),
+      userName: user.userName,
+      token: getToken(),
+    };
+    socket.emit("allow to observe game", playerToObserveRequest, (observeGameResponse: IuiAllowPlayerToObserveResponse) => {
+      // console.log("observeGameResponse", observeGameResponse);
+      if (observeGameResponse.isAuthenticated) {
+        handleAuthenticatedRequest(observeGameResponse.token);
+        refreshRoundInfo();
+      } else {
+        handleUnauthenticatedRequest(dispatch);
+      }
+    });
+  };
+
+  const renderActiveObservers = () => {
+    if (isActiveObservers()) {
+      return (
+        currentRoundInfo.observers?.filter(observer => !observer.waiting).map((observer, ind) => {
+          return (
+            <div key={ind} className="row">
+              <div className="col">
+                {observer.name}
+              </div>
+              <div className="col">
+                <Button size="sm" variant="danger" onClick={() => allowPlayerToObserve(observer.name, false)}>
+                  Dismiss
+                </Button>
+              </div>
+            </div>
+          );
+        })
+      );
+    } else {
+      return "No active observers";
+    }
+  };
+
+  const renderObserveRequests = () => {
+    if (isActiveObserveRequest()) {
+      return (
+        currentRoundInfo.observers?.filter(observer => observer.waiting).map((observer, ind) => {
+          return (
+            <div key={ind} className="row">
+              <div className="col">
+                {observer.name}
+              </div>
+              <div className="col">
+                <Button size="sm" variant="success" onClick={() => allowPlayerToObserve(observer.name, true)}>
+                  Allow
+                </Button>
+                &nbsp;
+                <Button size="sm" variant="warning" onClick={() => allowPlayerToObserve(observer.name, false)}>
+                  Reject
+                </Button>
+              </div>
+            </div>
+          );
+        })
+      );
+    } else {
+      return "No active requests";
+    }
+  };
+
   const renderRequest = () => {
-    if (activeJoinRequest) {
+    if (activeJoinRequest && !iAmObserver) {
       return (
         <React.Fragment>
           <div><i>{requestPlayerName}</i> want to play as <i>{otherPlayerName}</i>, is this ok?</div>
@@ -142,16 +273,43 @@ const GameMenu = () => {
     return null;
   };
 
-  return (
-    <div id="menuArea">
-      <div>
+  const renderMenuButtons = () => {
+    if (iAmObserver) {
+      return (
         <Button
           size="sm"
-          variant="danger"
-          onClick={() => setLeaveGameModal(!leaveGameModal)}
+          variant="warning"
+          onClick={() => leaveObservingClick()}
         >
-          Leaving Game?
+          Stop Observing
         </Button>
+      );
+    } else {
+      return (
+        <React.Fragment>
+          <Button
+            size="sm"
+            variant={isActiveObserveRequest() ? "warning" : (isActiveObservers() ? "info" : "secondary")}
+            onClick={() => toggleObserveModal(!showObserveModal)}
+          >
+            Observers
+          </Button>
+          <Button
+            size="sm"
+            variant="danger"
+            onClick={() => setLeaveGameModal(!leaveGameModal)}
+          >
+            Leaving Game?
+          </Button>
+        </React.Fragment>
+      );
+    }
+  };
+
+  return (
+    <div id="menuArea">
+      <div className="d-grid gap-2">
+        {renderMenuButtons()}
       </div>
 
       {renderRequest()}
@@ -209,6 +367,40 @@ const GameMenu = () => {
         </Modal.Header>
         <Modal.Body>
           Original player <i>{otherPlayerName}</i> has just joined again into this game and continues to play it.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={closeLeftModal}>CLOSE</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showObserveModal} onHide={() => toggleObserveModal(!showObserveModal)}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Observers
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <h5>Active</h5>
+          {renderActiveObservers()}
+          <hr />
+          <h5>Requests</h5>
+          {renderObserveRequests()}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="success" onClick={() => refreshRoundInfo()}>REFRESH</Button>
+          &nbsp;
+          <Button variant="primary" onClick={() => toggleObserveModal(!showObserveModal)}>CLOSE</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showObserveDismissedModal} onHide={closeLeftModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            You have been kicked off from observing this game!
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Some player in the game just dismissed your observing permission.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={closeLeftModal}>CLOSE</Button>

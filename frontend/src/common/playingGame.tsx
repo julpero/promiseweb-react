@@ -10,8 +10,8 @@ const getMyPosition = (round: IuiGetRoundResponse): number => {
   return round.roundToPlayer.players.findIndex(player => player.thisIsMe);
 };
 
-export const playerFromIndex = (round: IuiGetRoundResponse, index: number): IuiRoundPlayer => {
-  const myPosition = getMyPosition(round);
+export const playerFromIndex = (round: IuiGetRoundResponse, index: number, asAObserver: boolean): IuiRoundPlayer => {
+  const myPosition = asAObserver ? 0 : getMyPosition(round);
   const playerCount = round.roundToPlayer.players.length;
   let retIndex = myPosition + index;
   if (retIndex >= playerCount) retIndex = retIndex - playerCount;
