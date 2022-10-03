@@ -39,6 +39,7 @@ export interface ServerToClientEvents {
   "players wants to observe": (playersWantsToObserveNotification: IuiPlayersWantsToObserveNotification) => void;
   "player observing game": (playerObservingNotification: IuiPlayerObservingNotification) => void;
   "observe request rejected": (gameId: string) => void;
+
   "hey": () => void;
 }
 

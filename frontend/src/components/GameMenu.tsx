@@ -10,6 +10,7 @@ import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiAllowPlay
 import { getCurrentRoundInfo } from "../store/roundInfoSlice";
 import { IuiGetRoundRequest } from "../interfaces/IuiPlayingGame";
 import { setGetRoundInfo } from "../store/getRoundInfoSlice";
+import { IuiAuth, IuiUserData } from "../interfaces/IuiUser";
 
 /**
  * GameMenu
@@ -35,6 +36,8 @@ const GameMenu = () => {
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
   const getToken = (): string => window.localStorage.getItem("token") ?? "";
+
+  const iAmObserver = currentRoundInfo.observers?.some(observer => observer.name === user.userName && !observer.waiting) ?? false;
 
   useEffect(() => {
     const handleOtherPlayerReplacingMe = (playerJoinedNotification: IuiPlayerJoinedOnGoingGameNotification) => {
@@ -125,6 +128,24 @@ const GameMenu = () => {
             setGameDismissedModal(true);
             setLeaveGameModal(false);
           }
+        } else {
+          handleUnauthenticatedRequest(dispatch);
+        }
+      });
+    }
+  };
+
+  const leaveObservingClick = () => {
+    if (user.isUserLoggedIn) {
+      const cancelRequest: IuiUserData = {
+        uuid: getMyId(),
+        userName: user.userName,
+        token: getToken(),
+      };
+      socket.emit("stop observing", cancelRequest, (response: IuiAuth) => {
+        if (response.isAuthenticated) {
+          handleAuthenticatedRequest(response.token);
+          closeLeftModal();
         } else {
           handleUnauthenticatedRequest(dispatch);
         }
@@ -237,7 +258,7 @@ const GameMenu = () => {
   };
 
   const renderRequest = () => {
-    if (activeJoinRequest) {
+    if (activeJoinRequest && !iAmObserver) {
       return (
         <React.Fragment>
           <div><i>{requestPlayerName}</i> want to play as <i>{otherPlayerName}</i>, is this ok?</div>
@@ -252,23 +273,43 @@ const GameMenu = () => {
     return null;
   };
 
+  const renderMenuButtons = () => {
+    if (iAmObserver) {
+      return (
+        <Button
+          size="sm"
+          variant="warning"
+          onClick={() => leaveObservingClick()}
+        >
+          Stop Observing
+        </Button>
+      );
+    } else {
+      return (
+        <React.Fragment>
+          <Button
+            size="sm"
+            variant={isActiveObserveRequest() ? "warning" : (isActiveObservers() ? "info" : "secondary")}
+            onClick={() => toggleObserveModal(!showObserveModal)}
+          >
+            Observers
+          </Button>
+          <Button
+            size="sm"
+            variant="danger"
+            onClick={() => setLeaveGameModal(!leaveGameModal)}
+          >
+            Leaving Game?
+          </Button>
+        </React.Fragment>
+      );
+    }
+  };
+
   return (
     <div id="menuArea">
       <div className="d-grid gap-2">
-        <Button
-          size="sm"
-          variant={isActiveObserveRequest() ? "warning" : (isActiveObservers() ? "info" : "secondary")}
-          onClick={() => toggleObserveModal(!showObserveModal)}
-        >
-          Observers
-        </Button>
-        <Button
-          size="sm"
-          variant="danger"
-          onClick={() => setLeaveGameModal(!leaveGameModal)}
-        >
-          Leaving Game?
-        </Button>
+        {renderMenuButtons()}
       </div>
 
       {renderRequest()}

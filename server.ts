@@ -423,7 +423,7 @@ connectDB().then(() => {
                 const {gameId} = observingGame;
                 socket.join(gameId);
                 csm.setObserving(userName, timestamp, socket.id, gameId, false);
-                const chatLine = `player ${userName} observing game`;
+                const chatLine = `player ${userName} is observing game`;
                 io.to(gameId).emit("new chat line", chatLine);
                 checkResponse.gameId = gameId;
                 checkResponse.checkStatus = CHECK_GAME_STATUS.onGoingGame;
@@ -1106,6 +1106,37 @@ connectDB().then(() => {
         fn({
           isAuthenticated: false,
         } as IuiAllowPlayerToObserveResponse);
+        return null;
+      }
+    });
+
+    socket.on("stop observing", (cancelRequest: IuiUserData, fn: (simpleResponse: IuiAuth) => void) => {
+      //console.log("stop observing", cancelRequest);
+      const {userName, uuid, token} = cancelRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        const observedGame = csm.getObservingGame(userName);
+        csm.clearObserving(userName);
+        if (observedGame) {
+          socket.leave(observedGame.gameId);
+          const chatLine = `player ${userName} leaved observing this game`;
+          io.to(observedGame.gameId).emit("new chat line", chatLine);
+        }
+
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        fn({
+          isAuthenticated: true,
+          token: newToken,
+        } as IuiAuth);
+        return null;
+      } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiAuth);
         return null;
       }
     });
