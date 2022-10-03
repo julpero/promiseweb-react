@@ -1,4 +1,4 @@
-import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../interfaces/IuiAdminOperations";
+import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickRequest, IuiReNameNickResponse } from "../interfaces/IuiAdminOperations";
 import { IuiCheckIfOngoingGameResponse } from "../interfaces/IuiCheckIfOngoingGame";
 import { IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse } from "../interfaces/IuiGameList";
 import { IuiPlayedGamesReport } from "../interfaces/IuiGameReports";
@@ -76,4 +76,5 @@ export interface ClientToServerEvents {
   "re-create game statistics": (reCreateGameStatisticsRequest: IuiReCreateGameStatisticsRequest, fn: (gamesResponse: IuiGetGamesResponse) => void) => void,
   "re-create all game statistics": (updateRequest: IuiUserData, fn: (gamesResponse: IuiGetGamesResponse) => void) => void,
   "convert old data": (updateRequest: IuiUserData, fn: (convertReport: string[]) => void) => void,
+  "rename nick": (reNameNickRequest: IuiReNameNickRequest, fn: (reNameNickResponse: IuiReNameNickResponse) => void) => void,
 }

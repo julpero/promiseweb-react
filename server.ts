@@ -31,8 +31,8 @@ import { getOneGameReportData, getReportData } from "./backend/actions/reports";
 import { IuiGetOneGameReportRequest, IuiOneGameReport } from "./frontend/src/interfaces/IuiReports";
 import { IuiAuth, IuiLoginRequest, IuiLoginResponse, IuiRefreshLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./frontend/src/interfaces/IuiUser";
 import { handleLoginRequest } from "./backend/actions/login";
-import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "./frontend/src/interfaces/IuiAdminOperations";
-import { convertOldData, getGamesForAdmin, reCreateAllGameStats, reCreateGameStats } from "./backend/actions/adminActions";
+import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickRequest, IuiReNameNickResponse, RENAME_STATUS } from "./frontend/src/interfaces/IuiAdminOperations";
+import { convertOldData, getGamesForAdmin, reCreateAllGameStats, reCreateGameStats, reNameNick } from "./backend/actions/adminActions";
 import { getValidToken, isUserAuthenticated, isValidAdminUser, isValidUser, signUserToken } from "./backend/common/userValidation";
 
 dotenv.config();
@@ -254,6 +254,43 @@ connectDB().then(() => {
         const response = await convertOldData(userName);
         fn(response);
       } else {
+        return null;
+      }
+    });
+
+    socket.on("rename nick", async (reNameNickRequest: IuiReNameNickRequest, fn: (reNameNickResponse: IuiReNameNickResponse) => void) => {
+      // console.log("reNameNickRequest", reNameNickRequest);
+      const {uuid, userName, token, currentNick, newNick} = reNameNickRequest;
+      if (!isValidAdminUser(userName, uuid)) return null;
+      if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        if (!newNick || !currentNick || currentNick.trim() === newNick.trim() || currentNick.trim().length < 3) {
+          fn({
+            isAuthenticated: true,
+            token: token,
+            renameStatus: RENAME_STATUS.notOk,
+          } as IuiReNameNickResponse);
+          return null;
+        }
+        const renameStatus = await reNameNick(reNameNickRequest);
+        const getGamesResponse: IuiGetGamesResponse = await getGamesForAdmin(userName);
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        fn({
+          isAuthenticated: true,
+          token: newToken,
+          renameStatus: renameStatus,
+          gameList: getGamesResponse.gameList,
+        } as IuiReNameNickResponse);
+        return null;
+      } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiReNameNickResponse);
         return null;
       }
     });
