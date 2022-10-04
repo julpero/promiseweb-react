@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { MouseEvent as MouseEventReact, useEffect, useRef } from "react";
 import { IuiOnePlayerReportData } from "../../interfaces/IuiReports";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { format } from "date-fns";
@@ -21,7 +21,7 @@ import {
   LineController,
   BarController,
 } from "chart.js";
-import { Chart } from "react-chartjs-2";
+import { Chart, getDatasetAtEvent } from "react-chartjs-2";
 import { colorize, increase_brightness } from "../../common/commonFunctions";
 
 ChartJS.register(
@@ -199,12 +199,19 @@ const OnePlayerPOfPoints = ({gameReportData}: IProps) => {
           }
         },
       },
-    }
+    },
   };
 
   const chartData: ChartData<"line" | "bar"> = {
     labels: gameReportData?.gamesData.flatMap(data => data.started),
     datasets: getDataSetsData(),
+  };
+
+  const chartClick = (e: MouseEventReact<HTMLCanvasElement>) => {
+    if (chartRef.current) {
+      const canvasPosition = getDatasetAtEvent(chartRef.current, e);
+      console.log(canvasPosition);
+    }
   };
 
   return (
@@ -214,6 +221,7 @@ const OnePlayerPOfPoints = ({gameReportData}: IProps) => {
         ref={chartRef}
         data={chartData}
         options={chartOptions}
+        onClick={chartClick}
       />
     </div>
   );
