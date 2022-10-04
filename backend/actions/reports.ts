@@ -1,6 +1,6 @@
 import { IuiPlayedGamesReport } from "../../frontend/src/interfaces/IuiGameReports";
-import { IuiGetOneGameReportRequest, IuiOneGameReport } from "../../frontend/src/interfaces/IuiReports";
-import { oneGameReportData, reportData } from "../dbActions/reportData";
+import { IuiGetOneGameReportRequest, IuiOneGameReport, IuiOnePlayerReportData } from "../../frontend/src/interfaces/IuiReports";
+import { oneGameReportData, onePlayerReportData, reportData } from "../dbActions/reportData";
 
 export const getReportData = async (): Promise<IuiPlayedGamesReport> => {
   return await reportData();
@@ -14,4 +14,14 @@ export const getOneGameReportData = async (reportRequest: IuiGetOneGameReportReq
   } else {
     return null;
   }
+};
+
+export const getOnePlayerReport = async (playerName: string): Promise<IuiOnePlayerReportData> => {
+  const gamesData = await onePlayerReportData(playerName);
+  const reportData: IuiOnePlayerReportData = {
+    playerName: playerName,
+    gamesData: gamesData,
+  };
+
+  return reportData;
 };

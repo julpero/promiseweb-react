@@ -10,8 +10,13 @@ import { getUser } from "../store/userSlice";
 import { IuiUserData } from "../interfaces/IuiUser";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 import PlayedGamesByPlayerCount from "./ReportComponents/PlayedGamesByPlayerCount";
+import { RowComponent } from "tabulator-tables";
 
-const PlayedGamesReport = () => {
+interface IProps {
+  openPlayerReport: (playerName: string) => void,
+}
+
+const PlayedGamesReport = (props: IProps) => {
   // console.log("PlayedGamesReport");
   const [reportData, setReportData] = useState<IuiPlayedGamesReport>();
   const user = useSelector(getUser);
@@ -205,22 +210,40 @@ const PlayedGamesReport = () => {
     }
   }, [user, dispatch, socket]);
 
+  const openPlayerReport = (playerName: string) => {
+    props.openPlayerReport(playerName);
+  };
+
   return (
     <div>
       <hr />
-      <p>Total of {reportData?.gamesPlayed} games and {reportData?.roundsPlayed} rounds played so far...</p>
-      <p>... and there were {reportData?.playerCount} players in those games and they hit {reportData?.totalCardsHit} cards while playing.</p>
-      <ReactTabulator
-        columns={columns}
-        data={reportData?.gamesByPlayer ?? []}
-        options={{
-          initialSort: [{
-            column: "count"
-          }],
-          layout: "fitColumns",
-        }}
-      />
-      <PlayedGamesByPlayerCount gameReportData={reportData?.playersTotal} max={reportData?.gamesPlayed ?? 0} />
+      {reportData &&
+        <div>
+          <p>Total of {reportData?.gamesPlayed} games and {reportData?.roundsPlayed} rounds played so far...</p>
+          <p>... and there were {reportData?.playerCount} players in those games and they hit {reportData?.totalCardsHit} cards while playing.</p>
+        </div>
+      }
+      {reportData &&
+        <ReactTabulator
+          columns={columns}
+          events={{rowClick: (e: UIEvent, r: RowComponent) => {
+            const playerName = r.getData().playerName;
+            if (playerName) {
+              openPlayerReport(playerName);
+            }
+          }}}
+          data={reportData?.gamesByPlayer ?? []}
+          options={{
+            initialSort: [{
+              column: "count"
+            }],
+            layout: "fitColumns",
+          }}
+        />
+      }
+      {reportData &&
+        <PlayedGamesByPlayerCount gameReportData={reportData?.playersTotal} max={reportData?.gamesPlayed ?? 0} />
+      }
     </div>
   );
 };

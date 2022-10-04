@@ -18,7 +18,7 @@ import {
   IuiPlayCardResponse,
   IuiPromiseMadeNotification,
 } from "../interfaces/IuiPlayingGame";
-import { IuiGetOneGameReportRequest, IuiOneGameReport } from "../interfaces/IuiReports";
+import { IuiGetOneGameReportRequest, IuiOneGameReport, IuiOnePlayerReportRequest, IuiOnePlayerReportResponse } from "../interfaces/IuiReports";
 import { IuiAuth, IuiLoginRequest, IuiLoginResponse, IuiRefreshLoginResponse, IuiUserData } from "../interfaces/IuiUser";
 
 export interface ServerToClientEvents {
@@ -68,8 +68,10 @@ export interface ClientToServerEvents {
   "get round": (getRoundRequest: IuiGetRoundRequest, fn: (roundResponse: IuiGetRoundResponse) => void) => void;
   "make promise": (promiseRequest: IuiMakePromiseRequest, fn: (promiseResponse: IuiMakePromiseResponse) => void) => void;
   "play card": (playCardRequest: IuiPlayCardRequest, fn: (playCardResponse: IuiPlayCardResponse) => void) => void;
+
   "get report data": (request: IuiUserData, fn: (reportResponse: IuiPlayedGamesReport) => void) => void;
   "get game report": (reportRequest: IuiGetOneGameReportRequest, fn: (reportResponse: IuiOneGameReport) => void) => void;
+  "get one player report": (playerReportRequest: IuiOnePlayerReportRequest, fn: (playerReportResponse: IuiOnePlayerReportResponse) => void) => void;
 
   "admin login": (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => void;
   "get games for admin": (getGamesRequest: IuiUserData, fn: (gamesResponse: IuiGetGamesResponse) => void) => void,

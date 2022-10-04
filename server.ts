@@ -27,8 +27,8 @@ import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_
 import { leaveOngoingGame, joinOngoingGame, getHumanPlayer } from "./backend/actions/joinLeaveOngoingGame";
 import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiObserveGameRequest, IuiObserveGameResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerWantsToJoinNotification, JOIN_GAME_STATUS, OBSERVE_RESPONSE, IuiAllowPlayerToObserveRequest, IuiAllowPlayerToObserveResponse } from "./frontend/src/interfaces/IuiJoinOngoingGame";
 import { IuiPlayedGamesReport } from "./frontend/src/interfaces/IuiGameReports";
-import { getOneGameReportData, getReportData } from "./backend/actions/reports";
-import { IuiGetOneGameReportRequest, IuiOneGameReport } from "./frontend/src/interfaces/IuiReports";
+import { getOneGameReportData, getOnePlayerReport, getReportData } from "./backend/actions/reports";
+import { IuiGetOneGameReportRequest, IuiOneGameReport, IuiOnePlayerReportRequest, IuiOnePlayerReportResponse } from "./frontend/src/interfaces/IuiReports";
 import { IuiAuth, IuiLoginRequest, IuiLoginResponse, IuiRefreshLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./frontend/src/interfaces/IuiUser";
 import { handleLoginRequest } from "./backend/actions/login";
 import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickRequest, IuiReNameNickResponse, RENAME_STATUS } from "./frontend/src/interfaces/IuiAdminOperations";
@@ -1250,6 +1250,41 @@ connectDB().then(() => {
         fn({
           isAuthenticated: false,
         } as IuiOneGameReport);
+        return null;
+      }
+    });
+
+    socket.on("get one player report", async (playerReportRequest: IuiOnePlayerReportRequest, fn: (playerReportResponse: IuiOnePlayerReportResponse) => void) => {
+      // console.log("get one player report", playerReportRequest);
+      const {uuid, userName, token, playerName} = playerReportRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        if (!playerName) {
+          fn({
+            isAuthenticated: true,
+            token: token,
+          } as IuiOnePlayerReportResponse);
+          return null;
+        }
+        const reportData = await getOnePlayerReport(playerName);
+        if (!reportData) return null;
+
+        const timestamp = Date.now();
+        csm.setLastTimestamp(userName, socket.id, timestamp);
+        const newToken = signUserToken(userName, uuid, timestamp);
+        const reportResponse: IuiOnePlayerReportResponse = {
+          isAuthenticated: true,
+          token: newToken,
+          onePlayerReport: reportData,
+        };
+
+        fn(reportResponse);
+      } else {
+        fn({
+          isAuthenticated: false,
+        } as IuiOnePlayerReportResponse);
         return null;
       }
     });
