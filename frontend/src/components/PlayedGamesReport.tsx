@@ -11,6 +11,7 @@ import { IuiUserData } from "../interfaces/IuiUser";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 import PlayedGamesByPlayerCount from "./ReportComponents/PlayedGamesByPlayerCount";
 import { RowComponent } from "tabulator-tables";
+import { setSpinnerVisible } from "../store/spinnerSlice";
 
 interface IProps {
   openPlayerReport: (playerName: string) => void,
@@ -198,11 +199,13 @@ const PlayedGamesReport = (props: IProps) => {
         userName: user.userName,
         token: getToken(),
       };
+      dispatch(setSpinnerVisible(true));
       socket.emit("get report data", request, (reportData: IuiPlayedGamesReport) => {
         // console.log("report data", reportData);
         if (reportData.isAuthenticated) {
           handleAuthenticatedRequest(reportData.token);
           setReportData(reportData);
+          dispatch(setSpinnerVisible(false));
         } else {
           handleUnauthenticatedRequest(dispatch);
         }

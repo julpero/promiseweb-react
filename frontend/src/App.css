@@ -56,6 +56,26 @@ body {
   margin-right: 5px;
 }
 
+.spinnerContainer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  z-index: 1070;
+  background-color: #000;
+  opacity: 0.5;
+}
+
+.spinnerClass {
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  transform: translate(-50%, 0);
+}
+
 .smallErrorDiv {
   border: 1px red solid;
   border-radius: 5px;

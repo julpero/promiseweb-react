@@ -18,6 +18,8 @@ import AdminMassOperations from "../components/AdminComponents/AdminMassOperatio
 import { getUser, setUserLoggedIn } from "../store/userSlice";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 import OnePlayerReport from "../components/OnePlayerReport";
+import { BallTriangle } from "react-loader-spinner";
+import { isSpinnerVisible } from "../store/spinnerSlice";
 
 interface IUserLoginFormValidationFields {
   userName?: string,
@@ -60,6 +62,7 @@ const HomeScreen = ({onJoin}: IProps) => {
   const [adminUserName, setAdminUserName] = useState("");
   const adminLoggedIn = useSelector(isAdminLoggedIn);
   const user = useSelector(getUser);
+  const spinnerVisible = useSelector(isSpinnerVisible);
   const dispatch = useDispatch();
   const accRef = createRef<HTMLHeadingElement>();
 
@@ -352,6 +355,16 @@ const HomeScreen = ({onJoin}: IProps) => {
           <Button variant="primary" onClick={() => closeOnePlayerReport()}>CLOSE</Button>
         </Modal.Footer>
       </Modal>
+
+      {spinnerVisible &&
+        <div className="spinnerContainer">
+          <BallTriangle
+            wrapperClass="spinnerClass"
+            height="40vh"
+            width="40vw"
+          />
+        </div>
+      }
     </div>
   );
 };

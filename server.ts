@@ -112,7 +112,7 @@ connectDB().then(() => {
     });
 
     socket.on("do refresh login", async (loginRequest: IuiUserData, fn: (loginResponse: IuiRefreshLoginResponse) => void) => {
-      // console.log("do refresh login", loginRequest);
+      console.log("do refresh login", loginRequest);
       const {uuid, userName, token} = loginRequest;
       const validToken = getValidToken(token);
       console.log("validToken?.timestamp", validToken?.timestamp);
@@ -131,7 +131,14 @@ connectDB().then(() => {
           token: newToken,
         };
         fn(loginResponse);
+        return null;
       } else {
+        fn({
+          isAuthenticated: false,
+          myName: "",
+          loginStatus: LOGIN_RESPONSE.passwordFails,
+          token: "",
+        } as IuiRefreshLoginResponse);
         return null;
       }
     });
