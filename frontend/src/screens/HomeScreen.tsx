@@ -17,6 +17,7 @@ import { isAdminLoggedIn, setAdminLoggedIn } from "../store/adminSlice";
 import AdminMassOperations from "../components/AdminComponents/AdminMassOperations";
 import { getUser, setUserLoggedIn } from "../store/userSlice";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
+import OnePlayerReport from "../components/OnePlayerReport";
 
 interface IUserLoginFormValidationFields {
   userName?: string,
@@ -40,13 +41,22 @@ interface IAdminLoginForm {
   password: string,
 }
 
+enum ACTIVE_MODAL {
+  none,
+  loginForm,
+  adminLoginForm,
+  adminActions,
+  onePlayerReport,
+}
+
 interface IProps {
   onJoin: () => void,
 }
 
 const HomeScreen = ({onJoin}: IProps) => {
   const [loginFormValidationError, setLoginFormValidationError] = useState("");
-  const [showLoginAdminModal, setShowLoginAdminModal] = useState(false);
+  const [activeModal, setActiveModal] = useState<ACTIVE_MODAL>(ACTIVE_MODAL.none);
+  const [activePlayerName, setActivePlayerName] = useState("");
   const [adminUserName, setAdminUserName] = useState("");
   const adminLoggedIn = useSelector(isAdminLoggedIn);
   const user = useSelector(getUser);
@@ -57,6 +67,17 @@ const HomeScreen = ({onJoin}: IProps) => {
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
   const getToken = (): string => window.localStorage.getItem("token") ?? "";
+
+  const openOnePlayerReport = (playerName: string) => {
+    // console.log("openOnePlayerReport", playerName);
+    setActivePlayerName(playerName);
+    setActiveModal(ACTIVE_MODAL.onePlayerReport);
+  };
+
+  const closeOnePlayerReport = () => {
+    setActivePlayerName("");
+    setActiveModal(ACTIVE_MODAL.none);
+  };
 
   const handleGameCreation = () => {
     if (accRef.current?.firstElementChild) {
@@ -69,7 +90,7 @@ const HomeScreen = ({onJoin}: IProps) => {
   };
 
   const closeLoginAdminModal = () => {
-    setShowLoginAdminModal(false);
+    setActiveModal(ACTIVE_MODAL.none);
     dispatch(setAdminLoggedIn(false));
     setAdminUserName("");
   };
@@ -159,7 +180,11 @@ const HomeScreen = ({onJoin}: IProps) => {
 
   const renderPlayedGamesReport = () => {
     if (user.isUserLoggedIn) {
-      return (<PlayedGamesReport />);
+      return (
+        <PlayedGamesReport
+          openPlayerReport={openOnePlayerReport}
+        />
+      );
     } else {
       return null;
     }
@@ -193,7 +218,7 @@ const HomeScreen = ({onJoin}: IProps) => {
       <div className="adminButtonDiv">
         <Button variant="warning" onClick={() => logOutUser()} disabled={!user.isUserLoggedIn}>Log Out <i>{user.userName}</i></Button>
         &nbsp;
-        <Button onClick={() => setShowLoginAdminModal(true)}>Admin</Button>
+        <Button onClick={() => setActiveModal(ACTIVE_MODAL.adminLoginForm)}>Admin</Button>
       </div>
 
       <Modal
@@ -246,7 +271,7 @@ const HomeScreen = ({onJoin}: IProps) => {
       </Modal>
 
       <Modal
-        show={showLoginAdminModal}
+        show={activeModal === ACTIVE_MODAL.adminLoginForm}
         onHide={() => closeLoginAdminModal()}
       >
         <Modal.Header closeButton>
@@ -307,7 +332,23 @@ const HomeScreen = ({onJoin}: IProps) => {
         <Modal.Footer>
           <Button variant="warning" onClick={() => closeAndLogoutAdminModal()}>Log out</Button>
         </Modal.Footer>
+      </Modal>
 
+      <Modal
+        show={activeModal === ACTIVE_MODAL.onePlayerReport}
+        fullscreen={true}
+      >
+        <Modal.Header>
+          <Modal.Title>
+            Player Report - <i>{activePlayerName}</i>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <OnePlayerReport playerName={activePlayerName} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => closeOnePlayerReport()}>CLOSE</Button>
+        </Modal.Footer>
       </Modal>
     </div>
   );
