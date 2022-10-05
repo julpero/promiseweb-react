@@ -6,6 +6,7 @@ import { getCurrentRoundInfo } from "../store/roundInfoSlice";
 import { Table } from "react-bootstrap";
 import { IuiPlayerPromise } from "../interfaces/IuiPlayingGame";
 import ReactTooltip from "react-tooltip";
+import { colorize } from "../common/commonFunctions";
 
 /**
  * Promises made, table in bottom screen
@@ -124,9 +125,17 @@ const PromiseTable = () => {
 
   const renderPromiseTableBody = () => {
     if (!promiseTable) return null;
+    const bgColor = window.getComputedStyle(document.body, null).getPropertyValue("background-color");
     return (
       promiseTable.players.map((player, idx) => {
-        return <tr key={idx}><th className="tableCell tableHeading">{player.substring(0, 10)}</th>{renderPlayerPromises(idx)}</tr>;
+        return (
+          <tr key={idx}>
+            <th className="tableCell tableHeading" style={{"backgroundImage": `linear-gradient(90deg, ${colorize(player)}, ${bgColor})`}}>
+              {player.substring(0, 10)}
+            </th>
+            {renderPlayerPromises(idx)}
+          </tr>
+        );
       })
     );
   };

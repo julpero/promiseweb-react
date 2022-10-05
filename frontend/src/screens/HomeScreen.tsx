@@ -17,6 +17,9 @@ import { isAdminLoggedIn, setAdminLoggedIn } from "../store/adminSlice";
 import AdminMassOperations from "../components/AdminComponents/AdminMassOperations";
 import { getUser, setUserLoggedIn } from "../store/userSlice";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
+import OnePlayerReport from "../components/OnePlayerReport";
+import { BallTriangle } from "react-loader-spinner";
+import { isSpinnerVisible } from "../store/spinnerSlice";
 
 interface IUserLoginFormValidationFields {
   userName?: string,
@@ -40,16 +43,22 @@ interface IAdminLoginForm {
   password: string,
 }
 
-interface IProps {
-  onJoin: () => void,
+enum ACTIVE_MODAL {
+  none,
+  loginForm,
+  adminLoginForm,
+  adminActions,
+  onePlayerReport,
 }
 
-const HomeScreen = ({onJoin}: IProps) => {
+const HomeScreen = () => {
   const [loginFormValidationError, setLoginFormValidationError] = useState("");
-  const [showLoginAdminModal, setShowLoginAdminModal] = useState(false);
+  const [activeModal, setActiveModal] = useState<ACTIVE_MODAL>(ACTIVE_MODAL.none);
+  const [activePlayerName, setActivePlayerName] = useState("");
   const [adminUserName, setAdminUserName] = useState("");
   const adminLoggedIn = useSelector(isAdminLoggedIn);
   const user = useSelector(getUser);
+  const spinnerVisible = useSelector(isSpinnerVisible);
   const dispatch = useDispatch();
   const accRef = createRef<HTMLHeadingElement>();
 
@@ -57,6 +66,17 @@ const HomeScreen = ({onJoin}: IProps) => {
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
   const getToken = (): string => window.localStorage.getItem("token") ?? "";
+
+  const openOnePlayerReport = (playerName: string) => {
+    // console.log("openOnePlayerReport", playerName);
+    setActivePlayerName(playerName);
+    setActiveModal(ACTIVE_MODAL.onePlayerReport);
+  };
+
+  const closeOnePlayerReport = () => {
+    setActivePlayerName("");
+    setActiveModal(ACTIVE_MODAL.none);
+  };
 
   const handleGameCreation = () => {
     if (accRef.current?.firstElementChild) {
@@ -69,14 +89,13 @@ const HomeScreen = ({onJoin}: IProps) => {
   };
 
   const closeLoginAdminModal = () => {
-    setShowLoginAdminModal(false);
+    setActiveModal(ACTIVE_MODAL.none);
     dispatch(setAdminLoggedIn(false));
     setAdminUserName("");
   };
 
   const closeAndLogoutAdminModal = () => {
     closeLoginAdminModal();
-    setAdminUserName("");
   };
 
   const renderLoginError = () => {
@@ -159,7 +178,11 @@ const HomeScreen = ({onJoin}: IProps) => {
 
   const renderPlayedGamesReport = () => {
     if (user.isUserLoggedIn) {
-      return (<PlayedGamesReport />);
+      return (
+        <PlayedGamesReport
+          openPlayerReport={openOnePlayerReport}
+        />
+      );
     } else {
       return null;
     }
@@ -183,7 +206,7 @@ const HomeScreen = ({onJoin}: IProps) => {
         <Accordion.Item eventKey="2">
           <Accordion.Header>On Going Games</Accordion.Header>
           <Accordion.Body>
-            <JoinOnGoingGame onJoin={onJoin} />
+            <JoinOnGoingGame />
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
@@ -193,7 +216,7 @@ const HomeScreen = ({onJoin}: IProps) => {
       <div className="adminButtonDiv">
         <Button variant="warning" onClick={() => logOutUser()} disabled={!user.isUserLoggedIn}>Log Out <i>{user.userName}</i></Button>
         &nbsp;
-        <Button onClick={() => setShowLoginAdminModal(true)}>Admin</Button>
+        <Button onClick={() => setActiveModal(ACTIVE_MODAL.adminLoginForm)}>Admin</Button>
       </div>
 
       <Modal
@@ -216,6 +239,7 @@ const HomeScreen = ({onJoin}: IProps) => {
                   name="userName"
                   component={TextInput}
                   label="(Nick)Name"
+                  autoFocus
                 />
                 <Field<string>
                   name="password1"
@@ -246,7 +270,7 @@ const HomeScreen = ({onJoin}: IProps) => {
       </Modal>
 
       <Modal
-        show={showLoginAdminModal}
+        show={activeModal === ACTIVE_MODAL.adminLoginForm}
         onHide={() => closeLoginAdminModal()}
       >
         <Modal.Header closeButton>
@@ -264,6 +288,7 @@ const HomeScreen = ({onJoin}: IProps) => {
                   name="userName"
                   component={TextInput}
                   label="User name"
+                  autoFocus
                 />
                 <Field<string>
                   name="password"
@@ -296,19 +321,49 @@ const HomeScreen = ({onJoin}: IProps) => {
           <Accordion>
             <Accordion.Item eventKey="0">
               <Accordion.Header>Game List</Accordion.Header>
-              <Accordion.Body><AdminGameList userName={adminUserName} /></Accordion.Body>
+              <Accordion.Body>
+                <AdminGameList userName={adminUserName} />
+              </Accordion.Body>
             </Accordion.Item>
             <Accordion.Item eventKey="1">
               <Accordion.Header>Mass Operations</Accordion.Header>
-              <Accordion.Body><AdminMassOperations userName={adminUserName} /></Accordion.Body>
+              <Accordion.Body>
+                <AdminMassOperations userName={adminUserName} />
+              </Accordion.Body>
             </Accordion.Item>
           </Accordion>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="warning" onClick={() => closeAndLogoutAdminModal()}>Log out</Button>
+          <Button variant="warning" onClick={() => closeAndLogoutAdminModal()}>Log out as admin</Button>
         </Modal.Footer>
-
       </Modal>
+
+      <Modal
+        show={activeModal === ACTIVE_MODAL.onePlayerReport}
+        fullscreen={true}
+      >
+        <Modal.Header>
+          <Modal.Title>
+            Player Report - <i>{activePlayerName}</i>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <OnePlayerReport playerName={activePlayerName} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => closeOnePlayerReport()}>CLOSE</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {spinnerVisible &&
+        <div className="spinnerContainer">
+          <BallTriangle
+            wrapperClass="spinnerClass"
+            height="40vh"
+            width="40vw"
+          />
+        </div>
+      }
     </div>
   );
 };
@@ -319,6 +374,10 @@ const validateLoginUserForm = (values: IUserLoginForm) => {
 
   if (!values.userName || values.userName.length < 3) {
     errors.userName = "Your (nick)name must be at least three characters long";
+  }
+
+  if (values.userName && values.userName.length !== values.userName.trim().length) {
+    errors.userName = "Leading and ending white spaces are not allowed in (nick)name";
   }
 
   if (!values.password1 || values.password1?.length < 4) {

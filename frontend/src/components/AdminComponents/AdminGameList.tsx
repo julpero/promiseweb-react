@@ -1,15 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
+import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../../common/userFunctions";
-import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../../interfaces/IuiAdminOperations";
+import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickRequest, IuiReNameNickResponse, RENAME_STATUS } from "../../interfaces/IuiAdminOperations";
 import { IuiUserData } from "../../interfaces/IuiUser";
 import { useSocket } from "../../socket";
 import { getAdminGameList, isAdminLoggedIn, setAdminGameList } from "../../store/adminSlice";
+import { setSpinnerVisible } from "../../store/spinnerSlice";
+import SelectInput from "../FormComponents/SelectInput";
+import TextInput from "../FormComponents/TextInput";
 import OneGameReport from "../OneGameReport";
 
 interface IProps {
   userName: string,
+}
+
+interface IRenameFormValidation {
+  currentNick?: string,
+  newNick?: string,
+}
+interface IRenameForm {
+  currentNick: string,
+  newNick: string,
+}
+
+enum ACTIVE_MODAL {
+  none,
+  gameReport,
+  rename,
 }
 
 const AdminGameList = ({userName}: IProps) => {
@@ -17,7 +36,9 @@ const AdminGameList = ({userName}: IProps) => {
   const adminLoggedIn = useSelector(isAdminLoggedIn);
   const adminGameList = useSelector(getAdminGameList);
   const [buttonsActive, setButtonsActive] = useState(true);
-  const [gameToReport, setGameToReport] = useState("");
+  const [activeGame, setActiveGame] = useState("");
+  const [activeModal, setActiveModal] = useState(ACTIVE_MODAL.none);
+  const [errorStr, setErrorStr] = useState("");
 
   const dispatch = useDispatch();
 
@@ -32,15 +53,22 @@ const AdminGameList = ({userName}: IProps) => {
       userName: userName,
       token: getToken(),
     };
+    dispatch(setSpinnerVisible(true));
     socket.emit("get games for admin", getGamesRequest, (getGamesResponse: IuiGetGamesResponse) => {
       // console.log(getGamesResponse);
       if (getGamesResponse.isAuthenticated) {
         handleAuthenticatedRequest(getGamesResponse.token);
         dispatch(setAdminGameList(getGamesResponse.gameList));
+        dispatch(setSpinnerVisible(false));
       } else {
         handleUnauthenticatedRequest(dispatch);
       }
     });
+
+    return () => {
+      dispatch(setSpinnerVisible(false));
+    };
+
   }, [userName, socket, dispatch]);
 
   if (!adminLoggedIn) return null;
@@ -65,6 +93,17 @@ const AdminGameList = ({userName}: IProps) => {
     });
   };
 
+  const renderErrorStr = () => {
+    if (errorStr) {
+      return (<div className="smallErrorDiv">
+        {errorStr}
+      </div>
+      );
+    } else {
+      return null;
+    }
+  };
+
   const reCreateGameStats = (gameId: string) => {
     setButtonsActive(false);
     const reCreateGameStatisticsRequest: IuiReCreateGameStatisticsRequest = {
@@ -85,16 +124,98 @@ const AdminGameList = ({userName}: IProps) => {
     });
   };
 
+  const changeNickInGame = (values: IRenameForm) => {
+    // console.log(values);
+    if (activeGame) {
+      setButtonsActive(false);
+      const reNameNickRequest: IuiReNameNickRequest = {
+        uuid: getMyId(),
+        userName: userName,
+        token: getToken(),
+        gameId: activeGame,
+        currentNick: values.currentNick,
+        newNick: values.newNick,
+      };
+      socket.emit("rename nick", reNameNickRequest, (reNameNickResponse: IuiReNameNickResponse) => {
+        // console.log("reNameNickResponse", reNameNickResponse);
+        if (reNameNickResponse.isAuthenticated) {
+          handleAuthenticatedRequest(reNameNickResponse.token);
+          dispatch(setAdminGameList(reNameNickResponse.gameList));
+          switch (reNameNickResponse.renameStatus) {
+            case RENAME_STATUS.nameExistsInGame: {
+              setErrorStr("Nick already exists in the game, can't rename into this!");
+              break;
+            }
+            case RENAME_STATUS.notOk: {
+              setErrorStr("Something wen't wrong, please try again...");
+              break;
+            }
+            default: {
+              closeModal();
+              break;
+            }
+          }
+          setButtonsActive(true);
+        } else {
+          handleUnauthenticatedRequest(dispatch);
+        }
+      });
+    }
+  };
+
+  const showRenameModal = (gameId: string) => {
+    setActiveGame(gameId);
+    setActiveModal(ACTIVE_MODAL.rename);
+  };
+
+  const showGameReport = (gameId: string) => {
+    setActiveGame(gameId);
+    setActiveModal(ACTIVE_MODAL.gameReport);
+  };
+
+  const initialCurrentNick = () => {
+    if (activeGame && adminGameList.length > 0) {
+      return adminGameList.find(game => game.gameId === activeGame)?.players.at(0) ?? "";
+    }
+    return "";
+  };
+
+  const renderReNameNicks = () => {
+    if (activeGame && adminGameList.length > 0) {
+      const players = adminGameList.find(game => game.gameId === activeGame)?.players;
+      if (players) {
+        return players.map((player, ind) => {
+          return (
+            <option key={ind} value={player}>
+              {player}
+            </option>
+          );
+        });
+      }
+    }
+  };
+
   const renderGameActions = (gameId: string) => {
     return (
-      <Button
-        size="sm"
-        variant="warning"
-        disabled={!buttonsActive}
-        onClick={() => reCreateGameStats(gameId)}
-      >
-        Re-Create Stats
-      </Button>
+      <React.Fragment>
+        <Button
+          size="sm"
+          variant="warning"
+          disabled={!buttonsActive}
+          onClick={() => reCreateGameStats(gameId)}
+        >
+          Re-Create Stats
+        </Button>
+        &nbsp;
+        <Button
+          size="sm"
+          variant="warning"
+          disabled={!buttonsActive}
+          onClick={() => showRenameModal(gameId)}
+        >
+          ReName
+        </Button>
+      </React.Fragment>
     );
   };
 
@@ -102,7 +223,7 @@ const AdminGameList = ({userName}: IProps) => {
     return adminGameList.map((game, idx) => {
       return (
         <tr key={idx}>
-          <td><Button size="sm" disabled={!buttonsActive} onClick={() => setGameToReport(game.gameId)}>Show</Button></td>
+          <td><Button size="sm" disabled={!buttonsActive} onClick={() => showGameReport(game.gameId)}>Show</Button></td>
           <td>{new Date(game.played).toLocaleString()}</td>
           <td>{renderGamePlayers(game.players)}</td>
           <td>{new Date(game.statsGenerated).toLocaleString()}</td>
@@ -112,8 +233,10 @@ const AdminGameList = ({userName}: IProps) => {
     });
   };
 
-  const closeReportModal = () => {
-    setGameToReport("");
+  const closeModal = () => {
+    setActiveGame("");
+    setErrorStr("");
+    setActiveModal(ACTIVE_MODAL.none);
   };
 
   return (
@@ -142,9 +265,10 @@ const AdminGameList = ({userName}: IProps) => {
           {renderGameList()}
         </tbody>
       </Table>
+
       <Modal
-        show={gameToReport !== ""}
-        onHide={() => closeReportModal()}
+        show={activeModal === ACTIVE_MODAL.gameReport && activeGame !== ""}
+        onHide={() => closeModal()}
         fullscreen={true}
       >
         <Modal.Header closeButton>
@@ -153,15 +277,69 @@ const AdminGameList = ({userName}: IProps) => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <OneGameReport gameId={gameToReport} />
+          <OneGameReport gameId={activeGame} />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="warning" onClick={() => closeReportModal()}>Close Report</Button>
+          <Button variant="warning" onClick={() => closeModal()}>Close Report</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={activeModal === ACTIVE_MODAL.rename && activeGame !== ""}
+        onHide={() => closeModal()}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+          Change player name
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {renderErrorStr()}
+          <Form
+            onSubmit={changeNickInGame}
+            validate={validateNickChange}
+            initialValues={{currentNick: initialCurrentNick()}}
+            render={({handleSubmit}) => (
+              <form onSubmit={handleSubmit}>
+                <Field<string>
+                  name="currentNick"
+                  component={SelectInput}
+                  label="Change this..."
+                >
+                  {renderReNameNicks()}
+                </Field>
+                <Field<string>
+                  name="newNick"
+                  component={TextInput}
+                  label="... into this"
+                />
+                <hr />
+                <Button variant="primary" type="submit" disabled={!buttonsActive}>Change Name</Button>
+              </form>
+            )}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button disabled={!buttonsActive} variant="warning" onClick={() => closeModal()}>CANCEL</Button>
         </Modal.Footer>
 
       </Modal>
     </React.Fragment>
   );
+};
+
+const validateNickChange = (values: IRenameForm) => {
+  console.log(values);
+  const errors: IRenameFormValidation = {};
+  if (!values.newNick || values.newNick.length < 3) {
+    errors.newNick = "New name must be at least three characters long!";
+  }
+
+  if (values.newNick === values.currentNick) {
+    errors.newNick = "Current and new name cant be same!";
+  }
+
+  return errors;
 };
 
 export default AdminGameList;

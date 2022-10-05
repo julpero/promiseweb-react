@@ -5,6 +5,7 @@ import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 
 import PromiseButtons from "./PromiseButtons";
 import CardSlots from "./CardSlots";
+import { getUser } from "../../store/userSlice";
 
 interface IProps {
   maxCards: number,
@@ -13,9 +14,17 @@ interface IProps {
 
 const OwnPlayer = ({maxCards, styleProps}: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
-  if (!currentRoundInfo.gameId) return null;
+  const user = useSelector(getUser);
+  if (!currentRoundInfo.gameId || !user.isUserLoggedIn) return null;
 
-  const me = currentRoundInfo.roundToPlayer.players.find(player => player.thisIsMe);
+  let me = currentRoundInfo.roundToPlayer.players.find(player => player.thisIsMe);
+  if (!me) {
+    const iAmObserver = currentRoundInfo.observers?.some(observer => observer.name === user.userName && !observer.waiting) ?? false;
+    if (iAmObserver) {
+      me = currentRoundInfo.roundToPlayer.players[0];
+    }
+  }
+
   if (!me) return null;
 
   return (

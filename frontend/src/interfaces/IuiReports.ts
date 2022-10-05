@@ -20,10 +20,31 @@ export interface IuiGameReport extends IuiAuth {
   roundType: string,
 }
 
+export interface IuiOneGameData {
+  gameId: string,
+  started: Date,
+  position: number,
+  keepP: number,
+  pOfWinPoints: number,
+}
+
+export interface IuiOnePlayerReportData {
+  playerName: string,
+  gamesData: IuiOneGameData[],
+}
+
 export interface IuiGetOneGameReportRequest extends IuiUserData {
   gameId: string,
 }
 
 export interface IuiOneGameReport extends IuiGameReport, IuiAuth {
   gameId: string,
+}
+
+export interface IuiOnePlayerReportRequest extends IuiUserData {
+  playerName: string,
+}
+
+export interface IuiOnePlayerReportResponse extends IuiAuth {
+  onePlayerReport: IuiOnePlayerReportData,
 }

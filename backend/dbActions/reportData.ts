@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
-import { IuiGamesByPlayer, IuiPlayedGamesReport, IuiPlayersInGameReport } from "../../frontend/src/interfaces/IuiGameReports";
-import { IuiGameReport } from "../../frontend/src/interfaces/IuiReports";
+import { IuiGamesByPlayer, IuiPlayedGame, IuiPlayedGamesReport, IuiPlayersInGameReport } from "../../frontend/src/interfaces/IuiGameReports";
+import { IuiGameReport, IuiOneGameData } from "../../frontend/src/interfaces/IuiReports";
 import { getGameReport } from "../common/reportFunctions";
 import GameOptions from "../models/GameOptions";
 
@@ -143,6 +143,13 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
     } as IuiPlayersInGameReport);
   });
 
+  const lastGames = await GameOptions.find({
+    "gameStatus": {$eq: GAME_STATUS.played},
+    "thisIsDemoGame": {$in: [null, false]},
+  }).sort({
+    createDateTime: -1,
+  }).limit(5);
+
   const reportDataObj: IuiPlayedGamesReport = {
     gamesPlayed: gamesPlayed,
     playersTotal: playersTotalArr,
@@ -150,6 +157,13 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
     roundsPlayed: roundsAndCards[0]?.roundsPlayed ?? 0,
     playerCount: roundsAndCards[0]?.playerCount ?? 0,
     gamesByPlayer: Array.from(playerReport.values()),
+    lastGames: lastGames.map(game => {
+      return {
+        gameId: game.id,
+        played: game.createDateTime,
+        humanPlayers: game.gameStatistics?.playersStatistics.flatMap(player => player.playerName) ?? [],
+      } as IuiPlayedGame;
+    }),
   };
 
   return reportDataObj;
@@ -163,4 +177,29 @@ export const oneGameReportData = async (gameIdStr: string): Promise<IuiGameRepor
   } else {
     return null;
   }
+};
+
+export const onePlayerReportData = async (playerName: string): Promise<IuiOneGameData[]> => {
+  const gameArr: IuiOneGameData[] = [];
+  const gamesInDb = await GameOptions.find({
+    gameStatus: { $eq: GAME_STATUS.played },
+    thisIsDemoGame: {$in: [null, false]},
+    "humanPlayers.name": {$eq: playerName},
+  }).sort({
+    createDateTime: 1,
+  });
+  gamesInDb.forEach(gameInDb => {
+    const playerStats = gameInDb.gameStatistics?.playersStatistics.find(player => player.playerName === playerName);
+    const gameStats = gameInDb.gameStatistics;
+    if (playerStats && gameStats && gameStats.roundsPlayed > 0) {
+      gameArr.push({
+        gameId: gameInDb.id,
+        started: gameInDb.createDateTime,
+        position: playerStats.position,
+        keepP: Math.round(playerStats.totalKeeps * 1000 / gameStats.roundsPlayed)/10,
+        pOfWinPoints: Math.round(playerStats.totalPoints * 1000 / (gameInDb.gameStatistics?.playersStatistics.at(0)?.totalPoints ?? playerStats.totalPoints * 1000)) / 10,
+      } as IuiOneGameData);
+    }
+  });
+  return gameArr;
 };

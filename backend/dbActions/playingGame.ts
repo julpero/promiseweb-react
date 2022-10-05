@@ -222,6 +222,9 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
         round.roundPlayers[winnerIndexInRound].keeps++;
         response.winnerOfPlay = winner.name;
         response.winCount = round.roundPlayers[winnerIndexInRound].keeps;
+        if (response.winCount === (round.roundPlayers[winnerIndexInRound].promise ?? -1) +1) {
+          response.playWentOver = true;
+        }
       }
 
       if (round.cardsPlayed.length === round.cardsInRound) {

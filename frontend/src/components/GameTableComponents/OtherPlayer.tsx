@@ -10,6 +10,7 @@ import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 import { playerFromIndex } from "../../common/playingGame";
 import PlayerInfo from "./PlayerInfo";
+import { getUser } from "../../store/userSlice";
 
 interface IProps {
   /** index goes clockwise, starting from you 0 and rest players from 1 to 5 */
@@ -22,9 +23,12 @@ interface IProps {
 
 const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
-  if (!currentRoundInfo.gameId) return null;
+  const user = useSelector(getUser);
 
-  const player: IuiRoundPlayer = playerFromIndex(currentRoundInfo, index);
+  if (!currentRoundInfo.gameId || !user.isUserLoggedIn) return null;
+  const iAmObserver = currentRoundInfo.observers?.some(observer => observer.name === user.userName && !observer.waiting) ?? false;
+
+  const player: IuiRoundPlayer = playerFromIndex(currentRoundInfo, index, iAmObserver);
   // console.log("OtherPlayer, player", player);
 
   const renderCardsRow = () => {

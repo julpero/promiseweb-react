@@ -13,6 +13,8 @@ import { getCurrentGameId, setGameId } from "./store/gameInfoSlice";
 import { getUser, setUserLoggedIn } from "./store/userSlice";
 import { IuiRefreshLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./interfaces/IuiUser";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "./common/userFunctions";
+import { IuiGameBeginsNotification } from "./interfaces/IuiPlayingGame";
+import { setSpinnerVisible } from "./store/spinnerSlice";
 
 const App = () => {
   const [gameStatus, setGameStatus] = useState(CHECK_GAME_STATUS.noGame);
@@ -31,7 +33,7 @@ const App = () => {
     if (response.isAuthenticated) {
       handleAuthenticatedRequest(response.token);
       setGameStatus(response.checkStatus);
-      if (response.gameId && response.asAPlayer) {
+      if (response.gameId) {
         dispatch(setGameId(response.gameId ?? ""));
       }
     } else {
@@ -73,19 +75,23 @@ const App = () => {
           token: token,
         };
         socket.emit("do refresh login", loginRequest, (loginResponse: IuiRefreshLoginResponse) => {
+          console.log(loginResponse);
+          dispatch(setSpinnerVisible(false));
           if (loginResponse.loginStatus === LOGIN_RESPONSE.ok && loginResponse.isAuthenticated) {
             handleAuthenticatedRequest(loginResponse.token);
             dispatch(setUserLoggedIn({loggedIn: loginResponse.isAuthenticated ?? false, name: loginResponse.myName ?? ""}));
           }
         });
+      } else {
+        dispatch(setSpinnerVisible(false));
       }
     }
 
-    socket.on("game begins", (gameId: string) => {
+    socket.on("game begins", (gameBeginsNotification: IuiGameBeginsNotification) => {
       // console.log("game begins call");
-      if (gameId !== "" && user.isUserLoggedIn) {
-        setGameStatus(CHECK_GAME_STATUS.onGoingGame);
-        dispatch(setGameId(gameId));
+      if (gameBeginsNotification.gameId !== "" && user.isUserLoggedIn) {
+        setGameStatus(gameBeginsNotification.asAObserver ? CHECK_GAME_STATUS.observedGame : CHECK_GAME_STATUS.onGoingGame);
+        dispatch(setGameId(gameBeginsNotification.gameId));
       }
     });
 
@@ -94,24 +100,13 @@ const App = () => {
     };
   }, [handleOnGoingResponse, user, dispatch, socket]);
 
-  const onJoin = () => {
-    if (user.isUserLoggedIn) {
-      const checkGameRequest: IuiUserData = {
-        uuid: getMyId(),
-        userName: user.userName,
-        token: getToken(),
-      };
-      socket.emit("check if ongoing game", checkGameRequest, handleOnGoingResponse);
-    }
-  };
-
   // console.log("render app...");
 
-  if (gameStatus === CHECK_GAME_STATUS.onGoingGame && gameId !== "" && user.isUserLoggedIn) {
+  if ((gameStatus === CHECK_GAME_STATUS.onGoingGame || gameStatus === CHECK_GAME_STATUS.observedGame) && gameId !== "" && user.isUserLoggedIn) {
     return <GameTable gameId={gameId ?? ""} />;
   } else {
     return (
-      <HomeScreen onJoin={onJoin} />
+      <HomeScreen />
     );
   }
 };

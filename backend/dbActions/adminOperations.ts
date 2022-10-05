@@ -208,3 +208,37 @@ export const convertOldDataToNew = async (): Promise<string[]> => {
   console.log("conversion ready, converted count", retArr.length);
   return [];
 };
+
+export const reNameNickInGame = async (gameId: string, currentNick: string, newNick: string): Promise<boolean> => {
+  if (!mongoose.isValidObjectId(gameId)) return false;
+
+  const gameInDb = await GameOptions.findById(gameId);
+  if (gameInDb) {
+    const humanPlayer = gameInDb.humanPlayers.find(player => player.name === currentNick);
+    if (!humanPlayer) return false;
+    humanPlayer.name = newNick;
+
+    const playerInOrder = gameInDb.game.playerOrder.find(player => player.name === currentNick);
+    if (!playerInOrder) return false;
+    playerInOrder.name = newNick;
+
+    for (let i = 0; i < gameInDb.game.rounds.length; i++) {
+      const round = gameInDb.game.rounds[i];
+      const roundPlayer = round.roundPlayers.find(player => player.name === currentNick);
+      if (!roundPlayer) return false;
+      roundPlayer.name = newNick;
+
+      for (let j = 0; j < round.cardsPlayed.length; j++) {
+        const hitRound = round.cardsPlayed[j];
+        const hitOfPlayer = hitRound.find(hit => hit.name === currentNick);
+        if (!hitOfPlayer) return false;
+        hitOfPlayer.name = newNick;
+      }
+    }
+
+    gameInDb.gameStatistics = generateGameStats(gameInDb.game, true);
+    const gameAfter = await gameInDb.save();
+    if (gameAfter) return true;
+  }
+  return false;
+};

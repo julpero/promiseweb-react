@@ -1,3 +1,5 @@
+import { IuiObserver } from "../../frontend/src/interfaces/IuiPlayingGame";
+
 interface ISocketAdminData {
   socketId: string,
   uuid: string,
@@ -9,12 +11,19 @@ interface ISocketWaitingToJoin {
   asAPlayer: string,
 }
 
+interface ISocketObserving {
+  socketId: string,
+  gameId: string,
+  isWaiting: boolean,
+}
+
 interface ISocketMap {
   sockets: Set<string>,
   game?: string,
   adminSocket?: ISocketAdminData,
   lastTimestamp: number,
   waitingToJoin?: ISocketWaitingToJoin,
+  observing?: ISocketObserving,
 }
 
 const userSocketIdMap = new Map<string, ISocketMap>(); //a map of online usernames and their clients
@@ -57,6 +66,13 @@ export const removeUserFromGame = (userName: string, gameId: string): void => {
   const user = userSocketIdMap.get(userName);
   if (user && user.game === gameId) {
     user.game = undefined;
+  }
+  const players = getPlayersOfTheGame(gameId);
+  if (players.length === 0) {
+    userSocketIdMap.forEach(user => {
+      if (user.observing?.gameId === gameId) user.observing = undefined;
+      if (user.waitingToJoin?.gameId === gameId) user.waitingToJoin = undefined;
+    });
   }
 };
 
@@ -196,4 +212,75 @@ export const clearWaiting = (userName: string) => {
   if (user) {
     user.waitingToJoin = undefined;
   }
+};
+
+export const setObserving = (userName: string, timestamp: number, socketId: string, gameId: string, waiting: boolean): void => {
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    user.observing = {
+      socketId: socketId,
+      gameId: gameId,
+      isWaiting: waiting,
+    } as ISocketObserving;
+  } else {
+    userSocketIdMap.set(userName, {
+      sockets: new Set([socketId]),
+      game: undefined,
+      adminSocket: undefined,
+      lastTimestamp: timestamp,
+      observing: {
+        socketId: socketId,
+        gameId: gameId,
+        isWaiting: waiting,
+      } as ISocketObserving,
+    });
+  }
+};
+
+export const clearObserving = (userName: string): void => {
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    user.observing = undefined;
+  }
+};
+
+export const getGameObserversForUi = (gameId: string): IuiObserver[] => {
+  const obsArr: IuiObserver[] = [];
+  getGameObservers(gameId).forEach((val, key) => {
+    obsArr.push({
+      name: key,
+      waiting: val.isWaiting,
+    } as IuiObserver);
+  });
+  return obsArr;
+};
+
+export const getGameObservers = (gameId: string): Map<string, ISocketObserving> => {
+  const observers = new Map<string, ISocketObserving>();
+  userSocketIdMap.forEach((val, key) => {
+    if (val.observing?.gameId === gameId) {
+      observers.set(key, val.observing);
+    }
+  });
+  return observers;
+};
+
+export const getObservingGame = (userName: string): ISocketObserving | null => {
+  const user = userSocketIdMap.get(userName);
+  if (user) {
+    return user.observing ?? null;
+  }
+  return null;
+};
+
+export const userIsCurrentlyObserving = (userName: string, gameId?: string): boolean => {
+  const user = userSocketIdMap.get(userName);
+  if (user && user.observing?.isWaiting === false) {
+    if (gameId) {
+      return user.observing.gameId === gameId && !getPlayersOfTheGame(gameId).some(player => player === userName);
+    } else {
+      return true;
+    }
+  }
+  return false;
 };

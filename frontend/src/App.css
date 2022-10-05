@@ -35,11 +35,14 @@ body {
 #scoretableArea {
   grid-area: scoretable;
   position: relative;
+  margin-top: 5px;
+  margin-right: 5px;
 }
 
 #promisetableArea {
   grid-area: promisetable;
   position: relative;
+  margin-left: 5px;
 }
 
 #chatArea {
@@ -50,6 +53,27 @@ body {
 #menuArea {
   grid-area: menu;
   position: relative;
+  margin-right: 5px;
+}
+
+.spinnerContainer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  z-index: 1070;
+  background-color: #000;
+  opacity: 0.5;
+}
+
+.spinnerClass {
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  transform: translate(-50%, 0);
 }
 
 .smallErrorDiv {
@@ -69,7 +93,7 @@ body {
 
 .ownCardsDiv {
   position: absolute;
-  z-index: 9999;
+  z-index: 999;
 }
 
 .playerInfoDiv {
@@ -81,7 +105,7 @@ body {
   width: var(--normal-container-width);
 }
 .animatedCardPlayedSlot.cardTop:hover {
-  z-index: 9999;
+  z-index: 999;
 }
 .wonCardsRow {
   height: var(--normal-container-height);
@@ -184,6 +208,22 @@ body {
   border: 1px lightgray groove;
   border-radius: 0.4em;
   z-index: 1;
+  font-size: smaller;
+  margin-bottom: 5px;
+}
+
+.chatBox .gameOver {
+  animation-name: gameOverAnimation;
+  animation-duration: 5s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+@keyframes gameOverAnimation {
+  0% {background-color: greenyellow;}
+  25% {background-color: yellow;}
+  50% {background-color: orange;}
+  75% {background-color: red;}
+  100% {background-color: violet;}
 }
 
 .cardCol {
@@ -292,4 +332,12 @@ body {
   position: absolute;
   bottom: 10px;
   right: 10px;
+}
+
+.joinOtherButton {
+  margin-right: 2px;
+}
+
+.timeLineButton {
+  margin-right: 10px;
 }

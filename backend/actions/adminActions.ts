@@ -1,8 +1,9 @@
-import { IuiAdminGame, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest } from "../../frontend/src/interfaces/IuiAdminOperations";
+import { IuiAdminGame, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickRequest, IuiReNameNickResponse, RENAME_STATUS } from "../../frontend/src/interfaces/IuiAdminOperations";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
-import { convertOldDataToNew, reCreateAllGamesStatistic, reCreateGameStatistic } from "../dbActions/adminOperations";
+import { convertOldDataToNew, reCreateAllGamesStatistic, reCreateGameStatistic, reNameNickInGame } from "../dbActions/adminOperations";
 import { getGamesByStatus } from "../dbActions/games";
+import { getGameWithPlayer } from "../dbActions/playingGame";
 import { checkLogin } from "../dbActions/users";
 import { ICheckLoginRequest } from "../interfaces/IUser";
 
@@ -50,4 +51,25 @@ export const reCreateAllGameStats = async (userName: string): Promise<boolean> =
 export const convertOldData = async (userName: string): Promise<string[]> => {
   if (!await allowAdminActions(userName)) return [];
   return await convertOldDataToNew();
+};
+
+export const reNameNick = async (reNameNickRequest: IuiReNameNickRequest): Promise<RENAME_STATUS> => {
+  const {userName, gameId, currentNick, newNick} = reNameNickRequest;
+  if (!await allowAdminActions(userName)) return RENAME_STATUS.notOk;
+
+  const gameInDb = await getGameWithPlayer(gameId, currentNick);
+
+  if (!gameInDb) {
+    return RENAME_STATUS.notOk;
+  }
+  if (gameInDb.humanPlayers.some(player => player.name === newNick.trim())) {
+    return RENAME_STATUS.nameExistsInGame;
+  }
+
+  const reNameOk = await reNameNickInGame(gameId, currentNick.trim(), newNick.trim());
+  if (reNameOk) {
+    return RENAME_STATUS.ok;
+  }
+
+  return RENAME_STATUS.notOk;
 };

@@ -17,6 +17,12 @@ export interface IuiGamesByPlayer {
   avgPercentagePoints: number, // avgPercentagePoints
 }
 
+export interface IuiPlayedGame {
+  gameId: string,
+  humanPlayers: string[],
+  played: Date,
+}
+
 export interface IuiPlayedGamesReport extends IuiAuth {
   gamesPlayed: number,
   roundsPlayed: number,
@@ -32,4 +38,5 @@ export interface IuiPlayedGamesReport extends IuiAuth {
   // spurtingGame: null,
   // cardsInHandCount: null,
   // timesUsed: null,
+  lastGames?: IuiPlayedGame[],
 }

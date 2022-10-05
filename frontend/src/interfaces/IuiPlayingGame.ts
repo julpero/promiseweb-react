@@ -42,6 +42,16 @@ export enum CARD_ALIGN_TYPE {
   right,
 }
 
+export interface IuiGameBeginsNotification {
+  gameId: string,
+  asAObserver: boolean,
+}
+
+export interface IuiObserver {
+  name: string,
+  waiting: boolean,
+}
+
 export interface IuiGetRoundRequest extends IuiUserData {
   gameId: string,
   roundInd: number,
@@ -52,6 +62,7 @@ export interface IuiGetRoundResponse extends IuiAuth {
   roundInd: number,
   userName: string,
   roundToPlayer: IuiRoundToPlayer,
+  observers?: IuiObserver[],
 }
 
 export interface IuiGetGameInfoRequest extends IuiUserData {
@@ -192,6 +203,7 @@ export interface IuiPlayCardResponse extends IuiAuth {
   winCount?: number,
   newDealer?: string,
   winnerOfGame?: string;
+  playWentOver?: boolean,
 }
 
 export interface IuiCardPlayedNotification {

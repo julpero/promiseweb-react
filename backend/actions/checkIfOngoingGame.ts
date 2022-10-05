@@ -1,11 +1,10 @@
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameResponse } from "../../frontend/src/interfaces/IuiCheckIfOngoingGame";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
-import { IuiUserData } from "../../frontend/src/interfaces/IuiUser";
+import { getGame } from "../dbActions/playingGame";
 import { getLastGameByStatus, ILastGameStatusResponse } from "../dbActions/promiseweb";
 
-export const checkIfOngoingGame = async (checkRequest: IuiUserData): Promise<IuiCheckIfOngoingGameResponse> => {
+export const checkIfOngoingGame = async (userName: string): Promise<IuiCheckIfOngoingGameResponse> => {
   // console.log("checkRequest", checkRequest);
-  const {userName} = checkRequest;
 
   const response: IuiCheckIfOngoingGameResponse = {
     checkStatus: CHECK_GAME_STATUS.noGame,
@@ -31,7 +30,15 @@ export const checkIfOngoingGame = async (checkRequest: IuiUserData): Promise<Iui
     return response;
   }
 
-  // TODO observed game
-
   return response;
+};
+
+export const checkIfObservableGame = async (gameId: string, observerName: string): Promise<boolean> => {
+  const gameInDb = await getGame(gameId);
+  if (gameInDb) {
+    if (gameInDb.gameStatus !== GAME_STATUS.onGoing) return false;
+    if (gameInDb.humanPlayers.some(player => player.name === observerName || player.playedBy === observerName)) return false;
+    return true;
+  }
+  return false;
 };

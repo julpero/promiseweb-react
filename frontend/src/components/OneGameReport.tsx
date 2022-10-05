@@ -9,6 +9,7 @@ import CardsInGame from "./ReportComponents/CardsInGame";
 import CumulativePoints from "./ReportComponents/CumulativePoints";
 import KeepsInGame from "./ReportComponents/KeepsInGame";
 import PointsInGame from "./ReportComponents/PointsInGame";
+import PointsPerTimesUsedInGame from "./ReportComponents/PointsPerTimesUsedInGame";
 import TimesUsedInGame from "./ReportComponents/TimesUsedInGame";
 
 interface IProps {
@@ -50,6 +51,7 @@ const OneGameReport = ({gameId}: IProps) => {
       <KeepsInGame gameReportData={gameReportData} />
       <PointsInGame gameReportData={gameReportData} />
       <TimesUsedInGame gameReportData={gameReportData} />
+      <PointsPerTimesUsedInGame gameReportData={gameReportData} />
       <CardsInGame gameReportData={gameReportData} />
     </div>
   );
