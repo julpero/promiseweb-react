@@ -96,7 +96,6 @@ const HomeScreen = () => {
 
   const closeAndLogoutAdminModal = () => {
     closeLoginAdminModal();
-    setAdminUserName("");
   };
 
   const renderLoginError = () => {
@@ -322,16 +321,20 @@ const HomeScreen = () => {
           <Accordion>
             <Accordion.Item eventKey="0">
               <Accordion.Header>Game List</Accordion.Header>
-              <Accordion.Body><AdminGameList userName={adminUserName} /></Accordion.Body>
+              <Accordion.Body>
+                <AdminGameList userName={adminUserName} />
+              </Accordion.Body>
             </Accordion.Item>
             <Accordion.Item eventKey="1">
               <Accordion.Header>Mass Operations</Accordion.Header>
-              <Accordion.Body><AdminMassOperations userName={adminUserName} /></Accordion.Body>
+              <Accordion.Body>
+                <AdminMassOperations userName={adminUserName} />
+              </Accordion.Body>
             </Accordion.Item>
           </Accordion>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="warning" onClick={() => closeAndLogoutAdminModal()}>Log out</Button>
+          <Button variant="warning" onClick={() => closeAndLogoutAdminModal()}>Log out as admin</Button>
         </Modal.Footer>
       </Modal>
 

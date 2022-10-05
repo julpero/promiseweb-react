@@ -7,6 +7,7 @@ import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickReq
 import { IuiUserData } from "../../interfaces/IuiUser";
 import { useSocket } from "../../socket";
 import { getAdminGameList, isAdminLoggedIn, setAdminGameList } from "../../store/adminSlice";
+import { setSpinnerVisible } from "../../store/spinnerSlice";
 import SelectInput from "../FormComponents/SelectInput";
 import TextInput from "../FormComponents/TextInput";
 import OneGameReport from "../OneGameReport";
@@ -52,15 +53,22 @@ const AdminGameList = ({userName}: IProps) => {
       userName: userName,
       token: getToken(),
     };
+    dispatch(setSpinnerVisible(true));
     socket.emit("get games for admin", getGamesRequest, (getGamesResponse: IuiGetGamesResponse) => {
       // console.log(getGamesResponse);
       if (getGamesResponse.isAuthenticated) {
         handleAuthenticatedRequest(getGamesResponse.token);
         dispatch(setAdminGameList(getGamesResponse.gameList));
+        dispatch(setSpinnerVisible(false));
       } else {
         handleUnauthenticatedRequest(dispatch);
       }
     });
+
+    return () => {
+      dispatch(setSpinnerVisible(false));
+    };
+
   }, [userName, socket, dispatch]);
 
   if (!adminLoggedIn) return null;
