@@ -203,6 +203,7 @@ export interface IuiPlayCardResponse extends IuiAuth {
   winCount?: number,
   newDealer?: string,
   winnerOfGame?: string;
+  playWentOver?: boolean,
 }
 
 export interface IuiCardPlayedNotification {

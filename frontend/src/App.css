@@ -208,6 +208,22 @@ body {
   border: 1px lightgray groove;
   border-radius: 0.4em;
   z-index: 1;
+  font-size: smaller;
+  margin-bottom: 5px;
+}
+
+.chatBox .gameOver {
+  animation-name: gameOverAnimation;
+  animation-duration: 5s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+@keyframes gameOverAnimation {
+  0% {background-color: greenyellow;}
+  25% {background-color: yellow;}
+  50% {background-color: orange;}
+  75% {background-color: red;}
+  100% {background-color: violet;}
 }
 
 .cardCol {

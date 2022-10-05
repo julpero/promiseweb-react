@@ -90,7 +90,7 @@ const OnePlayerPOfPoints = ({gameReportData}: IProps) => {
       pointStyle: "rectRot",
     } as ChartDataset<"line">);
     accentColors.current.push(basicColor);
-    accentFadedColors.current.push(increase_brightness(basicColor, 75));
+    accentFadedColors.current.push(increase_brightness(basicColor, 95));
 
     label = "Keep %";
     basicColor = colorize(label);
@@ -105,7 +105,7 @@ const OnePlayerPOfPoints = ({gameReportData}: IProps) => {
       barThickness: 3,
     } as ChartDataset<"bar">);
     accentColors.current.push(basicColor);
-    accentFadedColors.current.push(increase_brightness(basicColor, 75));
+    accentFadedColors.current.push(increase_brightness(basicColor, 95));
 
     label = "% of winning points";
     basicColor = colorize(label);
@@ -123,7 +123,7 @@ const OnePlayerPOfPoints = ({gameReportData}: IProps) => {
       showLine: false,
     } as ChartDataset<"line">);
     accentColors.current.push(basicColor);
-    accentFadedColors.current.push(increase_brightness(basicColor, 75));
+    accentFadedColors.current.push(increase_brightness(basicColor, 95));
 
     return dataSetsData;
   };
