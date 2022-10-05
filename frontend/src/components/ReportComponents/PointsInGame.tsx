@@ -87,7 +87,7 @@ const PointsInGame = ({gameReportData}: IProps) => {
   };
 
   return (
-    <div style={{height: "210px"}}>
+    <div style={{height: "230px"}}>
       <Bar
         ref={chartRef}
         data={chartData}

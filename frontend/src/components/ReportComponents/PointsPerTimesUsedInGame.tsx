@@ -28,36 +28,27 @@ interface IProps {
   gameReportData?: IuiOneGameReport,
 }
 
-const TimesUsedInGame = ({gameReportData}: IProps) => {
+const PointsPerTimesUsedInGame = ({gameReportData}: IProps) => {
+  console.log(gameReportData);
   const chartRef = useRef<ChartJS<"bar">>(null);
-
-  const msToHMS = (ms: number): string => {
-    // 1- Convert to seconds:
-    let seconds = Math.floor(ms / 1000);
-    // 2- Extract hours:
-    const hours = Math.floor(seconds/3600); // 3,600 seconds in 1 hour
-    seconds = seconds % 3600; // seconds remaining after extracting hours
-    // 3- Extract minutes:
-    const minutes = Math.floor(seconds/60); // 60 seconds in 1 minute
-    // 4- Keep only seconds not extracted to minutes:
-    seconds = seconds % 60;
-    const minStr = ("00"+minutes).slice(-2);
-    const secStr = ("00"+seconds).slice(-2);
-
-    return hours > 0 ? `${hours}:${minStr}:${secStr}` : `${minStr}:${secStr}`;
-  };
 
   const getDataSetsData = (): ChartDataset<"bar">[] => {
     const dataSetsData: ChartDataset<"bar">[] = [];
     dataSetsData.push({
-      label: "Hit Time",
-      data: gameReportData?.playTimes ?? [],
+      label: "Points per Hit Time",
+      data: gameReportData?.playTimes?.map((time, ind) => {
+        const totalPoints = (gameReportData.pointsBig.at(ind) ?? 0) + (gameReportData.pointsSmall.at(ind) ?? 0);
+        return totalPoints / (time/1000);
+      }) ?? [],
       borderWidth: 1,
       backgroundColor: "rgba(255,153,0,0.6)",
     });
     dataSetsData.push({
-      label: "Promise Time",
-      data: gameReportData?.promiseTimes ?? [],
+      label: "Points per Promise Time",
+      data: gameReportData?.promiseTimes?.map((time, ind) => {
+        const totalPoints = (gameReportData.pointsBig.at(ind) ?? 0) + (gameReportData.pointsSmall.at(ind) ?? 0);
+        return totalPoints / (time/1000);
+      }) ?? [],
       borderWidth: 1,
       backgroundColor: "lightgreen",
     });
@@ -70,34 +61,24 @@ const TimesUsedInGame = ({gameReportData}: IProps) => {
     indexAxis: "y",
     scales: {
       x: {
-        stacked: true,
+        stacked: false,
         // max: Math.max(...reportObject.timesUsed.map(v => parseInt(v.totalPromiseTime, 10) + parseInt(v.totalPlayTime, 10))),
         min: 0,
-        display: false,
+        display: true,
       },
       y: {
-        stacked: true,
+        stacked: false,
       },
     },
     plugins: {
       title: {
         display: true,
-        text: "Used time in game by nickname"
+        text: "Points per used time in game by nickname"
       },
       tooltip: {
         callbacks: {
-          footer: function(tooltipItem) {
-            const chart = chartRef.current;
-            let total = 0;
-            if (chart) {
-              for (let i = 0; i < chart.data.datasets.length; i++) {
-                total += chart.data.datasets[i].data[tooltipItem[0].dataIndex];
-              }
-            }
-            return "TOTAL: "+msToHMS(total);
-          },
           label: function(context) {
-            return " "+context.dataset.label+": "+msToHMS(parseInt((context.raw) as string, 10));
+            return `${context.parsed.x.toFixed(2)} points per second`;
           },
         }
       },
@@ -112,7 +93,7 @@ const TimesUsedInGame = ({gameReportData}: IProps) => {
   if ((gameReportData?.playTimes?.at(0) ?? 0) === 0) return null;
 
   return (
-    <div style={{height: "230px"}}>
+    <div style={{height: "330px"}}>
       <Bar
         ref={chartRef}
         data={chartData}
@@ -122,4 +103,4 @@ const TimesUsedInGame = ({gameReportData}: IProps) => {
   );
 };
 
-export default TimesUsedInGame;
+export default PointsPerTimesUsedInGame;
