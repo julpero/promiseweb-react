@@ -14,6 +14,7 @@ import { getUser, setUserLoggedIn } from "./store/userSlice";
 import { IuiRefreshLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./interfaces/IuiUser";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "./common/userFunctions";
 import { IuiGameBeginsNotification } from "./interfaces/IuiPlayingGame";
+import { setSpinnerVisible } from "./store/spinnerSlice";
 
 const App = () => {
   const [gameStatus, setGameStatus] = useState(CHECK_GAME_STATUS.noGame);
@@ -74,11 +75,15 @@ const App = () => {
           token: token,
         };
         socket.emit("do refresh login", loginRequest, (loginResponse: IuiRefreshLoginResponse) => {
+          console.log(loginResponse);
+          dispatch(setSpinnerVisible(false));
           if (loginResponse.loginStatus === LOGIN_RESPONSE.ok && loginResponse.isAuthenticated) {
             handleAuthenticatedRequest(loginResponse.token);
             dispatch(setUserLoggedIn({loggedIn: loginResponse.isAuthenticated ?? false, name: loginResponse.myName ?? ""}));
           }
         });
+      } else {
+        dispatch(setSpinnerVisible(false));
       }
     }
 

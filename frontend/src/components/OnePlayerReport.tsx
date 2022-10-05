@@ -10,6 +10,7 @@ import parseISO from "date-fns/parseISO";
 import getYear from "date-fns/getYear";
 import isAfter from "date-fns/isAfter";
 import sub from "date-fns/sub";
+import { setSpinnerVisible } from "../store/spinnerSlice";
 
 interface IProps {
   playerName: string,
@@ -27,6 +28,7 @@ const OnePlayerReport = ({playerName}: IProps) => {
 
   useEffect(() => {
     if (playerName && user.isUserLoggedIn) {
+      dispatch(setSpinnerVisible(true));
       const reportRequest: IuiOnePlayerReportRequest = {
         uuid: getMyId(),
         userName: user.userName,
@@ -34,7 +36,8 @@ const OnePlayerReport = ({playerName}: IProps) => {
         playerName: playerName,
       };
       socket.emit("get one player report", reportRequest, (playerReportResponse: IuiOnePlayerReportResponse) => {
-        console.log("playerReportResponse", playerReportResponse);
+        // console.log("playerReportResponse", playerReportResponse);
+        dispatch(setSpinnerVisible(false));
         if (playerReportResponse.isAuthenticated) {
           handleAuthenticatedRequest(playerReportResponse.token);
           setReportData(playerReportResponse.onePlayerReport);
