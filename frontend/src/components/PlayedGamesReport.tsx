@@ -12,6 +12,11 @@ import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../com
 import PlayedGamesByPlayerCount from "./ReportComponents/PlayedGamesByPlayerCount";
 import { RowComponent } from "tabulator-tables";
 import { setSpinnerVisible } from "../store/spinnerSlice";
+import { Button, Modal } from "react-bootstrap";
+import OneGameReport from "./OneGameReport";
+
+import { format } from "date-fns";
+import { parseISO } from "date-fns/esm";
 
 interface IProps {
   openPlayerReport: (playerName: string) => void,
@@ -20,6 +25,7 @@ interface IProps {
 const PlayedGamesReport = (props: IProps) => {
   // console.log("PlayedGamesReport");
   const [reportData, setReportData] = useState<IuiPlayedGamesReport>();
+  const [activeGame, setActiveGame] = useState("");
   const user = useSelector(getUser);
 
   const dispatch = useDispatch();
@@ -217,6 +223,10 @@ const PlayedGamesReport = (props: IProps) => {
     props.openPlayerReport(playerName);
   };
 
+  const closeModal = () => {
+    setActiveGame("");
+  };
+
   return (
     <div>
       <hr />
@@ -245,7 +255,50 @@ const PlayedGamesReport = (props: IProps) => {
         />
       }
       {reportData &&
+        <div>
+          <p>Last five games</p>
+          <ul>
+            {reportData?.lastGames?.map((game, ind) => {
+              return (
+                <li key={ind}>
+                  <span onClick={() => setActiveGame(game.gameId)} style={{cursor: "pointer"}}>{format(parseISO(game.played.toString()), "dd MMM yyyy HH:mm:ss")}</span>
+                  &nbsp;-&nbsp;
+                  <span>{game.humanPlayers.map((player, idx) => {
+                    if (idx === 0) {
+                      return <strong key={idx}>{`${player}, `}</strong>;
+                    } else if (idx === game.humanPlayers.length-1) {
+                      return player;
+                    } else {
+                      return `${player}, `;
+                    }
+                  })}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      }
+      {reportData &&
         <PlayedGamesByPlayerCount gameReportData={reportData?.playersTotal} max={reportData?.gamesPlayed ?? 0} />
+      }
+      {reportData && activeGame !== "" &&
+        <Modal
+          show={activeGame !== ""}
+          onHide={() => closeModal()}
+          fullscreen={true}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+            Game Report
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <OneGameReport gameId={activeGame} />
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="warning" onClick={() => closeModal()}>Close Report</Button>
+          </Modal.Footer>
+        </Modal>
       }
     </div>
   );
