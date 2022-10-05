@@ -241,6 +241,7 @@ const HomeScreen = ({onJoin}: IProps) => {
                   name="userName"
                   component={TextInput}
                   label="(Nick)Name"
+                  autoFocus
                 />
                 <Field<string>
                   name="password1"
@@ -289,6 +290,7 @@ const HomeScreen = ({onJoin}: IProps) => {
                   name="userName"
                   component={TextInput}
                   label="User name"
+                  autoFocus
                 />
                 <Field<string>
                   name="password"
