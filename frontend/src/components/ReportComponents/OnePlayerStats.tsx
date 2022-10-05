@@ -1,4 +1,4 @@
-import React, { MouseEvent as MouseEventReact, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IuiOnePlayerReportData } from "../../interfaces/IuiReports";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { format } from "date-fns";
@@ -21,8 +21,10 @@ import {
   LineController,
   BarController,
 } from "chart.js";
-import { Chart, getDatasetAtEvent } from "react-chartjs-2";
+import { Chart } from "react-chartjs-2";
 import { colorize, increase_brightness } from "../../common/commonFunctions";
+import { Button, Modal } from "react-bootstrap";
+import OneGameReport from "../OneGameReport";
 
 ChartJS.register(
   CategoryScale,
@@ -43,6 +45,7 @@ interface IProps {
 }
 
 const OnePlayerPOfPoints = ({gameReportData}: IProps) => {
+  const [oneGameReportId, setOneGameReportId] = useState("");
   const chartRef = useRef<ChartJS<"line" | "bar">>(null);
   const legendHoverIndex = useRef(-1);
   const accentColors = useRef<string[]>([]);
@@ -77,12 +80,7 @@ const OnePlayerPOfPoints = ({gameReportData}: IProps) => {
     dataSetsData.push({
       type: "line",
       label: label,
-      data: gamesData.flatMap(data => {
-        return {
-          x: new Date(data.started).getTime(),
-          y: data.position,
-        };
-      }),
+      data: gamesData.flatMap(data => data.position),
       yAxisID: "y",
       borderColor: basicColor,
       tension: 0,
@@ -114,12 +112,7 @@ const OnePlayerPOfPoints = ({gameReportData}: IProps) => {
     dataSetsData.push({
       type: "line",
       label: label,
-      data: gamesData.flatMap(data => {
-        return {
-          x: new Date(data.started).getTime(),
-          y: data.pOfWinPoints,
-        };
-      }),
+      data: gamesData.flatMap(data => data.pOfWinPoints),
       yAxisID: "y1",
       borderColor: basicColor,
       tension: 0,
@@ -171,6 +164,18 @@ const OnePlayerPOfPoints = ({gameReportData}: IProps) => {
       mode: "nearest",
       intersect: true
     },
+    onClick: () => {
+      const chart = chartRef.current;
+      if (chart) {
+        const dataIndex = chart.tooltip?.dataPoints.at(0)?.dataIndex ?? -1;
+        if (dataIndex >= 0) {
+          const gameId = gameReportData?.gamesData.at(dataIndex)?.gameId;
+          if (gameId) {
+            setOneGameReportId(gameId);
+          }
+        }
+      }
+    },
     plugins: {
       title: {
         display: true,
@@ -207,23 +212,37 @@ const OnePlayerPOfPoints = ({gameReportData}: IProps) => {
     datasets: getDataSetsData(),
   };
 
-  const chartClick = (e: MouseEventReact<HTMLCanvasElement>) => {
-    if (chartRef.current) {
-      const canvasPosition = getDatasetAtEvent(chartRef.current, e);
-      console.log(canvasPosition);
-    }
-  };
-
   return (
-    <div style={{height: "80vh"}}>
-      <Chart
-        type="bar"
-        ref={chartRef}
-        data={chartData}
-        options={chartOptions}
-        onClick={chartClick}
-      />
-    </div>
+    <React.Fragment>
+      <div style={{height: "75vh"}}>
+        <Chart
+          type="bar"
+          ref={chartRef}
+          data={chartData}
+          options={chartOptions}
+        />
+      </div>
+
+      {oneGameReportId &&
+        <Modal
+          show={oneGameReportId !== ""}
+          fullscreen
+          onHide={() => setOneGameReportId("")}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              Game Report
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <OneGameReport gameId={oneGameReportId} />
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="warning" onClick={() => setOneGameReportId("")}>Close Report</Button>
+          </Modal.Footer>
+        </Modal>
+      }
+    </React.Fragment>
   );
 };
 
