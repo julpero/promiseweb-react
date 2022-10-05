@@ -352,7 +352,7 @@ const GameMenu = () => {
         </Modal.Header>
         <Modal.Body>
           <p>You were the last player in the game and now there is no more players in the game.</p>
-          <p>The game is now dismissed and can&amp;t be played anymore.</p>
+          <p>The game is now dismissed and can&apos;t be played anymore.</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={closeLeftModal}>CLOSE</Button>
