@@ -4,7 +4,6 @@ import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../com
 import { GAME_STATUS, ROUND_STATUS } from "../interfaces/IuiGameOptions";
 import { IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, ROUND_PHASE } from "../interfaces/IuiPlayingGame";
 import { useSocket } from "../socket";
-import { setActionsAvailable } from "../store/actionsAvailableSlice";
 import { AnimateCard, setAnimateCard } from "../store/animateCardSlice";
 import { getCurrentGameInfo, setGameInfo } from "../store/gameInfoSlice";
 import { getGetRoundInfo, setGetRoundInfo } from "../store/getRoundInfoSlice";
@@ -42,7 +41,6 @@ const EffectHandler = ({gameId}: IProps) => {
         if (roundResponse.isAuthenticated) {
           handleAuthenticatedRequest(roundResponse.token);
           dispatch(setRoundInfo(roundResponse));
-          dispatch(setActionsAvailable(roundResponse.roundToPlayer.isMyPromiseTurn || roundResponse.roundToPlayer.isMyTurn));
         } else {
           handleUnauthenticatedRequest(dispatch);
         }
@@ -71,7 +69,6 @@ const EffectHandler = ({gameId}: IProps) => {
       const { playerName, playedFromSlot, playedCard, roundStatusAfterPlay, currentRoundIndex, winnerOfPlay, winCount, newPlayAfterHit, gameStatusAfterPlay } = cardPlayedNotification;
 
       // animate played card
-      dispatch(setActionsAvailable(false));
       const animatedCard: AnimateCard = {
         cardFace: playedCard,
         fromPlayer: playerName,
@@ -152,7 +149,6 @@ const EffectHandler = ({gameId}: IProps) => {
         if (playCardResponse.isAuthenticated) {
           handleAuthenticatedRequest(playCardResponse.token);
           dispatch(setPlayedCard(null));
-          dispatch(setActionsAvailable(true));
         } else {
           handleUnauthenticatedRequest(dispatch);
         }

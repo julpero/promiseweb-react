@@ -4,7 +4,6 @@ import roundInfoReducer from "./roundInfoSlice";
 import getRoundInfoReducer from "./getRoundInfoSlice";
 import playCardReducer from "./playCardSlice";
 import animateCardReducer from "./animateCardSlice";
-import actionsAvailableReducer from "./actionsAvailableSlice";
 import emptySlotReducer from "./emptyAnimatedCardSlotSlice";
 import collectCardsReducer from "./collectAnimatedCardsSlice";
 import adminReducer from "./adminSlice";
@@ -18,7 +17,6 @@ const store = configureStore({
     getRoundInfoReducer,
     playCardReducer,
     animateCardReducer,
-    actionsAvailableReducer,
     emptySlotReducer,
     collectCardsReducer,
     adminReducer,

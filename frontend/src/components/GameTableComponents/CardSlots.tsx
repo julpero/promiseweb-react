@@ -10,7 +10,6 @@ import { CARD_ALIGN_TYPE, IuiCard, IuiGetRoundResponse, IuiRoundPlayer, IuiRound
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { setPlayedCard } from "../../store/playCardSlice";
-import { setActionsAvailable } from "../../store/actionsAvailableSlice";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 
 interface IProps {
@@ -52,7 +51,6 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
     if (card) {
       // console.log("play card (reducer)", card);
       dispatch(setPlayedCard(card));
-      dispatch(setActionsAvailable(false));
     }
   };
 
