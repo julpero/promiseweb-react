@@ -1,4 +1,5 @@
 import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickRequest, IuiReNameNickResponse } from "../interfaces/IuiAdminOperations";
+import { IuiChatNotification } from "../interfaces/IuiChat";
 import { IuiCheckIfOngoingGameResponse } from "../interfaces/IuiCheckIfOngoingGame";
 import { IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse } from "../interfaces/IuiGameList";
 import { IuiPlayedGamesReport } from "../interfaces/IuiGameReports";
@@ -22,7 +23,7 @@ import { IuiGetOneGameReportRequest, IuiOneGameReport, IuiOnePlayerReportRequest
 import { IuiAuth, IuiLoginRequest, IuiLoginResponse, IuiRefreshLoginResponse, IuiUserData } from "../interfaces/IuiUser";
 
 export interface ServerToClientEvents {
-  "new chat line": (chatLine: string) => void;
+  "new chat line": (chatObj: IuiChatNotification) => void;
 
   "new game created": () => void;
   "game list updated": () => void;

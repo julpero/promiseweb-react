@@ -29,7 +29,7 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
   const iAmObserver = currentRoundInfo.observers?.some(observer => observer.name === user.userName && !observer.waiting) ?? false;
 
   const player: IuiRoundPlayer = playerFromIndex(currentRoundInfo, index, iAmObserver);
-  console.log("OtherPlayer, player", player);
+  // console.log("OtherPlayer, player", player);
 
   const renderCardsRow = () => {
     if (index === 0) return null;
