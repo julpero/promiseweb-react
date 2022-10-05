@@ -8,13 +8,8 @@ import { IuiUserData } from "../interfaces/IuiUser";
 import { useSocket } from "../socket";
 import { getUser } from "../store/userSlice";
 
-interface IProps {
-  onJoin: () => void,
-}
-
-const JoinOnGoingGame = ({onJoin}: IProps) => {
+const JoinOnGoingGame = () => {
   const [ submitting, setSubmitting ] = useState(false);
-  const [ joinOk, setJoinOk ] = useState(false);
   const [ showRejection, setShowRejection ] = useState(false);
   const [ showWaiting, setShowWaiting ] = useState(false);
   const [ showObserveWaiting, setShowObserveWaiting ] = useState(false);
@@ -93,7 +88,7 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
       if (joinResponse.isAuthenticated) {
         handleAuthenticatedRequest(joinResponse.token);
         if (joinResponse.joinStatus === JOIN_GAME_STATUS.ok) {
-          setJoinOk(true);
+          // this is obsolete, we redirect waiter or mySelf straight in to the game
         } else if (joinResponse.joinStatus === JOIN_GAME_STATUS.failed) {
           setShowError(true);
           setShowWaiting(false);
@@ -127,11 +122,6 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
         handleUnauthenticatedRequest(dispatch);
       }
     });
-  };
-
-  const closeAndPlay = () =>  {
-    setJoinOk(false);
-    onJoin();
   };
 
   const cancelWaiting = () => {
@@ -253,21 +243,6 @@ const JoinOnGoingGame = ({onJoin}: IProps) => {
       <div>
         {renderGameItems()}
       </div>
-
-      <Modal show={joinOk} onHide={closeAndPlay}>
-        <Modal.Header closeButton>
-          <Modal.Title>
-            Joined game...
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>You have successfully joined the game as a player <i>{playerName}</i>.</p>
-          <p>You can now close this dialog and start playing.</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="success" onClick={closeAndPlay}>Close and Play</Button>
-        </Modal.Footer>
-      </Modal>
 
       <Modal show={showWaiting} onHide={cancelWaiting}>
         <Modal.Header>

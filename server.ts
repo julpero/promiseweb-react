@@ -966,6 +966,10 @@ connectDB().then(() => {
               type: CHAT_TYPE.join,
             };
             io.to(gameId).emit("new chat line", chatObj);
+
+            // straight to game
+            socket.emit("game begins", { gameId: gameId, asAObserver: false } as IuiGameBeginsNotification);
+            return null;
           }
           csm.setLastTimestamp(userName, socket.id, timestamp);
           const newToken = signUserToken(userName, uuid, timestamp);

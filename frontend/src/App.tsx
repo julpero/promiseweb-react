@@ -100,24 +100,13 @@ const App = () => {
     };
   }, [handleOnGoingResponse, user, dispatch, socket]);
 
-  const onJoin = () => {
-    if (user.isUserLoggedIn) {
-      const checkGameRequest: IuiUserData = {
-        uuid: getMyId(),
-        userName: user.userName,
-        token: getToken(),
-      };
-      socket.emit("check if ongoing game", checkGameRequest, handleOnGoingResponse);
-    }
-  };
-
   // console.log("render app...");
 
   if ((gameStatus === CHECK_GAME_STATUS.onGoingGame || gameStatus === CHECK_GAME_STATUS.observedGame) && gameId !== "" && user.isUserLoggedIn) {
     return <GameTable gameId={gameId ?? ""} />;
   } else {
     return (
-      <HomeScreen onJoin={onJoin} />
+      <HomeScreen />
     );
   }
 };

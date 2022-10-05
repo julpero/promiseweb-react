@@ -51,11 +51,7 @@ enum ACTIVE_MODAL {
   onePlayerReport,
 }
 
-interface IProps {
-  onJoin: () => void,
-}
-
-const HomeScreen = ({onJoin}: IProps) => {
+const HomeScreen = () => {
   const [loginFormValidationError, setLoginFormValidationError] = useState("");
   const [activeModal, setActiveModal] = useState<ACTIVE_MODAL>(ACTIVE_MODAL.none);
   const [activePlayerName, setActivePlayerName] = useState("");
@@ -211,7 +207,7 @@ const HomeScreen = ({onJoin}: IProps) => {
         <Accordion.Item eventKey="2">
           <Accordion.Header>On Going Games</Accordion.Header>
           <Accordion.Body>
-            <JoinOnGoingGame onJoin={onJoin} />
+            <JoinOnGoingGame />
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
