@@ -67,6 +67,13 @@ export const removeUserFromGame = (userName: string, gameId: string): void => {
   if (user && user.game === gameId) {
     user.game = undefined;
   }
+  const players = getPlayersOfTheGame(gameId);
+  if (players.length === 0) {
+    userSocketIdMap.forEach(user => {
+      if (user.observing?.gameId === gameId) user.observing = undefined;
+      if (user.waitingToJoin?.gameId === gameId) user.waitingToJoin = undefined;
+    });
+  }
 };
 
 export const getUserNameFromMapBySocket = (socketId: string): string | null => {

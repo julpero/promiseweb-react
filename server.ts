@@ -15,7 +15,7 @@ import { createGame } from "./backend/actions/createGame";
 import { getOpenGamesList } from "./backend/actions/getGameList";
 import { joinGame } from "./backend/actions/joinGame";
 import { leaveGame } from "./backend/actions/leaveGame";
-import { checkIfOngoingGame } from "./backend/actions/checkIfOngoingGame";
+import { checkIfObservableGame, checkIfOngoingGame } from "./backend/actions/checkIfOngoingGame";
 import { CREATE_GAME_STATUS, IuiCreateGameRequest, IuiCreateGameResponse } from "./frontend/src/interfaces/IuiNewGame";
 import { IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IuiGameList";
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameResponse } from "./frontend/src/interfaces/IuiCheckIfOngoingGame";
@@ -470,18 +470,21 @@ connectDB().then(() => {
               const observingGame = csm.getObservingGame(userName);
               if (observingGame) {
                 const {gameId} = observingGame;
-                socket.join(gameId);
-                csm.setObserving(userName, timestamp, socket.id, gameId, false);
-                const chatLine = `player ${userName} is observing game`;
-                const chatObj: IuiChatNotification = {
-                  chatLine: chatLine,
-                  focusedPlayer: userName,
-                  type: CHAT_TYPE.observe,
-                };
-                io.to(gameId).emit("new chat line", chatObj);
-                checkResponse.gameId = gameId;
-                checkResponse.checkStatus = CHECK_GAME_STATUS.onGoingGame;
-                break;
+                const isObservableGame = await checkIfObservableGame(gameId, userName);
+                if (isObservableGame) {
+                  socket.join(gameId);
+                  csm.setObserving(userName, timestamp, socket.id, gameId, false);
+                  const chatLine = `player ${userName} is observing game`;
+                  const chatObj: IuiChatNotification = {
+                    chatLine: chatLine,
+                    focusedPlayer: userName,
+                    type: CHAT_TYPE.observe,
+                  };
+                  io.to(gameId).emit("new chat line", chatObj);
+                  checkResponse.gameId = gameId;
+                  checkResponse.checkStatus = CHECK_GAME_STATUS.onGoingGame;
+                  break;
+                }
               }
             }
             // join waiting rooms
