@@ -2,6 +2,7 @@ import { ICard, IGameOptions, IHumanPlayer } from "../interfaces/IGameOptions";
 import { RULE } from "../../frontend/src/interfaces/IuiGameOptions";
 import { IuiRules } from "../../frontend/src/interfaces/IuiGameList";
 import { IuiCard } from "../../frontend/src/interfaces/IuiPlayingGame";
+import { IGameForList } from "../dbActions/games";
 
 export const playersToArr = (players: IHumanPlayer[]): string[] => {
   const playerArr: string[] = players.map(player => player.name);
@@ -9,7 +10,7 @@ export const playersToArr = (players: IHumanPlayer[]): string[] => {
   return playerArr;
 };
 
-const rulesToArr = (gameOptions: IGameOptions): RULE[] => {
+const rulesToArr = (gameOptions: IGameOptions | IGameForList): RULE[] => {
   const rulesArr: RULE[] = [];
 
   if (!gameOptions.evenPromisesAllowed) rulesArr.push(RULE.noEvenPromisesAllowed);
@@ -25,7 +26,7 @@ const rulesToArr = (gameOptions: IGameOptions): RULE[] => {
   return rulesArr;
 };
 
-export const rulesToRuleObj = (gameOptions: IGameOptions): IuiRules => {
+export const rulesToRuleObj = (gameOptions: IGameOptions | IGameForList): IuiRules => {
   return {
     ruleList: rulesToArr(gameOptions),
     hiddenCardsMode: gameOptions.hiddenCardsMode,

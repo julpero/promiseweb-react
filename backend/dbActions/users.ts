@@ -47,10 +47,14 @@ export const checkLogin = async ({userName, userPass1, userPass2, email, needsTo
       passHash: hashedPass,
       email: email,
     });
-    const newUser = await newUserObj.save();
-    if (newUser) {
-      loginObj.loginOk = true;
-      loginObj.result = LOGIN_RESPONSE.ok;
+    try {
+      const newUser = await newUserObj.save();
+      if (newUser) {
+        loginObj.loginOk = true;
+        loginObj.result = LOGIN_RESPONSE.ok;
+      }
+    } catch (e) {
+      console.error(e);
     }
   } else {
     // console.log("is user", user);

@@ -1,4 +1,4 @@
-import { IuiAdminGame, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickRequest, IuiReNameNickResponse, RENAME_STATUS } from "../../frontend/src/interfaces/IuiAdminOperations";
+import { IuiAdminGame, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickRequest, RENAME_STATUS } from "../../frontend/src/interfaces/IuiAdminOperations";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
 import { convertOldDataToNew, reCreateAllGamesStatistic, reCreateGameStatistic, reNameNickInGame } from "../dbActions/adminOperations";
