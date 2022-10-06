@@ -27,7 +27,7 @@ export interface IGameForList {
 }
 
 export const getGamesByStatus = async (gameStatus: GAME_STATUS): Promise<IGameForList[]> => {
-  console.time("getGamesByStatus");
+  // console.time("getGamesByStatus "+gameStatus);
   const games = await GameOptions.find(
     {
       gameStatus: gameStatus,
@@ -54,7 +54,7 @@ export const getGamesByStatus = async (gameStatus: GAME_STATUS): Promise<IGameFo
     thisIsDemoGame: 1,
     hiddenCardsMode: 1,
   }).lean();
-  console.timeEnd("getGamesByStatus");
+  console.timeEnd("getGamesByStatus "+gameStatus);
 
   const gameList: IGameForList[] = games.map((game) => {
     return({

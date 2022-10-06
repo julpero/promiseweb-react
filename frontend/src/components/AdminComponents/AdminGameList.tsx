@@ -54,7 +54,7 @@ const AdminGameList = ({userName}: IProps) => {
       token: getToken(),
     };
     dispatch(setSpinnerVisible(true));
-    console.time("get games for admin");
+    // console.time("get games for admin");
     socket.emit("get games for admin", getGamesRequest, (getGamesResponse: IuiGetGamesResponse) => {
       // console.log(getGamesResponse);
       console.timeEnd("get games for admin");

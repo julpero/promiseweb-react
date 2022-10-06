@@ -206,7 +206,7 @@ const PlayedGamesReport = (props: IProps) => {
         token: getToken(),
       };
       dispatch(setSpinnerVisible(true));
-      console.time("get report data");
+      // console.time("get report data");
       socket.emit("get report data", request, (reportData: IuiPlayedGamesReport) => {
         // console.log("report data", reportData);
         console.timeEnd("get report data");

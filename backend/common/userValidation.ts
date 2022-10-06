@@ -8,7 +8,7 @@ export interface IToken {
 }
 
 // our timestamp can be only one hour old (60 min * 60 sec * 1000 ms)
-const ALLOWED_INTERVAL = 60 * 60 * 1000;
+const ALLOWED_INTERVAL = parseInt(process.env.SESSION_MINUTES ?? "60", 10) * 60 * 1000;
 
 /**
  * This method does simple check to given parameters and checks if user name is in admin list.

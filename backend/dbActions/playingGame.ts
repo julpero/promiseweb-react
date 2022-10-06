@@ -35,18 +35,22 @@ import GameOptions from "../models/GameOptions";
 export const getGame = async (gameIdStr: string): Promise<IGameOptions | null> => {
   if (!mongoose.isValidObjectId(gameIdStr)) return null;
 
-  const gameInDb = await GameOptions.findById(gameIdStr);
+  // console.time("getGame");
+  const gameInDb = await GameOptions.findById(gameIdStr).lean();
+  console.timeEnd("getGame");
   return gameInDb;
 };
 
 export const getGameWithPlayer = async (gameIdStr: string, playerName: string): Promise<IGameOptions | null> => {
   if (!mongoose.isValidObjectId(gameIdStr)) return null;
 
+  // console.time("getGameWithPlayer "+playerName+" "+gameIdStr);
   const query = GameOptions.where({
     _id: gameIdStr,
     $or: [{"humanPlayers.name": { $eq: playerName }},{"humanPlayers.playedBy": { $eq: playerName }}],
-  });
+  }).lean();
   const gameInDb = await query.findOne();
+  console.timeEnd("getGameWithPlayer "+playerName+" "+gameIdStr);
   return gameInDb;
 };
 
@@ -66,7 +70,9 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
     $or: [{"humanPlayers.name": { $eq: userName }},{"humanPlayers.playedBy": { $eq: userName }}],
     gameStatus: GAME_STATUS.onGoing,
   });
+  // console.time("makePromiseToPlayer");
   const gameInDb = await query.findOne();
+  console.timeEnd("makePromiseToPlayer");
   if (gameInDb) {
     const currentRoundInd = getCurrentRoundInd(gameInDb.game);
     if (roundInd !== currentRoundInd) {
@@ -153,7 +159,9 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     $or: [{"humanPlayers.name": { $eq: userName }},{"humanPlayers.playedBy": { $eq: userName }}],
     gameStatus: GAME_STATUS.onGoing,
   });
+  // console.time("playerPlaysCard");
   const gameInDb = await query.findOne();
+  console.timeEnd("playerPlaysCard");
   if (gameInDb) {
     const currentRoundInd = getCurrentRoundInd(gameInDb.game);
     if (currentRoundInd !== roundInd) {

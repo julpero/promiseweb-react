@@ -34,7 +34,7 @@ const OneGameReport = ({gameId}: IProps) => {
         token: getToken(),
         gameId: gameId,
       };
-      console.time("get game report");
+      // console.time("get game report");
       socket.emit("get game report", reportRequest, (reportResponse: IuiOneGameReport) => {
         console.timeEnd("get game report");
         if (reportResponse.isAuthenticated) {
