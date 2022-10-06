@@ -29,7 +29,7 @@ interface IProps {
 }
 
 const PointsPerTimesUsedInGame = ({gameReportData}: IProps) => {
-  console.log(gameReportData);
+  // console.log(gameReportData);
   const chartRef = useRef<ChartJS<"bar">>(null);
 
   const getDataSetsData = (): ChartDataset<"bar">[] => {

@@ -6,6 +6,7 @@ import { getGameReport } from "../common/reportFunctions";
 import GameOptions from "../models/GameOptions";
 
 export const reportData = async (): Promise<IuiPlayedGamesReport> => {
+  console.time("reportData");
   const gamesPlayed = await GameOptions.countDocuments({
     gameStatus: { $eq: GAME_STATUS.played },
     thisIsDemoGame: {$in: [null, false]},
@@ -146,9 +147,13 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
   const lastGames = await GameOptions.find({
     "gameStatus": {$eq: GAME_STATUS.played},
     "thisIsDemoGame": {$in: [null, false]},
+  }).select({
+    _id: 1,
+    createDateTime: 1,
+    gameStatistics: 1,
   }).sort({
     createDateTime: -1,
-  }).limit(5);
+  }).limit(5).lean();
 
   const reportDataObj: IuiPlayedGamesReport = {
     gamesPlayed: gamesPlayed,
@@ -159,19 +164,21 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
     gamesByPlayer: Array.from(playerReport.values()),
     lastGames: lastGames.map(game => {
       return {
-        gameId: game.id,
+        gameId: game._id.toString(),
         played: game.createDateTime,
         humanPlayers: game.gameStatistics?.playersStatistics.flatMap(player => player.playerName) ?? [],
       } as IuiPlayedGame;
     }),
   };
-
+  console.timeEnd("reportData");
   return reportDataObj;
 };
 
 export const oneGameReportData = async (gameIdStr: string): Promise<IuiGameReport | null> => {
   if (!mongoose.isValidObjectId(gameIdStr)) return null;
-  const gameInDb = await GameOptions.findById(gameIdStr);
+  console.time("oneGameReportData");
+  const gameInDb = await GameOptions.findById(gameIdStr).lean();
+  console.timeEnd("oneGameReportData");
   if (gameInDb && gameInDb.gameStatus === GAME_STATUS.played) {
     return getGameReport(gameInDb);
   } else {
@@ -181,19 +188,26 @@ export const oneGameReportData = async (gameIdStr: string): Promise<IuiGameRepor
 
 export const onePlayerReportData = async (playerName: string): Promise<IuiOneGameData[]> => {
   const gameArr: IuiOneGameData[] = [];
+  console.time("onePlayerReportData");
   const gamesInDb = await GameOptions.find({
     gameStatus: { $eq: GAME_STATUS.played },
     thisIsDemoGame: {$in: [null, false]},
     "humanPlayers.name": {$eq: playerName},
+  }).select({
+    _id: 1,
+    createDateTime: 1,
+    gameStatistics: 1,
   }).sort({
     createDateTime: 1,
-  });
+  }).lean();
+  console.timeEnd("onePlayerReportData");
+  console.time("onePlayerReportData 2");
   gamesInDb.forEach(gameInDb => {
     const playerStats = gameInDb.gameStatistics?.playersStatistics.find(player => player.playerName === playerName);
     const gameStats = gameInDb.gameStatistics;
     if (playerStats && gameStats && gameStats.roundsPlayed > 0) {
       gameArr.push({
-        gameId: gameInDb.id,
+        gameId: gameInDb._id.toString(),
         started: gameInDb.createDateTime,
         position: playerStats.position,
         keepP: Math.round(playerStats.totalKeeps * 1000 / gameStats.roundsPlayed)/10,
@@ -201,5 +215,6 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
       } as IuiOneGameData);
     }
   });
+  console.timeEnd("onePlayerReportData 2");
   return gameArr;
 };
