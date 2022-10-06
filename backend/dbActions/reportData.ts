@@ -201,7 +201,6 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
     createDateTime: 1,
   }).lean();
   console.timeEnd("onePlayerReportData");
-  console.time("onePlayerReportData 2");
   gamesInDb.forEach(gameInDb => {
     const playerStats = gameInDb.gameStatistics?.playersStatistics.find(player => player.playerName === playerName);
     const gameStats = gameInDb.gameStatistics;
@@ -215,6 +214,5 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
       } as IuiOneGameData);
     }
   });
-  console.timeEnd("onePlayerReportData 2");
   return gameArr;
 };

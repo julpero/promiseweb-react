@@ -156,10 +156,9 @@ export const convertOldDataToNew = async (): Promise<string[]> => {
     {
       oldId: {$ne: null},
     },
-    {
-      oldId: 1
-    },
-  );
+  ).select({
+    oldId: 1,
+  }).lean();
   const convertedIds = alreadyConverted.flatMap(obj => {return new mongoose.Types.ObjectId(obj.oldId as string);});
   console.log("convertedIds", convertedIds);
 
