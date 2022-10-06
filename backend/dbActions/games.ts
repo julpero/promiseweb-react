@@ -54,7 +54,7 @@ export const getGamesByStatus = async (gameStatus: GAME_STATUS): Promise<IGameFo
     thisIsDemoGame: 1,
     hiddenCardsMode: 1,
   }).lean();
-  console.timeEnd("getGamesByStatus "+gameStatus);
+  // console.timeEnd("getGamesByStatus "+gameStatus);
 
   const gameList: IGameForList[] = games.map((game) => {
     return({

@@ -41,7 +41,7 @@ export const getLastGameByStatus = async (playerName: string, status: GAME_STATU
       game: 1,
       humanPlayers: 1,
     }).lean();
-    console.timeEnd("getLastGameByStatus "+playerName+" "+status);
+    // console.timeEnd("getLastGameByStatus "+playerName+" "+status);
     if (gamesInDb && gamesInDb.length > 0) {
       const gameInDb = gamesInDb.pop();
       if (gameInDb) {

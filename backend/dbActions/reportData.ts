@@ -12,7 +12,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
     gameStatus: { $eq: GAME_STATUS.played },
     thisIsDemoGame: {$in: [null, false]},
   });
-  console.timeEnd("reportData count");
+  // console.timeEnd("reportData count");
 
   // console.time("reportData rounds and cards");
   interface roundsAndCardsAgg {_id: string, roundsPlayed: number, totalCardsHit: number, playerCount: number}
@@ -28,7 +28,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
       playerCount: {$sum: "$humanPlayersCount"},
     }}
   ]);
-  console.timeEnd("reportData rounds and cards");
+  // console.timeEnd("reportData rounds and cards");
 
   const playerReport = new Map<string, IuiGamesByPlayer>();
 
@@ -71,7 +71,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
       } as IuiGamesByPlayer);
     }
   });
-  console.timeEnd("reportData player report");
+  // console.timeEnd("reportData player report");
 
   // console.time("reportData player avg");
   // average points per player
@@ -97,7 +97,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
       rep.avgPoints = player.avgPoints;
     }
   });
-  console.timeEnd("reportData player avg");
+  // console.timeEnd("reportData player avg");
 
   // console.time("reportData player avg keeps");
   // average keep percentage per player
@@ -132,7 +132,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
       rep.avgKeepPercentage = player.avgKeepPercentage*100;
     }
   });
-  console.timeEnd("reportData player avg keeps");
+  // console.timeEnd("reportData player avg keeps");
 
   // console.time("reportData player count");
   // player count in games
@@ -154,7 +154,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
       count: total.playersTotal,
     } as IuiPlayersInGameReport);
   });
-  console.timeEnd("reportData player count");
+  // console.timeEnd("reportData player count");
 
   // console.time("reportData last games");
   const lastGames = await GameOptions.find({
@@ -167,7 +167,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
   }).sort({
     createDateTime: -1,
   }).limit(5).lean();
-  console.timeEnd("reportData last games");
+  // console.timeEnd("reportData last games");
 
   const reportDataObj: IuiPlayedGamesReport = {
     gamesPlayed: gamesPlayed,
@@ -184,7 +184,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
       } as IuiPlayedGame;
     }),
   };
-  console.timeEnd("reportData");
+  // console.timeEnd("reportData");
   return reportDataObj;
 };
 
@@ -192,7 +192,7 @@ export const oneGameReportData = async (gameIdStr: string): Promise<IuiGameRepor
   if (!mongoose.isValidObjectId(gameIdStr)) return null;
   // console.time("oneGameReportData");
   const gameInDb = await GameOptions.findById(gameIdStr).lean();
-  console.timeEnd("oneGameReportData");
+  // console.timeEnd("oneGameReportData");
   if (gameInDb && gameInDb.gameStatus === GAME_STATUS.played) {
     return getGameReport(gameInDb);
   } else {
@@ -214,7 +214,7 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
   }).sort({
     createDateTime: 1,
   }).lean();
-  console.timeEnd("onePlayerReportData");
+  // console.timeEnd("onePlayerReportData");
   gamesInDb.forEach(gameInDb => {
     const playerStats = gameInDb.gameStatistics?.playersStatistics.find(player => player.playerName === playerName);
     const gameStats = gameInDb.gameStatistics;

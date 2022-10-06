@@ -37,7 +37,7 @@ export const getGame = async (gameIdStr: string): Promise<IGameOptions | null> =
 
   // console.time("getGame");
   const gameInDb = await GameOptions.findById(gameIdStr).lean();
-  console.timeEnd("getGame");
+  // console.timeEnd("getGame");
   return gameInDb;
 };
 
@@ -50,7 +50,7 @@ export const getGameWithPlayer = async (gameIdStr: string, playerName: string): 
     $or: [{"humanPlayers.name": { $eq: playerName }},{"humanPlayers.playedBy": { $eq: playerName }}],
   }).lean();
   const gameInDb = await query.findOne();
-  console.timeEnd("getGameWithPlayer "+playerName+" "+gameIdStr);
+  // console.timeEnd("getGameWithPlayer "+playerName+" "+gameIdStr);
   return gameInDb;
 };
 
@@ -72,7 +72,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
   });
   // console.time("makePromiseToPlayer");
   const gameInDb = await query.findOne();
-  console.timeEnd("makePromiseToPlayer");
+  // console.timeEnd("makePromiseToPlayer");
   if (gameInDb) {
     const currentRoundInd = getCurrentRoundInd(gameInDb.game);
     if (roundInd !== currentRoundInd) {
@@ -165,7 +165,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
   });
   // console.time("playerPlaysCard");
   const gameInDb = await query.findOne();
-  console.timeEnd("playerPlaysCard");
+  // console.timeEnd("playerPlaysCard");
   if (gameInDb) {
     const currentRoundInd = getCurrentRoundInd(gameInDb.game);
     if (currentRoundInd !== roundInd) {

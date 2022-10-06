@@ -209,7 +209,7 @@ const PlayedGamesReport = (props: IProps) => {
       // console.time("get report data");
       socket.emit("get report data", request, (reportData: IuiPlayedGamesReport) => {
         // console.log("report data", reportData);
-        console.timeEnd("get report data");
+        // console.timeEnd("get report data");
         if (reportData.isAuthenticated) {
           handleAuthenticatedRequest(reportData.token);
           setReportData(reportData);
