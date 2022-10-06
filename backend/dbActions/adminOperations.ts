@@ -15,8 +15,13 @@ export const reCreateGameStatistic = async (gameIdStr: string): Promise<boolean>
   const gameInDb = await GameOptions.findById(gameIdStr);
   if (gameInDb) {
     gameInDb.gameStatistics = generateGameStats(gameInDb.game, true);
-    const gameAfter = await gameInDb.save();
-    if (gameAfter) return true;
+    try {
+      const gameAfter = await gameInDb.save();
+      if (gameAfter) return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
   }
 
   return false;
@@ -31,8 +36,12 @@ export const reCreateAllGamesStatistic = async (): Promise<boolean> => {
     const gameIdStr = gameInDb._id.toString();
     console.log("starting to generate stats...", gameIdStr);
     gameInDb.gameStatistics = generateGameStats(gameInDb.game, true);
-    const gameAfter = await gameInDb.save();
-    if (!gameAfter) return false;
+    try {
+      const gameAfter = await gameInDb.save();
+      if (!gameAfter) return false;
+    } catch (e) {
+      console.error(e);
+    }
     console.log("... stats generated", gameIdStr);
   }
 
@@ -156,10 +165,9 @@ export const convertOldDataToNew = async (): Promise<string[]> => {
     {
       oldId: {$ne: null},
     },
-    {
-      oldId: 1
-    },
-  );
+  ).select({
+    oldId: 1,
+  }).lean();
   const convertedIds = alreadyConverted.flatMap(obj => {return new mongoose.Types.ObjectId(obj.oldId as string);});
   console.log("convertedIds", convertedIds);
 
@@ -198,9 +206,13 @@ export const convertOldDataToNew = async (): Promise<string[]> => {
   });
 
   for (let i = 0; i < newGames.length; i++) {
-    const gameAfter = await newGames[i].save();
-    retArr.push(JSON.stringify(gameAfter));
-    console.log("converted", gameAfter.oldId);
+    try {
+      const gameAfter = await newGames[i].save();
+      retArr.push(JSON.stringify(gameAfter));
+      console.log("converted", gameAfter.oldId);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   // return newGames.map(game => {return JSON.stringify(game);});
@@ -237,8 +249,12 @@ export const reNameNickInGame = async (gameId: string, currentNick: string, newN
     }
 
     gameInDb.gameStatistics = generateGameStats(gameInDb.game, true);
-    const gameAfter = await gameInDb.save();
-    if (gameAfter) return true;
+    try {
+      const gameAfter = await gameInDb.save();
+      if (gameAfter) return true;
+    } catch (e) {
+      console.error(e);
+    }
   }
   return false;
 };

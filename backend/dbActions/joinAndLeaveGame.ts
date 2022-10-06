@@ -57,13 +57,18 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
     }
   }
 
-  const gameAfter = await gameInDb.save();
-  if (!gameAfter) {
+  try {
+    const gameAfter = await gameInDb.save();
+    if (!gameAfter) {
+      return JOIN_LEAVE_RESULT.notOk;
+    } else if (gameAfter.humanPlayers.length === gameAfter.humanPlayersCount) {
+      return JOIN_LEAVE_RESULT.lastOk;
+    } else {
+      return JOIN_LEAVE_RESULT.ok;
+    }
+  } catch (e) {
+    console.error(e);
     return JOIN_LEAVE_RESULT.notOk;
-  } else if (gameAfter.humanPlayers.length === gameAfter.humanPlayersCount) {
-    return JOIN_LEAVE_RESULT.lastOk;
-  } else {
-    return JOIN_LEAVE_RESULT.ok;
   }
 };
 
@@ -94,8 +99,13 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
     game.gameStatus = GAME_STATUS.dismissed;
   }
 
-  const gameAfter = await game.save();
-  return gameAfter !== null ? JOIN_LEAVE_RESULT.ok : JOIN_LEAVE_RESULT.notOk;
+  try {
+    const gameAfter = await game.save();
+    return gameAfter !== null ? JOIN_LEAVE_RESULT.ok : JOIN_LEAVE_RESULT.notOk;
+  } catch (e) {
+    console.error(e);
+    return JOIN_LEAVE_RESULT.notOk;
+  }
 };
 
 export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest): Promise<IuiLeaveOngoingGameResponse> => {
@@ -132,8 +142,13 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
       }
     }
 
-    const gameAfter = await gameInDb.save();
-    if (!gameAfter) {
+    try {
+      const gameAfter = await gameInDb.save();
+      if (!gameAfter) {
+        leaveOngoingGameResponse.leaveStatus = LEAVE_ONGOING_GAME_RESULT.notOk;
+      }
+    } catch (e) {
+      console.error(e);
       leaveOngoingGameResponse.leaveStatus = LEAVE_ONGOING_GAME_RESULT.notOk;
     }
   }
@@ -185,12 +200,17 @@ export const joinTheOngoingGame = async (joinRequest: IuiJoinOngoingGame, forceJ
         return joinOngoingGameResponse;
       }
 
-      const gameAfter = await gameInDb.save();
-      if (gameAfter) {
-        joinOngoingGameResponse.joinStatus = JOIN_GAME_STATUS.ok;
-        return joinOngoingGameResponse;
-      } else {
-        joinOngoingGameResponse.playedBy = undefined;
+      try {
+        const gameAfter = await gameInDb.save();
+        if (gameAfter) {
+          joinOngoingGameResponse.joinStatus = JOIN_GAME_STATUS.ok;
+          return joinOngoingGameResponse;
+        } else {
+          joinOngoingGameResponse.playedBy = undefined;
+        }
+      } catch (e) {
+        console.error(e);
+        joinOngoingGameResponse.joinStatus = JOIN_GAME_STATUS.failed;
       }
     }
   }

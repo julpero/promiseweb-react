@@ -35,18 +35,22 @@ import GameOptions from "../models/GameOptions";
 export const getGame = async (gameIdStr: string): Promise<IGameOptions | null> => {
   if (!mongoose.isValidObjectId(gameIdStr)) return null;
 
-  const gameInDb = await GameOptions.findById(gameIdStr);
+  // console.time("getGame");
+  const gameInDb = await GameOptions.findById(gameIdStr).lean();
+  // console.timeEnd("getGame");
   return gameInDb;
 };
 
 export const getGameWithPlayer = async (gameIdStr: string, playerName: string): Promise<IGameOptions | null> => {
   if (!mongoose.isValidObjectId(gameIdStr)) return null;
 
+  // console.time("getGameWithPlayer "+playerName+" "+gameIdStr);
   const query = GameOptions.where({
     _id: gameIdStr,
     $or: [{"humanPlayers.name": { $eq: playerName }},{"humanPlayers.playedBy": { $eq: playerName }}],
-  });
+  }).lean();
   const gameInDb = await query.findOne();
+  // console.timeEnd("getGameWithPlayer "+playerName+" "+gameIdStr);
   return gameInDb;
 };
 
@@ -66,7 +70,9 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
     $or: [{"humanPlayers.name": { $eq: userName }},{"humanPlayers.playedBy": { $eq: userName }}],
     gameStatus: GAME_STATUS.onGoing,
   });
+  // console.time("makePromiseToPlayer");
   const gameInDb = await query.findOne();
+  // console.timeEnd("makePromiseToPlayer");
   if (gameInDb) {
     const currentRoundInd = getCurrentRoundInd(gameInDb.game);
     if (roundInd !== currentRoundInd) {
@@ -119,14 +125,18 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
     // TODO Speed promise points
     gameInDb.game.lastTimeStamp = now;
 
-    const gameAfter = await gameInDb.save();
-    if (gameAfter) {
-      if (!isRuleActive(gameAfter, RULE.hiddenPromiseRound)) promiseResponse.promise = promise;
-      promiseResponse.promiseResponse = PROMISE_RESPONSE.promiseOk;
-      promiseResponse.promiser = promiser.name;
-      promiseResponse.promiseTime = promiseTime;
-    } else {
-      console.error("promising, error while saving game");
+    try {
+      const gameAfter = await gameInDb.save();
+      if (gameAfter) {
+        if (!isRuleActive(gameAfter, RULE.hiddenPromiseRound)) promiseResponse.promise = promise;
+        promiseResponse.promiseResponse = PROMISE_RESPONSE.promiseOk;
+        promiseResponse.promiser = promiser.name;
+        promiseResponse.promiseTime = promiseTime;
+      } else {
+        console.error("promising, error while saving game");
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
   return promiseResponse;
@@ -153,7 +163,9 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     $or: [{"humanPlayers.name": { $eq: userName }},{"humanPlayers.playedBy": { $eq: userName }}],
     gameStatus: GAME_STATUS.onGoing,
   });
+  // console.time("playerPlaysCard");
   const gameInDb = await query.findOne();
+  // console.timeEnd("playerPlaysCard");
   if (gameInDb) {
     const currentRoundInd = getCurrentRoundInd(gameInDb.game);
     if (currentRoundInd !== roundInd) {
@@ -260,14 +272,20 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     // (when game is over we calculate more data than just after card hit)
     gameInDb.gameStatistics = generateGameStats(gameInDb.game, response.gameStatusAfterPlay === GAME_STATUS.played);
 
-    const gameAfter = await gameInDb.save();
-    if (gameAfter) {
-      response.playerName = originalPlayerName ?? userName;
-      response.playTime = playTime;
-      response.playResponse = PLAY_CARD_RESPONSE.playOk;
+    try {
+      const gameAfter = await gameInDb.save();
+      if (gameAfter) {
+        response.playerName = originalPlayerName ?? userName;
+        response.playTime = playTime;
+        response.playResponse = PLAY_CARD_RESPONSE.playOk;
+        return response;
+      } else {
+        console.error("playing card, error while saving game");
+      }
+    } catch (e) {
+      console.error(e);
+      response.playResponse = PLAY_CARD_RESPONSE.notOk;
       return response;
-    } else {
-      console.error("playing card, error while saving game");
     }
   } else {
     console.warn("playing card, no game");

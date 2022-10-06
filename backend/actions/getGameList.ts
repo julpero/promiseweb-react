@@ -1,7 +1,7 @@
 import { IuiGameListItem, IuiGetGameListResponse } from "../../frontend/src/interfaces/IuiGameList";
-import { IGameOptions, IHumanPlayer } from "../interfaces/IGameOptions";
+import { IHumanPlayer } from "../interfaces/IGameOptions";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
-import { getGamesByStatus } from "../dbActions/games";
+import { getGamesByStatus, IGameForList } from "../dbActions/games";
 import { playersToArr, rulesToRuleObj } from "../common/model";
 import { IuiUserData } from "../../frontend/src/interfaces/IuiUser";
 
@@ -17,7 +17,7 @@ export const getOpenGamesList = async (getGameListRequest: IuiUserData, gameStat
   const response: IuiGetGameListResponse = {
     games: [],
   };
-  const openGames: (IGameOptions & {id: string})[] = await getGamesByStatus(gameStatus);
+  const openGames: IGameForList[] = await getGamesByStatus(gameStatus);
   openGames.forEach(openGame => {
     // console.log("openGame", openGame);
     response.games.push({

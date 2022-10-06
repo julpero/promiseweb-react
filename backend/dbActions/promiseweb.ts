@@ -11,9 +11,14 @@ export interface ILastGameStatusResponse {
 
 export const insertNewGame = async (gameModel: IGameOptions): Promise<string> => {
   const createGameObj = new GameOptions(gameModel);
-  const createdGame = await createGameObj.save();
-  console.log("createdGame", createdGame);
-  return createdGame._id.toString();
+  try {
+    const createdGame = await createGameObj.save();
+    console.log("createdGame", createdGame);
+    return createdGame._id.toString();
+  } catch (e) {
+    console.error(e);
+    return "";
+  }
 };
 
 export const hasOngoingOrCreatedGame = async (playerName: string): Promise<boolean> => {
@@ -27,10 +32,16 @@ export const hasOngoingOrCreatedGame = async (playerName: string): Promise<boole
 
 export const getLastGameByStatus = async (playerName: string, status: GAME_STATUS): Promise<ILastGameStatusResponse | null> => {
   try {
+    // console.time("getLastGameByStatus "+playerName+" "+status);
     const gamesInDb = await GameOptions.find({
       gameStatus: { $eq: status },
       $or: [{"humanPlayers.name": { $eq: playerName }},{"humanPlayers.playedBy": { $eq: playerName }}],
-    });
+    }).select({
+      _id: 1,
+      game: 1,
+      humanPlayers: 1,
+    }).lean();
+    // console.timeEnd("getLastGameByStatus "+playerName+" "+status);
     if (gamesInDb && gamesInDb.length > 0) {
       const gameInDb = gamesInDb.pop();
       if (gameInDb) {
