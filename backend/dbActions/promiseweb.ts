@@ -11,9 +11,14 @@ export interface ILastGameStatusResponse {
 
 export const insertNewGame = async (gameModel: IGameOptions): Promise<string> => {
   const createGameObj = new GameOptions(gameModel);
-  const createdGame = await createGameObj.save();
-  console.log("createdGame", createdGame);
-  return createdGame._id.toString();
+  try {
+    const createdGame = await createGameObj.save();
+    console.log("createdGame", createdGame);
+    return createdGame._id.toString();
+  } catch (e) {
+    console.error(e);
+    return "";
+  }
 };
 
 export const hasOngoingOrCreatedGame = async (playerName: string): Promise<boolean> => {

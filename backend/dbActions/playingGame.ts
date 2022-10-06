@@ -125,14 +125,18 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
     // TODO Speed promise points
     gameInDb.game.lastTimeStamp = now;
 
-    const gameAfter = await gameInDb.save();
-    if (gameAfter) {
-      if (!isRuleActive(gameAfter, RULE.hiddenPromiseRound)) promiseResponse.promise = promise;
-      promiseResponse.promiseResponse = PROMISE_RESPONSE.promiseOk;
-      promiseResponse.promiser = promiser.name;
-      promiseResponse.promiseTime = promiseTime;
-    } else {
-      console.error("promising, error while saving game");
+    try {
+      const gameAfter = await gameInDb.save();
+      if (gameAfter) {
+        if (!isRuleActive(gameAfter, RULE.hiddenPromiseRound)) promiseResponse.promise = promise;
+        promiseResponse.promiseResponse = PROMISE_RESPONSE.promiseOk;
+        promiseResponse.promiser = promiser.name;
+        promiseResponse.promiseTime = promiseTime;
+      } else {
+        console.error("promising, error while saving game");
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
   return promiseResponse;
@@ -268,15 +272,20 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     // (when game is over we calculate more data than just after card hit)
     gameInDb.gameStatistics = generateGameStats(gameInDb.game, response.gameStatusAfterPlay === GAME_STATUS.played);
 
-    // TODO try-catch
-    const gameAfter = await gameInDb.save();
-    if (gameAfter) {
-      response.playerName = originalPlayerName ?? userName;
-      response.playTime = playTime;
-      response.playResponse = PLAY_CARD_RESPONSE.playOk;
+    try {
+      const gameAfter = await gameInDb.save();
+      if (gameAfter) {
+        response.playerName = originalPlayerName ?? userName;
+        response.playTime = playTime;
+        response.playResponse = PLAY_CARD_RESPONSE.playOk;
+        return response;
+      } else {
+        console.error("playing card, error while saving game");
+      }
+    } catch (e) {
+      console.error(e);
+      response.playResponse = PLAY_CARD_RESPONSE.notOk;
       return response;
-    } else {
-      console.error("playing card, error while saving game");
     }
   } else {
     console.warn("playing card, no game");
