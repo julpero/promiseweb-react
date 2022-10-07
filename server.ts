@@ -34,6 +34,7 @@ import { handleLoginRequest } from "./backend/actions/login";
 import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickRequest, IuiReNameNickResponse, RENAME_STATUS } from "./frontend/src/interfaces/IuiAdminOperations";
 import { convertOldData, getGamesForAdmin, reCreateAllGameStats, reCreateGameStats, reNameNick } from "./backend/actions/adminActions";
 import { getValidToken, isUserAuthenticated, isValidAdminUser, isValidUser, signUserToken } from "./backend/common/userValidation";
+import { deletePing, doPing } from "./backend/actions/pingHandler";
 
 dotenv.config();
 
@@ -60,15 +61,34 @@ if (process.env.NODE_ENV === "development") {
   app.use(express.static(path.join(__dirname, "./build")));
 }
 
-// Default
+// // Default
 app.get("/", (req: Request, res: Response) => {
   res.sendFile("index.html");
 });
+
 
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
   server.listen(PORT, () => {
     console.log("server listening on *:" + PORT);
+  });
+
+  app.get("/ping", async (req: Request, res: Response) => {
+    const now = Date.now();
+    const q = req.query.ver;
+    const ver = q ? process.version : "";
+    // console.time("ping");
+    const pingPong = await doPing(now);
+    if (pingPong.returnId) {
+      const deleteOk = await deletePing(pingPong.returnId);
+      if (deleteOk) {
+        console.timeEnd("ping");
+        res.send({now: now, ver: ver});
+        return null;
+      }
+    }
+    // console.timeEnd("ping");
+    res.sendStatus(500);
   });
 
   io.on("connection", (socket: Socket) => {
