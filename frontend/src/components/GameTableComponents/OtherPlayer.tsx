@@ -97,6 +97,13 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
           </div>
           <div style={{position: "absolute", width: "70%", left: "3%"}}>
             {renderCardsWonCols()}
+            {currentRoundInfo.roundToPlayer.handValues &&
+              <div className="handValueContainerLeft">
+                <div className="handValue">
+                  HV: {currentRoundInfo.roundToPlayer.handValues.find(hv => hv.name === player.name)?.value}
+                </div>
+              </div>
+            }
           </div>
         </div>
       );
@@ -109,18 +116,33 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
           </div>
           <div style={{position: "absolute", width: "70%", right: "3%"}}>
             {renderCardsWonCols()}
+            {currentRoundInfo.roundToPlayer.handValues &&
+              <div className="handValueContainerRight">
+                <div className="handValue">
+                  HV: {currentRoundInfo.roundToPlayer.handValues.find(hv => hv.name === player.name)?.value}
+                </div>
+              </div>
+            }
           </div>
         </div>
       );
     }
   } else {
     const rowClassName = "wonCardsRow";
+    const containerClassName = align === CARD_ALIGN_TYPE.left ? "handValueContainerLeft" : "handValueContainerRight";
     return (
       <div className="playerInfoDiv" style={styleProps}>
         <PlayerInfo index={index} />
         {renderCardsRow()}
         <div className={rowClassName}>
           {renderCardsWonCols()}
+          {currentRoundInfo.roundToPlayer.handValues &&
+            <div className={containerClassName}>
+              <div className="handValue">
+                HV: {currentRoundInfo.roundToPlayer.handValues.find(hv => hv.name === player.name)?.value}
+              </div>
+            </div>
+          }
         </div>
       </div>
     );
