@@ -5,6 +5,7 @@ export interface IuiGameReport extends IuiAuth {
   pointsPerRound: number[][],
   cumulativePointsPerRound: number[][],
   rounds: number[],
+  cardsInRound: number[],
   pointsBig: number[], // rounds of 6-10 cards
   pointsSmall: number[], // rounds of 1-5 cards
   keepsBig: number[], // rounds of 6-10 cards

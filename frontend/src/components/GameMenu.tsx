@@ -70,6 +70,7 @@ const GameMenu = () => {
     return () => {
       socket.off("player joined on going game");
       socket.off("player wants to join");
+      socket.off("observe request rejected");
     };
   }, [user, currentGameInfo, socket]);
 

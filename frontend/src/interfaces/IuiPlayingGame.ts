@@ -135,6 +135,11 @@ export interface IuiPromiseTable {
   rounds: IuiRoundTotalPromise[],
 }
 
+export interface IuiHandValues {
+  name: string,
+  value: number,
+}
+
 export interface IuiRoundToPlayer {
   cardsInRound: number,
   /** for the first play of the round */
@@ -157,7 +162,7 @@ export interface IuiRoundToPlayer {
   whoseTurn: string,
   isMyTurn: boolean,
   isMyPromiseTurn: boolean,
-  handValues: null, // TODO getHandValues(thisGame, roundInd),
+  handValues: IuiHandValues[] | null,
   obsGame: null, // TODO obsGameToRoundObj
   roundPhase: ROUND_PHASE,
 }

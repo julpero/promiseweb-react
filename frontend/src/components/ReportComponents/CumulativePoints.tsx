@@ -127,6 +127,35 @@ const CumulativePoints = ({gameReportData}: IProps) => {
       tooltip: {
         mode: "index",
         intersect: false,
+        callbacks: {
+          label: (tooltipItem) => {
+            const roundInd = tooltipItem.dataIndex;
+            const dataInd = tooltipItem.datasetIndex;
+            const label = tooltipItem.dataset.label || "";
+            const val = tooltipItem.formattedValue;
+            const pointsFromRound = gameReportData?.pointsPerRound[dataInd][roundInd] ?? 0;
+            if (roundInd === 0) {
+              return `${label}: ${val}`;
+            } else {
+              return `${label}: ${val} (${pointsFromRound})`;
+            }
+          },
+          title: (tooltipItems) => {
+            if (tooltipItems.length > 0) {
+              const item = tooltipItems[0];
+              const label = item.label;
+              const ind = item.dataIndex;
+              if (ind === 0) {
+                return "Start of the Game";
+              } else {
+                const cardsInRound = gameReportData?.cardsInRound[ind-1] ?? 0;
+                return `Round ${label} with ${cardsInRound} cards`;
+              }
+            } else {
+              return "";
+            }
+          },
+        },
       },
       legend: {
         onHover: (e, legendItem) => {

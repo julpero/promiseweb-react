@@ -7,9 +7,6 @@ export interface IToken {
   timestamp: number,
 }
 
-// our timestamp can be only one hour old (60 min * 60 sec * 1000 ms)
-const ALLOWED_INTERVAL = parseInt(process.env.SESSION_MINUTES ?? "60", 10) * 60 * 1000;
-
 /**
  * This method does simple check to given parameters and checks if user name is in admin list.
  * @param userName string
@@ -62,6 +59,8 @@ export const isValidUser = (userName: string, password: string, uuid: string): b
  */
 export const isUserAuthenticated = (token: string | string[] | undefined, userName: string, uuid: string, timestamp: number | null): boolean => {
   // console.log("isUserAuthenticated");
+  // our timestamp can be only one hour old (60 min * 60 sec * 1000 ms)
+  const ALLOWED_INTERVAL = parseInt(process.env.SESSION_MINUTES ?? "60", 10) * 60 * 1000;
 
   if (userName !== userName.trim()) return false;
 
@@ -84,6 +83,9 @@ export const isUserAuthenticated = (token: string | string[] | undefined, userNa
  */
 export const getValidToken = (token: string | string[] | undefined): IToken | null => {
   // console.log("getValidToken, token", token);
+  // our timestamp can be only one hour old (60 min * 60 sec * 1000 ms)
+  const ALLOWED_INTERVAL = parseInt(process.env.SESSION_MINUTES ?? "60", 10) * 60 * 1000;
+
   // valid token is always set
   if (!token || token === undefined) return null;
 

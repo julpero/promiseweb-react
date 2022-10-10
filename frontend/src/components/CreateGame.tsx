@@ -102,6 +102,16 @@ const CreateGame = (props: IProps) => {
           <div>Promises of the other players are visible only after all promises are made.</div>
         );
       }
+      case "opponentPromiseCardValue": {
+        return (
+          <div>Players see other players hand value while promising.</div>
+        );
+      }
+      case "opponentGameCardValue": {
+        return (
+          <div>Players see other players hand value while playing.</div>
+        );
+      }
       case "thisIsDemoGame": {
         return (
           <div>This game won&apos;t affect stats.</div>
@@ -310,7 +320,6 @@ const CreateGame = (props: IProps) => {
                   <div className="row">
                     <div className="col">
                       <Field
-                        disabled
                         name="opponentPromiseCardValue"
                         type="checkbox"
                         component={CheckboxInput}
@@ -319,11 +328,12 @@ const CreateGame = (props: IProps) => {
                         onChange={(checked: boolean) => {
                           form.change("opponentPromiseCardValue", checked);
                         }}
+                        data-for="ruleInfoTooltip"
+                        data-tip="opponentPromiseCardValue"
                       />
                     </div>
                     <div className="col">
                       <Field
-                        disabled
                         name="opponentGameCardValue"
                         type="checkbox"
                         component={CheckboxInput}
@@ -332,6 +342,8 @@ const CreateGame = (props: IProps) => {
                         onChange={(checked: boolean) => {
                           form.change("opponentGameCardValue", checked);
                         }}
+                        data-for="ruleInfoTooltip"
+                        data-tip="opponentGameCardValue"
                       />
                     </div>
                   </div>
