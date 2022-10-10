@@ -118,6 +118,7 @@ connectDB().then(() => {
       // disconnect must leave observing status as it was because we allow refresh login to observers too
     });
 
+    //#region LOGIN SOCKETS
     socket.on("user login", async (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => {
       // console.log("user login", loginRequest);
       const {uuid, userName, password1} = loginRequest;
@@ -167,6 +168,7 @@ connectDB().then(() => {
         return null;
       }
     });
+    //#endregion LOGIN SOCKETS
 
     //#region ADMIN SOCKETS
     socket.on("admin login", async (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => {
@@ -328,6 +330,7 @@ connectDB().then(() => {
     });
     //#endregion ADMIN SOCKETS
 
+    //#region BEFORE GAME SOCKETS
     socket.on("create game", async (createGameRequest: IuiCreateGameRequest, fn: (createGameResponse: IuiCreateGameResponse) => void) => {
       const {uuid, userName, token} = createGameRequest;
       const lastTimestamp = csm.getLastTimestamp(userName);
@@ -563,7 +566,9 @@ connectDB().then(() => {
         return null;
       }
     });
+    //#endregion BEFORE GAME SOCKETS
 
+    //#region PLAYING GAME SOCKETS
     socket.on("check game", async (getGameInfoRequest: IuiGetGameInfoRequest, fn: (gameInfoResponse: IuiGetGameInfoResponse) => void) => {
       // console.log("check game", getGameInfoRequest);
       const {gameId, uuid, userName, token} = getGameInfoRequest;
@@ -810,6 +815,7 @@ connectDB().then(() => {
         return null;
       }
     });
+    //#endregion PLAYING GAME SOCKETS
 
     socket.on("write chat", async (chatObj: IuiChatObj ) => {
       const {userName, gameId, uuid, token, chatLine} = chatObj;
@@ -830,6 +836,7 @@ connectDB().then(() => {
       }
     });
 
+    //#region LEAVE AND JOIN GAME SOCKETS
     socket.on("leave ongoing game", async (leaveOngoingGameRequest: IuiLeaveOngoingGameRequest, fn: (leaveOngoingGameResponse: IuiLeaveOngoingGameResponse) => void) => {
       // console.log("leaveOngoingGameRequest", leaveOngoingGameRequest);
       const {gameId, uuid, userName, token} = leaveOngoingGameRequest;
@@ -1171,7 +1178,9 @@ connectDB().then(() => {
         return null;
       }
     });
+    //#endregion LEAVE AND JOIN GAME SOCKETS
 
+    //#region OBSERVE SOCKETS
     socket.on("observe game", async (observeGameRequest: IuiObserveGameRequest, fn: (observeGameResponse: IuiObserveGameResponse) => void) => {
       // console.log("observeGameRequest", observeGameRequest);
       const {gameId, userName, uuid, token} = observeGameRequest;
@@ -1364,7 +1373,9 @@ connectDB().then(() => {
         return null;
       }
     });
+    //#endregion OBSERVE SOCKETS
 
+    //#region REPORT SOCKETS
     socket.on("get report data", async (request: IuiUserData, fn: (reportResponse: IuiPlayedGamesReport) => void) => {
       // console.log("get report data", request);
       const {userName, uuid, token} = request;
@@ -1445,6 +1456,7 @@ connectDB().then(() => {
         return null;
       }
     });
+    //#endregion REPORT SOCKETS
   });
 }).catch((e: unknown) => {
   console.error("DATABASE ERROR", e);
