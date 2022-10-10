@@ -36,6 +36,7 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
     pointsPerRound: [],
     cumulativePointsPerRound: [],
     rounds: [],
+    cardsInRound: [],
     pointsBig: [], // rounds of 6-10 cards
     pointsSmall: [], // rounds of 1-5 cards
     keepsBig: [], // rounds of 6-10 cards
@@ -53,6 +54,7 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
 
   const players: string[] = [];
   const roundsArr: number[] = [];
+  const cardsInRound: number[] = [];
   const pointsBigArr: number[] = [];
   const pointsSmallArr: number[] = [];
   const keepsBigArr: number[] = [];
@@ -90,10 +92,14 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
   retObj.players = players;
 
   for (let i = 0; i <= gameStats.roundsPlayed; i++) roundsArr.push(i);
+  gameInDb.game.rounds.forEach((round) => {
+    cardsInRound.push(round.cardsInRound);
+  });
 
   retObj.pointsPerRound = pointsPerRoundArr;
   retObj.cumulativePointsPerRound = cumulativePointsPerRoundArr;
   retObj.rounds = roundsArr;
+  retObj.cardsInRound = cardsInRound;
   retObj.pointsBig = pointsBigArr;
   retObj.pointsSmall = pointsSmallArr;
   retObj.keepsBig = keepsBigArr;
