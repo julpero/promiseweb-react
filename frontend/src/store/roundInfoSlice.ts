@@ -45,6 +45,7 @@ export const roundInfoSlice = createSlice({
   initialState,
   reducers: {
     setRoundInfo: (state, action: PayloadAction<IuiGetRoundResponse>) => {
+      // console.log("setRoundInfo", action.payload);
       state.value = action.payload;
     }
   }

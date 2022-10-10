@@ -6,6 +6,7 @@ import {
   IuiGetGameInfoResponse,
   IuiGetRoundRequest,
   IuiGetRoundResponse,
+  IuiHandValues,
   IuiMakePromiseRequest,
   IuiMakePromiseResponse,
   IuiParsedHumanPlayer,
@@ -59,6 +60,22 @@ export const getGameInfo = async (getGameInfoRequest: IuiGetGameInfoRequest, obs
   } else {
     return null;
   }
+};
+
+const getHandValues = (round: IRound, roundPhase: ROUND_PHASE, visibleInPromise: boolean, visibleInPlay: boolean): IuiHandValues[] | null => {
+  const showHandValue = ((visibleInPromise && roundPhase === ROUND_PHASE.onPromises) || (visibleInPlay && roundPhase === ROUND_PHASE.onPlay));
+
+  if (showHandValue) {
+    return round.roundPlayers.map(player => {
+      return {
+        name: player.name,
+        value: player.cards.reduce((count, card) => {
+          return count + card.value;
+        }, 0),
+      } as IuiHandValues;
+    });
+  }
+  return null;
 };
 
 const parsePlayerStats = (gameInDb: IGameOptions, playerName: string): IuiPlayerStats => {
@@ -199,7 +216,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, o
     whoseTurn: playerInTurn?.name ?? "",
     isMyTurn: isNowMyTurn, // TODO
     isMyPromiseTurn: isMyPromiseTurn(name, round, originalPlayerName), // TODO ?
-    handValues: null, // TODO getHandValues(thisGame, roundInd),
+    handValues: getHandValues(round, roundPhase, isRuleActive(gameInDb, RULE.opponentPromiseCardValue), isRuleActive(gameInDb, RULE.opponentGameCardValue)),
     obsGame: null, // TODO obsGameToRoundObj
     promiseTable: getPromiseTable(gameInDb),
     roundPhase: roundPhase,

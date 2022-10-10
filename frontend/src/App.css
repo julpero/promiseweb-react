@@ -76,6 +76,21 @@ body {
   transform: translate(-50%, 0);
 }
 
+.handValueContainerLeft {
+  position: absolute;
+  padding: 0px 10px;
+  left: 0px;
+}
+.handValueContainerRight {
+  position: absolute;
+  padding: 0px 10px;
+  right: 0px;
+}
+.handValue {
+  text-shadow: 1px 1px 1px black, 0 0 4px blue, 0 0 2px darkblue;
+  font-size: x-large;
+}
+
 .smallErrorDiv {
   border: 1px red solid;
   border-radius: 5px;
