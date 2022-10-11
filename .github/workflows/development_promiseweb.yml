@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - development
+      - test/playwright
   workflow_dispatch:
 
 jobs:
@@ -56,7 +57,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: node-app
-      
+
       - name: UnZip artifact for deployment
         run: unzip release.zip
 
@@ -71,3 +72,26 @@ jobs:
 
       - name: Delete zip package
         run: rm release.zip
+
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16.x'
+
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    - name: Install Playwright
+      working-directory: ./frontend
+      run: npx playwright install --with-deps
+
+    - name: Run Playwright tests
+      working-directory: ./frontend
+      run: npx playwright test
+      env:
+        PLAYWRIGHT_TEST_BASE_URL: https://promiseweb.azurewebsites.net/
