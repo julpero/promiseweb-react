@@ -74,6 +74,7 @@ jobs:
         run: rm release.zip
 
   test:
+    needs: deploy
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
