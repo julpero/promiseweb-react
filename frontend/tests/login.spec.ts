@@ -1,10 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { userInDatabase } from "./commons/testvariables";
+import { pageUrl, userInDatabase } from "./commons/testvariables";
 import { textsLogIn } from "./commons/texts";
 
 test.beforeEach(async ({page}) => {
-  // await page.goto("https://promiseweb.azurewebsites.net/");
-  await page.goto("http://localhost:3000");
+  await page.goto(pageUrl);
 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle(/PromiseWeb/);

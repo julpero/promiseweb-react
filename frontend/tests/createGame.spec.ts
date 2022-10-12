@@ -1,10 +1,8 @@
 import { test, expect } from "@playwright/test";
-import { userInDatabase } from "./commons/testvariables";
-import { textsLogIn } from "./commons/texts";
+import { pageUrl, userInDatabase } from "./commons/testvariables";
 
 test.beforeEach(async ({page}) => {
-  // await page.goto("https://promiseweb.azurewebsites.net/");
-  await page.goto("http://localhost:3000");
+  await page.goto(pageUrl);
 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle(/PromiseWeb/);
@@ -60,5 +58,5 @@ test("Create and dismiss game", async ({ page }) => {
 
   await leaveGameButton.click();
 
-  await expect(page.locator("div", {hasText: "No open games at the moment, why don't you just create one by your self?"})).toHaveCount(1);
+  await expect(page.getByText("No open games at the moment, why don't you just create one by your self?")).toHaveCount(1);
 });

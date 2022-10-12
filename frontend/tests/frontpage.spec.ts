@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { userNotInDatabase } from "./commons/testvariables";
+import { pageUrl, userNotInDatabase } from "./commons/testvariables";
 import { textsLogIn } from "./commons/texts";
 
 test.beforeEach(async ({page}) => {
-  await page.goto("https://promiseweb.azurewebsites.net/");
+  await page.goto(pageUrl);
 });
 
 test("homepage has PromiseWeb in title and Log In button works with new user", async ({ page }) => {
@@ -31,7 +31,7 @@ test("homepage has PromiseWeb in title and Log In button works with new user", a
 });
 
 test("ping page", async ({request}) => {
-  const pingPage = await request.get("https://promiseweb.azurewebsites.net/ping?ver=1");
+  const pingPage = await request.get(`${pageUrl}ping?ver=1`);
   expect(pingPage.ok()).toBeTruthy();
   expect((await pingPage.text()).includes("v16.")).toBeTruthy();
 });
