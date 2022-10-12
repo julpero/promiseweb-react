@@ -46,6 +46,7 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
   "user login": (loginRequest: IuiLoginRequest, fn: (loginResponse: IuiLoginResponse) => void) => void;
+  "log out": (logOutRequest: IuiUserData) => void;
   "do refresh login": (loginRequest: IuiUserData, fn: (loginResponse: IuiRefreshLoginResponse) => void) => void;
   "check if ongoing game": (checkGameRequest: IuiUserData, fn: (response: IuiCheckIfOngoingGameResponse) => void) => void;
   "create game": (createGameRequest: IuiCreateGameRequest, fn: (createGameResponse: IuiCreateGameResponse) => void) => void;

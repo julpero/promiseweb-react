@@ -18,7 +18,7 @@ const CardBoard = () => {
   const currentGameInfo = useSelector(getCurrentGameInfo);
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const dispatch = useDispatch();
-  if (!currentGameInfo || !currentRoundInfo) return null;
+  if (!currentGameInfo.gameId || !currentRoundInfo.gameId) return null;
   // console.log("CardBoard");
 
   const closeReportModal = () => {

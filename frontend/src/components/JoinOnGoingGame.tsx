@@ -217,6 +217,9 @@ const JoinOnGoingGame = () => {
     return gameItemList.map(({created, id, humanPlayers, imInTheGame, inActivePlayers, inActivePlayerSockets, playedBy}: IuiGameListItem, ind) => {
       return(
         <div key={ind} className="row">
+          {ind > 0 &&
+            <hr />
+          }
           <div className="col">
             {renderDateStr(created.toString())}
           </div>

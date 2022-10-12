@@ -47,11 +47,14 @@ export const roundInfoSlice = createSlice({
     setRoundInfo: (state, action: PayloadAction<IuiGetRoundResponse>) => {
       // console.log("setRoundInfo", action.payload);
       state.value = action.payload;
-    }
+    },
+    clearRoundInfo: (state) => {
+      state.value = initialState.value;
+    },
   }
 });
 
-export const { setRoundInfo } = roundInfoSlice.actions;
+export const { setRoundInfo, clearRoundInfo } = roundInfoSlice.actions;
 
 export const getCurrentRoundFromRoundInfo = (state: RootState) => state.roundInfoReducer.value.roundInd;
 export const getCurrentRoundInfo = (state: RootState) => state.roundInfoReducer.value;

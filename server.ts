@@ -128,6 +128,19 @@ connectDB().then(() => {
       fn(loginResponse);
     });
 
+    socket.on("log out", async (logOutRequest: IuiUserData) => {
+      const {uuid, userName, token} = logOutRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        csm.removeUserSocketsAndGames(userName);
+        csm.unsetUserAsAdmin(userName);
+        csm.clearWaiting(userName);
+        csm.clearObserving(userName);
+      }
+    });
+
     socket.on("do refresh login", async (loginRequest: IuiUserData, fn: (loginResponse: IuiRefreshLoginResponse) => void) => {
       // console.log("do refresh login", loginRequest);
       const {uuid, userName, token} = loginRequest;
