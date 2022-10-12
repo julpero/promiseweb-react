@@ -11,7 +11,7 @@ import CreateGame from "../components/CreateGame";
 import JoinOnGoingGame from "../components/JoinOnGoingGame";
 import PlayedGamesReport from "../components/PlayedGamesReport";
 import TextInput from "../components/FormComponents/TextInput";
-import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "../interfaces/IuiUser";
+import { IuiLoginRequest, IuiLoginResponse, IuiUserData, LOGIN_RESPONSE } from "../interfaces/IuiUser";
 import AdminGameList from "../components/AdminComponents/AdminGameList";
 import { isAdminLoggedIn, setAdminLoggedIn } from "../store/adminSlice";
 import AdminMassOperations from "../components/AdminComponents/AdminMassOperations";
@@ -20,6 +20,8 @@ import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../com
 import OnePlayerReport from "../components/OnePlayerReport";
 import { BallTriangle } from "react-loader-spinner";
 import { isSpinnerVisible } from "../store/spinnerSlice";
+import { setGameId } from "../store/gameInfoSlice";
+import { clearRoundInfo } from "../store/roundInfoSlice";
 
 interface IUserLoginFormValidationFields {
   userName?: string,
@@ -122,6 +124,8 @@ const HomeScreen = () => {
       // console.log("user login, response", loginResponse);
       if (loginResponse.loginStatus === LOGIN_RESPONSE.ok && loginResponse.isAuthenticated) {
         handleAuthenticatedRequest(loginResponse.token);
+        dispatch(setGameId(""));
+        dispatch(clearRoundInfo());
         dispatch(setUserLoggedIn({loggedIn: true, name: loginRequest.userName}));
       } else {
         window.localStorage.removeItem("token");
@@ -146,7 +150,18 @@ const HomeScreen = () => {
 
   const logOutUser = () => {
     // console.log("user want's to log out");
+    if (user.isUserLoggedIn) {
+      const logOutRequest: IuiUserData = {
+        userName: user.userName,
+        uuid: getMyId(),
+        token: getToken(),
+      };
+      socket.emit("log out", logOutRequest);
+    }
+    window.localStorage.removeItem("uUID");
     window.localStorage.removeItem("token");
+    dispatch(setGameId(""));
+    dispatch(clearRoundInfo());
     dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
   };
 
