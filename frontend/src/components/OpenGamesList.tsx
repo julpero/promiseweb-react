@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Form } from "react-final-form";
+import React, { useEffect, useState, useCallback } from "react";
 import { useSocket } from "../socket";
 import GameItem from "./GameItem";
 import {
@@ -10,21 +9,12 @@ import {
   JOIN_LEAVE_RESULT
 } from "../interfaces/IuiGameList";
 import { Modal } from "react-bootstrap";
-import { FormApi } from "final-form";
 import { IuiUserData, LOGIN_RESPONSE } from "../interfaces/IuiUser";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../store/userSlice";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 
-interface IFormFields {
-  gamepassword?: string,
-}
-
-type MethodType = null | "join" | "leave";
-
 const OpenGamesList = () => {
-  const [ gameId, setGameId] = useState("");
-  const [ method, setMethod] = useState<MethodType>(null);
   const [ gameItemList, setGameItemList ] = useState<IuiGameListItem[]>([]);
   const [ loginStatus, setLoginStatus ] = useState<LOGIN_RESPONSE | null>(null);
   const [ joinLeaveStatus, setJoinLeaveStatus ] = useState<JOIN_LEAVE_RESULT | null>(null);
@@ -33,8 +23,6 @@ const OpenGamesList = () => {
   const dispatch = useDispatch();
 
   const { socket } = useSocket();
-
-  const callBackList = useRef<(() => void)[]>([]);
 
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
   const getToken = (): string => window.localStorage.getItem("token") ?? "";
@@ -75,24 +63,26 @@ const OpenGamesList = () => {
     };
   }, [socket, fetchGameItemList]);
 
-  useEffect(() => {
-    if (method !== null) {
-      // console.log("method", method);
-      callBackList.current.forEach(cb => cb());
-      callBackList.current = [];
-    }
-  }, [method]);
-
-  const joinGameMethod = (gameId: string, form: FormApi<IFormFields, Partial<IFormFields>>) => {
-    callBackList.current.push(form.submit);
-    setGameId(gameId);
-    setMethod("join");
+  const joinGameMethod = (gameId: string, password?: string) => {
+    const joinGameRequest: IuiJoinLeaveGameRequest = {
+      userName: user.userName,
+      uuid: getMyId(),
+      token: getToken(),
+      gameId: gameId,
+      gamePassword: password ?? "",
+    };
+    joinGame(joinGameRequest);
   };
 
-  const leaveGameMethod = (gameId: string, form: FormApi<IFormFields, Partial<IFormFields>>) => {
-    callBackList.current.push(form.submit);
-    setGameId(gameId);
-    setMethod("leave");
+  const leaveGameMethod = (gameId: string) => {
+    const leaveGameRequest: IuiJoinLeaveGameRequest = {
+      userName: user.userName,
+      uuid: getMyId(),
+      token: getToken(),
+      gameId: gameId,
+      gamePassword: "",
+    };
+    leaveGame(leaveGameRequest);
   };
 
   const createGameErrorStr = (): string => {
@@ -116,7 +106,6 @@ const OpenGamesList = () => {
   const handleErrorClose = (): void => {
     setLoginStatus(null);
     setJoinLeaveStatus(null);
-    setMethod(null);
   };
 
   const createGameErrorHeaderStr = (): string => {
@@ -158,7 +147,7 @@ const OpenGamesList = () => {
     });
   };
 
-  const renderGameItems = (form: FormApi<IFormFields, Partial<IFormFields>>) => {
+  const renderGameItems = () => {
     if (gameItemList.length === 0) {
       return "No open games at the moment, why don't you just create one by your self?";
     }
@@ -173,52 +162,17 @@ const OpenGamesList = () => {
           imInTheGame={imInTheGame}
           playerCount= {playerCount}
           gameHasPassword={gameHasPassword}
-          onJoin={() => {joinGameMethod(id, form);}}
-          onLeave={() => {leaveGameMethod(id, form);}}
+          onJoin={(gamePassword?: string) => {joinGameMethod(id, gamePassword);}}
+          onLeave={() => {leaveGameMethod(id);}}
         />
       );
     });
   };
 
-  const onSubmit = (values: IFormFields) => {
-    // console.log("onSubmit", values);
-    if (user.isUserLoggedIn && gameId.length > 0 && method !== null) {
-      const request: IuiJoinLeaveGameRequest = {
-        uuid: getMyId(),
-        token: getToken(),
-        gameId: gameId,
-        userName: user.userName,
-        gamePassword: values.gamepassword ?? "",
-        method: method,
-      };
-      switch (method) {
-        case "join": {
-          joinGame(request);
-          break;
-        }
-        case "leave": {
-          leaveGame(request);
-          break;
-        }
-      }
-    }
-  };
-
   return (
     <React.Fragment>
-      <Form
-        onSubmit={onSubmit}
-        render={({handleSubmit, form }) => (
-          <form onSubmit={ handleSubmit }>
-            <div className="row">
-              <div className="col">
-                {renderGameItems(form)}
-              </div>
-            </div>
-            <input type="hidden" name="gameId" />
-          </form>
-        )}
-      />
+      {renderGameItems()}
+
       <Modal
         show={((loginStatus || (joinLeaveStatus !== null && joinLeaveStatus === JOIN_LEAVE_RESULT.notOk))) as boolean }
         onHide={handleErrorClose}

@@ -27,7 +27,6 @@ export interface IuiGetGameListResponse extends IuiAuth {
 export interface IuiJoinLeaveGameRequest extends IuiUserData {
   gameId: string,
   gamePassword: string,
-  method: "join" | "leave",
 }
 
 export enum JOIN_LEAVE_RESULT {
