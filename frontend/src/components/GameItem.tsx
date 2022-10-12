@@ -1,21 +1,22 @@
-import React from "react";
+import React, { useRef } from "react";
 import { HIDDEN_CARDS_MODE } from "../interfaces/IuiGameOptions";
 import { IuiGameListItem } from "../interfaces/IuiGameList";
 import { hiddenCardsModeToStr } from "../common/enumFunctions";
 import { Card } from "react-bootstrap";
-import { Field } from "react-final-form";
-import TextInput from "./FormComponents/TextInput";
 import Button from "react-bootstrap/Button";
 import RuleList from "./RuleList";
+import Form from "react-bootstrap/Form";
 
 interface IProps {
-  onJoin: () => void,
+  onJoin: (gamePassword?: string) => void,
   onLeave: () => void,
 }
 
 const GameItem = (props: IuiGameListItem & IProps) => {
+  const passRef = useRef<HTMLInputElement | null>(null);
+
   const joinGameClick = (): void => {
-    props.onJoin();
+    props.onJoin(passRef.current?.value);
   };
 
   const leaveGameClick = (): void => {
@@ -78,14 +79,13 @@ const GameItem = (props: IuiGameListItem & IProps) => {
     if (props.gameHasPassword) {
       return (
         <div>
-          <Field<string>
+          <Form.Control
+            ref={passRef}
             name="gamepassword"
-            component={TextInput}
-            label="Enter game password"
-            ispassword="true"
+            placeholder="Enter game password"
+            type="password"
             disabled={props.imInTheGame}
           />
-          <hr />
         </div>
       );
     } else {
