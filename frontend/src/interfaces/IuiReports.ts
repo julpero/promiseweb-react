@@ -27,6 +27,8 @@ export interface IuiOneGameData {
   position: number,
   keepP: number,
   pOfWinPoints: number,
+  playersInGame: number,
+  scorePoints: number,
 }
 
 export interface IuiOnePlayerReportData {

@@ -23,8 +23,6 @@ import {
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
 import { colorize, increase_brightness } from "../../common/commonFunctions";
-import { Button, Modal } from "react-bootstrap";
-import OneGameReport from "../OneGameReport";
 
 ChartJS.register(
   CategoryScale,
@@ -44,8 +42,7 @@ interface IProps {
   gameReportData?: IuiOnePlayerReportData,
 }
 
-const OnePlayerStats = ({gameReportData}: IProps) => {
-  const [oneGameReportId, setOneGameReportId] = useState("");
+const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
   const chartRef = useRef<ChartJS<"line" | "bar">>(null);
   const legendHoverIndex = useRef(-1);
   const accentColors = useRef<string[]>([]);
@@ -74,26 +71,41 @@ const OnePlayerStats = ({gameReportData}: IProps) => {
     if (!gameReportData) return dataSetsData;
 
     const {gamesData} = gameReportData;
+    const threeData = gamesData.filter(data => data.playersInGame === 3);
+    const fourData = gamesData.filter(data => data.playersInGame === 4);
+    const fiveData = gamesData.filter(data => data.playersInGame === 5);
+    const sixData = gamesData.filter(data => data.playersInGame === 6);
 
-    let label = "Position";
-    let basicColor = colorize(label);
+    let label = "3 players";
+    let basicColor = colorize("qwerty");
     dataSetsData.push({
-      type: "line",
+      type: "bar",
       label: label,
-      data: gamesData.flatMap(data => data.position),
+      data: [
+        threeData.reduce((count, data) => {
+          return count + data.keepP;
+        }, 0),
+        fourData.reduce((count, data) => {
+          return count + data.keepP;
+        }, 0),
+        fiveData.reduce((count, data) => {
+          return count + data.keepP;
+        }, 0),
+        sixData.reduce((count, data) => {
+          return count + data.keepP;
+        }, 0),
+      ],
       yAxisID: "y",
       borderColor: basicColor,
-      tension: 0,
       borderWidth: 1,
       hoverBorderWidth: 3,
       pointRadius: 5,
-      pointStyle: "rectRot",
-    } as ChartDataset<"line">);
+    } as ChartDataset<"bar">);
     accentColors.current.push(basicColor);
     accentFadedColors.current.push(increase_brightness(basicColor, 95));
 
-    label = "Keep %";
-    basicColor = colorize(label);
+    label = "4 players";
+    basicColor = colorize("P O I U Y");
     dataSetsData.push({
       type: "bar",
       label: label,
@@ -107,8 +119,8 @@ const OnePlayerStats = ({gameReportData}: IProps) => {
     accentColors.current.push(basicColor);
     accentFadedColors.current.push(increase_brightness(basicColor, 95));
 
-    label = "% of winning points";
-    basicColor = colorize(label);
+    label = "5 players";
+    basicColor = colorize("11 22 33");
     dataSetsData.push({
       type: "line",
       label: label,
@@ -164,18 +176,6 @@ const OnePlayerStats = ({gameReportData}: IProps) => {
       mode: "nearest",
       intersect: true
     },
-    onClick: () => {
-      const chart = chartRef.current;
-      if (chart) {
-        const dataIndex = chart.tooltip?.dataPoints.at(0)?.dataIndex ?? -1;
-        if (dataIndex >= 0) {
-          const gameId = gameReportData?.gamesData.at(dataIndex)?.gameId;
-          if (gameId) {
-            setOneGameReportId(gameId);
-          }
-        }
-      }
-    },
     plugins: {
       title: {
         display: true,
@@ -214,7 +214,7 @@ const OnePlayerStats = ({gameReportData}: IProps) => {
 
   return (
     <React.Fragment>
-      <div style={{height: "55vh"}}>
+      <div style={{height: "35vh"}}>
         <Chart
           type="bar"
           ref={chartRef}
@@ -223,27 +223,8 @@ const OnePlayerStats = ({gameReportData}: IProps) => {
         />
       </div>
 
-      {oneGameReportId &&
-        <Modal
-          show={oneGameReportId !== ""}
-          fullscreen
-          onHide={() => setOneGameReportId("")}
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>
-              Game Report
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <OneGameReport gameId={oneGameReportId} />
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="warning" onClick={() => setOneGameReportId("")}>Close Report</Button>
-          </Modal.Footer>
-        </Modal>
-      }
     </React.Fragment>
   );
 };
 
-export default OnePlayerStats;
+export default OnePlayerStatsPerPlayers;
