@@ -3,12 +3,18 @@ import { userInDatabase } from "./commons/testvariables";
 import { textsLogIn } from "./commons/texts";
 
 test.beforeEach(async ({page}) => {
-  await page.goto("https://promiseweb.azurewebsites.net/");
+  // await page.goto("https://promiseweb.azurewebsites.net/");
+  await page.goto("http://localhost:3000");
+
+  // Expect a title "to contain" a substring.
+  await expect(page).toHaveTitle(/PromiseWeb/);
 });
 
 test("Login with falsy and correct passwords and logout", async ({ page }) => {
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/PromiseWeb/);
+  // Log In / Register -button
+  const logInButton = page.locator("button", {hasText: /Log In/});
+  await expect(logInButton).toBeVisible();
+  await expect(logInButton).toBeEnabled();
 
   const userNameField = page.getByPlaceholder("(Nick)Name", { exact: true });
   await userNameField.fill(userInDatabase.name);
@@ -16,8 +22,6 @@ test("Login with falsy and correct passwords and logout", async ({ page }) => {
   const password1Field = page.getByPlaceholder("Password", { exact: true });
   await password1Field.fill(userInDatabase.falsyPass);
 
-  // Log In / Register -button
-  const logInButton = page.locator("button", {hasText: /Log In/});
   await logInButton.click();
 
   await expect(page.locator(".smallErrorDiv")).toHaveText(textsLogIn.error4);
@@ -26,8 +30,11 @@ test("Login with falsy and correct passwords and logout", async ({ page }) => {
   await logInButton.click();
 
   const logOutButton = page.locator("button", {hasText: /Log Out/});
-  expect(await logOutButton.isVisible()).toBeTruthy();
-  expect(await logInButton.isVisible()).toBeTruthy();
+  await expect(logOutButton).toBeVisible();
+  await expect(logOutButton).toBeEnabled();
+
   await logOutButton.click();
 
+  await expect(logInButton).toBeVisible();
+  await expect(logInButton).toBeEnabled();
 });
