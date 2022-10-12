@@ -95,24 +95,29 @@ export const getValidToken = (token: string | string[] | undefined): IToken | nu
   // JWT must be splitted into three parts by full stop (.)
   if (token.split(".").length !== 3) return null;
 
-  const checked = verify(token, process.env.AUTH_SECRET ?? "MUST_SET_THIS");
-  // console.log("checked", checked);
+  try {
+    const checked = verify(token, process.env.AUTH_SECRET ?? "MUST_SET_THIS");
+    // console.log("checked", checked);
 
-  // our token is always object (JWTPayload)
-  if (typeof checked === "string") return null;
+    // our token is always object (JWTPayload)
+    if (typeof checked === "string") return null;
 
-  // our token has uuid, userName amd timestamp fields
-  if (!checked.uuid) return null;
-  if (!checked.userName) return null;
-  if (!checked.timestamp) return null;
-  const parsedTimeStamp = parseInt(checked.timestamp, 10);
-  if (parsedTimeStamp + ALLOWED_INTERVAL < Date.now()) return null;
+    // our token has uuid, userName amd timestamp fields
+    if (!checked.uuid) return null;
+    if (!checked.userName) return null;
+    if (!checked.timestamp) return null;
+    const parsedTimeStamp = parseInt(checked.timestamp, 10);
+    if (parsedTimeStamp + ALLOWED_INTERVAL < Date.now()) return null;
 
-  return {
-    uuid: checked.uuid,
-    userName: checked.userName,
-    timestamp: parsedTimeStamp,
-  } as IToken;
+    return {
+      uuid: checked.uuid,
+      userName: checked.userName,
+      timestamp: parsedTimeStamp,
+    } as IToken;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
 };
 
 export const signUserToken = (userName: string, uuid: string, timestamp: number): string => {
