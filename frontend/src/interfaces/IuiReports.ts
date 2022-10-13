@@ -1,5 +1,12 @@
 import { IuiAuth, IuiUserData } from "./IuiUser";
 
+export const PlayerCountColor = {
+  3: "#ff990090",
+  4: "#90EE9090",
+  5: "#ADD8E690",
+  6: "#ffffe090",
+};
+
 export interface IuiGameReport extends IuiAuth {
   players: string[],
   pointsPerRound: number[][],

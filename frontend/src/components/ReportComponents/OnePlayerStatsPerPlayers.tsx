@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { IuiOnePlayerReportData } from "../../interfaces/IuiReports";
+import { IuiOnePlayerReportData, PlayerCountColor } from "../../interfaces/IuiReports";
 
 import {
   Chart as ChartJS,
@@ -16,7 +16,7 @@ import {
   BarController,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { colorize, increase_brightness } from "../../common/commonFunctions";
+import { increase_brightness } from "../../common/commonFunctions";
 
 ChartJS.register(
   CategoryScale,
@@ -74,7 +74,7 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     playedGamesCount.current.push(sixData.length);
 
     let label = "3 player";
-    let basicColor = colorize(label);
+    let basicColor = PlayerCountColor[3];
     dataSetsData.push({
       type: "bar",
       label: label,
@@ -100,7 +100,7 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     accentFadedColors.current.push(increase_brightness(basicColor, 95));
 
     label = "4 player";
-    basicColor = colorize(label);
+    basicColor = PlayerCountColor[4];
     dataSetsData.push({
       type: "bar",
       label: label,
@@ -126,7 +126,7 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     accentFadedColors.current.push(increase_brightness(basicColor, 95));
 
     label = "5 player";
-    basicColor = colorize(label);
+    basicColor = PlayerCountColor[5];
     dataSetsData.push({
       type: "bar",
       label: label,
@@ -152,7 +152,7 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     accentFadedColors.current.push(increase_brightness(basicColor, 95));
 
     label = "6 player";
-    basicColor = colorize(label);
+    basicColor = PlayerCountColor[6];
     dataSetsData.push({
       type: "bar",
       label: label,

@@ -14,6 +14,7 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { IuiPlayersInGameReport } from "../../interfaces/IuiGameReports";
+import { PlayerCountColor } from "../../interfaces/IuiReports";
 
 ChartJS.register(
   CategoryScale,
@@ -36,25 +37,25 @@ const PlayedGamesByPlayerCount = ({gameReportData, max}: IProps) => {
       label: "three player games",
       data: [gameReportData?.find(data => data.playersInGame === 3)?.count ?? 0],
       borderWidth: 1,
-      backgroundColor: "rgba(255,153,0,0.6)",
+      backgroundColor: PlayerCountColor[3],
     });
     dataSetsData.push({
       label: "four player games",
       data: [gameReportData?.find(data => data.playersInGame === 4)?.count ?? 0],
       borderWidth: 1,
-      backgroundColor: "lightgreen",
+      backgroundColor: PlayerCountColor[4],
     });
     dataSetsData.push({
       label: "five player games",
       data: [gameReportData?.find(data => data.playersInGame === 5)?.count ?? 0],
       borderWidth: 1,
-      backgroundColor: "lightblue",
+      backgroundColor: PlayerCountColor[5],
     });
     dataSetsData.push({
       label: "six player games",
       data: [gameReportData?.find(data => data.playersInGame === 6)?.count ?? 0],
       borderWidth: 1,
-      backgroundColor: "lightyellow",
+      backgroundColor: PlayerCountColor[6],
     });
     return dataSetsData;
   };
