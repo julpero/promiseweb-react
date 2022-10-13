@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { testLogIn } from "./commons/methods";
+import { testCheckLoginSuccess, testLogIn } from "./commons/methods";
 import { pageUrl, userInDatabase } from "./commons/testvariables";
 
 test("Create and dismiss game", async ({ page }) => {
@@ -7,9 +7,7 @@ test("Create and dismiss game", async ({ page }) => {
 
   await testLogIn(page, userInDatabase);
 
-  const logOutButton = page.locator("button", {hasText: /Log Out/});
-  await expect(logOutButton).toBeVisible();
-  await expect(logOutButton).toBeEnabled();
+  await testCheckLoginSuccess(page);
 
   const createGameAccordionButton = page.locator("button", {hasText: /Create New Game/});
   await createGameAccordionButton.click();
