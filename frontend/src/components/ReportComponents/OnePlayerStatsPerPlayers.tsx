@@ -1,8 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import { IuiOnePlayerReportData } from "../../interfaces/IuiReports";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { format } from "date-fns";
-import "chartjs-adapter-date-fns";
 
 import {
   Chart as ChartJS,
@@ -41,6 +38,7 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
   const legendHoverIndex = useRef(-1);
   const accentColors = useRef<string[]>([]);
   const accentFadedColors = useRef<string[]>([]);
+  const playedGamesCount = useRef<number[]>([]);
 
   useEffect(() => {
     const chart = chartRef.current;
@@ -70,15 +68,10 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     const fiveData = gamesData.filter(data => data.playersInGame === 5);
     const sixData = gamesData.filter(data => data.playersInGame === 6);
 
-    dataSetsData.push({
-      data: [
-        threeData.length,
-        fourData.length,
-        fiveData.length,
-        sixData.length,
-      ],
-      hidden: true,
-    });
+    playedGamesCount.current.push(threeData.length);
+    playedGamesCount.current.push(fourData.length);
+    playedGamesCount.current.push(fiveData.length);
+    playedGamesCount.current.push(sixData.length);
 
     let label = "3 player";
     let basicColor = colorize(label);
@@ -222,13 +215,12 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
         mode: "index",
         intersect: false,
         callbacks: {
-          label: ({dataIndex, datasetIndex, formattedValue, dataset, chart, parsed}) => {
+          label: ({dataIndex, datasetIndex, formattedValue, dataset, parsed}) => {
             const label = dataset.label || "";
             switch (dataIndex) {
               case 0: {
-                const playedGames = chart.data.datasets[0].data;
-                // console.log(chart.data.datasets[0]);
-                return `${label}: ${(parsed.y ?? 0).toFixed(1)}%, (${playedGames[datasetIndex-1]} games)`; // games
+                const playedGames = playedGamesCount.current[datasetIndex] ?? 0;
+                return `${label}: ${(parsed.y ?? 0).toFixed(1)}%, (${playedGames} games)`; // games
               }
               case 1: return `${label}: ${(parsed.y ?? 0).toFixed(1)}%`; // avg keep %
               case 2: return `${label}: ${((parsed.y ?? 0)/100).toFixed(3)}`; // avg score points

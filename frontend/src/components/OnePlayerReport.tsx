@@ -39,7 +39,7 @@ const OnePlayerReport = ({playerName}: IProps) => {
       // console.time("get one player report");
       socket.emit("get one player report", reportRequest, (playerReportResponse: IuiOnePlayerReportResponse) => {
         // console.timeEnd("get one player report");
-        console.log("playerReportResponse", playerReportResponse);
+        // console.log("playerReportResponse", playerReportResponse);
         dispatch(setSpinnerVisible(false));
         if (playerReportResponse.isAuthenticated) {
           handleAuthenticatedRequest(playerReportResponse.token);
