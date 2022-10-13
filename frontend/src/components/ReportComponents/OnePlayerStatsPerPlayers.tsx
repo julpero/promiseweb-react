@@ -70,6 +70,16 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     const fiveData = gamesData.filter(data => data.playersInGame === 5);
     const sixData = gamesData.filter(data => data.playersInGame === 6);
 
+    dataSetsData.push({
+      data: [
+        threeData.length,
+        fourData.length,
+        fiveData.length,
+        sixData.length,
+      ],
+      hidden: true,
+    });
+
     let label = "3 player";
     let basicColor = colorize(label);
     dataSetsData.push({
@@ -212,21 +222,19 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
         mode: "index",
         intersect: false,
         callbacks: {
-          label: (tooltipItem) => {
-            const roundInd = tooltipItem.dataIndex;
-            const dataInd = tooltipItem.datasetIndex;
-            const label = tooltipItem.dataset.label || "";
-            const val = tooltipItem.formattedValue;
-            switch (roundInd) {
+          label: ({dataIndex, datasetIndex, formattedValue, dataset, chart, parsed}) => {
+            const label = dataset.label || "";
+            switch (dataIndex) {
               case 0: {
-                // const playedGames = dataInd === 0 ? 1 : 0 ;
-                return `${label}: ${dataInd}: ${(tooltipItem.parsed.y ?? 0).toFixed(1)}%`; // games
+                const playedGames = chart.data.datasets[0].data;
+                // console.log(chart.data.datasets[0]);
+                return `${label}: ${(parsed.y ?? 0).toFixed(1)}%, (${playedGames[datasetIndex-1]} games)`; // games
               }
-              case 1: return `${label}: ${(tooltipItem.parsed.y ?? 0).toFixed(1)}%`; // avg keep %
-              case 2: return `${label}: ${((tooltipItem.parsed.y ?? 0)/100).toFixed(3)}`; // avg score points
-              case 3: return `${label}: ${(tooltipItem.parsed.y ?? 0).toFixed(1)}%`; // avg % of winning points
+              case 1: return `${label}: ${(parsed.y ?? 0).toFixed(1)}%`; // avg keep %
+              case 2: return `${label}: ${((parsed.y ?? 0)/100).toFixed(3)}`; // avg score points
+              case 3: return `${label}: ${(parsed.y ?? 0).toFixed(1)}%`; // avg % of winning points
             }
-            return `${label}: ${val}`;
+            return `${label}: ${formattedValue}`;
           },
         }
       },
