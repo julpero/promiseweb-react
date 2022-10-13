@@ -1,29 +1,16 @@
 import { test, expect } from "@playwright/test";
+import { testLogIn } from "./commons/methods";
 import { pageUrl, userInDatabase } from "./commons/testvariables";
 
-test.beforeEach(async ({page}) => {
+test("Create and dismiss game", async ({ page }) => {
   await page.goto(pageUrl);
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/PromiseWeb/);
-
-  // Log In / Register -button
-  const logInButton = page.locator("button", {hasText: /Log In/});
-  await expect(logInButton).toBeVisible();
-  await expect(logInButton).toBeEnabled();
-
-  const userNameField = page.getByPlaceholder("(Nick)Name", { exact: true });
-  const password1Field = page.getByPlaceholder("Password", { exact: true });
-  await userNameField.fill(userInDatabase.name);
-  await password1Field.fill(userInDatabase.pass);
-  await logInButton.click();
+  await testLogIn(page, userInDatabase);
 
   const logOutButton = page.locator("button", {hasText: /Log Out/});
   await expect(logOutButton).toBeVisible();
   await expect(logOutButton).toBeEnabled();
-});
 
-test("Create and dismiss game", async ({ page }) => {
   const createGameAccordionButton = page.locator("button", {hasText: /Create New Game/});
   await createGameAccordionButton.click();
   const createGameButton = page.locator("button", {hasText: /Create Game/});
