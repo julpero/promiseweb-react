@@ -39,16 +39,15 @@ test("Create and dismiss game", async ({ page }) => {
 
   await createGameButton.click();
 
-  await expect(page.locator("li", {hasText: "no even promises"})).toHaveCount(1);
-  await expect(page.locator("li", {hasText: "hidden promise round"})).toHaveCount(1);
-  await expect(page.locator("li", {hasText: "show opponent hand value when promising"})).toHaveCount(1);
-  await expect(page.locator("li", {hasText: "show opponent hand value in game"})).toHaveCount(1);
+  // await expect(page.locator("li", {hasText: "no even promises"})).toHaveCount(1);
+  // await expect(page.locator("li", {hasText: "hidden promise round"})).toHaveCount(1);
+  // await expect(page.locator("li", {hasText: "show opponent hand value when promising"})).toHaveCount(1);
+  // await expect(page.locator("li", {hasText: "show opponent hand value in game"})).toHaveCount(1);
 
   await expect(page.locator("li", {hasText: userInDatabase.name})).toHaveCount(1);
-  await expect(page.locator("li", {hasText: "[ ]"})).toHaveCount(2);
 
-  const joinGameButton = page.locator("button", {hasText: /JOIN GAME/});
-  const leaveGameButton = page.locator("button", {hasText: /LEAVE GAME/});
+  const joinGameButton = page.locator("button", {hasText: `JOIN GAME - created by ${userInDatabase.name}`});
+  const leaveGameButton = page.locator("button", {hasText: `LEAVE GAME - created by ${userInDatabase.name}`});
 
   await expect(joinGameButton).toBeVisible();
   await expect(joinGameButton).toBeDisabled();
