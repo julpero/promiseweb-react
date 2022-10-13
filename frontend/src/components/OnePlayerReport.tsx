@@ -11,6 +11,7 @@ import getYear from "date-fns/getYear";
 import isAfter from "date-fns/isAfter";
 import sub from "date-fns/sub";
 import { setSpinnerVisible } from "../store/spinnerSlice";
+import OnePlayerStatsPerPlayers from "./ReportComponents/OnePlayerStatsPerPlayers";
 
 interface IProps {
   playerName: string,
@@ -166,6 +167,7 @@ const OnePlayerReport = ({playerName}: IProps) => {
         renderTimeLine()
       }
       <OnePlayerStats gameReportData={reportDataToShow} />
+      <OnePlayerStatsPerPlayers gameReportData={reportDataToShow} />
     </React.Fragment>
   );
 };

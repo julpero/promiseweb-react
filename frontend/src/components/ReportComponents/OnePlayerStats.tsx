@@ -44,7 +44,7 @@ interface IProps {
   gameReportData?: IuiOnePlayerReportData,
 }
 
-const OnePlayerPOfPoints = ({gameReportData}: IProps) => {
+const OnePlayerStats = ({gameReportData}: IProps) => {
   const [oneGameReportId, setOneGameReportId] = useState("");
   const chartRef = useRef<ChartJS<"line" | "bar">>(null);
   const legendHoverIndex = useRef(-1);
@@ -214,7 +214,7 @@ const OnePlayerPOfPoints = ({gameReportData}: IProps) => {
 
   return (
     <React.Fragment>
-      <div style={{height: "75vh"}}>
+      <div style={{height: "50vh"}}>
         <Chart
           type="bar"
           ref={chartRef}
@@ -246,4 +246,4 @@ const OnePlayerPOfPoints = ({gameReportData}: IProps) => {
   );
 };
 
-export default OnePlayerPOfPoints;
+export default OnePlayerStats;

@@ -211,6 +211,7 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
     _id: 1,
     createDateTime: 1,
     gameStatistics: 1,
+    humanPlayersCount: 1,
   }).sort({
     createDateTime: 1,
   }).lean();
@@ -225,6 +226,8 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
         position: playerStats.position,
         keepP: Math.round(playerStats.totalKeeps * 1000 / gameStats.roundsPlayed)/10,
         pOfWinPoints: Math.round(playerStats.totalPoints * 1000 / (gameInDb.gameStatistics?.playersStatistics.at(0)?.totalPoints ?? playerStats.totalPoints * 1000)) / 10,
+        playersInGame: gameInDb.humanPlayersCount,
+        scorePoints: playerStats.scorePoints,
       } as IuiOneGameData);
     }
   });
