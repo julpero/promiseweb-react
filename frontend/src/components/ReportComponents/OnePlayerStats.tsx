@@ -214,7 +214,7 @@ const OnePlayerStats = ({gameReportData}: IProps) => {
 
   return (
     <React.Fragment>
-      <div style={{height: "55vh"}}>
+      <div style={{height: "50vh"}}>
         <Chart
           type="bar"
           ref={chartRef}

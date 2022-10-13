@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { IuiOnePlayerReportData } from "../../interfaces/IuiReports";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { format } from "date-fns";
@@ -13,15 +13,12 @@ import {
   LinearScale,
   TimeScale,
   BarElement,
-  PointElement,
-  LineElement,
   Title,
   Legend,
   Tooltip,
-  LineController,
   BarController,
 } from "chart.js";
-import { Chart } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import { colorize, increase_brightness } from "../../common/commonFunctions";
 
 ChartJS.register(
@@ -29,12 +26,9 @@ ChartJS.register(
   LinearScale,
   TimeScale,
   BarElement,
-  PointElement,
-  LineElement,
   Title,
   Legend,
   Tooltip,
-  LineController,
   BarController,
 );
 
@@ -43,7 +37,7 @@ interface IProps {
 }
 
 const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
-  const chartRef = useRef<ChartJS<"line" | "bar">>(null);
+  const chartRef = useRef<ChartJS<"bar">>(null);
   const legendHoverIndex = useRef(-1);
   const accentColors = useRef<string[]>([]);
   const accentFadedColors = useRef<string[]>([]);
@@ -66,8 +60,8 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     }
   }, []);
 
-  const getDataSetsData = (): ChartDataset<"line" | "bar">[] => {
-    const dataSetsData: ChartDataset<"line" | "bar">[] = [];
+  const getDataSetsData = (): ChartDataset<"bar">[] => {
+    const dataSetsData: ChartDataset<"bar">[] = [];
     if (!gameReportData) return dataSetsData;
 
     const {gamesData} = gameReportData;
@@ -76,24 +70,22 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     const fiveData = gamesData.filter(data => data.playersInGame === 5);
     const sixData = gamesData.filter(data => data.playersInGame === 6);
 
-    let label = "3 players";
-    let basicColor = colorize("qwerty");
+    let label = "3 player";
+    let basicColor = colorize(label);
     dataSetsData.push({
       type: "bar",
       label: label,
       data: [
+        100 * threeData.length / gamesData.length,
         threeData.reduce((count, data) => {
           return count + data.keepP;
-        }, 0),
-        fourData.reduce((count, data) => {
-          return count + data.keepP;
-        }, 0),
-        fiveData.reduce((count, data) => {
-          return count + data.keepP;
-        }, 0),
-        sixData.reduce((count, data) => {
-          return count + data.keepP;
-        }, 0),
+        }, 0) / threeData.length,
+        100 * threeData.reduce((count, data) => {
+          return count + data.scorePoints;
+        }, 0) / threeData.length,
+        threeData.reduce((count, data) => {
+          return count + data.pOfWinPoints;
+        }, 0) / threeData.length,
       ],
       yAxisID: "y",
       borderColor: basicColor,
@@ -104,48 +96,93 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     accentColors.current.push(basicColor);
     accentFadedColors.current.push(increase_brightness(basicColor, 95));
 
-    label = "4 players";
-    basicColor = colorize("P O I U Y");
+    label = "4 player";
+    basicColor = colorize(label);
     dataSetsData.push({
       type: "bar",
       label: label,
-      data: gamesData.flatMap(data => data.keepP),
-      yAxisID: "y1",
+      data: [
+        100 * fourData.length / gamesData.length,
+        fourData.reduce((count, data) => {
+          return count + data.keepP;
+        }, 0) / fourData.length,
+        100 * fourData.reduce((count, data) => {
+          return count + data.scorePoints;
+        }, 0) / fourData.length,
+        fourData.reduce((count, data) => {
+          return count + data.pOfWinPoints;
+        }, 0) / fourData.length,
+      ],
+      yAxisID: "y",
       borderColor: basicColor,
       borderWidth: 1,
       hoverBorderWidth: 3,
-      barThickness: 3,
+      pointRadius: 5,
     } as ChartDataset<"bar">);
     accentColors.current.push(basicColor);
     accentFadedColors.current.push(increase_brightness(basicColor, 95));
 
-    label = "5 players";
-    basicColor = colorize("11 22 33");
+    label = "5 player";
+    basicColor = colorize(label);
     dataSetsData.push({
-      type: "line",
+      type: "bar",
       label: label,
-      data: gamesData.flatMap(data => data.pOfWinPoints),
-      yAxisID: "y1",
+      data: [
+        100 * fiveData.length / gamesData.length,
+        fiveData.reduce((count, data) => {
+          return count + data.keepP;
+        }, 0) / fiveData.length,
+        100 * fiveData.reduce((count, data) => {
+          return count + data.scorePoints;
+        }, 0) / fiveData.length,
+        fiveData.reduce((count, data) => {
+          return count + data.pOfWinPoints;
+        }, 0) / fiveData.length,
+      ],
+      yAxisID: "y",
       borderColor: basicColor,
-      tension: 0,
       borderWidth: 1,
       hoverBorderWidth: 3,
       pointRadius: 5,
-      pointStyle: "crossRot",
-      showLine: false,
-    } as ChartDataset<"line">);
+    } as ChartDataset<"bar">);
+    accentColors.current.push(basicColor);
+    accentFadedColors.current.push(increase_brightness(basicColor, 95));
+
+    label = "6 player";
+    basicColor = colorize(label);
+    dataSetsData.push({
+      type: "bar",
+      label: label,
+      data: [
+        100 * sixData.length / gamesData.length,
+        sixData.reduce((count, data) => {
+          return count + data.keepP;
+        }, 0) / sixData.length,
+        100 * sixData.reduce((count, data) => {
+          return count + data.scorePoints;
+        }, 0) / sixData.length,
+        sixData.reduce((count, data) => {
+          return count + data.pOfWinPoints;
+        }, 0) / sixData.length,
+      ],
+      yAxisID: "y",
+      borderColor: basicColor,
+      borderWidth: 1,
+      hoverBorderWidth: 3,
+      pointRadius: 5,
+    } as ChartDataset<"bar">);
     accentColors.current.push(basicColor);
     accentFadedColors.current.push(increase_brightness(basicColor, 95));
 
     return dataSetsData;
   };
 
-  const chartOptions: ChartOptions<"line" | "bar"> = {
+  const chartOptions: ChartOptions<"bar"> = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
       x: {
-        type: "time",
+        type: "category",
         ticks: {
           includeBounds: true,
         }
@@ -153,24 +190,14 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
       y: {
         type: "linear",
         display: true,
-        min: 1,
-        max: 6,
+        min: 0,
+        max: 100,
         position: "left",
-        reverse: true,
+        reverse: false,
         grid: {
           drawOnChartArea: false,
         },
       },
-      y1: {
-        type: "linear",
-        display: true,
-        min: 0,
-        max: 100,
-        position: "right",
-        grid: {
-          drawOnChartArea: false,
-        },
-      }
     },
     hover: {
       mode: "nearest",
@@ -178,14 +205,33 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     },
     plugins: {
       title: {
-        display: true,
+        display: false,
         text: `Player Report - ${gameReportData?.playerName}`
       },
       tooltip: {
         mode: "index",
         intersect: false,
+        callbacks: {
+          label: (tooltipItem) => {
+            const roundInd = tooltipItem.dataIndex;
+            const dataInd = tooltipItem.datasetIndex;
+            const label = tooltipItem.dataset.label || "";
+            const val = tooltipItem.formattedValue;
+            switch (roundInd) {
+              case 0: {
+                // const playedGames = dataInd === 0 ? 1 : 0 ;
+                return `${label}: ${dataInd}: ${(tooltipItem.parsed.y ?? 0).toFixed(1)}%`; // games
+              }
+              case 1: return `${label}: ${(tooltipItem.parsed.y ?? 0).toFixed(1)}%`; // avg keep %
+              case 2: return `${label}: ${((tooltipItem.parsed.y ?? 0)/100).toFixed(3)}`; // avg score points
+              case 3: return `${label}: ${(tooltipItem.parsed.y ?? 0).toFixed(1)}%`; // avg % of winning points
+            }
+            return `${label}: ${val}`;
+          },
+        }
       },
       legend: {
+        position: "bottom",
         onHover: (e, legendItem) => {
           if (legendHoverIndex.current !== legendItem.datasetIndex) {
             const chart = chartRef.current;
@@ -207,16 +253,20 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     },
   };
 
-  const chartData: ChartData<"line" | "bar"> = {
-    labels: gameReportData?.gamesData.flatMap(data => data.started),
+  const chartData: ChartData<"bar"> = {
+    labels: [
+      "games distribution",
+      "avg keep %",
+      "avg score points",
+      "avg % of winning points",
+    ],
     datasets: getDataSetsData(),
   };
 
   return (
     <React.Fragment>
-      <div style={{height: "35vh"}}>
-        <Chart
-          type="bar"
+      <div style={{height: "25vh"}}>
+        <Bar
           ref={chartRef}
           data={chartData}
           options={chartOptions}
