@@ -151,7 +151,7 @@ const OpenGamesList = () => {
     if (gameItemList.length === 0) {
       return "No open games at the moment, why don't you just create one by your self?";
     }
-    return gameItemList.map(({created, id, rules, humanPlayers, imInTheGame, playerCount, gameHasPassword}: IuiGameListItem) => {
+    return gameItemList.map(({created, id, rules, humanPlayers, imInTheGame, playerCount, gameHasPassword, creator}: IuiGameListItem) => {
       return(
         <GameItem
           key={id}
@@ -164,6 +164,7 @@ const OpenGamesList = () => {
           gameHasPassword={gameHasPassword}
           onJoin={(gamePassword?: string) => {joinGameMethod(id, gamePassword);}}
           onLeave={() => {leaveGameMethod(id);}}
+          creator={creator}
         />
       );
     });

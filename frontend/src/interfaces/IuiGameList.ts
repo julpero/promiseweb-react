@@ -18,6 +18,7 @@ export interface IuiGameListItem {
   inActivePlayers?: string[],
   inActivePlayerSockets?: string[],
   playedBy?: string,
+  creator: string,
 }
 
 export interface IuiGetGameListResponse extends IuiAuth {
