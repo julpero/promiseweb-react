@@ -8,7 +8,7 @@ import {
   IuiJoinLeaveGameResponse,
   JOIN_LEAVE_RESULT
 } from "../interfaces/IuiGameList";
-import { Modal } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import { IuiUserData, LOGIN_RESPONSE } from "../interfaces/IuiUser";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../store/userSlice";
@@ -186,6 +186,9 @@ const OpenGamesList = () => {
         <Modal.Body>
           {createGameErrorStr()}
         </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" onClick={() => handleErrorClose()}>Close</Button>
+        </Modal.Footer>
       </Modal>
     </React.Fragment>
   );
