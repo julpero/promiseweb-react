@@ -54,7 +54,9 @@ const App = () => {
       // console.log("has token:", window.localStorage.getItem("token"));
     } else {
       // console.log("no token");
-      dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
+      if (user.isUserLoggedIn) {
+        dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
+      }
     }
 
     if (user.isUserLoggedIn) {
@@ -102,13 +104,16 @@ const App = () => {
 
   // console.log("render app...");
 
-  if ((gameStatus === CHECK_GAME_STATUS.onGoingGame || gameStatus === CHECK_GAME_STATUS.observedGame) && gameId !== "" && user.isUserLoggedIn) {
-    return <GameTable gameId={gameId ?? ""} />;
-  } else {
-    return (
-      <HomeScreen />
-    );
-  }
+  return (
+    <React.Fragment>
+      {(((gameStatus === CHECK_GAME_STATUS.onGoingGame || gameStatus === CHECK_GAME_STATUS.observedGame) && gameId !== "" && user.isUserLoggedIn)) &&
+        <GameTable />
+      }
+      {(!user.isUserLoggedIn || gameId === "" || (gameStatus !== CHECK_GAME_STATUS.onGoingGame && gameStatus !== CHECK_GAME_STATUS.observedGame)) &&
+        <HomeScreen />
+      }
+    </React.Fragment>
+  );
 };
 
 export default App;

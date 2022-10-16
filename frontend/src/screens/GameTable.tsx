@@ -8,11 +8,7 @@ import ScoreBoard from "../components/ScoreBoard";
 import EffectHandler from "../components/EffectHandler";
 import GameMenu from "../components/GameMenu";
 
-interface IProps {
-  gameId: string,
-}
-
-const GameTable = ({gameId}: IProps) => {
+const GameTable = () => {
   // console.log("GameTable");
 
   return (
@@ -22,7 +18,7 @@ const GameTable = ({gameId}: IProps) => {
       <PromiseTable />
       <Chat />
       <GameMenu />
-      <EffectHandler gameId={gameId} />
+      <EffectHandler  />
     </div>
   );
 };

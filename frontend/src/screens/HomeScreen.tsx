@@ -11,7 +11,7 @@ import CreateGame from "../components/CreateGame";
 import JoinOnGoingGame from "../components/JoinOnGoingGame";
 import PlayedGamesReport from "../components/PlayedGamesReport";
 import TextInput from "../components/FormComponents/TextInput";
-import { IuiLoginRequest, IuiLoginResponse, LOGIN_RESPONSE } from "../interfaces/IuiUser";
+import { IuiLoginRequest, IuiLoginResponse, IuiUserData, LOGIN_RESPONSE } from "../interfaces/IuiUser";
 import AdminGameList from "../components/AdminComponents/AdminGameList";
 import { isAdminLoggedIn, setAdminLoggedIn } from "../store/adminSlice";
 import AdminMassOperations from "../components/AdminComponents/AdminMassOperations";
@@ -20,6 +20,8 @@ import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../com
 import OnePlayerReport from "../components/OnePlayerReport";
 import { BallTriangle } from "react-loader-spinner";
 import { isSpinnerVisible } from "../store/spinnerSlice";
+import { setGameId } from "../store/gameInfoSlice";
+import { clearRoundInfo } from "../store/roundInfoSlice";
 
 interface IUserLoginFormValidationFields {
   userName?: string,
@@ -56,6 +58,7 @@ const HomeScreen = () => {
   const [activeModal, setActiveModal] = useState<ACTIVE_MODAL>(ACTIVE_MODAL.none);
   const [activePlayerName, setActivePlayerName] = useState("");
   const [adminUserName, setAdminUserName] = useState("");
+  const [buttonsDisabled, setButtonsDisabled] = useState(false);
   const adminLoggedIn = useSelector(isAdminLoggedIn);
   const user = useSelector(getUser);
   const spinnerVisible = useSelector(isSpinnerVisible);
@@ -111,6 +114,7 @@ const HomeScreen = () => {
 
   const onLoginUserSubmit = ({userName, password1, password2, email}: IUserLoginForm) => {
     setLoginFormValidationError("");
+    setButtonsDisabled(true);
     const loginRequest: IuiLoginRequest = {
       uuid: getMyId(),
       userName: userName,
@@ -122,6 +126,8 @@ const HomeScreen = () => {
       // console.log("user login, response", loginResponse);
       if (loginResponse.loginStatus === LOGIN_RESPONSE.ok && loginResponse.isAuthenticated) {
         handleAuthenticatedRequest(loginResponse.token);
+        dispatch(setGameId(""));
+        dispatch(clearRoundInfo());
         dispatch(setUserLoggedIn({loggedIn: true, name: loginRequest.userName}));
       } else {
         window.localStorage.removeItem("token");
@@ -141,17 +147,30 @@ const HomeScreen = () => {
           }
         }
       }
+      setButtonsDisabled(false);
     });
   };
 
   const logOutUser = () => {
     // console.log("user want's to log out");
+    if (user.isUserLoggedIn) {
+      const logOutRequest: IuiUserData = {
+        userName: user.userName,
+        uuid: getMyId(),
+        token: getToken(),
+      };
+      socket.emit("log out", logOutRequest);
+    }
+    window.localStorage.removeItem("uUID");
     window.localStorage.removeItem("token");
+    dispatch(setGameId(""));
+    dispatch(clearRoundInfo());
     dispatch(setUserLoggedIn({loggedIn: false, name: ""}));
   };
 
   const onLoginAdminSubmit = ({userName, password}: IAdminLoginForm) => {
     if (user.isUserLoggedIn) {
+      setButtonsDisabled(true);
       const loginRequest: IuiLoginRequest = {
         uuid: getMyId(),
         userName: userName,
@@ -172,6 +191,7 @@ const HomeScreen = () => {
         } else {
           handleUnauthenticatedRequest(dispatch);
         }
+        setButtonsDisabled(false);
       });
     }
   };
@@ -216,7 +236,7 @@ const HomeScreen = () => {
       <div className="adminButtonDiv">
         <Button variant="warning" onClick={() => logOutUser()} disabled={!user.isUserLoggedIn}>Log Out <i>{user.userName}</i></Button>
         &nbsp;
-        <Button onClick={() => setActiveModal(ACTIVE_MODAL.adminLoginForm)}>Admin</Button>
+        <Button onClick={() => setActiveModal(ACTIVE_MODAL.adminLoginForm)} disabled={!user.isUserLoggedIn}>Admin</Button>
       </div>
 
       <Modal
@@ -233,7 +253,7 @@ const HomeScreen = () => {
           <Form
             onSubmit={onLoginUserSubmit}
             validate={validateLoginUserForm}
-            render={({handleSubmit, submitting}) => (
+            render={({handleSubmit}) => (
               <form onSubmit={handleSubmit}>
                 <Field<string>
                   name="userName"
@@ -261,7 +281,7 @@ const HomeScreen = () => {
                 />
                 <br />
                 <div className="d-grid gap-2">
-                  <Button disabled={submitting} type="submit" variant="primary" size="lg">Log In / Register</Button>
+                  <Button disabled={buttonsDisabled || user.isUserLoggedIn} type="submit" variant="primary" size="lg">Log In / Register</Button>
                 </div>
               </form>
             )}
@@ -282,7 +302,7 @@ const HomeScreen = () => {
           <Form
             onSubmit={onLoginAdminSubmit}
             validate={validateLoginAdminForm}
-            render={({handleSubmit, submitting}) => (
+            render={({handleSubmit}) => (
               <form onSubmit={handleSubmit}>
                 <Field<string>
                   name="userName"
@@ -297,7 +317,7 @@ const HomeScreen = () => {
                   ispassword="true"
                 />
                 <div className="d-grid gap-2">
-                  <Button disabled={submitting} type="submit" variant="primary" size="lg">Log In</Button>
+                  <Button disabled={buttonsDisabled} type="submit" variant="primary" size="lg">Log In</Button>
                 </div>
               </form>
             )}

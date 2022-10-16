@@ -5,17 +5,14 @@ import { GAME_STATUS, ROUND_STATUS } from "../interfaces/IuiGameOptions";
 import { IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, ROUND_PHASE } from "../interfaces/IuiPlayingGame";
 import { useSocket } from "../socket";
 import { AnimateCard, setAnimateCard } from "../store/animateCardSlice";
-import { getCurrentGameInfo, setGameInfo } from "../store/gameInfoSlice";
+import { getCurrentGameId, getCurrentGameInfo, setGameInfo } from "../store/gameInfoSlice";
 import { getGetRoundInfo, setGetRoundInfo } from "../store/getRoundInfoSlice";
 import { getPlayedCard, setPlayedCard } from "../store/playCardSlice";
 import { getCurrentRoundInfo, setRoundInfo } from "../store/roundInfoSlice";
 import { getUser } from "../store/userSlice";
 
-interface IProps {
-  gameId: string,
-}
-
-const EffectHandler = ({gameId}: IProps) => {
+const EffectHandler = () => {
+  const gameId = useSelector(getCurrentGameId);
   const currentGameInfo = useSelector(getCurrentGameInfo);
   const getRoundInfoRequest = useSelector(getGetRoundInfo);
   const currentRoundInfo = useSelector(getCurrentRoundInfo);

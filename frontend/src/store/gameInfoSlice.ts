@@ -39,7 +39,11 @@ export const gameInfoSlice = createSlice({
       state.value = action.payload;
     },
     setGameId: (state, action: PayloadAction<string>) => {
-      state.gameId = action.payload;
+      const newGameId = action.payload;
+      state.gameId = newGameId;
+      if (newGameId === "") {
+        state.value = initialState.value;
+      }
     }
   }
 });

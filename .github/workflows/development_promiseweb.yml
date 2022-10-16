@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - promiseweb
+name: TEST ENV - Build and deploy Node.js app to Azure Web App - promiseweb
 
 on:
   push:
@@ -14,10 +14,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Node.js version
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
 
@@ -39,7 +39,7 @@ jobs:
         run: Compress-Archive -Update ./serverBuild/* release.zip
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: node-app
           path: release.zip
@@ -53,10 +53,10 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: node-app
-      
+
       - name: UnZip artifact for deployment
         run: unzip release.zip
 
@@ -71,3 +71,28 @@ jobs:
 
       - name: Delete zip package
         run: rm release.zip
+
+  test:
+    needs: deploy
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    - name: Install Playwright
+      working-directory: ./frontend
+      run: npx playwright install --with-deps
+
+    - name: Run Playwright tests
+      working-directory: ./frontend
+      run: npx playwright test
+      env:
+        PLAYWRIGHT_TEST_BASE_URL: https://promiseweb.azurewebsites.net/
