@@ -10,6 +10,8 @@ import Form from "react-bootstrap/Form";
 interface IProps {
   onJoin: (gamePassword?: string) => void,
   onLeave: () => void,
+  imInTheGame: boolean,
+  disabledButtons: boolean,
 }
 
 const GameItem = (props: IuiGameListItem & IProps) => {
@@ -99,12 +101,12 @@ const GameItem = (props: IuiGameListItem & IProps) => {
         <Button
           variant="success"
           onClick={joinGameClick}
-          disabled={props.imInTheGame}
+          disabled={props.imInTheGame || props.disabledButtons}
         >JOIN GAME</Button>
         <Button
           variant="warning"
           onClick={leaveGameClick}
-          disabled={!props.imInTheGame}
+          disabled={!props.imInTheGame || props.disabledButtons}
         >LEAVE GAME</Button>
       </div>
     );

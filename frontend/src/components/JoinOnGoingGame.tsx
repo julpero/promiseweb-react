@@ -179,23 +179,25 @@ const JoinOnGoingGame = () => {
     });
   };
 
-  const renderOtherJoinButtons = (gameId: string, inActivePlayers?: string[], inActivePlayerSockets? : string[]) => {
+  const renderOtherJoinButtons = (gameId: string, inActivePlayers?: string[], inActivePlayerSockets? : string[], playedByMap?: Map<string, string>) => {
     const buttonsArr: JSX.Element[] = [];
     const freePlayers = Array.from(new Set([ ...inActivePlayers ?? [], ...inActivePlayerSockets ?? [] ]));
     freePlayers.forEach(player => {
-      buttonsArr.push(<Button className="joinOtherButton" key={`joinAs${player}`} size="sm" onClick={() => joinGame(gameId, player, false)} disabled={submitting}>Join as {player}</Button>);
+      if (!playedByMap || !playedByMap.has(player)) {
+        buttonsArr.push(<Button className="joinOtherButton" key={`joinAs${player}`} size="sm" onClick={() => joinGame(gameId, player, false)} disabled={submitting}>Join as {player}</Button>);
+      }
     });
     return buttonsArr;
   };
 
-  const renderActions = (gameId: string, imInTheGame: boolean, inActivePlayers?: string[], inActivePlayerSockets?: string[]) => {
+  const renderActions = (gameId: string, imInTheGame: boolean, inActivePlayers?: string[], inActivePlayerSockets?: string[], playedByMap?: Map<string, string>) => {
     const actionArr: JSX.Element[] = [];
     if (imInTheGame) {
       actionArr.push(
         <Button key="joinAsMySelfButton" variant="success" size="sm" onClick={() => joinGame(gameId, user.userName, true)} disabled={submitting}>Re-Join as my self</Button>
       );
     } else if (!imInTheGame) {
-      renderOtherJoinButtons(gameId, inActivePlayers, inActivePlayerSockets).forEach(button => {
+      renderOtherJoinButtons(gameId, inActivePlayers, inActivePlayerSockets, playedByMap).forEach(button => {
         actionArr.push(button);
         actionArr.push();
       });
@@ -214,7 +216,9 @@ const JoinOnGoingGame = () => {
     if (gameItemList.length === 0) {
       return "No on going games at the moment, why don't you just create one by your self?";
     }
-    return gameItemList.map(({created, id, humanPlayers, imInTheGame, inActivePlayers, inActivePlayerSockets, playedBy}: IuiGameListItem, ind) => {
+    return gameItemList.map(({created, id, humanPlayers, inActivePlayers, inActivePlayerSockets, playedBy}: IuiGameListItem, ind) => {
+      const playedByMap: Map<string, string> | undefined = playedBy ? new Map(JSON.parse(playedBy)) : undefined;
+      const imInTheGame = humanPlayers.some(player => player === user.userName) || Array.from(playedByMap?.values() ?? []).includes(user.userName);
       return(
         <div key={ind} className="row">
           {ind > 0 &&
@@ -227,7 +231,7 @@ const JoinOnGoingGame = () => {
             {renderPlayerList(humanPlayers, playedBy)}
           </div>
           <div className="col">
-            {renderActions(id, imInTheGame, inActivePlayers, inActivePlayerSockets)}
+            {renderActions(id, imInTheGame, inActivePlayers, inActivePlayerSockets, playedByMap)}
           </div>
           <div className="col">
             {renderObserveButton(id, imInTheGame)}

@@ -347,7 +347,9 @@ connectDB().then(() => {
           const gameIdStr = createGameResponse.newGameId;
           socket.join(gameIdStr);
           csm.addUserToMap(userName, socket.id, timestamp, gameIdStr);
-          io.to("waiting lobby").emit("new game created");
+
+          const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(createGameRequest, GAME_STATUS.created);
+          io.to("waiting lobby").emit("new game created", getGameListResponse.games);
         }
         csm.setLastTimestamp(userName, socket.id, timestamp);
         const newToken = signUserToken(userName, uuid, timestamp);
@@ -428,12 +430,14 @@ connectDB().then(() => {
       if (isAuthenticated) {
         const joinResponse: IuiJoinLeaveGameResponse = await joinGame(joinGameRequest);
         const timestamp = Date.now();
-        if (joinResponse.joinLeaveResult !== JOIN_LEAVE_RESULT.notOk) {
+        if (joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.ok || joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.lastOk) {
           socket.join(gameId);
           csm.addUserToMap(userName, socket.id, timestamp, gameId);
           csm.clearWaiting(userName);
           // notify other users
-          io.to("waiting lobby").emit("game list updated");
+          const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(joinGameRequest, GAME_STATUS.created);
+          joinResponse.games = getGameListResponse.games;
+          io.to("waiting lobby").emit("game list updated", joinResponse.games);
         }
         if (joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.lastOk) {
           // notify all games players about game start
@@ -461,11 +465,13 @@ connectDB().then(() => {
 
       if (isAuthenticated) {
         const leaveResponse: IuiJoinLeaveGameResponse = await leaveGame(leaveGameRequest);
+        const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(leaveGameRequest, GAME_STATUS.created);
+        leaveResponse.games = getGameListResponse.games;
         if (leaveResponse.joinLeaveResult === JOIN_LEAVE_RESULT.ok) {
           socket.leave(gameId);
           csm.removeUserFromGame(userName, gameId);
           // notify other users
-          io.emit("game list updated");
+          io.emit("game list updated", leaveResponse.games);
         }
         const timestamp = Date.now();
         csm.setLastTimestamp(userName, socket.id, timestamp);
