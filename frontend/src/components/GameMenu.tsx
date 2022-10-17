@@ -314,6 +314,11 @@ const GameMenu = () => {
       </div>
 
       {renderRequest()}
+      {currentGameInfo.thisIsDemoGame &&
+        <div>
+          I AM: {user.userName}
+        </div>
+      }
 
       <Modal show={showLeaveModal()} onHide={() => setLeaveGameModal(false)}>
         <Modal.Header closeButton>
