@@ -25,17 +25,17 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
 
   if (gameInDb.gameStatus !== GAME_STATUS.created) {
     console.warn("wrong game status", gameInDb.gameStatus);
-    return JOIN_LEAVE_RESULT.notOk;
+    return JOIN_LEAVE_RESULT.gameIsOn;
   }
 
   if (gameInDb.humanPlayers.length === gameInDb.humanPlayersCount) {
     console.warn("wrong human players length", gameInDb.humanPlayers.length, gameInDb.humanPlayersCount);
-    return JOIN_LEAVE_RESULT.notOk;
+    return JOIN_LEAVE_RESULT.gameFull;
   }
 
   if (gameInDb.humanPlayers.find(player => player.name === joinGameRequest.userName) !== undefined) {
     console.warn("player name is already in game", joinGameRequest.userName);
-    return JOIN_LEAVE_RESULT.notOk;
+    return JOIN_LEAVE_RESULT.alreadyInGame;
   }
 
   const newPlayerStats = await getPlayerStats(gameInDb, joinGameRequest.userName);

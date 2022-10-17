@@ -1,7 +1,7 @@
 import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickRequest, IuiReNameNickResponse } from "../interfaces/IuiAdminOperations";
 import { IuiChatNotification } from "../interfaces/IuiChat";
 import { IuiCheckIfOngoingGameResponse } from "../interfaces/IuiCheckIfOngoingGame";
-import { IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse } from "../interfaces/IuiGameList";
+import { IuiGameListItem, IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse } from "../interfaces/IuiGameList";
 import { IuiPlayedGamesReport } from "../interfaces/IuiGameReports";
 import { IuiAllowPlayerToJoinRequest, IuiAllowPlayerToJoinResponse, IuiAllowPlayerToObserveRequest, IuiAllowPlayerToObserveResponse, IuiJoinOngoingGame, IuiJoinOngoingGameResponse, IuiObserveGameRequest, IuiObserveGameResponse, IuiPlayerJoinedOnGoingGameNotification, IuiPlayerObservingNotification, IuiPlayerWantsToJoinNotification, IuiPlayersWantsToObserveNotification } from "../interfaces/IuiJoinOngoingGame";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse } from "../interfaces/IuiLeaveOngoingGame";
@@ -25,8 +25,8 @@ import { IuiAuth, IuiLoginRequest, IuiLoginResponse, IuiRefreshLoginResponse, Iu
 export interface ServerToClientEvents {
   "new chat line": (chatObj: IuiChatNotification) => void;
 
-  "new game created": () => void;
-  "game list updated": () => void;
+  "new game created": (gameList: IuiGameListItem[]) => void;
+  "game list updated": (gameList: IuiGameListItem[]) => void;
   "changes in game players": () => void;
 
   "game begins": (gameBeginsNotification: IuiGameBeginsNotification) => void;
