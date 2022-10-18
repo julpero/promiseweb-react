@@ -35,6 +35,7 @@ const gameOptionsSchema: Schema = new Schema<IGameOptions>({
 }, {
   collection: PROMISEWEB_COLLECTION,
   timestamps: true,
+  optimisticConcurrency: true,
 });
 
 export default model<IGameOptions>("GameOptions", gameOptionsSchema);
