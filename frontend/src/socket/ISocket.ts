@@ -8,6 +8,7 @@ import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse } from "../inte
 import { IuiCreateGameRequest, IuiCreateGameResponse } from "../interfaces/IuiNewGame";
 import {
   IuiCardPlayedNotification,
+  IuiEndGameRequest,
   IuiGameBeginsNotification,
   IuiGetGameInfoRequest,
   IuiGetGameInfoResponse,
@@ -70,6 +71,7 @@ export interface ClientToServerEvents {
   "get round": (getRoundRequest: IuiGetRoundRequest, fn: (roundResponse: IuiGetRoundResponse) => void) => void;
   "make promise": (promiseRequest: IuiMakePromiseRequest, fn: (promiseResponse: IuiMakePromiseResponse) => void) => void;
   "play card": (playCardRequest: IuiPlayCardRequest, fn: (playCardResponse: IuiPlayCardResponse) => void) => void;
+  "end game": (playCardRequest: IuiEndGameRequest) => void;
 
   "get report data": (request: IuiUserData, fn: (reportResponse: IuiPlayedGamesReport) => void) => void;
   "get game report": (reportRequest: IuiGetOneGameReportRequest, fn: (reportResponse: IuiOneGameReport) => void) => void;
