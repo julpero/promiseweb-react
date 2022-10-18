@@ -1,6 +1,8 @@
 import { test, expect } from "@playwright/test";
-import { testCheckLoginSuccess, testLogIn } from "./commons/methods";
+import { timeOut } from "./commons/constants";
+import { confirmLeavingOnGoingGame, testCheckLoginSuccess, testGameBoardVisible, testLogIn } from "./commons/methods";
 import { pageUrl, ekaUser, tokaUser, vikaUser } from "./commons/testvariables";
+import { buttonText, notificationText } from "./commons/texts";
 
 test.describe.configure({ mode: "parallel" });
 
@@ -12,13 +14,16 @@ test.beforeEach(async ({page}) => {
 });
 
 test("Play game as creator Eka", async ({ page }) => {
+  const currentUser = ekaUser;
+  const myName = currentUser.name;
+
   try {
     await testLogIn(page, ekaUser);
     await testCheckLoginSuccess(page);
 
-    const createGameAccordionButton = page.locator("button", {hasText: /Create New Game/});
+    const createGameAccordionButton = page.locator("button", {hasText: "Create New Game"});
     await createGameAccordionButton.click();
-    const createGameButton = page.locator("button", {hasText: /Create Game/});
+    const createGameButton = page.locator("button", {hasText: "Create Game"});
     await expect(createGameButton).toBeVisible();
     await expect(createGameButton).toBeEnabled();
 
@@ -27,6 +32,7 @@ test("Play game as creator Eka", async ({ page }) => {
     await createGameButton.click();
 
     await expect(page.locator("li", {hasText: ekaUser.name})).toHaveCount(1);
+    console.log("Eka created game");
 
     const joinGameButton = page.locator("button", {hasText: `JOIN GAME - created by ${ekaUser.name}`});
     const leaveGameButton = page.locator("button", {hasText: `LEAVE GAME - created by ${ekaUser.name}`});
@@ -37,30 +43,38 @@ test("Play game as creator Eka", async ({ page }) => {
     await expect(leaveGameButton).toBeVisible();
     await expect(leaveGameButton).toBeEnabled();
 
-    await expect(page.locator("li", {hasText: tokaUser.name})).toHaveCount(1);
-    await expect(page.locator("li", {hasText: vikaUser.name})).toHaveCount(1);
+    console.log(`${myName} buttons ok`);
 
-    await leaveGameButton.click();
+    // should be game visible game board
+    const leaveOngoingGameButton = page.locator("button", {hasText: buttonText.leaveOnGoingGame});
+    await expect(leaveOngoingGameButton).toBeVisible({timeout: timeOut.eternity});
+    await expect(leaveOngoingGameButton).toBeEnabled();
+    console.log(`${myName} visible game board`);
+    await leaveOngoingGameButton.click();
 
-    await expect(page.getByText("No open games at the moment, why don't you just create one by your self?")).toHaveCount(1);
+    await confirmLeavingOnGoingGame(page);
   } catch (e) {
-    await page.screenshot({ path: "playwright-images/screenshot_eka.png", fullPage: true });
+    await page.screenshot({ path: `playwright-images/screenshot_${myName}.png`, fullPage: true });
     throw e;
   }
 });
 
 test("Play game as Toka", async ({ page }) => {
+  const creatorUser = ekaUser;
+  const currentUser = tokaUser;
+  const myName = currentUser.name;
+
   try {
-    await testLogIn(page, tokaUser);
+    await testLogIn(page, currentUser);
     await testCheckLoginSuccess(page);
 
-    const createGameAccordionButton = page.locator("button", {hasText: /Open Games/});
+    const createGameAccordionButton = page.locator("button", {hasText: "Open Games"});
     await createGameAccordionButton.click();
 
-    await expect(page.locator("li", {hasText: ekaUser.name})).toHaveCount(1);
+    await expect(page.locator("li", {hasText: creatorUser.name})).toHaveCount(1);
 
-    const joinGameButton = page.locator("button", {hasText: `JOIN GAME - created by ${ekaUser.name}`});
-    const leaveGameButton = page.locator("button", {hasText: `LEAVE GAME - created by ${ekaUser.name}`});
+    const joinGameButton = page.locator("button", {hasText: `JOIN GAME - created by ${creatorUser.name}`});
+    const leaveGameButton = page.locator("button", {hasText: `LEAVE GAME - created by ${creatorUser.name}`});
 
     await expect(joinGameButton).toBeVisible();
     await expect(joinGameButton).toBeEnabled();
@@ -68,56 +82,63 @@ test("Play game as Toka", async ({ page }) => {
     await expect(leaveGameButton).toBeVisible();
     await expect(leaveGameButton).toBeDisabled();
 
+    console.log(`${myName} buttons ok`);
+
+    // Toka joins second
     await joinGameButton.click();
 
-    try {
-      await expect(page.locator("li", {hasText: tokaUser.name})).toHaveCount(1);
-    } catch (e) {
-      // possible error -> retry
-      const closeErrorButton = page.locator("button", {hasText: "Close"});
-      await expect(closeErrorButton).toBeVisible();
-      await expect(closeErrorButton).toBeEnabled();
-      closeErrorButton.click();
-      await expect(joinGameButton).toBeVisible();
-      await expect(joinGameButton).toBeEnabled();
-      await joinGameButton.click();
-      await expect(page.locator("li", {hasText: tokaUser.name})).toHaveCount(1);
-    }
+    // should be game visible game board
+    const leaveOngoingGameButton = await testGameBoardVisible(page);
+    console.log(`${myName} visible game board B`);
+    await expect(page.getByText(`${ekaUser.name} has left the game!`)).toHaveCount(1);
+    await leaveOngoingGameButton.click();
 
-    await expect(joinGameButton).toBeVisible();
-    await expect(joinGameButton).toBeDisabled();
-
-    await expect(leaveGameButton).toBeVisible();
-    await expect(leaveGameButton).toBeEnabled();
-
-    await leaveGameButton.click();
-
-    await expect(page.getByText("No open games at the moment, why don't you just create one by your self?")).toHaveCount(1);
+    await confirmLeavingOnGoingGame(page);
   } catch (e) {
-    await page.screenshot({ path: "playwright-images/screenshot_toka.png", fullPage: true });
+    await page.screenshot({ path: `playwright-images/screenshot_${myName}.png`, fullPage: true });
     throw e;
   }
 });
 
-// test("Play game as Vika", async ({ page }) => {
-//   const creatorUser = ekaUser;
-//   const currentUser = vikaUser;
+test("Play game as Vika", async ({ page }) => {
+  const creatorUser = ekaUser;
+  const currentUser = vikaUser;
+  const myName = currentUser.name;
 
-//   try {
-//     await testLogIn(page, currentUser);
-//     await testCheckLoginSuccess(page);
+  try {
+    await testLogIn(page, currentUser);
+    await testCheckLoginSuccess(page);
 
-//     await expect(joinGameButton).toBeVisible();
-//     await expect(joinGameButton).toBeDisabled();
+    const createGameAccordionButton = page.locator("button", {hasText: "Open Games"});
+    await createGameAccordionButton.click();
 
-//     await expect(leaveGameButton).toBeVisible();
-//     await expect(leaveGameButton).toBeEnabled();
+    await expect(page.locator("li", {hasText: creatorUser.name})).toHaveCount(1);
 
-//     await leaveGameButton.click();
+    const joinGameButton = page.locator("button", {hasText: `JOIN GAME - created by ${creatorUser.name}`});
+    const leaveGameButton = page.locator("button", {hasText: `LEAVE GAME - created by ${creatorUser.name}`});
 
-//     await expect(page.getByText("No open games at the moment, why don't you just create one by your self?")).toHaveCount(1);
-//   } catch (e) {
-//     await page.screenshot({ path: "playwright-images/screenshot_vika.png", fullPage: true });
-//     throw e;
-//   }
-// });
+    await expect(joinGameButton).toBeVisible();
+    await expect(joinGameButton).toBeEnabled();
+
+    await expect(leaveGameButton).toBeVisible();
+    await expect(leaveGameButton).toBeDisabled();
+
+    console.log(`${myName} buttons ok`);
+
+    // Vika joins last, wait until Toka has joined
+    await expect(page.locator("li", {hasText: tokaUser.name})).toHaveCount(1);
+
+    await joinGameButton.click();
+
+    // should be game visible game board
+    const leaveOngoingGameButton = await testGameBoardVisible(page);
+    console.log(`${myName} visible game board B`);
+    await expect(page.getByText(`${tokaUser.name} has left the game!`)).toHaveCount(1);
+    await leaveOngoingGameButton.click();
+
+    await confirmLeavingOnGoingGame(page);
+  } catch (e) {
+    await page.screenshot({ path: `playwright-images/screenshot_${myName}.png`, fullPage: true });
+    throw e;
+  }
+});

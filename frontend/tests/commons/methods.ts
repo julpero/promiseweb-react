@@ -1,5 +1,7 @@
-import { expect, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
+import { timeOut } from "./constants";
 import { ITUser } from "./testvariables";
+import { buttonText, notificationText } from "./texts";
 
 export const testLogIn = async (page: Page, user: ITUser, falsy?: boolean) => {
   const logInButton = page.locator("button", {hasText: /Log In/});
@@ -19,24 +21,22 @@ export const testCheckLoginSuccess = async (page: Page) => {
   await expect(logOutButton).toBeEnabled();
 };
 
-// const openOpenGamesList = async (page: Page, creatorUser: ITUser) => {
-//   try {
-//     const createGameAccordionButton = page.locator("button", {hasText: /Open Games/});
-//     await createGameAccordionButton.click();
+export const testGameBoardVisible = async (page: Page): Promise<Locator> => {
+  const leaveOngoingGameButton = page.locator("button", {hasText: buttonText.leaveOnGoingGame});
+  await expect(leaveOngoingGameButton).toBeVisible({timeout: timeOut.eternity});
+  await expect(leaveOngoingGameButton).toBeEnabled();
+  return leaveOngoingGameButton;
+};
 
-//     try {
-//       await expect(page.locator("li", {hasText: creatorUser.name})).toHaveCount(1);
-//     } catch {
-//       // maybe we just closed the accordion?
-//       // try again
-//       await createGameAccordionButton.click();
-//       await expect(page.locator("li", {hasText: creatorUser.name})).toHaveCount(1);
-//     }
+export const confirmLeavingOnGoingGame = async (page: Page) => {
+  const confirmLeavingButton = page.locator("button", {hasText: buttonText.confirmLeaveOnGoingGame});
+  await expect(confirmLeavingButton).toBeVisible();
+  await expect(confirmLeavingButton).toBeEnabled();
 
-//   } catch (e) {
-//     throw e;
-//   }
-// };
+  await confirmLeavingButton.click();
+
+  await expect(page.getByText(notificationText.leavedGame)).toHaveCount(1);
+};
 
 export const joinGame = async (page: Page, currentUser: ITUser, creatorUser: ITUser) => {
   // await openOpenGamesList(page, creatorUser);

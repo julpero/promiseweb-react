@@ -122,12 +122,21 @@ const GameMenu = () => {
         // console.log("leaveOngoingGameResponse", leaveOngoingGameResponse);
         if (leaveOngoingGameResponse.isAuthenticated) {
           handleAuthenticatedRequest(leaveOngoingGameResponse.token);
-          if (leaveOngoingGameResponse.leaveStatus === LEAVE_ONGOING_GAME_RESULT.leaveOk) {
-            setLeftGameModal(true);
-            setLeaveGameModal(false);
-          } else if (leaveOngoingGameResponse.leaveStatus === LEAVE_ONGOING_GAME_RESULT.gameDismissed) {
-            setGameDismissedModal(true);
-            setLeaveGameModal(false);
+          switch (leaveOngoingGameResponse.leaveStatus) {
+            case LEAVE_ONGOING_GAME_RESULT.leaveOk: {
+              setLeftGameModal(true);
+              setLeaveGameModal(false);
+              break;
+            }
+            case LEAVE_ONGOING_GAME_RESULT.gameDismissed: {
+              setGameDismissedModal(true);
+              setLeaveGameModal(false);
+              break;
+            }
+            default: {
+              // not ok
+              // TODO handle not ok -case
+            }
           }
         } else {
           handleUnauthenticatedRequest(dispatch);
