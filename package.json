@@ -36,7 +36,7 @@
     "card-games-typescript": "^1.2.5",
     "cors": "^2.8.5",
     "dotenv": "^16.0.2",
-    "express": "^4.18.1",
+    "express": "^4.18.2",
     "jsonwebtoken": "^8.5.1",
     "knuth-shuffle": "^1.0.8",
     "mongoose": "^6.6.5",
