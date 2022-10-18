@@ -1,5 +1,7 @@
-import { expect, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
+import { timeOut } from "./constants";
 import { ITUser } from "./testvariables";
+import { buttonText, notificationText } from "./texts";
 
 export const testLogIn = async (page: Page, user: ITUser, falsy?: boolean) => {
   const logInButton = page.locator("button", {hasText: /Log In/});
@@ -17,6 +19,26 @@ export const testCheckLoginSuccess = async (page: Page) => {
   const logOutButton = page.locator("button", {hasText: /Log Out/});
   await expect(logOutButton).toBeVisible();
   await expect(logOutButton).toBeEnabled();
+};
+
+export const testGameBoardVisible = async (page: Page): Promise<Locator> => {
+  const leaveOngoingGameButton = page.locator("button", {hasText: buttonText.leaveOnGoingGame});
+  await expect(leaveOngoingGameButton).toBeVisible({timeout: timeOut.eternity});
+  await expect(leaveOngoingGameButton).toBeEnabled();
+  return leaveOngoingGameButton;
+};
+
+export const confirmLeavingOnGoingGame = async (page: Page, awaitFirst?: string) => {
+  const confirmLeavingButton = page.locator("button", {hasText: buttonText.confirmLeaveOnGoingGame});
+  await expect(confirmLeavingButton).toBeVisible();
+  await expect(confirmLeavingButton).toBeEnabled();
+
+  if (awaitFirst) {
+    await expect(page.getByText(`${awaitFirst} has left the game!`)).toHaveCount(1);
+  }
+  await confirmLeavingButton.click();
+
+  await expect(page.getByText(notificationText.leavedGame)).toHaveCount(1);
 };
 
 // const openOpenGamesList = async (page: Page, creatorUser: ITUser) => {
