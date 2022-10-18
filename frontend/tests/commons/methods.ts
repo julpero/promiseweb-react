@@ -28,37 +28,15 @@ export const testGameBoardVisible = async (page: Page): Promise<Locator> => {
   return leaveOngoingGameButton;
 };
 
-export const confirmLeavingOnGoingGame = async (page: Page, awaitFirst?: string) => {
+export const confirmLeavingOnGoingGame = async (page: Page) => {
   const confirmLeavingButton = page.locator("button", {hasText: buttonText.confirmLeaveOnGoingGame});
   await expect(confirmLeavingButton).toBeVisible();
   await expect(confirmLeavingButton).toBeEnabled();
 
-  if (awaitFirst) {
-    await expect(page.getByText(`${awaitFirst} has left the game!`)).toHaveCount(1);
-  }
   await confirmLeavingButton.click();
 
   await expect(page.getByText(notificationText.leavedGame)).toHaveCount(1);
 };
-
-// const openOpenGamesList = async (page: Page, creatorUser: ITUser) => {
-//   try {
-//     const createGameAccordionButton = page.locator("button", {hasText: /Open Games/});
-//     await createGameAccordionButton.click();
-
-//     try {
-//       await expect(page.locator("li", {hasText: creatorUser.name})).toHaveCount(1);
-//     } catch {
-//       // maybe we just closed the accordion?
-//       // try again
-//       await createGameAccordionButton.click();
-//       await expect(page.locator("li", {hasText: creatorUser.name})).toHaveCount(1);
-//     }
-
-//   } catch (e) {
-//     throw e;
-//   }
-// };
 
 export const joinGame = async (page: Page, currentUser: ITUser, creatorUser: ITUser) => {
   // await openOpenGamesList(page, creatorUser);

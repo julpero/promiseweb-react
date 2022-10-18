@@ -52,15 +52,7 @@ test("Play game as creator Eka", async ({ page }) => {
     console.log(`${myName} visible game board`);
     await leaveOngoingGameButton.click();
 
-    const confirmLeavingButton = page.locator("button", {hasText: buttonText.confirmLeaveOnGoingGame});
-    await expect(confirmLeavingButton).toBeVisible();
-    await expect(confirmLeavingButton).toBeEnabled();
-    console.log(`${myName} leaving game`);
-    // Eka leaves first
-    await confirmLeavingButton.click();
-
-    await expect(page.getByText(notificationText.leavedGame)).toHaveCount(1);
-
+    await confirmLeavingOnGoingGame(page);
   } catch (e) {
     await page.screenshot({ path: `playwright-images/screenshot_${myName}.png`, fullPage: true });
     throw e;
@@ -98,9 +90,10 @@ test("Play game as Toka", async ({ page }) => {
     // should be game visible game board
     const leaveOngoingGameButton = await testGameBoardVisible(page);
     console.log(`${myName} visible game board B`);
+    await expect(page.getByText(`${ekaUser.name} has left the game!`)).toHaveCount(1);
     await leaveOngoingGameButton.click();
 
-    await confirmLeavingOnGoingGame(page, ekaUser.name);
+    await confirmLeavingOnGoingGame(page);
   } catch (e) {
     await page.screenshot({ path: `playwright-images/screenshot_${myName}.png`, fullPage: true });
     throw e;
@@ -140,9 +133,10 @@ test("Play game as Vika", async ({ page }) => {
     // should be game visible game board
     const leaveOngoingGameButton = await testGameBoardVisible(page);
     console.log(`${myName} visible game board B`);
+    await expect(page.getByText(`${tokaUser.name} has left the game!`)).toHaveCount(1);
     await leaveOngoingGameButton.click();
 
-    await confirmLeavingOnGoingGame(page, tokaUser.name);
+    await confirmLeavingOnGoingGame(page);
   } catch (e) {
     await page.screenshot({ path: `playwright-images/screenshot_${myName}.png`, fullPage: true });
     throw e;
