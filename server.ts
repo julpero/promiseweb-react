@@ -73,7 +73,7 @@ connectDB().then(() => {
     if (pingPong.returnId) {
       const deleteOk = await deletePing(pingPong.returnId);
       if (deleteOk) {
-        console.timeEnd("ping");
+        // console.timeEnd("ping");
         res.send({now: now, ver: ver});
         return null;
       }
