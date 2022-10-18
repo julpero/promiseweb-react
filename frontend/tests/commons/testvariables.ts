@@ -1,5 +1,5 @@
-export const pageUrl = "https://promiseweb.azurewebsites.net/";
-// export const pageUrl = "http://localhost:3000/";
+// export const pageUrl = "https://promiseweb.azurewebsites.net/";
+export const pageUrl = process.env.PLAYWRIGHT_TEST_BASE_URL ?? "http://localhost:3000/";
 
 export interface ITUser {
   name: string,
