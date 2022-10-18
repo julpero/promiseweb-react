@@ -224,3 +224,7 @@ export interface IuiCardPlayedNotification {
   winCount?: number,
   newDealer?: string,
 }
+
+export interface IuiEndGameRequest extends IuiUserData {
+  gameId: string,
+}

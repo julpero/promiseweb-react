@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 import { GAME_STATUS, ROUND_STATUS } from "../interfaces/IuiGameOptions";
-import { IuiCardPlayedNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, ROUND_PHASE } from "../interfaces/IuiPlayingGame";
+import { IuiCardPlayedNotification, IuiEndGameRequest, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, ROUND_PHASE } from "../interfaces/IuiPlayingGame";
 import { useSocket } from "../socket";
 import { AnimateCard, setAnimateCard } from "../store/animateCardSlice";
 import { getCurrentGameId, getCurrentGameInfo, setGameInfo } from "../store/gameInfoSlice";
@@ -29,7 +29,7 @@ const EffectHandler = () => {
 
   useEffect(() => {
     // console.log("getRoundInfoRequest", getRoundInfoRequest);
-    if (getRoundInfoRequest) {
+    if (user.isUserLoggedIn && getRoundInfoRequest) {
       const getRoundRequest = { ...getRoundInfoRequest };
       // console.log("use effect, getRoundRequest", getRoundRequest);
 
@@ -38,12 +38,22 @@ const EffectHandler = () => {
         if (roundResponse.isAuthenticated) {
           handleAuthenticatedRequest(roundResponse.token);
           dispatch(setRoundInfo(roundResponse));
+          if (roundResponse.roundToPlayer.gameOver) {
+            // console.log("GAME OVER");
+            const endGameRequest: IuiEndGameRequest = {
+              uuid: getMyId(),
+              userName: user.userName,
+              token: getToken(),
+              gameId: roundResponse.gameId,
+            };
+            socket.emit("end game", endGameRequest);
+          }
         } else {
           handleUnauthenticatedRequest(dispatch);
         }
       });
     }
-  }, [getRoundInfoRequest, socket, dispatch]);
+  }, [user, getRoundInfoRequest, socket, dispatch]);
 
   useEffect(() => {
     // console.log("EffectHandler, gameId", gameId);

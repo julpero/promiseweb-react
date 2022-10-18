@@ -1,5 +1,5 @@
 import { HIDDEN_CARDS_MODE, IuiRoundInfo, RULE } from "./IuiGameOptions";
-import { IuiAuth, IuiUserData, LOGIN_RESPONSE } from "./IuiUser";
+import { IuiAuth, IuiUserData } from "./IuiUser";
 
 export interface IuiRules {
   ruleList: RULE[],
@@ -12,7 +12,6 @@ export interface IuiGameListItem {
   id: string,
   rules: IuiRules,
   humanPlayers: string[],
-  imInTheGame: boolean,
   playerCount: number,
   gameHasPassword: boolean,
   inActivePlayers?: string[],
@@ -34,10 +33,14 @@ export enum JOIN_LEAVE_RESULT {
   ok,
   notOk,
   lastOk,
+  alreadyInGame,
+  notInGame,
+  gameFull,
+  gameIsOn,
 }
 
 export interface IuiJoinLeaveGameResponse extends IuiAuth {
   joinLeaveResult: JOIN_LEAVE_RESULT,
-  loginStatus: LOGIN_RESPONSE,
   startGame?: boolean,
+  games?: IuiGameListItem[],
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { useSocket } from "../socket";
 import GameItem from "./GameItem";
 import {
@@ -9,15 +9,15 @@ import {
   JOIN_LEAVE_RESULT
 } from "../interfaces/IuiGameList";
 import { Button, Modal } from "react-bootstrap";
-import { IuiUserData, LOGIN_RESPONSE } from "../interfaces/IuiUser";
+import { IuiUserData } from "../interfaces/IuiUser";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../store/userSlice";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 
 const OpenGamesList = () => {
   const [ gameItemList, setGameItemList ] = useState<IuiGameListItem[]>([]);
-  const [ loginStatus, setLoginStatus ] = useState<LOGIN_RESPONSE | null>(null);
   const [ joinLeaveStatus, setJoinLeaveStatus ] = useState<JOIN_LEAVE_RESULT | null>(null);
+  const [disabledButtons, setDisabledButtons] = useState(true);
   const user = useSelector(getUser);
 
   const dispatch = useDispatch();
@@ -27,43 +27,48 @@ const OpenGamesList = () => {
   const getMyId = (): string => window.localStorage.getItem("uUID") ?? "";
   const getToken = (): string => window.localStorage.getItem("token") ?? "";
 
-  const fetchGameItemList = useCallback(() => {
-    if (user.isUserLoggedIn) {
-      const gameListRequest: IuiUserData = {
-        uuid: getMyId(),
-        userName: user.userName,
-        token: getToken(),
-      };
-      socket.emit("get open games", gameListRequest, (gameList: IuiGetGameListResponse) => {
-        // console.log("gameList", gameList);
-        if (gameList.isAuthenticated) {
-          handleAuthenticatedRequest(gameList.token);
-          setGameItemList(gameList.games);
-        } else {
-          handleUnauthenticatedRequest(dispatch);
-        }
-      });
-    }
-  }, [user, dispatch, socket]);
-
   useEffect(() => {
+    const fetchGameItemList = () => {
+      if (user.isUserLoggedIn) {
+        const gameListRequest: IuiUserData = {
+          uuid: getMyId(),
+          userName: user.userName,
+          token: getToken(),
+        };
+        setDisabledButtons(true);
+        socket.emit("get open games", gameListRequest, (gameList: IuiGetGameListResponse) => {
+          // console.log("gameList", gameList);
+          if (gameList.isAuthenticated) {
+            handleAuthenticatedRequest(gameList.token);
+            setGameItemList(gameList.games);
+          } else {
+            handleUnauthenticatedRequest(dispatch);
+          }
+          setDisabledButtons(false);
+        });
+      }
+    };
+
     fetchGameItemList();
 
-    socket.on("new game created", () => {
-      fetchGameItemList();
+    socket.on("new game created", (gameList: IuiGameListItem[]) => {
+      // console.log("new game created", gameList);
+      setGameItemList(gameList);
     });
 
-    socket.on("game list updated", () => {
-      fetchGameItemList();
+    socket.on("game list updated", (gameList: IuiGameListItem[]) => {
+      // console.log("game list updated", gameList);
+      setGameItemList(gameList);
     });
 
     return () => {
       socket.off("new game created");
       socket.off("game list updated");
     };
-  }, [socket, fetchGameItemList]);
+  }, [user, dispatch, socket]);
 
   const joinGameMethod = (gameId: string, password?: string) => {
+    if (disabledButtons) return;
     const joinGameRequest: IuiJoinLeaveGameRequest = {
       userName: user.userName,
       uuid: getMyId(),
@@ -75,6 +80,7 @@ const OpenGamesList = () => {
   };
 
   const leaveGameMethod = (gameId: string) => {
+    if (disabledButtons) return;
     const leaveGameRequest: IuiJoinLeaveGameRequest = {
       userName: user.userName,
       uuid: getMyId(),
@@ -86,64 +92,48 @@ const OpenGamesList = () => {
   };
 
   const createGameErrorStr = (): string => {
-    switch (loginStatus) {
-      case LOGIN_RESPONSE.passwordFails: {
-        return "Password doesn't match!";
-      }
-      case LOGIN_RESPONSE.passwordMismatch: {
-        return "Password doesn't match!";
-      }
-      case LOGIN_RESPONSE.password2Empty: {
-        return "New username, enter password to both fields!";
-      }
-      case LOGIN_RESPONSE.passwordShort: {
-        return "Password must be at least four characters long!";
-      }
-    }
     return "Unexpected error";
   };
 
   const handleErrorClose = (): void => {
-    setLoginStatus(null);
     setJoinLeaveStatus(null);
   };
 
   const createGameErrorHeaderStr = (): string => {
-    if (loginStatus) {
-      return "Check your password";
-    }
     return "Error";
   };
 
   const joinGame = (joinGameRequest: IuiJoinLeaveGameRequest) => {
+    setDisabledButtons(true);
     socket.emit("join game", joinGameRequest, (response: IuiJoinLeaveGameResponse) => {
       // console.log("join response", response);
       if (response.isAuthenticated) {
         handleAuthenticatedRequest(response.token);
-        setLoginStatus(response.loginStatus);
         setJoinLeaveStatus(response.joinLeaveResult);
-        if (response.loginStatus !== LOGIN_RESPONSE.ok || response.joinLeaveResult === JOIN_LEAVE_RESULT.notOk) {
-          fetchGameItemList();
+        if (response.games) {
+          setGameItemList(response.games);
         }
       } else {
         handleUnauthenticatedRequest(dispatch);
       }
+      setDisabledButtons(false);
     });
   };
 
   const leaveGame = (leaveGameRequest: IuiJoinLeaveGameRequest) => {
+    setDisabledButtons(true);
     socket.emit("leave game", leaveGameRequest, (response: IuiJoinLeaveGameResponse) => {
       // console.log("leave response", response);
       if (response.isAuthenticated) {
         handleAuthenticatedRequest(response.token);
-        setLoginStatus(response.loginStatus);
         setJoinLeaveStatus(response.joinLeaveResult);
-        if (response.loginStatus !== LOGIN_RESPONSE.ok || response.joinLeaveResult === JOIN_LEAVE_RESULT.notOk) {
-          fetchGameItemList();
+        if (response.games) {
+          setGameItemList(response.games);
         }
       } else {
         handleUnauthenticatedRequest(dispatch);
       }
+      setDisabledButtons(false);
     });
   };
 
@@ -151,7 +141,7 @@ const OpenGamesList = () => {
     if (gameItemList.length === 0) {
       return "No open games at the moment, why don't you just create one by your self?";
     }
-    return gameItemList.map(({created, id, rules, humanPlayers, imInTheGame, playerCount, gameHasPassword, creator}: IuiGameListItem) => {
+    return gameItemList.map(({created, id, rules, humanPlayers, playerCount, gameHasPassword, creator}: IuiGameListItem) => {
       return(
         <GameItem
           key={id}
@@ -159,11 +149,12 @@ const OpenGamesList = () => {
           id={id}
           rules={rules}
           humanPlayers={humanPlayers}
-          imInTheGame={imInTheGame}
+          imInTheGame={humanPlayers.some(player => player === user.userName)}
           playerCount= {playerCount}
           gameHasPassword={gameHasPassword}
           onJoin={(gamePassword?: string) => {joinGameMethod(id, gamePassword);}}
           onLeave={() => {leaveGameMethod(id);}}
+          disabledButtons={disabledButtons}
           creator={creator}
         />
       );
@@ -175,7 +166,7 @@ const OpenGamesList = () => {
       {renderGameItems()}
 
       <Modal
-        show={((loginStatus || (joinLeaveStatus !== null && joinLeaveStatus === JOIN_LEAVE_RESULT.notOk))) as boolean }
+        show={(joinLeaveStatus !== null && joinLeaveStatus === JOIN_LEAVE_RESULT.notOk) as boolean }
         onHide={handleErrorClose}
       >
         <Modal.Header closeButton>
