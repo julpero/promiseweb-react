@@ -5,6 +5,7 @@ import { GAME_STATUS, HIDDEN_CARDS_MODE } from "../../frontend/src/interfaces/Iu
 export interface IGameForList {
   id: string,
   createDateTime: Date,
+  adminName: string,
   humanPlayersCount: number,
   gameStatistics?: IGameStatistics,
   humanPlayers: IHumanPlayer[],
@@ -36,6 +37,7 @@ export const getGamesByStatus = async (gameStatus: GAME_STATUS): Promise<IGameFo
     _id: 1,
     createDateTime: 1,
     humanPlayersCount: 1,
+    adminName: 1,
     gameStatistics: 1,
     humanPlayers: 1,
     startRound: 1,

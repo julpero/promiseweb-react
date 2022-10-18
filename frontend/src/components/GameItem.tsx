@@ -102,12 +102,12 @@ const GameItem = (props: IuiGameListItem & IProps) => {
           variant="success"
           onClick={joinGameClick}
           disabled={props.imInTheGame || props.disabledButtons}
-        >JOIN GAME</Button>
+        >JOIN GAME - created by <i>{props.creator}</i></Button>
         <Button
           variant="warning"
           onClick={leaveGameClick}
           disabled={!props.imInTheGame || props.disabledButtons}
-        >LEAVE GAME</Button>
+        >LEAVE GAME - created by <i>{props.creator}</i></Button>
       </div>
     );
   };
