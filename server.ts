@@ -19,7 +19,7 @@ import { CREATE_GAME_STATUS, IuiCreateGameRequest, IuiCreateGameResponse } from 
 import { IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IuiGameList";
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameResponse } from "./frontend/src/interfaces/IuiCheckIfOngoingGame";
 import { CHAT_TYPE, IuiChatNotification, IuiChatObj } from "./frontend/src/interfaces/IuiChat";
-import { IuiCardPlayedNotification, IuiGameBeginsNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, PLAY_CARD_RESPONSE, PROMISE_RESPONSE } from "./frontend/src/interfaces/IuiPlayingGame";
+import { IuiCardPlayedNotification, IuiEndGameRequest, IuiGameBeginsNotification, IuiGetGameInfoRequest, IuiGetGameInfoResponse, IuiGetRoundRequest, IuiGetRoundResponse, IuiMakePromiseRequest, IuiMakePromiseResponse, IuiPlayCardRequest, IuiPlayCardResponse, IuiPromiseMadeNotification, PLAY_CARD_RESPONSE, PROMISE_RESPONSE } from "./frontend/src/interfaces/IuiPlayingGame";
 import { getGameInfo, getRound, makePromise, playCard } from "./backend/actions/playingGame";
 import { GAME_STATUS, ROUND_STATUS } from "./frontend/src/interfaces/IuiGameOptions";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "./frontend/src/interfaces/IuiLeaveOngoingGame";
@@ -838,6 +838,22 @@ connectDB().then(() => {
         return null;
       }
     });
+
+    socket.on("end game", (endGameRequest: IuiEndGameRequest) => {
+      const {userName, gameId, uuid, token} = endGameRequest;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        if (!gameId) {
+          return null;
+        }
+        csm.removeUserFromGame(userName, gameId);
+        socket.leave(gameId);
+        socket.join("waiting lobby");
+      }
+    });
+
     //#endregion PLAYING GAME SOCKETS
 
     socket.on("write chat", async (chatObj: IuiChatObj ) => {
