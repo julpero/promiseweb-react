@@ -8,7 +8,7 @@ import {
   IuiJoinLeaveGameResponse,
   JOIN_LEAVE_RESULT
 } from "../interfaces/IuiGameList";
-import { Modal } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import { IuiUserData } from "../interfaces/IuiUser";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../store/userSlice";
@@ -141,7 +141,7 @@ const OpenGamesList = () => {
     if (gameItemList.length === 0) {
       return "No open games at the moment, why don't you just create one by your self?";
     }
-    return gameItemList.map(({created, id, rules, humanPlayers, playerCount, gameHasPassword}: IuiGameListItem) => {
+    return gameItemList.map(({created, id, rules, humanPlayers, playerCount, gameHasPassword, creator}: IuiGameListItem) => {
       return(
         <GameItem
           key={id}
@@ -155,6 +155,7 @@ const OpenGamesList = () => {
           onJoin={(gamePassword?: string) => {joinGameMethod(id, gamePassword);}}
           onLeave={() => {leaveGameMethod(id);}}
           disabledButtons={disabledButtons}
+          creator={creator}
         />
       );
     });
@@ -176,6 +177,9 @@ const OpenGamesList = () => {
         <Modal.Body>
           {createGameErrorStr()}
         </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" onClick={() => handleErrorClose()}>Close</Button>
+        </Modal.Footer>
       </Modal>
     </React.Fragment>
   );

@@ -30,6 +30,7 @@ export const getOpenGamesList = async (getGameListRequest: IuiUserData, gameStat
       gameHasPassword: openGame.password.length > 0,
       inActivePlayers: openGame.humanPlayers.filter(player => !player.active).map(player => player.name) ?? [],
       playedBy: playedByMap(openGame.humanPlayers),
+      creator: openGame.adminName,
     } as IuiGameListItem);
   });
   // console.log("response", response);
