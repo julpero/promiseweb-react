@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { timeOut } from "./commons/constants";
 import { confirmLeavingOnGoingGame, testCheckLoginSuccess, testGameBoardVisible, testLogIn } from "./commons/methods";
 import { pageUrl, ekaUser, tokaUser, vikaUser } from "./commons/testvariables";
-import { buttonText, notificationText } from "./commons/texts";
+import { buttonText } from "./commons/texts";
 
 test.describe.configure({ mode: "parallel" });
 
