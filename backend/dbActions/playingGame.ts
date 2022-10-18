@@ -272,6 +272,10 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     // (when game is over we calculate more data than just after card hit)
     gameInDb.gameStatistics = generateGameStats(gameInDb.game, response.gameStatusAfterPlay === GAME_STATUS.played);
 
+    if (response.gameStatusAfterPlay === GAME_STATUS.played) {
+      response.winnerOfGame = gameInDb.gameStatistics.winnerName;
+    }
+
     try {
       const gameAfter = await gameInDb.save();
       if (gameAfter) {
