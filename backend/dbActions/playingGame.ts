@@ -114,12 +114,14 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
 
     const now = Date.now();
 
-    // before first promiser there is animation delay of playing and collecting last play of previous round
-    // technically there is no such animation delay in the very first promiser of the game,
-    // but we can add same time because there is some waiting time when redirecting players to cardboard
-    // and rendering it
     const animationTime = getAdditionalTimeToPromise(round.roundPlayers);
-    const promiseTime = now - (gameInDb.game.lastTimeStamp + animationTime);
+    let promiseTime = now - (gameInDb.game.lastTimeStamp + animationTime);
+
+    if (promiseTime < 0) {
+      console.warn("promise too fast, promiseTime", promiseTime);
+      promiseTime = 0;
+    }
+
     round.roundPlayers[promiser.index].promiseStarted = gameInDb.game.lastTimeStamp + animationTime;
     round.roundPlayers[promiser.index].promiseMade = now;
     // TODO Speed promise points
