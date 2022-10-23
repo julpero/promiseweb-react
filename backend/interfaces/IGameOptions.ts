@@ -36,7 +36,7 @@ export interface IGameOptions {
 export interface IHumanPlayer {
   name: string,
   active: boolean,
-  playerStats: IPlayerStats,
+  playerStats?: IPlayerStats,
   playedBy?: string,
 }
 

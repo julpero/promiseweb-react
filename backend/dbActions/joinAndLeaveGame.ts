@@ -2,7 +2,6 @@ import { IuiJoinLeaveGameRequest, JOIN_LEAVE_RESULT } from "../../frontend/src/i
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { IHumanPlayer } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
-import { getPlayerStats } from "../common/common";
 import { startGame } from "../common/initGame";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "../../frontend/src/interfaces/IuiLeaveOngoingGame";
 import { IuiJoinOngoingGame, IuiJoinOngoingGameResponse, JOIN_GAME_STATUS } from "../../frontend/src/interfaces/IuiJoinOngoingGame";
@@ -38,11 +37,9 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
     return JOIN_LEAVE_RESULT.alreadyInGame;
   }
 
-  const newPlayerStats = await getPlayerStats(gameInDb, joinGameRequest.userName);
   const newPlayer: IHumanPlayer = {
     name: joinGameRequest.userName,
     active: true,
-    playerStats: newPlayerStats,
   };
 
   gameInDb.humanPlayers.push(newPlayer);
@@ -51,7 +48,7 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
   if (gameInDb.humanPlayers.length === gameInDb.humanPlayersCount) {
     // start game
     console.log("start game!");
-    gameStartOk = startGame(gameInDb);
+    gameStartOk = await startGame(gameInDb);
     if (gameStartOk) {
       console.log("started game");
     }
