@@ -1,5 +1,4 @@
 import { insertNewGame, hasOngoingOrCreatedGame } from "../dbActions/promiseweb";
-import { getPlayerStats } from "../common/common";
 import { IGameOptions} from "../interfaces/IGameOptions";
 import { IuiCreateGameRequest, IuiCreateGameResponse, CREATE_GAME_STATUS } from "../../frontend/src/interfaces/IuiNewGame";
 import { GAME_STATUS, HIDDEN_CARDS_MODE } from "../../frontend/src/interfaces/IuiGameOptions";
@@ -70,7 +69,6 @@ export const createGame = async (createGameRequest: IuiCreateGameRequest): Promi
     const gameOptions = createGameOptions(createGameRequest);
     // console.log("gameOptions", gameOptions);
 
-    gameOptions.humanPlayers[0].playerStats = await getPlayerStats(gameOptions, gameOptions.adminName);
     const createdGameIdStr = await insertNewGame(gameOptions);
     // console.log("create game - gameOptions inserted with _id: " + createdGameIdStr);
     response.responseStatus = createdGameIdStr ? CREATE_GAME_STATUS.ok : CREATE_GAME_STATUS.notOk;

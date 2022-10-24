@@ -103,13 +103,13 @@ export const getCurrentPlayIndex = (round: IRound): number => {
 
 export const getAdditionalTimeToPromise = (roundPlayers: IRoundPlayer[]): number => {
   let animationTime = 0;
-  if (roundPlayers.filter(player => player.promise !== null)) {
-    animationTime+= ANIMATION_TIMES.playDelay + ANIMATION_TIMES.playDuration + ANIMATION_TIMES.collectDelay + ANIMATION_TIMES.collectDuration;
-  }
 
-  if (animationTime < 0) {
-    console.log("promise too fast animationTime", animationTime);
-    animationTime = 0;
+  // before first promiser there is animation delay of playing and collecting last play of previous round
+  // technically there is no such animation delay in the very first promiser of the game,
+  // but we can add same time because there is some waiting time when redirecting players to cardboard
+  // and rendering it
+  if (!roundPlayers.some(player => player.promise !== null)) {
+    animationTime+= ANIMATION_TIMES.playDelay + ANIMATION_TIMES.playDuration + ANIMATION_TIMES.collectDelay + ANIMATION_TIMES.collectDuration;
   }
 
   // console.log("promise animationTime", animationTime);

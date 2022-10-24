@@ -3,15 +3,16 @@ import { Card, DeckOfCards, Suite } from "card-games-typescript";
 import { ICardPlayed, IGameOptions, IGame, IPlayer, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 import { GAME_STATUS, ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { startRound } from "./game";
+import { getPlayerStats } from "./common";
 
-export const startGame = (gameInDb: IGameOptions): boolean => {
+export const startGame = async (gameInDb: IGameOptions): Promise<boolean> => {
   try {
     gameInDb.game = {
       playerOrder: [],
       rounds: [],
       lastTimeStamp: 0,
     } as IGame;
-    initPlayers(gameInDb);
+    await initPlayers(gameInDb);
     initRounds(gameInDb);
 
     gameInDb.game.lastTimeStamp = Date.now();
@@ -30,7 +31,7 @@ const getDealerPositionIndex = (roundIndex: number, totalPlayers: number): numbe
   return getDealerPositionIndex(roundIndex - totalPlayers, totalPlayers);
 };
 
-const initPlayers = (gameInDb: IGameOptions): void => {
+const initPlayers = async (gameInDb: IGameOptions) => {
   const players: IPlayer[] = gameInDb.humanPlayers.map(player => { return { name: player.name } as IPlayer; });
   gameInDb.game.playerOrder = knuthShuffle(players).map((player) => {
     return {
@@ -38,6 +39,10 @@ const initPlayers = (gameInDb: IGameOptions): void => {
       type: "human",
     } as IPlayer;
   });
+
+  for (let i = 0; i < gameInDb.humanPlayers.length; i++) {
+    gameInDb.humanPlayers[i].playerStats = await getPlayerStats(gameInDb, gameInDb.humanPlayers[i].name);
+  }
   // console.log(gameInDb.game.playerOrder);
 };
 

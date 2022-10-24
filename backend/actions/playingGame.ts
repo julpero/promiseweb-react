@@ -80,7 +80,7 @@ const getHandValues = (round: IRound, roundPhase: ROUND_PHASE, visibleInPromise:
 
 const parsePlayerStats = (gameInDb: IGameOptions, playerName: string): IuiPlayerStats => {
   return {
-    playerAvgPointsInRounds: gameInDb.humanPlayers.find(player => player.name == playerName)?.playerStats.playerAvgPointsInRounds ?? [],
+    playerAvgPointsInRounds: gameInDb.humanPlayers.find(player => player.name == playerName)?.playerStats?.playerAvgPointsInRounds ?? [],
   } as IuiPlayerStats;
 };
 
