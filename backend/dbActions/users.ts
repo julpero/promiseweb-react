@@ -68,7 +68,7 @@ export const checkLogin = async ({userName, userPass1, userPass2, email, needsTo
     // check if password matches
     const passOk = await bcrypt.compare(passStr, user.passHash);
     if (passOk) {
-      console.log("... and login ok!");
+      console.log(`... and ${user.playerName} login ok!`);
       loginObj.result = LOGIN_RESPONSE.ok;
       loginObj.loginOk = true;
     } else {

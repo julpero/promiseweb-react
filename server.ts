@@ -91,16 +91,16 @@ connectDB().then(() => {
       const userName = csm.getUserNameFromMapBySocket(socket.id) ?? "unknown";
       if (userName !== "unknown") {
         gameIdStr = csm.getUserGameFromMap(userName);
-        console.log("mapped gameIdStr", gameIdStr);
+        console.log(`on disconnect - mapped username ${userName} to gameId ${gameIdStr}`);
       }
-      const chatLine = "player " + userName + " disconnected";
-      const chatObj: IuiChatNotification = {
-        chatLine: chatLine,
-        focusedPlayer: userName,
-        type: CHAT_TYPE.disconnect,
-      };
-      // console.log("chat", chatLine);
       if (gameIdStr) {
+        const chatLine = "player " + userName + " disconnected";
+        // console.log("chat", chatLine);
+        const chatObj: IuiChatNotification = {
+          chatLine: chatLine,
+          focusedPlayer: userName,
+          type: CHAT_TYPE.disconnect,
+        };
         io.to(gameIdStr).emit("new chat line", chatObj);
       }
       csm.removeUserSocketsAndGames(userName);
