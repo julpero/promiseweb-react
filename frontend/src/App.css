@@ -11,6 +11,7 @@
 
 body {
   background-color: azure;
+  overflow: hidden;
 }
 
 #gameTableContainer {
@@ -19,10 +20,11 @@ body {
     "cardboard cardboard scoretable"
     "promisetable chat menu";
   grid-template-rows: 1fr 220px;
-  grid-template-columns: auto auto 230px;
+  grid-template-columns: auto auto 260px;
   column-gap: 10px;
   row-gap: 5px;
   height: 100vh;
+  width: 100vw;
   margin: 0;
 }
 
