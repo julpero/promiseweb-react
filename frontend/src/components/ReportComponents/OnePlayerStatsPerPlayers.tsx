@@ -92,12 +92,13 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
       ],
       yAxisID: "y",
       backgroundColor: basicColor,
-      borderWidth: 1,
+      borderColor: "darkgrey",
+      borderWidth: 2,
       hoverBorderWidth: 3,
       pointRadius: 5,
     } as ChartDataset<"bar">);
     accentColors.current.push(basicColor);
-    accentFadedColors.current.push(increase_brightness(basicColor, 95));
+    accentFadedColors.current.push(increase_brightness(basicColor, 65));
 
     label = "4 player";
     basicColor = PlayerCountColor[4];
@@ -118,12 +119,13 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
       ],
       yAxisID: "y",
       backgroundColor: basicColor,
-      borderWidth: 1,
+      borderColor: "darkgrey",
+      borderWidth: 2,
       hoverBorderWidth: 3,
       pointRadius: 5,
     } as ChartDataset<"bar">);
     accentColors.current.push(basicColor);
-    accentFadedColors.current.push(increase_brightness(basicColor, 95));
+    accentFadedColors.current.push(increase_brightness(basicColor, 65));
 
     label = "5 player";
     basicColor = PlayerCountColor[5];
@@ -144,12 +146,13 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
       ],
       yAxisID: "y",
       backgroundColor: basicColor,
-      borderWidth: 1,
+      borderColor: "darkgrey",
+      borderWidth: 2,
       hoverBorderWidth: 3,
       pointRadius: 5,
     } as ChartDataset<"bar">);
     accentColors.current.push(basicColor);
-    accentFadedColors.current.push(increase_brightness(basicColor, 95));
+    accentFadedColors.current.push(increase_brightness(basicColor, 65));
 
     label = "6 player";
     basicColor = PlayerCountColor[6];
@@ -170,12 +173,13 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
       ],
       yAxisID: "y",
       backgroundColor: basicColor,
-      borderWidth: 1,
+      borderColor: "darkgrey",
+      borderWidth: 2,
       hoverBorderWidth: 3,
       pointRadius: 5,
     } as ChartDataset<"bar">);
     accentColors.current.push(basicColor);
-    accentFadedColors.current.push(increase_brightness(basicColor, 95));
+    accentFadedColors.current.push(increase_brightness(basicColor, 65));
 
     return dataSetsData;
   };
@@ -239,16 +243,32 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
               for (let i = 0; i < chart.data.datasets.length; i++) {
                 const dataset = chart.data.datasets[i];
                 if (i === legendItem.datasetIndex) {
-                  dataset.borderColor = accentColors.current[i];
+                  dataset.backgroundColor = accentColors.current[i];
                 } else {
-                  dataset.borderColor = accentFadedColors.current[i];
+                  dataset.backgroundColor = accentFadedColors.current[i];
                 }
+                // dataset.borderWidth = 2;
+                // dataset.hoverBorderWidth = 3;
+                // dataset.borderColor = "darkgrey";
               }
               chart.update();
             }
             legendHoverIndex.current = legendItem.datasetIndex !== undefined ? legendItem.datasetIndex : -1;
           }
         },
+        onLeave: () => {
+          const chart = chartRef.current;
+          if (chart) {
+            for (let i = 0; i < chart.data.datasets.length; i++) {
+              const dataset = chart.data.datasets[i];
+              dataset.backgroundColor = accentColors.current[i];
+              dataset.borderWidth = 2;
+              dataset.hoverBorderWidth = 3;
+              dataset.borderColor = "darkgrey";
+            }
+            chart.update();
+          }
+        }
       },
     },
   };
