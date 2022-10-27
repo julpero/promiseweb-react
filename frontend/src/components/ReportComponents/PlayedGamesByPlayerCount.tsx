@@ -36,25 +36,33 @@ const PlayedGamesByPlayerCount = ({gameReportData, max}: IProps) => {
     dataSetsData.push({
       label: "three player games",
       data: [gameReportData?.find(data => data.playersInGame === 3)?.count ?? 0],
-      borderWidth: 1,
+      borderWidth: 2,
+      hoverBorderWidth: 3,
+      borderColor: "darkgrey",
       backgroundColor: PlayerCountColor[3],
     });
     dataSetsData.push({
       label: "four player games",
       data: [gameReportData?.find(data => data.playersInGame === 4)?.count ?? 0],
-      borderWidth: 1,
+      borderWidth: 2,
+      hoverBorderWidth: 3,
+      borderColor: "darkgrey",
       backgroundColor: PlayerCountColor[4],
     });
     dataSetsData.push({
       label: "five player games",
       data: [gameReportData?.find(data => data.playersInGame === 5)?.count ?? 0],
-      borderWidth: 1,
+      borderWidth: 2,
+      hoverBorderWidth: 3,
+      borderColor: "darkgrey",
       backgroundColor: PlayerCountColor[5],
     });
     dataSetsData.push({
       label: "six player games",
       data: [gameReportData?.find(data => data.playersInGame === 6)?.count ?? 0],
-      borderWidth: 1,
+      borderWidth: 2,
+      hoverBorderWidth: 3,
+      borderColor: "darkgrey",
       backgroundColor: PlayerCountColor[6],
     });
     return dataSetsData;
