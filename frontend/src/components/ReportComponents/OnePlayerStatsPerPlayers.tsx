@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { IuiOnePlayerReportData, PlayerCountColor } from "../../interfaces/IuiReports";
+import { IuiOneGameData, IuiOnePlayerReportData, PlayerCountColor } from "../../interfaces/IuiReports";
 
 import {
   Chart as ChartJS,
@@ -49,6 +49,9 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
             for (let i = 0; i < chart.data.datasets.length; i++) {
               const dataset = chart.data.datasets[i];
               dataset.borderColor = accentColors.current[i];
+              dataset.borderWidth = 2;
+              dataset.hoverBorderWidth = 3;
+              dataset.borderColor = "darkgrey";
             }
             chart.update();
             legendHoverIndex.current = -1;
@@ -58,9 +61,26 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     }
   }, []);
 
+  const gamePerPlayerData = (thisData: IuiOneGameData[], allGamesCount: number): number[] => {
+    return [
+      100 * thisData.length / allGamesCount,
+      thisData.reduce((count, data) => {
+        return count + data.keepP;
+      }, 0) / thisData.length,
+      100 * thisData.reduce((count, data) => {
+        return count + data.scorePoints;
+      }, 0) / thisData.length,
+      100 * thisData.filter(data => data.position === 1).length / thisData.length,
+      thisData.reduce((count, data) => {
+        return count + data.pOfWinPoints;
+      }, 0) / thisData.length,
+    ];
+  };
+
   const getDataSetsData = (): ChartDataset<"bar">[] => {
     const dataSetsData: ChartDataset<"bar">[] = [];
     if (!gameReportData) return dataSetsData;
+    console.log(gameReportData);
 
     const {gamesData} = gameReportData;
     const threeData = gamesData.filter(data => data.playersInGame === 3);
@@ -78,24 +98,12 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     dataSetsData.push({
       type: "bar",
       label: label,
-      data: [
-        100 * threeData.length / gamesData.length,
-        threeData.reduce((count, data) => {
-          return count + data.keepP;
-        }, 0) / threeData.length,
-        100 * threeData.reduce((count, data) => {
-          return count + data.scorePoints;
-        }, 0) / threeData.length,
-        threeData.reduce((count, data) => {
-          return count + data.pOfWinPoints;
-        }, 0) / threeData.length,
-      ],
+      data: gamePerPlayerData(threeData, gamesData.length),
       yAxisID: "y",
       backgroundColor: basicColor,
       borderColor: "darkgrey",
       borderWidth: 2,
       hoverBorderWidth: 3,
-      pointRadius: 5,
     } as ChartDataset<"bar">);
     accentColors.current.push(basicColor);
     accentFadedColors.current.push(increase_brightness(basicColor, 65));
@@ -105,24 +113,12 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     dataSetsData.push({
       type: "bar",
       label: label,
-      data: [
-        100 * fourData.length / gamesData.length,
-        fourData.reduce((count, data) => {
-          return count + data.keepP;
-        }, 0) / fourData.length,
-        100 * fourData.reduce((count, data) => {
-          return count + data.scorePoints;
-        }, 0) / fourData.length,
-        fourData.reduce((count, data) => {
-          return count + data.pOfWinPoints;
-        }, 0) / fourData.length,
-      ],
+      data: gamePerPlayerData(fourData, gamesData.length),
       yAxisID: "y",
       backgroundColor: basicColor,
       borderColor: "darkgrey",
       borderWidth: 2,
       hoverBorderWidth: 3,
-      pointRadius: 5,
     } as ChartDataset<"bar">);
     accentColors.current.push(basicColor);
     accentFadedColors.current.push(increase_brightness(basicColor, 65));
@@ -132,24 +128,12 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     dataSetsData.push({
       type: "bar",
       label: label,
-      data: [
-        100 * fiveData.length / gamesData.length,
-        fiveData.reduce((count, data) => {
-          return count + data.keepP;
-        }, 0) / fiveData.length,
-        100 * fiveData.reduce((count, data) => {
-          return count + data.scorePoints;
-        }, 0) / fiveData.length,
-        fiveData.reduce((count, data) => {
-          return count + data.pOfWinPoints;
-        }, 0) / fiveData.length,
-      ],
+      data: gamePerPlayerData(fiveData, gamesData.length),
       yAxisID: "y",
       backgroundColor: basicColor,
       borderColor: "darkgrey",
       borderWidth: 2,
       hoverBorderWidth: 3,
-      pointRadius: 5,
     } as ChartDataset<"bar">);
     accentColors.current.push(basicColor);
     accentFadedColors.current.push(increase_brightness(basicColor, 65));
@@ -159,24 +143,12 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
     dataSetsData.push({
       type: "bar",
       label: label,
-      data: [
-        100 * sixData.length / gamesData.length,
-        sixData.reduce((count, data) => {
-          return count + data.keepP;
-        }, 0) / sixData.length,
-        100 * sixData.reduce((count, data) => {
-          return count + data.scorePoints;
-        }, 0) / sixData.length,
-        sixData.reduce((count, data) => {
-          return count + data.pOfWinPoints;
-        }, 0) / sixData.length,
-      ],
+      data: gamePerPlayerData(sixData, gamesData.length),
       yAxisID: "y",
       backgroundColor: basicColor,
       borderColor: "darkgrey",
       borderWidth: 2,
       hoverBorderWidth: 3,
-      pointRadius: 5,
     } as ChartDataset<"bar">);
     accentColors.current.push(basicColor);
     accentFadedColors.current.push(increase_brightness(basicColor, 65));
@@ -278,6 +250,7 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
       "games distribution",
       "avg keep %",
       "avg score points",
+      "avg win %",
       "avg % of winning points",
     ],
     datasets: getDataSetsData(),
