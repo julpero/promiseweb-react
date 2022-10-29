@@ -1,8 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { timeOut } from "./commons/constants";
 import { confirmLeavingOnGoingGame, testCheckLoginSuccess, testGameBoardVisible, testLogIn } from "./commons/methods";
 import { pageUrl, ekaUser, tokaUser, vikaUser } from "./commons/testvariables";
-import { buttonText } from "./commons/texts";
 
 test.describe.configure({ mode: "parallel" });
 
@@ -46,9 +44,7 @@ test("Play game as creator Eka", async ({ page }) => {
     console.log(`${myName} buttons ok`);
 
     // should be game visible game board
-    const leaveOngoingGameButton = page.locator("button", {hasText: buttonText.leaveOnGoingGame});
-    await expect(leaveOngoingGameButton).toBeVisible({timeout: timeOut.eternity});
-    await expect(leaveOngoingGameButton).toBeEnabled();
+    const leaveOngoingGameButton = await testGameBoardVisible(page);
     console.log(`${myName} visible game board`);
     await leaveOngoingGameButton.click();
 
