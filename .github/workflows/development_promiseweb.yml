@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - development
+      - 'test/**'
   workflow_dispatch:
 
 jobs:
@@ -75,7 +76,7 @@ jobs:
   test:
     needs: deploy
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
     
