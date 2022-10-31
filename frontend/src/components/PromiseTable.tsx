@@ -58,7 +58,7 @@ const PromiseTable = () => {
   };
 
   const promiseHeaderClass = (roundInd: number): string => {
-    const classArr: string[] = ["tableHeading"];
+    const classArr: string[] = ["tableHeading", "prHead"];
     if (roundInd === currentRoundInfo.roundInd) classArr.push("currentRound");
     const {cardsInRound, totalPromise} = promiseTable.rounds[roundInd];
     if (totalPromise !== null) {

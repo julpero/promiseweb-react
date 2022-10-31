@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { confirmLeavingOnGoingGame, testCheckLoginSuccess, testGameBoardVisible, testLogIn } from "./commons/methods";
+import { confirmLeavingOnGoingGame, makePromise, testCheckLoginSuccess, testGameBoardVisible, testLogIn } from "./commons/methods";
 import { pageUrl, ekaUser, tokaUser, vikaUser } from "./commons/testvariables";
 
 test.describe.configure({ mode: "parallel" });
@@ -46,6 +46,13 @@ test("Play game as creator Eka", async ({ page }) => {
     // should be game visible game board
     const leaveOngoingGameButton = await testGameBoardVisible(page);
     console.log(`${myName} visible game board`);
+
+    const roundsInGame = await page.locator(".prHead").count();
+    console.log(`${myName} rounds in game ${roundsInGame}`);
+
+    const promise = await makePromise(page);
+    console.log(`${myName} promised ${promise}`);
+
     await leaveOngoingGameButton.click();
 
     await confirmLeavingOnGoingGame(page);
@@ -87,6 +94,13 @@ test("Play game as Toka", async ({ page }) => {
     const leaveOngoingGameButton = await testGameBoardVisible(page);
     console.log(`${myName} visible game board B`);
     await expect(page.getByText(`${ekaUser.name} has left the game!`)).toHaveCount(1);
+
+    const roundsInGame = await page.locator(".prHead").count();
+    console.log(`${myName} rounds in game ${roundsInGame}`);
+
+    const promise = await makePromise(page);
+    console.log(`${myName} promised ${promise}`);
+
     await leaveOngoingGameButton.click();
 
     await confirmLeavingOnGoingGame(page);
@@ -130,6 +144,13 @@ test("Play game as Vika", async ({ page }) => {
     const leaveOngoingGameButton = await testGameBoardVisible(page);
     console.log(`${myName} visible game board B`);
     await expect(page.getByText(`${tokaUser.name} has left the game!`)).toHaveCount(1);
+
+    const roundsInGame = await page.locator(".prHead").count();
+    console.log(`${myName} rounds in game ${roundsInGame}`);
+
+    const promise = await makePromise(page);
+    console.log(`${myName} promised ${promise}`);
+
     await leaveOngoingGameButton.click();
 
     await confirmLeavingOnGoingGame(page);

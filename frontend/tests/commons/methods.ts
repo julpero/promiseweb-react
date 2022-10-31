@@ -3,6 +3,10 @@ import { timeOut } from "./constants";
 import { ITUser } from "./testvariables";
 import { buttonText, notificationText } from "./texts";
 
+const randomInteger = (min: number, max: number): number => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
 export const testLogIn = async (page: Page, user: ITUser, falsy?: boolean) => {
   const logInButton = page.locator("button", {hasText: /Log In/});
   await expect(logInButton).toBeVisible();
@@ -64,5 +68,12 @@ export const joinGame = async (page: Page, currentUser: ITUser, creatorUser: ITU
   } catch (e) {
     // all ok, do nothing
   }
+};
 
+export const makePromise = async (page: Page): Promise<number> => {
+  // this wont work if do not allow even promises rule is active
+  const promiseButtons = await page.$$(".promiseButton > button");
+  const selectedPromise = randomInteger(0, promiseButtons.length);
+  await page.locator(".promiseButton > button", {hasText: selectedPromise.toString()}).click();
+  return selectedPromise;
 };
