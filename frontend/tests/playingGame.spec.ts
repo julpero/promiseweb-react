@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { confirmLeavingOnGoingGame, makePromise, testCheckLoginSuccess, testGameBoardVisible, testLogIn } from "./commons/methods";
+import { confirmLeavingOnGoingGame, playGame, testCheckLoginSuccess, testGameBoardVisible, testLogIn } from "./commons/methods";
 import { pageUrl, ekaUser, tokaUser, vikaUser } from "./commons/testvariables";
 
 test.describe.configure({ mode: "parallel" });
@@ -50,8 +50,7 @@ test("Play game as creator Eka", async ({ page }) => {
     const roundsInGame = await page.locator(".prHead").count();
     console.log(`${myName} rounds in game ${roundsInGame}`);
 
-    const promise = await makePromise(page);
-    console.log(`${myName} promised ${promise}`);
+    await playGame(page, roundsInGame);
 
     await leaveOngoingGameButton.click();
 
@@ -93,14 +92,13 @@ test("Play game as Toka", async ({ page }) => {
     // should be game visible game board
     const leaveOngoingGameButton = await testGameBoardVisible(page);
     console.log(`${myName} visible game board B`);
-    await expect(page.getByText(`${ekaUser.name} has left the game!`)).toHaveCount(1);
 
     const roundsInGame = await page.locator(".prHead").count();
     console.log(`${myName} rounds in game ${roundsInGame}`);
 
-    const promise = await makePromise(page);
-    console.log(`${myName} promised ${promise}`);
+    await playGame(page, roundsInGame);
 
+    await expect(page.getByText(`${ekaUser.name} has left the game!`)).toHaveCount(1);
     await leaveOngoingGameButton.click();
 
     await confirmLeavingOnGoingGame(page);
@@ -143,14 +141,13 @@ test("Play game as Vika", async ({ page }) => {
     // should be game visible game board
     const leaveOngoingGameButton = await testGameBoardVisible(page);
     console.log(`${myName} visible game board B`);
-    await expect(page.getByText(`${tokaUser.name} has left the game!`)).toHaveCount(1);
 
     const roundsInGame = await page.locator(".prHead").count();
     console.log(`${myName} rounds in game ${roundsInGame}`);
 
-    const promise = await makePromise(page);
-    console.log(`${myName} promised ${promise}`);
+    await playGame(page, roundsInGame);
 
+    await expect(page.getByText(`${tokaUser.name} has left the game!`)).toHaveCount(1);
     await leaveOngoingGameButton.click();
 
     await confirmLeavingOnGoingGame(page);
