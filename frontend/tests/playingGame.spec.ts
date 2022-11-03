@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { confirmLeavingOnGoingGame, playGame, testCheckLoginSuccess, testGameBoardVisible, testLogIn } from "./commons/methods";
+import { playGame, testCheckLoginSuccess, testGameBoardVisible, testLogIn, waitAndCloseOneGameReport } from "./commons/methods";
 import { pageUrl, ekaUser, tokaUser, vikaUser } from "./commons/testvariables";
 
 test.describe.configure({ mode: "parallel" });
@@ -25,6 +25,11 @@ test("Play game as creator Eka", async ({ page }) => {
     await expect(createGameButton).toBeVisible();
     await expect(createGameButton).toBeEnabled();
 
+    // rounds
+    await page.selectOption("[label='Start round of the game']", "6");
+    await page.selectOption("[label='Turn round of the game']", "5");
+    await page.selectOption("[label='End round of the game']", "6");
+
     // rules
     await page.locator("input[data-tip='thisIsDemoGame']").check();
     await createGameButton.click();
@@ -44,7 +49,8 @@ test("Play game as creator Eka", async ({ page }) => {
     console.log(`${myName} buttons ok`);
 
     // should be game visible game board
-    const leaveOngoingGameButton = await testGameBoardVisible(page);
+    // const leaveOngoingGameButton = await testGameBoardVisible(page);
+    await testGameBoardVisible(page);
     console.log(`${myName} visible game board`);
 
     const roundsInGame = await page.locator(".prHead").count();
@@ -52,9 +58,11 @@ test("Play game as creator Eka", async ({ page }) => {
 
     await playGame(page, roundsInGame);
 
-    await leaveOngoingGameButton.click();
+    await waitAndCloseOneGameReport(page);
 
-    await confirmLeavingOnGoingGame(page);
+    // await leaveOngoingGameButton.click();
+
+    // await confirmLeavingOnGoingGame(page);
   } catch (e) {
     await page.screenshot({ path: `playwright-images/screenshot_${myName}.png`, fullPage: true });
     throw e;
@@ -90,18 +98,21 @@ test("Play game as Toka", async ({ page }) => {
     await joinGameButton.click();
 
     // should be game visible game board
-    const leaveOngoingGameButton = await testGameBoardVisible(page);
-    console.log(`${myName} visible game board B`);
+    // const leaveOngoingGameButton = await testGameBoardVisible(page);
+    await testGameBoardVisible(page);
+    console.log(`${myName} visible game board`);
 
     const roundsInGame = await page.locator(".prHead").count();
     console.log(`${myName} rounds in game ${roundsInGame}`);
 
     await playGame(page, roundsInGame);
 
-    await expect(page.getByText(`${ekaUser.name} has left the game!`)).toHaveCount(1);
-    await leaveOngoingGameButton.click();
+    await waitAndCloseOneGameReport(page);
 
-    await confirmLeavingOnGoingGame(page);
+    // await expect(page.getByText(`${ekaUser.name} has left the game!`)).toHaveCount(1);
+    // await leaveOngoingGameButton.click();
+
+    // await confirmLeavingOnGoingGame(page);
   } catch (e) {
     await page.screenshot({ path: `playwright-images/screenshot_${myName}.png`, fullPage: true });
     throw e;
@@ -139,18 +150,21 @@ test("Play game as Vika", async ({ page }) => {
     await joinGameButton.click();
 
     // should be game visible game board
-    const leaveOngoingGameButton = await testGameBoardVisible(page);
-    console.log(`${myName} visible game board B`);
+    // const leaveOngoingGameButton = await testGameBoardVisible(page);
+    await testGameBoardVisible(page);
+    console.log(`${myName} visible game board`);
 
     const roundsInGame = await page.locator(".prHead").count();
     console.log(`${myName} rounds in game ${roundsInGame}`);
 
     await playGame(page, roundsInGame);
 
-    await expect(page.getByText(`${tokaUser.name} has left the game!`)).toHaveCount(1);
-    await leaveOngoingGameButton.click();
+    await waitAndCloseOneGameReport(page);
 
-    await confirmLeavingOnGoingGame(page);
+    // await expect(page.getByText(`${tokaUser.name} has left the game!`)).toHaveCount(1);
+    // await leaveOngoingGameButton.click();
+
+    // await confirmLeavingOnGoingGame(page);
   } catch (e) {
     await page.screenshot({ path: `playwright-images/screenshot_${myName}.png`, fullPage: true });
     throw e;

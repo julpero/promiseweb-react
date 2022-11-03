@@ -29,6 +29,8 @@ export const testGameBoardVisible = async (page: Page): Promise<Locator> => {
   const leaveOngoingGameButton = page.locator("button", {hasText: buttonText.leaveOnGoingGame});
   await expect(leaveOngoingGameButton).toBeVisible({timeout: timeOut.eternity});
   await expect(leaveOngoingGameButton).toBeEnabled();
+  const headers = page.locator(".prHead");
+  await expect(headers.first()).toBeVisible({timeout: timeOut.eternity});
   return leaveOngoingGameButton;
 };
 
@@ -115,5 +117,11 @@ export const playGame = async (page: Page, roundsInGame: number) => {
     await playRound(page, cardsInRound);
     console.log(`round ${i+1} played`);
   }
+};
 
+export const waitAndCloseOneGameReport = async (page: Page) => {
+  const closeButton = page.locator("button", {hasText: "Close Report and Game"});
+  await expect(closeButton).toBeVisible({ timeout: timeOut.eternity });
+  await expect(closeButton).toBeEnabled({ timeout: timeOut.eternity });
+  await closeButton.click();
 };
