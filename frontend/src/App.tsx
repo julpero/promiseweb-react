@@ -15,6 +15,7 @@ import { IuiRefreshLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./interfac
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "./common/userFunctions";
 import { IuiGameBeginsNotification } from "./interfaces/IuiPlayingGame";
 import { setSpinnerVisible } from "./store/spinnerSlice";
+import { Button, Modal } from "react-bootstrap";
 
 const App = () => {
   const [gameStatus, setGameStatus] = useState(CHECK_GAME_STATUS.noGame);
@@ -45,6 +46,7 @@ const App = () => {
 
   useEffect(() => {
     const showDisconnect = () => {
+      console.log("going to show disconnected modal", user.isUserLoggedIn, user.connected);
       if (user.isUserLoggedIn && !user.connected) {
         setShowConnectionModal(true);
       }
@@ -137,6 +139,23 @@ const App = () => {
       }
       {(!user.isUserLoggedIn || gameId === "" || (gameStatus !== CHECK_GAME_STATUS.onGoingGame && gameStatus !== CHECK_GAME_STATUS.observedGame)) &&
         <HomeScreen />
+      }
+      {(user.isUserLoggedIn && !user.connected && showConnectionModal) &&
+              <Modal
+              >
+                <Modal.Header>
+                  <Modal.Title>
+                  Connection error!
+                  </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  Ou nou...
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="primary" onClick={() => setShowConnectionModal(false)}>CLOSE</Button>
+                </Modal.Footer>
+              </Modal>
+
       }
     </React.Fragment>
   );
