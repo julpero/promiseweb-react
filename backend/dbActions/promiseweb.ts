@@ -75,8 +75,12 @@ export const getPlayerAvgPoints = async (playerName: string, startRound: number,
         startRound: { $eq: startRound },
         turnRound: { $eq: turnRound },
         endRound: { $eq: endRound },
-      }
-    }
+      },
+    }, {
+      $project: {
+        gameStatistics: 1,
+      },
+    },
   ]);
   // console.log("getPlayerAvgPoints gamesInDb", gamesInDb);
 
@@ -93,6 +97,7 @@ export const getPlayerAvgPoints = async (playerName: string, startRound: number,
       }
     }
   });
+
   if (gamesInDb.length > 0) return stats.map(v => v/gamesInDb.length);
   return stats;
 };

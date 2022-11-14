@@ -1,4 +1,4 @@
-import { insertNewGame, hasOngoingOrCreatedGame } from "../dbActions/promiseweb";
+import { insertNewGame, hasOngoingOrCreatedGame, getPlayerAvgPoints } from "../dbActions/promiseweb";
 import { IGameOptions} from "../interfaces/IGameOptions";
 import { IuiCreateGameRequest, IuiCreateGameResponse, CREATE_GAME_STATUS } from "../../frontend/src/interfaces/IuiNewGame";
 import { GAME_STATUS, HIDDEN_CARDS_MODE } from "../../frontend/src/interfaces/IuiGameOptions";
@@ -11,17 +11,24 @@ const hiddenCardsModeToEnum = (selected: string): HIDDEN_CARDS_MODE => {
   }
 };
 
-const createGameOptions = (values: IuiCreateGameRequest): IGameOptions => {
+const createGameOptions = async (values: IuiCreateGameRequest): Promise<IGameOptions> => {
+  const startRound = parseInt(values.newGameStartRound, 10);
+  const turnRound = parseInt(values.newGameTurnRound, 10);
+  const endRound = parseInt(values.newGameEndRound, 10);
+  const avgStats = await getPlayerAvgPoints(values.userName, startRound, turnRound, endRound);
+  const statsGamesObj = {
+    playerAvgPointsInRounds: avgStats,
+  };
   return {
     humanPlayersCount: parseInt(values.newGameHumanPlayersCount, 10),
     botPlayersCount: 0,
-    startRound: parseInt(values.newGameStartRound, 10),
-    turnRound: parseInt(values.newGameTurnRound, 10),
-    endRound: parseInt(values.newGameEndRound, 10),
+    startRound: startRound,
+    turnRound: turnRound,
+    endRound: endRound,
     adminName: values.userName,
     password: values.newGamePassword ?? "",
     gameStatus: GAME_STATUS.created,
-    humanPlayers: [{name: values.userName, active: true}],
+    humanPlayers: [{name: values.userName, active: true, playerStats: statsGamesObj}],
     createDateTime: new Date(),
     evenPromisesAllowed: !values.noEvenPromises,
     visiblePromiseRound: !values.hidePromiseRound,
@@ -66,7 +73,7 @@ export const createGame = async (createGameRequest: IuiCreateGameRequest): Promi
   }
 
   if (okToCreate) {
-    const gameOptions = createGameOptions(createGameRequest);
+    const gameOptions = await createGameOptions(createGameRequest);
     // console.log("gameOptions", gameOptions);
 
     const createdGameIdStr = await insertNewGame(gameOptions);
