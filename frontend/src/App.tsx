@@ -46,7 +46,7 @@ const App = () => {
 
   useEffect(() => {
     const showDisconnect = () => {
-      console.log("going to show disconnected modal", user.isUserLoggedIn, user.connected);
+      // console.log("going to show disconnected modal", user.isUserLoggedIn, user.connected);
       if (user.isUserLoggedIn && !user.connected) {
         setShowConnectionModal(true);
       }
@@ -108,16 +108,16 @@ const App = () => {
     });
 
     socket.on("disconnect", () => {
+      // console.log("DISCONNECTED", user.isUserLoggedIn);
       if (user.isUserLoggedIn) {
-        console.log("DISCONNECTED");
         dispatch(setConnectionState(false));
-        setTimeout(showDisconnect, 200);
+        setTimeout(showDisconnect, 5000);
       }
     });
 
     socket.on("connect", () => {
+      // console.log("CONNECTED", user.isUserLoggedIn);
       if (user.isUserLoggedIn) {
-        console.log("CONNECTED");
         setShowConnectionModal(false);
         dispatch(setConnectionState(true));
       }
@@ -140,23 +140,22 @@ const App = () => {
       {(!user.isUserLoggedIn || gameId === "" || (gameStatus !== CHECK_GAME_STATUS.onGoingGame && gameStatus !== CHECK_GAME_STATUS.observedGame)) &&
         <HomeScreen />
       }
-      {(user.isUserLoggedIn && !user.connected && showConnectionModal) &&
-              <Modal
-              >
-                <Modal.Header>
-                  <Modal.Title>
-                  Connection error!
-                  </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                  Ou nou...
-                </Modal.Body>
-                <Modal.Footer>
-                  <Button variant="primary" onClick={() => setShowConnectionModal(false)}>CLOSE</Button>
-                </Modal.Footer>
-              </Modal>
 
-      }
+      <Modal
+        show={showConnectionModal}
+      >
+        <Modal.Header>
+          <Modal.Title>
+          Connection error!
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Ou nou...</p>
+          <p>Something bad happened - your connection to the Promise Web backend has just disconnected.</p>
+          <p>All you can do is just wait or refresh page and hope that all will be good again :)</p>
+        </Modal.Body>
+      </Modal>
+
     </React.Fragment>
   );
 };
