@@ -15,7 +15,7 @@ import { IuiRefreshLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./interfac
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "./common/userFunctions";
 import { IuiGameBeginsNotification } from "./interfaces/IuiPlayingGame";
 import { setSpinnerVisible } from "./store/spinnerSlice";
-import { Button, Modal } from "react-bootstrap";
+import { Modal } from "react-bootstrap";
 
 const App = () => {
   const [gameStatus, setGameStatus] = useState(CHECK_GAME_STATUS.noGame);
