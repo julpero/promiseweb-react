@@ -40,7 +40,8 @@ const initPlayers = async (gameInDb: IGameOptions) => {
     } as IPlayer;
   });
 
-  for (let i = 0; i < gameInDb.humanPlayers.length; i++) {
+  // creators stats are generated when creating game
+  for (let i = 1; i < gameInDb.humanPlayers.length; i++) {
     gameInDb.humanPlayers[i].playerStats = await getPlayerStats(gameInDb, gameInDb.humanPlayers[i].name);
   }
   // console.log(gameInDb.game.playerOrder);

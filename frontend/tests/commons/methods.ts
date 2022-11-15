@@ -3,6 +3,10 @@ import { timeOut } from "./constants";
 import { ITUser } from "./testvariables";
 import { buttonText, notificationText } from "./texts";
 
+const randomInteger = (min: number, max: number): number => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
 export const testLogIn = async (page: Page, user: ITUser, falsy?: boolean) => {
   const logInButton = page.locator("button", {hasText: /Log In/});
   await expect(logInButton).toBeVisible();
@@ -25,6 +29,8 @@ export const testGameBoardVisible = async (page: Page): Promise<Locator> => {
   const leaveOngoingGameButton = page.locator("button", {hasText: buttonText.leaveOnGoingGame});
   await expect(leaveOngoingGameButton).toBeVisible({timeout: timeOut.eternity});
   await expect(leaveOngoingGameButton).toBeEnabled();
+  const headers = page.locator(".prHead");
+  await expect(headers.first()).toBeVisible({timeout: timeOut.eternity});
   return leaveOngoingGameButton;
 };
 
@@ -64,5 +70,58 @@ export const joinGame = async (page: Page, currentUser: ITUser, creatorUser: ITU
   } catch (e) {
     // all ok, do nothing
   }
+};
 
+export const getCardCountInRound = async (page: Page): Promise<number> => {
+  // first wait until promise buttons are visible
+  await page.waitForSelector(".promiseButton > button >>text='0'", {timeout: timeOut.eternity});
+  return await page.locator(".promiseButton > button").count() - 1;
+};
+
+
+const makePromise = async (page: Page, cardsInRound: number): Promise<number> => {
+  // this wont work if do not allow even promises rule is active
+  const selectedPromise = randomInteger(0, cardsInRound);
+  console.log(`selected promise ${selectedPromise}`);
+  await page.locator(".promiseButton > button", { hasText: selectedPromise.toString() }).first().click({ timeout: timeOut.eternity });
+  return selectedPromise;
+};
+
+const playAnyCard = async (page: Page) => {
+  const playableCards = page.locator(".playableCard");
+  await expect(playableCards.first()).toBeVisible({timeout: timeOut.eternity});
+  const playableCardsCount = await playableCards.count();
+  const playCardNbr = randomInteger(0,  playableCardsCount - 1);
+  await page.locator(".playableCard").nth(playCardNbr).click({timeout: timeOut.eternity});
+  console.log(`played card ${playCardNbr}`);
+};
+
+const playRoundCards = async (page: Page, cardsInRound: number) => {
+  for (let i = 0; i < cardsInRound; i++) {
+    await playAnyCard(page);
+    if (i < cardsInRound - 1) {
+      await expect(page.locator(".cardWonCol > .cardCol")).toHaveCount(i+1, {timeout: timeOut.eternity});
+    }
+  }
+};
+
+const playRound = async (page: Page, cardsInRound: number) => {
+  await makePromise(page, cardsInRound);
+  await playRoundCards(page, cardsInRound);
+};
+
+export const playGame = async (page: Page, roundsInGame: number) => {
+  for (let i = 0; i < roundsInGame; i++) {
+    console.log(`start round ${i+1}`);
+    const cardsInRound = await getCardCountInRound(page);
+    await playRound(page, cardsInRound);
+    console.log(`round ${i+1} played`);
+  }
+};
+
+export const waitAndCloseOneGameReport = async (page: Page) => {
+  const closeButton = page.locator("button", {hasText: "Close Report and Game"});
+  await expect(closeButton).toBeVisible({ timeout: timeOut.eternity });
+  await expect(closeButton).toBeEnabled({ timeout: timeOut.eternity });
+  await closeButton.click();
 };

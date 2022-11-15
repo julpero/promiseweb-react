@@ -10,14 +10,16 @@ import GameTable from "./screens/GameTable";
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameResponse } from "./interfaces/IuiCheckIfOngoingGame";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentGameId, setGameId } from "./store/gameInfoSlice";
-import { getUser, setUserLoggedIn } from "./store/userSlice";
+import { getUser, setUserLoggedIn, setConnectionState } from "./store/userSlice";
 import { IuiRefreshLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./interfaces/IuiUser";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "./common/userFunctions";
 import { IuiGameBeginsNotification } from "./interfaces/IuiPlayingGame";
 import { setSpinnerVisible } from "./store/spinnerSlice";
+import { Modal } from "react-bootstrap";
 
 const App = () => {
   const [gameStatus, setGameStatus] = useState(CHECK_GAME_STATUS.noGame);
+  const [showConnectionModal, setShowConnectionModal] = useState(false);
   const gameId = useSelector(getCurrentGameId);
   const user = useSelector(getUser);
 
@@ -41,7 +43,15 @@ const App = () => {
     }
   }, [dispatch]);
 
+
   useEffect(() => {
+    const showDisconnect = () => {
+      // console.log("going to show disconnected modal", user.isUserLoggedIn, user.connected);
+      if (user.isUserLoggedIn && !user.connected) {
+        setShowConnectionModal(true);
+      }
+    };
+
     if (window.localStorage.getItem("uUID")) {
       // console.log("has uUid:", window.localStorage.getItem("uUID"));
     } else {
@@ -97,8 +107,26 @@ const App = () => {
       }
     });
 
+    socket.on("disconnect", () => {
+      // console.log("DISCONNECTED", user.isUserLoggedIn);
+      if (user.isUserLoggedIn) {
+        dispatch(setConnectionState(false));
+        setTimeout(showDisconnect, 5000);
+      }
+    });
+
+    socket.on("connect", () => {
+      // console.log("CONNECTED", user.isUserLoggedIn);
+      if (user.isUserLoggedIn) {
+        setShowConnectionModal(false);
+        dispatch(setConnectionState(true));
+      }
+    });
+
     return () => {
       socket.off("game begins");
+      socket.off("disconnect");
+      socket.off("connect");
     };
   }, [handleOnGoingResponse, user, dispatch, socket]);
 
@@ -112,6 +140,22 @@ const App = () => {
       {(!user.isUserLoggedIn || gameId === "" || (gameStatus !== CHECK_GAME_STATUS.onGoingGame && gameStatus !== CHECK_GAME_STATUS.observedGame)) &&
         <HomeScreen />
       }
+
+      <Modal
+        show={showConnectionModal}
+      >
+        <Modal.Header>
+          <Modal.Title>
+          Connection error!
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Ou nou...</p>
+          <p>Something bad happened - your connection to the Promise Web backend has just disconnected.</p>
+          <p>All you can do is just wait or refresh page and hope that all will be good again :)</p>
+        </Modal.Body>
+      </Modal>
+
     </React.Fragment>
   );
 };

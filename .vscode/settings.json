@@ -22,5 +22,6 @@
   "cSpell.ignoreWords": [
     "qwaszxpolkmn"
   ],
-  "files.eol": "\r\n"
+  "files.eol": "\r\n",
+  "sarif-viewer.connectToGithubCodeScanning": "off"
 }
