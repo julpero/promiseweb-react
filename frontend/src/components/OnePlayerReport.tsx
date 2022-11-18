@@ -12,6 +12,8 @@ import isAfter from "date-fns/isAfter";
 import sub from "date-fns/sub";
 import { setSpinnerVisible } from "../store/spinnerSlice";
 import OnePlayerStatsPerPlayers from "./ReportComponents/OnePlayerStatsPerPlayers";
+import Form from "react-bootstrap/Form";
+import OnePlayerStatsPerOpponents from "./ReportComponents/OnePlayerStatsPerOpponents";
 
 interface IProps {
   playerName: string,
@@ -161,13 +163,37 @@ const OnePlayerReport = ({playerName}: IProps) => {
     );
   };
 
+  const renderPlayerButtons = () => {
+    const playersArr = reportData?.gamesData.flatMap(data => data.opponents) ?? [];
+    const distinctPlayersArr = Array.from(new Set( [...playersArr] ));
+    return distinctPlayersArr.sort((a: string, b: string) => a.localeCompare(b)).map((player, ind) => {
+      return (
+        <Form.Check inline type="switch" id={`inline-switch-${ind}`} key={ind} label={player} />
+      );
+    });
+  };
+
+  const renderPlayerSwitch = () => {
+    return (
+      <Form>
+        <div key="inline-switch" className="mb-3">
+          {renderPlayerButtons()}
+        </div>
+      </Form>
+    );
+  };
+
   return (
     <React.Fragment>
       {reportData &&
         renderTimeLine()
       }
-      <OnePlayerStats gameReportData={reportDataToShow} />
+      {reportData &&
+        renderPlayerSwitch()
+      }
+      <OnePlayerStatsPerOpponents gameReportData={reportDataToShow} />
       <OnePlayerStatsPerPlayers gameReportData={reportDataToShow} />
+      <OnePlayerStats gameReportData={reportDataToShow} />
     </React.Fragment>
   );
 };

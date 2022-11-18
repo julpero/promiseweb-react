@@ -228,6 +228,7 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
         pOfWinPoints: Math.round(playerStats.totalPoints * 1000 / (gameInDb.gameStatistics?.playersStatistics.at(0)?.totalPoints ?? playerStats.totalPoints * 1000)) / 10,
         playersInGame: gameInDb.humanPlayersCount,
         scorePoints: playerStats.scorePoints,
+        opponents: gameInDb.gameStatistics?.playersStatistics.filter(stats => stats.playerName !== playerName).flatMap(stats => stats.playerName).sort((a: string, b: string) => a.localeCompare(b)),
       } as IuiOneGameData);
     }
   });

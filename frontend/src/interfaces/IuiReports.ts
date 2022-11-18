@@ -36,6 +36,7 @@ export interface IuiOneGameData {
   pOfWinPoints: number,
   playersInGame: number,
   scorePoints: number,
+  opponents: string[],
 }
 
 export interface IuiOnePlayerReportData {
