@@ -33,7 +33,7 @@ interface IProps {
   gameReportData?: IuiOnePlayerReportData,
 }
 
-const OnePlayerStatsPerOpponents = ({gameReportData}: IProps) => {
+const OnePlayerStatsPerPlayersInGame = ({gameReportData}: IProps) => {
   const getPlayerColors = () => {
     const colorArr: string[] = [];
     const opponents = getLabels();
@@ -52,7 +52,7 @@ const OnePlayerStatsPerOpponents = ({gameReportData}: IProps) => {
     const opponents = getLabels();
     const inGamesArr: number[] = [];
     opponents.forEach(opponent => {
-      const inGames = gamesData.filter(game => game.opponents.some(opponentInGame => opponentInGame === opponent)).length;
+      const inGames = gamesData.filter(game => game.opponents.join(",") === opponent).length;
       // console.log(opponent, inGames);
       inGamesArr.push(inGames);
     });
@@ -87,7 +87,7 @@ const OnePlayerStatsPerOpponents = ({gameReportData}: IProps) => {
         type: "linear",
         display: true,
         min: 0,
-        max: gameReportData?.gamesData.length ?? 0,
+        // max: gameReportData?.gamesData.length ?? 0,
         position: "left",
         reverse: false,
         grid: {
@@ -112,7 +112,7 @@ const OnePlayerStatsPerOpponents = ({gameReportData}: IProps) => {
   };
 
   const getLabels = () => {
-    const playersArr = gameReportData?.gamesData.flatMap(data => data.opponents) ?? [];
+    const playersArr = gameReportData?.gamesData.flatMap(data => data.opponents.join(",")) ?? [];
     const distinctPlayersArr = Array.from(new Set( [...playersArr] ));
     return distinctPlayersArr.sort((a: string, b: string) => a.localeCompare(b));
   };
@@ -135,4 +135,4 @@ const OnePlayerStatsPerOpponents = ({gameReportData}: IProps) => {
   );
 };
 
-export default OnePlayerStatsPerOpponents;
+export default OnePlayerStatsPerPlayersInGame;
