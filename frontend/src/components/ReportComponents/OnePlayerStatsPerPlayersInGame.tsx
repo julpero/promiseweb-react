@@ -57,7 +57,7 @@ const OnePlayerStatsPerPlayersInGame = ({gameReportData}: IProps) => {
       inGamesArr.push(inGames);
     });
 
-    const label = "Opponent in games";
+    const label = "Players in games";
     dataSetsData.push({
       type: "bar",
       label: label,
@@ -107,6 +107,9 @@ const OnePlayerStatsPerPlayersInGame = ({gameReportData}: IProps) => {
       tooltip: {
         mode: "index",
         intersect: false,
+      },
+      legend: {
+        display: false,
       },
     },
   };

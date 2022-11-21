@@ -32,6 +32,8 @@ export interface IuiOneGameData {
   gameId: string,
   started: Date,
   position: number,
+  points: number,
+  roundCount: number,
   keepP: number,
   pOfWinPoints: number,
   playersInGame: number,

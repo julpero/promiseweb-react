@@ -234,8 +234,7 @@ const OnePlayerReport = ({playerName}: IProps) => {
     <React.Fragment>
       {allReportData &&
         <React.Fragment>
-          <h4>Total {allReportData.length} games</h4>
-          <OnePlayerStatsSummary gameReportData={{playerName: playerName, gamesData: allReportData}} />
+          <OnePlayerStatsSummary description="Total" gameReportData={{playerName: playerName, gamesData: allReportData}} />
         </React.Fragment>
       }
       {allReportData &&
@@ -246,8 +245,7 @@ const OnePlayerReport = ({playerName}: IProps) => {
       }
       {reportDataToShow &&
       <React.Fragment>
-        <h5>Filtered {reportDataToShow.gamesData.length} games</h5>
-        <OnePlayerStatsSummary gameReportData={reportDataToShow} />
+        <OnePlayerStatsSummary description="Filtered" gameReportData={reportDataToShow} />
       </React.Fragment>
       }
 

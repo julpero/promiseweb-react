@@ -108,6 +108,9 @@ const OnePlayerStatsPerOpponents = ({gameReportData}: IProps) => {
         mode: "index",
         intersect: false,
       },
+      legend: {
+        display: false,
+      },
     },
   };
 

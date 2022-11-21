@@ -224,6 +224,8 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
         gameId: gameInDb._id.toString(),
         started: gameInDb.createDateTime,
         position: playerStats.position,
+        points: playerStats.totalPoints,
+        roundCount: gameStats.roundsPlayed,
         keepP: Math.round(playerStats.totalKeeps * 1000 / gameStats.roundsPlayed)/10,
         pOfWinPoints: Math.round(playerStats.totalPoints * 1000 / (gameInDb.gameStatistics?.playersStatistics.at(0)?.totalPoints ?? playerStats.totalPoints * 1000)) / 10,
         playersInGame: gameInDb.humanPlayersCount,
