@@ -132,7 +132,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
     try {
       const gameAfter = await gameInDb.save();
       if (gameAfter) {
-        if (!isRuleActive(gameAfter, RULE.hiddenPromiseRound)) promiseResponse.promise = promise;
+        if (!isRuleActive(gameAfter, RULE.hiddenPromiseRound) && !isRuleActive(gameAfter, RULE.onlyTotalPromise)) promiseResponse.promise = promise;
         promiseResponse.promiseResponse = PROMISE_RESPONSE.promiseOk;
         promiseResponse.promiser = promiser.name;
         promiseResponse.promiseTime = promiseTime;
