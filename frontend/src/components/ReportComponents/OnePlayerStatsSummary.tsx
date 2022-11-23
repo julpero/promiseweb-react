@@ -9,7 +9,7 @@ interface IProps {
 const OnePlayerStatsSummary = ({description, gameReportData}: IProps) => {
   const {gamesData} = gameReportData;
 
-  console.log(gamesData);
+  // console.log(gamesData);
 
   const totalRounds = (): number => {
     return gamesData.reduce((count, game) => {
@@ -23,14 +23,30 @@ const OnePlayerStatsSummary = ({description, gameReportData}: IProps) => {
     }, 0);
   };
 
-  const avgPoints = (): number => {
+  const totalScorePoints = (): number => {
     return gamesData.reduce((count, game) => {
-      return game.roundCount === 19 ? count + game.points : count;
+      return count + game.scorePoints;
     }, 0);
   };
 
+  const totalPercentageOfWinningPoints = (): number => {
+    return gamesData.reduce((count, game) => {
+      return count + game.pOfWinPoints;
+    }, 0);
+  };
+
+  const totalPointsByRoundCount = (rounds: number): number => {
+    return gamesData.reduce((count, game) => {
+      return game.roundCount === rounds ? count + game.points : count;
+    }, 0);
+  };
+
+  const winCount = (): number => {
+    return gamesData.filter(game => game.position === 1).length;
+  };
+
   const winPercentage = (): string => {
-    const winP = gamesData.filter(game => game.position === 1).length/gamesData.length;
+    const winP = winCount()/gamesData.length;
     return (winP * 100).toFixed(1)+"%";
   };
 
@@ -45,16 +61,26 @@ const OnePlayerStatsSummary = ({description, gameReportData}: IProps) => {
   };
 
   const avg10to1to10Points = (): string => {
-    return (avgPoints()/gamesData.filter(game => game.roundCount === 19).length).toFixed(1);
+    return (totalPointsByRoundCount(19)/gamesData.filter(game => game.roundCount === 19).length).toFixed(1);
+  };
+
+  const avgScorePoints = (): string => {
+    return (totalScorePoints()/gamesData.length).toFixed(3);
+  };
+
+  const avgWinPoints = (): string => {
+    return (totalPercentageOfWinningPoints()/gamesData.length).toFixed(1)+"%";
   };
 
   return (
     <div>
-      <h5>{description} {gamesData.length} games, {totalRounds()} rounds, {totalPoints()} points</h5>
+      <h5>{description} {gamesData.length} games, {winCount()} wins, {totalRounds()} rounds, {totalPoints()} points</h5>
       Summary:
       [win%: {winPercentage()}]
       [keep%: {keepPercentage()}]
+      [avg score points: {avgScorePoints()}]
       [avg 10-1-10 points: {avg10to1to10Points()}]
+      [avg% of win-points: {avgWinPoints()}]
     </div>
   );
 };

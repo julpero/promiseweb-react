@@ -233,10 +233,9 @@ const OnePlayerReport = ({playerName}: IProps) => {
   return (
     <React.Fragment>
       {allReportData &&
-        <React.Fragment>
-          <OnePlayerStatsSummary description="Total" gameReportData={{playerName: playerName, gamesData: allReportData}} />
-        </React.Fragment>
+        <OnePlayerStatsSummary description="Total" gameReportData={{playerName: playerName, gamesData: allReportData}} />
       }
+      <hr />
       {allReportData &&
         renderTimeLine()
       }
@@ -244,9 +243,7 @@ const OnePlayerReport = ({playerName}: IProps) => {
         renderPlayerSwitch()
       }
       {reportDataToShow &&
-      <React.Fragment>
         <OnePlayerStatsSummary description="Filtered" gameReportData={reportDataToShow} />
-      </React.Fragment>
       }
 
       <OnePlayerStatsPerOpponents gameReportData={reportDataToShow} />
