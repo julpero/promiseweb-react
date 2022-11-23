@@ -2,11 +2,13 @@ import React, { useEffect } from "react";
 
 import { useSelector } from "react-redux";
 import { getCurrentRoundInfo } from "../store/roundInfoSlice";
+import { getCurrentGameInfo } from "../store/gameInfoSlice";
 
 import { Table } from "react-bootstrap";
 import { IuiPlayerPromise } from "../interfaces/IuiPlayingGame";
 import ReactTooltip from "react-tooltip";
-import { colorize } from "../common/commonFunctions";
+import { colorize, isRuleActive } from "../common/commonFunctions";
+import { RULE } from "../interfaces/IuiGameOptions";
 
 /**
  * Promises made, table in bottom screen
@@ -14,6 +16,7 @@ import { colorize } from "../common/commonFunctions";
 const PromiseTable = () => {
   // console.log("PromiseTable");
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  const currentGameInfo = useSelector(getCurrentGameInfo);
 
   useEffect(() => {
     ReactTooltip.rebuild();
@@ -140,6 +143,16 @@ const PromiseTable = () => {
     );
   };
 
+  const renderRoundTotalPromise = () => {
+    if (!promiseTable || !isRuleActive(currentGameInfo.rules, RULE.onlyTotalPromise)) return null;
+    const currentRoundInd = currentRoundInfo.roundInd;
+    const retStr = "Tot.Pro:";
+    if (promiseTable.rounds[currentRoundInd].totalPromise !== null) {
+      return `${retStr} ${promiseTable.rounds[currentRoundInd].totalPromise}`;
+    }
+    return `${retStr} -`;
+  };
+
   return (
     <div id="promisetableArea">
       <ReactTooltip id="promisesThTooltip" getContent={(dataTip) => renderTotalPromiseTooltip(dataTip)} />
@@ -147,7 +160,7 @@ const PromiseTable = () => {
       <Table size="sm">
         <thead>
           <tr>
-            <th />
+            <td className="totalPromiseCell">{renderRoundTotalPromise()}</td>
             {renderPromiseTableHeader()}
           </tr>
         </thead>

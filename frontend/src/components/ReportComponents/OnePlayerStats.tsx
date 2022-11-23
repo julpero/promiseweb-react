@@ -178,7 +178,7 @@ const OnePlayerStats = ({gameReportData}: IProps) => {
     },
     plugins: {
       title: {
-        display: true,
+        display: false,
         text: `Player Report - ${gameReportData?.playerName}`
       },
       tooltip: {

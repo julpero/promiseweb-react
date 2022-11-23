@@ -102,6 +102,11 @@ const CreateGame = (props: IProps) => {
           <div>Promises of the other players are visible only after all promises are made.</div>
         );
       }
+      case "onlyTotalPromise": {
+        return (
+          <div>Only the total sum of promises is visible. While promising phase, this is same as the &quot;Hidden promise round&quot; rule.</div>
+        );
+      }
       case "opponentPromiseCardValue": {
         return (
           <div>Players see other players hand value while promising.</div>
@@ -238,7 +243,6 @@ const CreateGame = (props: IProps) => {
                   <div className="row">
                     <div className="col">
                       <Field
-                        disabled
                         name="onlyTotalPromise"
                         type="checkbox"
                         component={CheckboxInput}
@@ -247,6 +251,8 @@ const CreateGame = (props: IProps) => {
                         onChange={(checked: boolean) => {
                           form.change("onlyTotalPromise", checked);
                         }}
+                        data-for="ruleInfoTooltip"
+                        data-tip="onlyTotalPromise"
                       />
                     </div>
                     <div className="col">

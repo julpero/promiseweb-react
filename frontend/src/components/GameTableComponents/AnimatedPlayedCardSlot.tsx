@@ -8,13 +8,15 @@ import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 import { getUser } from "../../store/userSlice";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
+import { IuiAnimationTimes } from "../../interfaces/IuiPlayingGame";
 
 interface IProps {
   index: number,
   styleProps: CSSProperties,
+  animationTimes: IuiAnimationTimes,
 }
 
-const AnimatedPlayedCardSlot = ({index, styleProps}: IProps) => {
+const AnimatedPlayedCardSlot = ({index, styleProps, animationTimes}: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const user = useSelector(getUser);
 
@@ -39,6 +41,7 @@ const AnimatedPlayedCardSlot = ({index, styleProps}: IProps) => {
         animationObject={animationObject}
         isCardInCharge={thisIsCardInCharge}
         isWinningCard={thisIsWinningCard}
+        animationTimes={animationTimes}
       >
         {cardFace}
       </ AnimatedCardSlot>

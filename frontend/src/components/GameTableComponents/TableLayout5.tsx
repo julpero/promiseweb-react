@@ -11,10 +11,14 @@ import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { cardAsString } from "../../common/commonFunctions";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 import AnimatedPlayedCardSlot from "./AnimatedPlayedCardSlot";
-import { CARD_ALIGN_TYPE } from "../../interfaces/IuiPlayingGame";
+import { CARD_ALIGN_TYPE, IuiAnimationTimes } from "../../interfaces/IuiPlayingGame";
 import { getUser } from "../../store/userSlice";
 
-const TableLayout5 = () => {
+interface IProps {
+  animationTimes: IuiAnimationTimes,
+}
+
+const TableLayout5 = ({animationTimes}: IProps) => {
   // console.log("TableLayout5");
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const user = useSelector(getUser);
@@ -49,10 +53,12 @@ const TableLayout5 = () => {
           borderRight: "1px inset cyan",
         }}
         oneRow={true}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={2}
         styleProps={{top: "150px", left: "40%"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -69,10 +75,12 @@ const TableLayout5 = () => {
           borderRight: "1px inset cyan",
         }}
         oneRow={true}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={3}
         styleProps={{top: "150px", right: "40%"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -87,10 +95,12 @@ const TableLayout5 = () => {
           borderTop: "1px inset cyan",
           borderLeft: "1px inset cyan",
         }}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={1}
         styleProps={{top: "270px", left: "40%"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -105,14 +115,17 @@ const TableLayout5 = () => {
           borderTop: "1px inset cyan",
           borderRight: "1px inset cyan",
         }}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={4}
         styleProps={{top: "270px", right: "40%"}}
+        animationTimes={animationTimes}
       />
 
       <TrumpSlot
         styleProps={{top: "30px", left: "50%", right: "50%", transform: "translate(-50%, 0)"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -127,10 +140,12 @@ const TableLayout5 = () => {
           borderBottom: "1px inset cyan",
           borderLeft: "1px inset cyan",
         }}
+        animationTimes={animationTimes}
       />
       <OwnPlayer
         maxCards={10}
         styleProps={{bottom: "2%", left: "27%", width: "65%"}}
+        animationTimes={animationTimes}
       />
       <div
         className="myPlayedCardDiv"
@@ -145,6 +160,7 @@ const TableLayout5 = () => {
           containerId={`cardPlayedDivX${myName}`}
           classStr={classStr}
           animationObject={animationObject}
+          animationTimes={animationTimes}
           isCardInCharge={iAmStarter && roundToPlayer.cardsPlayed.length > 0}
           isWinningCard={iHaveWinningCard}
         >

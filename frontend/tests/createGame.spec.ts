@@ -18,6 +18,7 @@ test("Create and dismiss game", async ({ page }) => {
   // rules
   await page.locator("input[data-tip='noEvenPromises']").check();
   await page.locator("input[data-tip='hidePromiseRound']").check();
+  await page.locator("input[data-tip='onlyTotalPromise']").check();
   await page.locator("input[data-tip='opponentPromiseCardValue']").check();
   await page.locator("input[data-tip='opponentGameCardValue']").check();
   await page.locator("input[data-tip='thisIsDemoGame']").check();

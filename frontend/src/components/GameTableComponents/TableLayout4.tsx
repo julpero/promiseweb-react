@@ -11,10 +11,14 @@ import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { cardAsString } from "../../common/commonFunctions";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 import AnimatedPlayedCardSlot from "./AnimatedPlayedCardSlot";
-import { CARD_ALIGN_TYPE } from "../../interfaces/IuiPlayingGame";
+import { CARD_ALIGN_TYPE, IuiAnimationTimes } from "../../interfaces/IuiPlayingGame";
 import { getUser } from "../../store/userSlice";
 
-const TableLayout4 = () => {
+interface IProps {
+  animationTimes: IuiAnimationTimes,
+}
+
+const TableLayout4 = ({animationTimes}: IProps) => {
   // console.log("TableLayout4");
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const user = useSelector(getUser);
@@ -47,10 +51,12 @@ const TableLayout4 = () => {
           borderTop: "1px inset cyan",
           borderLeft: "1px inset cyan",
         }}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={1}
         styleProps={{top: "30%", left: "30%"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -65,10 +71,12 @@ const TableLayout4 = () => {
           borderTop: "1px inset cyan",
           borderRight: "1px inset cyan",
         }}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={2}
         styleProps={{top: "28%", right: "40%"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -82,14 +90,17 @@ const TableLayout4 = () => {
           borderRadius: "5px",
           borderRight: "1px inset cyan",
         }}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={3}
         styleProps={{top: "50%", right: "45%"}}
+        animationTimes={animationTimes}
       />
 
       <TrumpSlot
         styleProps={{top: "5%", left: "50%", right: "50%", transform: "translate(-50%, 0)"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -103,16 +114,19 @@ const TableLayout4 = () => {
           borderRadius: "5px",
           borderLeft: "1px inset cyan",
         }}
+        animationTimes={animationTimes}
       />
       <OwnPlayer
         maxCards={10}
         styleProps={{bottom: "2%", left: "1%", width: "65%"}}
+        animationTimes={animationTimes}
       />
       <div className="myPlayedCardDiv" style={{bottom: "165px", left: "35%", right: "60%", transform: "translate(-40%, 0)"}}>
         <AnimatedCardSlot
           containerId={`cardPlayedDivX${myName}`}
           classStr={classStr}
           animationObject={animationObject}
+          animationTimes={animationTimes}
           isCardInCharge={iAmStarter && roundToPlayer.cardsPlayed.length > 0}
           isWinningCard={iHaveWinningCard}
         >

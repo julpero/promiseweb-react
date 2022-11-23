@@ -8,11 +8,25 @@ export type CardValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 
 export type Suite = "hearts" | "spades" | "diamonds" | "clubs" | "dummy";
 export type PromiseValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
-export const ANIMATION_TIMES = {
+export interface IuiAnimationTimes {
+  collectDelay: number,
+  collectDuration: number,
+  playDelay: number,
+  playDuration: number,
+}
+
+export const ANIMATION_TIMES: IuiAnimationTimes = {
   collectDelay: 400,
   collectDuration: 900,
   playDelay: 300,
   playDuration: 800,
+};
+
+export const DEBUG_ANIMATION_TIMES: IuiAnimationTimes = {
+  collectDelay: 50,
+  collectDuration: 100,
+  playDelay: 50,
+  playDuration: 100,
 };
 
 export enum PLAY_CARD_RESPONSE {

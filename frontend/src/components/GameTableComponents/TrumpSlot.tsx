@@ -2,16 +2,17 @@ import React, { CSSProperties, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { cardAsString } from "../../common/commonFunctions";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
-import { IuiCard } from "../../interfaces/IuiPlayingGame";
+import { IuiAnimationTimes, IuiCard } from "../../interfaces/IuiPlayingGame";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 
 interface IProps {
   styleProps?: CSSProperties,
+  animationTimes: IuiAnimationTimes,
 }
 
-const TrumpSlot = ({styleProps}: IProps) => {
+const TrumpSlot = ({styleProps, animationTimes}: IProps) => {
   const [trump, setTrump] = useState<IuiCard | null>(null);
   const [cardFace, setCardFace] = useState<JSX.Element | undefined>(undefined);
   const [animationObject, setAnimationObject] = useState(commonAnimationObject(true));
@@ -44,6 +45,7 @@ const TrumpSlot = ({styleProps}: IProps) => {
           containerId={`overDeckSlotX${i}`}
           classStr="stackedCards"
           animationObject={commonAnimationObject()}
+          animationTimes={animationTimes}
         >
           {overCardFace}
         </AnimatedCardSlot>
@@ -60,6 +62,7 @@ const TrumpSlot = ({styleProps}: IProps) => {
         containerId="trumpCardDiv"
         classStr="trumpCardCol"
         animationObject={animationObject}
+        animationTimes={animationTimes}
       >
         {cardFace}
       </AnimatedCardSlot>

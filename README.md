@@ -14,6 +14,7 @@ PromiseWeb Card Game App Using The MERN Stack With TypeScript & Redux and Socket
 - Redux
 - Socket.io
 - React Spring
+- Playwright
 
 ## Environment Variables
 

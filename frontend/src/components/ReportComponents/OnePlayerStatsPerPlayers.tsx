@@ -78,9 +78,10 @@ const OnePlayerStatsPerPlayers = ({gameReportData}: IProps) => {
   };
 
   const getDataSetsData = (): ChartDataset<"bar">[] => {
+    playedGamesCount.current = [];
     const dataSetsData: ChartDataset<"bar">[] = [];
     if (!gameReportData) return dataSetsData;
-    console.log(gameReportData);
+    // console.log(gameReportData);
 
     const {gamesData} = gameReportData;
     const threeData = gamesData.filter(data => data.playersInGame === 3);

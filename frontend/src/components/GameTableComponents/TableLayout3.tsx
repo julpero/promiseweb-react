@@ -11,10 +11,14 @@ import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { cardAsString } from "../../common/commonFunctions";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
 import AnimatedPlayedCardSlot from "./AnimatedPlayedCardSlot";
-import { CARD_ALIGN_TYPE } from "../../interfaces/IuiPlayingGame";
+import { CARD_ALIGN_TYPE, IuiAnimationTimes } from "../../interfaces/IuiPlayingGame";
 import { getUser } from "../../store/userSlice";
 
-const TableLayout3 = () => {
+interface IProps {
+  animationTimes: IuiAnimationTimes,
+}
+
+const TableLayout3 = ({animationTimes}: IProps) => {
   // console.log("TableLayout3");
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const user = useSelector(getUser);
@@ -47,10 +51,12 @@ const TableLayout3 = () => {
           borderTop: "1px inset cyan",
           borderLeft: "1px inset cyan",
         }}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={1}
         styleProps={{top: "200px", left: "30%"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -65,14 +71,17 @@ const TableLayout3 = () => {
           borderTop: "1px inset cyan",
           borderRight: "1px inset cyan",
         }}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={2}
         styleProps={{top: "200px", right: "30%"}}
+        animationTimes={animationTimes}
       />
 
       <TrumpSlot
         styleProps={{top: "5%", left: "50%", right: "50%", transform: "translate(-50%, 0)"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -87,16 +96,19 @@ const TableLayout3 = () => {
           borderBottom: "1px inset cyan",
           borderLeft: "1px inset cyan",
         }}
+        animationTimes={animationTimes}
       />
       <OwnPlayer
         maxCards={10}
         styleProps={{bottom: "2%", left: "30%", width: "65%"}}
+        animationTimes={animationTimes}
       />
       <div className="myPlayedCardDiv" style={{top: "50%", left: "50%", right: "50%", transform: "translate(-50%, 0)"}}>
         <AnimatedCardSlot
           containerId={`cardPlayedDivX${myName}`}
           classStr={classStr}
           animationObject={animationObject}
+          animationTimes={animationTimes}
           isCardInCharge={iAmStarter && roundToPlayer.cardsPlayed.length > 0}
           isWinningCard={iHaveWinningCard}
         >

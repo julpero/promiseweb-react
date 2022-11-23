@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
-import { IuiOnePlayerReportData, IuiOnePlayerReportRequest, IuiOnePlayerReportResponse } from "../interfaces/IuiReports";
+import { IuiOneGameData, IuiOnePlayerReportData, IuiOnePlayerReportRequest, IuiOnePlayerReportResponse } from "../interfaces/IuiReports";
 import { useSocket } from "../socket";
 import { getUser } from "../store/userSlice";
 import OnePlayerStats from "./ReportComponents/OnePlayerStats";
@@ -12,14 +12,22 @@ import isAfter from "date-fns/isAfter";
 import sub from "date-fns/sub";
 import { setSpinnerVisible } from "../store/spinnerSlice";
 import OnePlayerStatsPerPlayers from "./ReportComponents/OnePlayerStatsPerPlayers";
+import Form from "react-bootstrap/Form";
+import OnePlayerStatsPerOpponents from "./ReportComponents/OnePlayerStatsPerOpponents";
+import OnePlayerStatsPerPlayersInGame from "./ReportComponents/OnePlayerStatsPerPlayersInGame";
+import OnePlayerStatsSummary from "./ReportComponents/OnePlayerStatsSummary";
 
 interface IProps {
   playerName: string,
 }
 
 const OnePlayerReport = ({playerName}: IProps) => {
-  const [reportData, setReportData] = useState<IuiOnePlayerReportData>();
+  const [allReportData, setAllReportData] = useState<IuiOneGameData[]>();
   const [reportDataToShow, setReportDataToShow] = useState<IuiOnePlayerReportData>();
+
+  const [yearFilter, setYearFilter] = useState("");
+  const [playerFilter, setPlayerFilter] = useState<string[]>([]);
+
   const user = useSelector(getUser);
   const dispatch = useDispatch();
   const { socket } = useSocket();
@@ -43,8 +51,8 @@ const OnePlayerReport = ({playerName}: IProps) => {
         dispatch(setSpinnerVisible(false));
         if (playerReportResponse.isAuthenticated) {
           handleAuthenticatedRequest(playerReportResponse.token);
-          setReportData(playerReportResponse.onePlayerReport);
-          setReportDataToShow(playerReportResponse.onePlayerReport);
+          setAllReportData(playerReportResponse.onePlayerReport.gamesData);
+          setReportDataToShow({...playerReportResponse.onePlayerReport || undefined});
         } else {
           handleUnauthenticatedRequest(dispatch);
         }
@@ -52,80 +60,106 @@ const OnePlayerReport = ({playerName}: IProps) => {
     }
   }, [playerName, user, socket, dispatch]);
 
-  const handleTimeLineButtons = (button: string) => {
-    const now = Date.now();
-    const minusWeek = sub(now, {weeks: 1});
-    const minusMonth = sub(now, {months: 1});
-    const minusMonth2 = sub(now, {months: 2});
-    const minusMonth3 = sub(now, {months: 3});
-    const minusMonth6 = sub(now, {months: 6});
-    const minusYear = sub(now, {years: 1});
-    if (reportData) {
-      switch (button) {
-        case "-1wk": {
-          setReportDataToShow({
-            playerName: reportData.playerName,
-            gamesData: reportData.gamesData.filter(data => isAfter(parseISO(data.started.toString()), minusWeek)),
-          });
-          break;
-        }
-        case "-1mo": {
-          setReportDataToShow({
-            playerName: reportData.playerName,
-            gamesData: reportData.gamesData.filter(data => isAfter(parseISO(data.started.toString()), minusMonth)),
-          });
-          break;
-        }
-        case "-2mo": {
-          setReportDataToShow({
-            playerName: reportData.playerName,
-            gamesData: reportData.gamesData.filter(data => isAfter(parseISO(data.started.toString()), minusMonth2)),
-          });
-          break;
-        }
-        case "-3mo": {
-          setReportDataToShow({
-            playerName: reportData.playerName,
-            gamesData: reportData.gamesData.filter(data => isAfter(parseISO(data.started.toString()), minusMonth3)),
-          });
-          break;
-        }
-        case "-6mo": {
-          setReportDataToShow({
-            playerName: reportData.playerName,
-            gamesData: reportData.gamesData.filter(data => isAfter(parseISO(data.started.toString()), minusMonth6)),
-          });
-          break;
-        }
-        case "-1year": {
-          setReportDataToShow({
-            playerName: reportData.playerName,
-            gamesData: reportData.gamesData.filter(data => isAfter(parseISO(data.started.toString()), minusYear)),
-          });
-          break;
-        }
-        default: {
-          const year = parseInt(button, 10);
-          if (!isNaN(year)) {
-            setReportDataToShow({
-              playerName: reportData.playerName,
-              gamesData: reportData.gamesData.filter(data => getYear(parseISO(data.started.toString())) === year),
-            });
-          } else {
-            setReportDataToShow(reportData);
+  useEffect(() => {
+    const handleTimeLineReportFilter = (): IuiOnePlayerReportData | undefined => {
+      const now = Date.now();
+      const minusWeek = sub(now, {weeks: 1});
+      const minusMonth = sub(now, {months: 1});
+      const minusMonth2 = sub(now, {months: 2});
+      const minusMonth3 = sub(now, {months: 3});
+      const minusMonth6 = sub(now, {months: 6});
+      const minusYear = sub(now, {years: 1});
+      if (allReportData) {
+        // console.log("yearFilter", yearFilter);
+        switch (yearFilter) {
+          case "-1wk": {
+            return {
+              playerName: playerName,
+              gamesData: allReportData.filter(data => isAfter(parseISO(data.started.toString()), minusWeek)),
+            };
           }
-          break;
+          case "-1mo": {
+            return {
+              playerName: playerName,
+              gamesData: allReportData.filter(data => isAfter(parseISO(data.started.toString()), minusMonth)),
+            };
+          }
+          case "-2mo": {
+            return {
+              playerName: playerName,
+              gamesData: allReportData.filter(data => isAfter(parseISO(data.started.toString()), minusMonth2)),
+            };
+          }
+          case "-3mo": {
+            return {
+              playerName: playerName,
+              gamesData: allReportData.filter(data => isAfter(parseISO(data.started.toString()), minusMonth3)),
+            };
+          }
+          case "-6mo": {
+            return {
+              playerName: playerName,
+              gamesData: allReportData.filter(data => isAfter(parseISO(data.started.toString()), minusMonth6)),
+            };
+          }
+          case "-1year": {
+            return {
+              playerName: playerName,
+              gamesData: allReportData.filter(data => isAfter(parseISO(data.started.toString()), minusYear)),
+            };
+          }
+          default: {
+            const year = parseInt(yearFilter, 10);
+            if (!isNaN(year)) {
+              return {
+                playerName: playerName,
+                gamesData: allReportData.filter(data => getYear(parseISO(data.started.toString())) === year),
+              };
+            } else {
+              return {
+                playerName: playerName,
+                gamesData: allReportData,
+              };
+            }
+          }
         }
       }
+    };
+
+    if (allReportData) {
+      // console.log("allReportData", allReportData);
+      const reportToShow = handleTimeLineReportFilter();
+      // console.log("reportToShow 1", reportToShow);
+      if (reportToShow?.gamesData && playerFilter.length > 0) {
+        // console.log("playerFilter", playerFilter);
+
+        const gamesToReport: IuiOneGameData[] = [];
+        reportToShow?.gamesData.forEach(game => {
+          let includeGame = true;
+          playerFilter.forEach(filter => {
+            if (!game.opponents.some(opponent => opponent === filter)) {
+              includeGame = false;
+            }
+          });
+          if (includeGame) {
+            gamesToReport.push(game);
+          }
+          // console.log(`game ${game.gameId} to report ${includeGame}`);
+        });
+        reportToShow.gamesData = gamesToReport;
+        // console.log("reportToShow 2", reportToShow);
+      }
+      setReportDataToShow(reportToShow);
+
     }
-  };
+  }, [yearFilter, playerFilter, playerName, allReportData]);
 
   const renderYearButtons = () => {
-    const yearArr = reportData?.gamesData.flatMap(data => getYear(parseISO(data.started.toString())).toString()) ?? [];
+    const yearArr = allReportData?.flatMap(data => getYear(parseISO(data.started.toString())).toString()) ?? [];
     const distinctYearArr = Array.from(new Set( [...yearArr] ));
     return distinctYearArr.map((year, ind) => {
       return (
-        <Button className="timeLineButton" key={ind} size="sm" onClick={() => handleTimeLineButtons(year)}>
+        <Button className="timeLineButton" key={ind} size="sm" onClick={() => setYearFilter(year)}>
           {year}
         </Button>
       );
@@ -135,39 +169,87 @@ const OnePlayerReport = ({playerName}: IProps) => {
   const renderTimeLine = () => {
     return (
       <div>
-        <Button className="timeLineButton" size="sm" onClick={() => handleTimeLineButtons("all")}>
+        <Button className="timeLineButton" size="sm" onClick={() => setYearFilter("all")}>
           All
         </Button>
         {renderYearButtons()}
-        <Button className="timeLineButton" size="sm"  onClick={() => handleTimeLineButtons("-1year")}>
+        <Button className="timeLineButton" size="sm"  onClick={() => setYearFilter("-1year")}>
           -1 year
         </Button>
-        <Button className="timeLineButton" size="sm"  onClick={() => handleTimeLineButtons("-6mo")}>
+        <Button className="timeLineButton" size="sm"  onClick={() => setYearFilter("-6mo")}>
           -6 mo
         </Button>
-        <Button className="timeLineButton" size="sm"  onClick={() => handleTimeLineButtons("-3mo")}>
+        <Button className="timeLineButton" size="sm"  onClick={() => setYearFilter("-3mo")}>
           -3 mo
         </Button>
-        <Button className="timeLineButton" size="sm"  onClick={() => handleTimeLineButtons("-2mo")}>
+        <Button className="timeLineButton" size="sm"  onClick={() => setYearFilter("-2mo")}>
           -2 mo
         </Button>
-        <Button className="timeLineButton" size="sm"  onClick={() => handleTimeLineButtons("-1mo")}>
+        <Button className="timeLineButton" size="sm"  onClick={() => setYearFilter("-1mo")}>
           -1 mo
         </Button>
-        <Button className="timeLineButton" size="sm"  onClick={() => handleTimeLineButtons("-1wk")}>
+        <Button className="timeLineButton" size="sm"  onClick={() => setYearFilter("-1wk")}>
           -1 wk
         </Button>
       </div>
     );
   };
 
+  const handleOpponentFilterClick = (opponentName: string, filterOn: boolean) => {
+    // console.log(opponentName, filterOn);
+    let currentFilter = [...playerFilter];
+    if (filterOn) {
+      if (!currentFilter.some(opponent => opponent === opponentName)) {
+        currentFilter.push(opponentName);
+      }
+    } else {
+      currentFilter = currentFilter.filter(opponent => opponent !== opponentName);
+    }
+    // console.log(currentFilter);
+    setPlayerFilter(currentFilter);
+  };
+
+  const renderPlayerButtons = () => {
+    // console.log("allReportData", allReportData);
+    const playersArr = allReportData?.flatMap(data => data.opponents) ?? [];
+    const distinctPlayersArr = Array.from(new Set( [...playersArr] ));
+    return distinctPlayersArr.sort((a: string, b: string) => a.localeCompare(b)).map((player, ind) => {
+      return (
+        <Form.Check inline type="switch" id={`inline-switch-${ind}`} key={ind} label={player} name={player} onChange={(e) => handleOpponentFilterClick(e.target.name, e.target.checked)} />
+      );
+    });
+  };
+
+  const renderPlayerSwitch = () => {
+    return (
+      <Form>
+        <div key="inline-switch" className="mb-3">
+          {renderPlayerButtons()}
+        </div>
+      </Form>
+    );
+  };
+
   return (
     <React.Fragment>
-      {reportData &&
+      {allReportData &&
+        <OnePlayerStatsSummary description="Total" gameReportData={{playerName: playerName, gamesData: allReportData}} />
+      }
+      <hr />
+      {allReportData &&
         renderTimeLine()
       }
-      <OnePlayerStats gameReportData={reportDataToShow} />
+      {allReportData &&
+        renderPlayerSwitch()
+      }
+      {reportDataToShow &&
+        <OnePlayerStatsSummary description="Filtered" gameReportData={reportDataToShow} />
+      }
+
+      <OnePlayerStatsPerOpponents gameReportData={reportDataToShow} />
       <OnePlayerStatsPerPlayers gameReportData={reportDataToShow} />
+      <OnePlayerStatsPerPlayersInGame gameReportData={reportDataToShow} />
+      <OnePlayerStats gameReportData={reportDataToShow} />
     </React.Fragment>
   );
 };
