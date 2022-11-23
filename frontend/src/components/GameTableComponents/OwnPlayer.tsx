@@ -6,13 +6,15 @@ import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 import PromiseButtons from "./PromiseButtons";
 import CardSlots from "./CardSlots";
 import { getUser } from "../../store/userSlice";
+import { IuiAnimationTimes } from "../../interfaces/IuiPlayingGame";
 
 interface IProps {
   maxCards: number,
   styleProps?: CSSProperties,
+  animationTimes: IuiAnimationTimes,
 }
 
-const OwnPlayer = ({maxCards, styleProps}: IProps) => {
+const OwnPlayer = ({maxCards, styleProps, animationTimes}: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const user = useSelector(getUser);
   if (!currentRoundInfo.gameId || !user.isUserLoggedIn) return null;
@@ -33,6 +35,7 @@ const OwnPlayer = ({maxCards, styleProps}: IProps) => {
         player={me}
         slotCount={maxCards}
         cards={currentRoundInfo.roundToPlayer.myCards}
+        animationTimes={animationTimes}
       />
       <PromiseButtons />
     </div>

@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { GAME_STATUS, ROUND_STATUS, RULE } from "../../frontend/src/interfaces/IuiGameOptions";
 import {
+  ANIMATION_TIMES,
+  DEBUG_ANIMATION_TIMES,
   IuiMakePromiseRequest,
   IuiMakePromiseResponse,
   IuiPlayCardRequest,
@@ -114,7 +116,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
 
     const now = Date.now();
 
-    const animationTime = getAdditionalTimeToPromise(round.roundPlayers);
+    const animationTime = getAdditionalTimeToPromise(round.roundPlayers, gameInDb.thisIsDemoGame ? DEBUG_ANIMATION_TIMES : ANIMATION_TIMES);
     let promiseTime = now - (gameInDb.game.lastTimeStamp + animationTime);
 
     if (promiseTime < 0) {
@@ -212,7 +214,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
     const myIndexInRound = getPlayerIndexFromRoundByName(round.roundPlayers, userName, originalPlayerName);
     const now = Date.now();
 
-    const animationTime = getCurrentAnimationTime(round, playIndex);
+    const animationTime = getCurrentAnimationTime(round, playIndex, gameInDb.thisIsDemoGame ? DEBUG_ANIMATION_TIMES : ANIMATION_TIMES);
     const playTime = now - (gameInDb.game.lastTimeStamp + animationTime);
     round.cardsPlayed[playIndex].push({
       name: originalPlayerName ?? userName,

@@ -6,7 +6,7 @@ import {
 } from "../../store/roundInfoSlice";
 
 import { cardAsString } from "../../common/commonFunctions";
-import { CARD_ALIGN_TYPE, IuiCard, IuiGetRoundResponse, IuiRoundPlayer, IuiRoundToPlayer, ROUND_PHASE } from "../../interfaces/IuiPlayingGame";
+import { CARD_ALIGN_TYPE, IuiAnimationTimes, IuiCard, IuiGetRoundResponse, IuiRoundPlayer, IuiRoundToPlayer, ROUND_PHASE } from "../../interfaces/IuiPlayingGame";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { setPlayedCard } from "../../store/playCardSlice";
@@ -19,9 +19,10 @@ interface IProps {
   // cardsRemainingCount: number,
   playedSlot?: number,
   align?: CARD_ALIGN_TYPE,
+  animationTimes: IuiAnimationTimes,
 }
 
-const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
+const CardSlots = ({player, slotCount, cards, playedSlot, align, animationTimes}: IProps) => {
   const currentRoundInfo: IuiGetRoundResponse = useSelector(getCurrentRoundInfo);
   const dispatch = useDispatch();
   // console.log("CardSlots");
@@ -83,6 +84,7 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
           <AnimatedCardSlot
             containerId={`cardsToPlaySlotsX${name}X${i}`}
             animationObject={commonAnimationObject()}
+            animationTimes={animationTimes}
           />
         </div>
       );
@@ -99,6 +101,7 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align}: IProps) => {
             containerId={`cardsToPlaySlotsX${name}X${i}`}
             classStr={classStrArr.join(" ")}
             animationObject={commonAnimationObject()}
+            animationTimes={animationTimes}
             onPlayCard={
               () => playCard(canPlayThisCard === CARD_PLAYABLE.ok ? cardToRender : null)
             }

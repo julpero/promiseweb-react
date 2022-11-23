@@ -1,6 +1,6 @@
 import { Suite } from "card-games-typescript";
 import { ROUND_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
-import { ANIMATION_TIMES, IuiCard } from "../../frontend/src/interfaces/IuiPlayingGame";
+import { IuiAnimationTimes, IuiCard } from "../../frontend/src/interfaces/IuiPlayingGame";
 import { getPlayerAvgPoints } from "../dbActions/promiseweb";
 import { ICard, ICardPlayed, IGame, IGameOptions, IPlayer, IPlayerInTurn, IPlayerStats, IPromiser, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 import { ICardToIuiCard } from "./model";
@@ -101,7 +101,7 @@ export const getCurrentPlayIndex = (round: IRound): number => {
   return round.cardsPlayed.length - 1;
 };
 
-export const getAdditionalTimeToPromise = (roundPlayers: IRoundPlayer[]): number => {
+export const getAdditionalTimeToPromise = (roundPlayers: IRoundPlayer[], animationTimes: IuiAnimationTimes): number => {
   let animationTime = 0;
 
   // before first promiser there is animation delay of playing and collecting last play of previous round
@@ -109,24 +109,24 @@ export const getAdditionalTimeToPromise = (roundPlayers: IRoundPlayer[]): number
   // but we can add same time because there is some waiting time when redirecting players to cardboard
   // and rendering it
   if (!roundPlayers.some(player => player.promise !== null)) {
-    animationTime+= ANIMATION_TIMES.playDelay + ANIMATION_TIMES.playDuration + ANIMATION_TIMES.collectDelay + ANIMATION_TIMES.collectDuration;
+    animationTime+= animationTimes.playDelay + animationTimes.playDuration + animationTimes.collectDelay + animationTimes.collectDuration;
   }
 
   // console.log("promise animationTime", animationTime);
   return animationTime;
 };
 
-export const getCurrentAnimationTime = (round: IRound, playIndex: number): number => {
+export const getCurrentAnimationTime = (round: IRound, playIndex: number, animationTimes: IuiAnimationTimes): number => {
   let animationTime = 0;
 
   if (playIndex === 0 && round.cardsPlayed[playIndex].length === 0) {
     // first card in round, previous action was the last promise -> no animations
   } else {
     // animation time is at least play delay and duration
-    animationTime+= ANIMATION_TIMES.playDelay + ANIMATION_TIMES.playDuration;
+    animationTime+= animationTimes.playDelay + animationTimes.playDuration;
 
     // first card in new hit round, previous action was hit and collecting cards -> add also collect durations
-    if (playIndex > 0 && round.cardsPlayed[playIndex].length === 0) animationTime+= ANIMATION_TIMES.collectDelay + ANIMATION_TIMES.collectDuration;
+    if (playIndex > 0 && round.cardsPlayed[playIndex].length === 0) animationTime+= animationTimes.collectDelay + animationTimes.collectDuration;
   }
 
   // console.log("card animationTime", animationTime);

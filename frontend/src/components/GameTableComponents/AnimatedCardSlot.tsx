@@ -10,7 +10,7 @@ import { useSpring, animated, easings } from "react-spring";
 import { cardAsString, randomNegToPos } from "../../common/commonFunctions";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { IuiSpringObject } from "../../interfaces/IuiAnimation";
-import { ANIMATION_TIMES } from "../../interfaces/IuiPlayingGame";
+import { IuiAnimationTimes } from "../../interfaces/IuiPlayingGame";
 
 interface IProps {
   containerId: string,
@@ -20,9 +20,10 @@ interface IProps {
   onPlayCard?: () => void,
   isCardInCharge?: boolean,
   isWinningCard?: boolean,
+  animationTimes: IuiAnimationTimes,
 }
 
-const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onPlayCard, isCardInCharge, isWinningCard}: IProps) => {
+const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onPlayCard, isCardInCharge, isWinningCard, animationTimes}: IProps) => {
   const [child, setChild] = useState<JSX.Element | undefined>(undefined);
   const initialChildren = useRef<JSX.Element | undefined>(children);
   const initialEffect = useRef(true);
@@ -59,8 +60,8 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
         const fromY = playedTo.top- playedFrom.top;
         const springObject = {
           from: { },
-          config: { duration: ANIMATION_TIMES.collectDuration, easing: easings.easeOutQuint },
-          delay: ANIMATION_TIMES.collectDelay,
+          config: { duration: animationTimes.collectDuration, easing: easings.easeOutQuint },
+          delay: animationTimes.collectDelay,
           to: [{
             x: fromX,
             y: fromY,
@@ -85,7 +86,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
         setAnimation(springObject);
       }
     }
-  }, [collectCards, containerId, dispatch]);
+  }, [animationTimes, collectCards, containerId, dispatch]);
 
   useEffect(() => {
     if (emptySlot && emptySlot === containerId) {
@@ -122,8 +123,8 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
 
         const springObject = {
           from: { x: fromX, y: fromY },
-          config: { duration: ANIMATION_TIMES.playDuration, easing: easings.easeOutQuint },
-          delay: ANIMATION_TIMES.playDelay,
+          config: { duration: animationTimes.playDuration, easing: easings.easeOutQuint },
+          delay: animationTimes.playDelay,
           to: [{
             x: randomNegToPos(2),
             y: randomNegToPos(2),
@@ -150,7 +151,7 @@ const AnimatedCardSlot = ({containerId, children, classStr, animationObject, onP
         setAnimation(springObject);
       }
     }
-  }, [animateCard, containerId, dispatch]);
+  }, [animationTimes, animateCard, containerId, dispatch]);
 
   useEffect(() => {
     if (api && animation) {
