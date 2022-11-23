@@ -71,7 +71,7 @@ const PointsInGame = ({gameReportData}: IProps) => {
             let total = 0;
             if (chart) {
               for (let i = 0; i < chart.data.datasets.length; i++) {
-                total += chart.data.datasets[i].data[tooltipItem[0].dataIndex];
+                total += chart.data.datasets[i].data[tooltipItem[0].dataIndex] as number;
               }
             }
             return "TOTAL: "+total;
