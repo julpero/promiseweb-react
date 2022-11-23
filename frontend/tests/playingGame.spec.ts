@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { playGame, testCheckLoginSuccess, testGameBoardVisible, testLogIn, waitAndCloseOneGameReport } from "./commons/methods";
-import { pageUrl, ekaUser, tokaUser, vikaUser } from "./commons/testvariables";
+import { pageUrl, ekaUser, tokaUser, vikaUser, gameVariables } from "./commons/testvariables";
 
 test.describe.configure({ mode: "parallel" });
 
@@ -26,12 +26,18 @@ test("Play game as creator Eka", async ({ page }) => {
     await expect(createGameButton).toBeEnabled();
 
     // rounds
-    await page.selectOption("[label='Start round of the game']", "6");
-    await page.selectOption("[label='Turn round of the game']", "5");
-    await page.selectOption("[label='End round of the game']", "6");
+    await page.selectOption("[label='Start round of the game']", gameVariables.start);
+    await page.selectOption("[label='Turn round of the game']", gameVariables.turn);
+    await page.selectOption("[label='End round of the game']", gameVariables.end);
 
     // rules
     await page.locator("input[data-tip='thisIsDemoGame']").check();
+    if (gameVariables.hidePromiseRound) {
+      await page.locator("input[data-tip='hidePromiseRound']").check();
+    }
+    if (gameVariables.onlyTotalPromise) {
+      await page.locator("input[data-tip='onlyTotalPromise']").check();
+    }
     await createGameButton.click();
 
     await expect(page.locator("li", {hasText: ekaUser.name})).toHaveCount(1);

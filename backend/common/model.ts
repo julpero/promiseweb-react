@@ -86,19 +86,3 @@ export const IuiCardToICard = (card: IuiCard): ICard => {
     value: card.value,
   } as ICard;
 };
-
-/*
-export const rulesToArr = (gameOptions: IGameOptions): string[] => {
-  const rulesArr: string[] = [];
-  if (!gameOptions.evenPromisesAllowed) rulesArr.push("No even promises");
-  if (!gameOptions.visiblePromiseRound) rulesArr.push("Hidden promise round");
-  if (gameOptions.onlyTotalPromise) rulesArr.push("Show only total promise");
-  if (!gameOptions.freeTrump) rulesArr.push("Must play trump");
-  if (gameOptions.hiddenTrump) rulesArr.push("Hidden trump when promising");
-  if (gameOptions.speedPromise) rulesArr.push("Speed promise round");
-  if (gameOptions.privateSpeedGame) rulesArr.push("Speed game");
-  if (gameOptions.opponentPromiseCardValue) rulesArr.push("Hand");
-
-  return rulesArr;
-}
-*/

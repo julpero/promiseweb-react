@@ -721,7 +721,9 @@ connectDB().then(() => {
           return null;
         }
 
+        // console.time(`playCardResponse ${userName}`);
         const playCardResponse: IuiPlayCardResponse = await playCard(playCardRequest);
+        // console.timeEnd(`playCardResponse ${userName}`);
         if (playCardResponse.playResponse === PLAY_CARD_RESPONSE.playOk) {
           const {
             playerName,

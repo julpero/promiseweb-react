@@ -33,3 +33,11 @@ export const vikaUser: ITUser = {
   name: "Vika",
   pass: "3VikaPass",
 };
+
+export const gameVariables = {
+  start: "6",
+  turn: "5",
+  end: "6",
+  hidePromiseRound: false,
+  onlyTotalPromise: false,
+};

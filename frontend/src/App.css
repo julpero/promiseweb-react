@@ -318,6 +318,12 @@ body {
   border: 1px lightgray dotted;
 }
 
+.totalPromiseCell {
+  text-align: right;
+  cursor: default;
+  padding: 0.25em !important;
+  font-weight: bolder;
+}
 .tableCell {
   text-align: center;
   cursor: default;
