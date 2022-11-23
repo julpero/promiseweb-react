@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Modal } from "react-bootstrap";
 
 import { useDispatch, useSelector } from "react-redux";
+import { ANIMATION_TIMES, DEBUG_ANIMATION_TIMES, IuiAnimationTimes } from "../interfaces/IuiPlayingGame";
 import { getCurrentGameInfo, setGameId } from "../store/gameInfoSlice";
 import { getCurrentRoundInfo } from "../store/roundInfoSlice";
 
@@ -21,6 +22,8 @@ const CardBoard = () => {
   if (!currentGameInfo.gameId || !currentRoundInfo.gameId) return null;
   // console.log("CardBoard");
 
+  const animationTimes: IuiAnimationTimes = currentGameInfo.thisIsDemoGame ? DEBUG_ANIMATION_TIMES : ANIMATION_TIMES;
+
   const closeReportModal = () => {
     dispatch(setGameId(""));
   };
@@ -29,22 +32,22 @@ const CardBoard = () => {
     switch (playerCount) {
       case 3: {
         return (
-          <TableLayout3 />
+          <TableLayout3 animationTimes={animationTimes} />
         );
       }
       case 4: {
         return (
-          <TableLayout4 />
+          <TableLayout4 animationTimes={animationTimes} />
         );
       }
       case 5: {
         return (
-          <TableLayout5 />
+          <TableLayout5 animationTimes={animationTimes} />
         );
       }
       case 6: {
         return (
-          <TableLayout6 />
+          <TableLayout6 animationTimes={animationTimes} />
         );
       }
       default: {

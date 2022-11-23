@@ -10,11 +10,15 @@ import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { cardAsString } from "../../common/commonFunctions";
 import { commonAnimationObject } from "../../interfaces/IuiAnimation";
-import { CARD_ALIGN_TYPE } from "../../interfaces/IuiPlayingGame";
+import { CARD_ALIGN_TYPE, IuiAnimationTimes } from "../../interfaces/IuiPlayingGame";
 import AnimatedPlayedCardSlot from "./AnimatedPlayedCardSlot";
 import { getUser } from "../../store/userSlice";
 
-const TableLayout6 = () => {
+interface IProps {
+  animationTimes: IuiAnimationTimes,
+}
+
+const TableLayout6 = ({animationTimes}: IProps) => {
   // console.log("TableLayout6");
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const user = useSelector(getUser);
@@ -49,10 +53,12 @@ const TableLayout6 = () => {
           borderRight: "1px inset cyan",
         }}
         oneRow={true}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={3}
         styleProps={{top: "165px", left: "50%", right: "50%", transform: "translate(-50%, 0)"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -68,10 +74,12 @@ const TableLayout6 = () => {
           borderLeft: "1px inset cyan",
         }}
         oneRow={true}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={2}
         styleProps={{top: "290px", left: "40%"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -88,10 +96,12 @@ const TableLayout6 = () => {
           borderRight: "1px inset cyan",
         }}
         oneRow={true}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={4}
         styleProps={{top: "290px", right: "40%"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -107,10 +117,12 @@ const TableLayout6 = () => {
           borderLeft: "1px inset cyan",
         }}
         oneRow={true}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={1}
         styleProps={{bottom: "190px", left: "35%"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -126,14 +138,17 @@ const TableLayout6 = () => {
           borderRight: "1px inset cyan",
         }}
         oneRow={true}
+        animationTimes={animationTimes}
       />
       <AnimatedPlayedCardSlot
         index={5}
         styleProps={{bottom: "190px", right: "35%"}}
+        animationTimes={animationTimes}
       />
 
       <TrumpSlot
         styleProps={{top: "20px", left: "15%"}}
+        animationTimes={animationTimes}
       />
 
       <OtherPlayer
@@ -148,10 +163,12 @@ const TableLayout6 = () => {
           borderBottom: "1px inset cyan",
           borderLeft: "1px inset cyan",
         }}
+        animationTimes={animationTimes}
       />
       <OwnPlayer
         maxCards={10}
         styleProps={{bottom: "2%", left: "27%", width: "65%"}}
+        animationTimes={animationTimes}
       />
       <div
         className="myPlayedCardDiv"
@@ -166,6 +183,7 @@ const TableLayout6 = () => {
           containerId={`cardPlayedDivX${myName}`}
           classStr={classStr}
           animationObject={animationObject}
+          animationTimes={animationTimes}
           isCardInCharge={iAmStarter && roundToPlayer.cardsPlayed.length > 0}
           isWinningCard={iHaveWinningCard}
         >

@@ -3,7 +3,7 @@ import React, { CSSProperties } from "react";
 import { useSelector } from "react-redux";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 
-import { CARD_ALIGN_TYPE, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
+import { CARD_ALIGN_TYPE, IuiAnimationTimes, IuiRoundPlayer } from "../../interfaces/IuiPlayingGame";
 import CardSlots from "./CardSlots";
 import AnimatedCardSlot from "./AnimatedCardSlot";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
@@ -19,9 +19,10 @@ interface IProps {
   align: CARD_ALIGN_TYPE,
   styleProps?: CSSProperties,
   oneRow?: boolean,
+  animationTimes: IuiAnimationTimes,
 }
 
-const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => {
+const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow, animationTimes }: IProps) => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const user = useSelector(getUser);
 
@@ -40,6 +41,7 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
           slotCount={maxCards}
           cards={[]}
           align={align}
+          animationTimes={animationTimes}
         />
       </div>
     );
@@ -68,6 +70,7 @@ const OtherPlayer = ({ index, maxCards, align, styleProps, oneRow }: IProps) => 
             <AnimatedCardSlot
               containerId={`cardsWonSlotsX${player.name}X${i}`}
               animationObject={animationObject}
+              animationTimes={animationTimes}
             >
               {cardFace}
             </AnimatedCardSlot>
