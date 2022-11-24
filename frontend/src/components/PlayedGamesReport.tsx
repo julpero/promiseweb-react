@@ -208,7 +208,7 @@ const PlayedGamesReport = (props: IProps) => {
       dispatch(setSpinnerVisible(true));
       // console.time("get report data");
       socket.emit("get report data", request, (reportData: IuiPlayedGamesReport) => {
-        // console.log("report data", reportData);
+        console.log("report data", reportData);
         // console.timeEnd("get report data");
         if (reportData.isAuthenticated) {
           handleAuthenticatedRequest(reportData.token);
