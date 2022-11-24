@@ -162,13 +162,12 @@ export const addUsedRules = async (): Promise<string[]> => {
   const retArr: string[] = [];
   const oldDb = mongoose.connection.db;
 
-  const rulesNotImported = await GameOptions.find(
-    {
-      oldId: {$ne: null},
-      evenPromisesAllowed: {$exists: false},
-      // "humanPlayers.name": {$eq: "ju-ha"},
-    },
-  ).limit(50);
+  const rulesNotImported = await GameOptions.find({
+    oldId: {$ne: null},
+    evenPromisesAllowed: {$exists: true},
+    onlyTotalPromise: {$exists: false},
+    // "humanPlayers.name": {$eq: "ju-ha"},
+  }).limit(150);
 
   for (let i = 0; i < rulesNotImported.length; i++) {
     const game = rulesNotImported[i];

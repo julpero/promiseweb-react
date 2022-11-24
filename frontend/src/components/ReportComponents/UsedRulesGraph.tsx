@@ -95,6 +95,10 @@ const UsedRulesGraph = ({usedRulesCount, hiddenCardsModeCount, vanillaGamesCount
       intersect: true
     },
     plugins: {
+      title: {
+        display: true,
+        text: `Vanilla games: ${vanillaGamesCount}`
+      },
       tooltip: {
         mode: "index",
         intersect: false,

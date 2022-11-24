@@ -233,13 +233,13 @@ const PlayedGamesReport = (props: IProps) => {
 
   const usedRulesToMap = (usedRulesJson: string): Map<RULE, number> => {
     const retMap = new Map<RULE, number>(JSON.parse(usedRulesJson));
-    console.log(retMap);
+    // console.log(retMap);
     return retMap;
   };
 
   const usedCardModesToMap = (usedCardModesJson: string): Map<HIDDEN_CARDS_MODE, number> => {
     const retMap = new Map<HIDDEN_CARDS_MODE, number>(JSON.parse(usedCardModesJson));
-    console.log(retMap);
+    // console.log(retMap);
     return retMap;
   };
 
