@@ -186,6 +186,7 @@ export const addUsedRules = async (): Promise<string[]> => {
         try {
           const evenPromisesAllowed = oldGame.evenPromisesAllowed as boolean;
           const visiblePromiseRound = oldGame.visiblePromiseRound as boolean;
+          const onlyTotalPromise = oldGame.onlyTotalPromise as boolean;
           const freeTrump = oldGame.freeTrump as boolean;
           const hiddenTrump = oldGame.hiddenTrump as boolean;
           const speedPromise = oldGame.speedPromise as boolean;
@@ -194,10 +195,11 @@ export const addUsedRules = async (): Promise<string[]> => {
           const opponentGameCardValue = oldGame.opponentGameCardValue as boolean;
           const hiddenCardsMode = oldGame.hiddenCardsMode as HIDDEN_CARDS_MODE;
 
-          console.log(oldId, evenPromisesAllowed, visiblePromiseRound, freeTrump, hiddenTrump, speedPromise, privateSpeedGame, opponentPromiseCardValue, opponentGameCardValue, hiddenCardsMode);
+          console.log(oldId, evenPromisesAllowed, visiblePromiseRound, onlyTotalPromise, freeTrump, hiddenTrump, speedPromise, privateSpeedGame, opponentPromiseCardValue, opponentGameCardValue, hiddenCardsMode);
 
           game.evenPromisesAllowed = evenPromisesAllowed;
           game.visiblePromiseRound = visiblePromiseRound;
+          game.onlyTotalPromise = onlyTotalPromise;
           game.freeTrump = freeTrump;
           game.hiddenTrump = hiddenTrump;
           game.speedPromise = speedPromise;
