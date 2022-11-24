@@ -156,7 +156,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
   });
   // console.timeEnd("reportData player count");
 
-  console.time("reportData used rules");
+  // console.time("reportData used rules");
   // used rules in games
   interface usedRulesCountAgg {
     _id: string,
@@ -224,7 +224,25 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
       hiddenCardsModeCount.set(HIDDEN_CARDS_MODE.cardInChargeAndWinning, values.showCardInChargeAndWinningCardCount);
     }
   }
-  console.timeEnd("reportData used rules");
+  // console.timeEnd("reportData used rules");
+
+  // console.time("reportData vanilla games count");
+  // count vanilla games (no rules)
+  const vanillaGameCount = await GameOptions.count({
+    "gameStatus": {$eq: GAME_STATUS.played},
+    "thisIsDemoGame": {$in: [null, false]},
+    "evenPromisesAllowed": {$in: [null, true]},
+    "visiblePromiseRound": {$in: [null, true]},
+    "onlyTotalPromise": {$in: [null, false]},
+    "freeTrump": {$in: [null, true]},
+    "hiddenTrump": {$in: [null, false]},
+    "speedPromise": {$in: [null, false]},
+    "privateSpeedGame": {$in: [null, false]},
+    "opponentPromiseCardValue": {$in: [null, false]},
+    "opponentGameCardValue": {$in: [null, false]},
+    "hiddenCardsMode": {$in: [null, 0]},
+  });
+  // console.timeEnd("reportData vanilla games count");
 
   // console.time("reportData last games");
   const lastGames = await GameOptions.find({
@@ -247,6 +265,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
     playerCount: roundsAndCards[0]?.playerCount ?? 0,
     usedRulesCount: JSON.stringify(Array.from(usedRulesCount)),
     hiddenCardsModeCount: JSON.stringify(Array.from(hiddenCardsModeCount)),
+    vanillaGamesCount: vanillaGameCount,
     gamesByPlayer: Array.from(playerReport.values()),
     lastGames: lastGames.map(game => {
       return {

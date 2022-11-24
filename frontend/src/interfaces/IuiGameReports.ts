@@ -36,6 +36,7 @@ export interface IuiPlayedGamesReport extends IuiAuth {
   // usedRulesCount: Map<RULE | HIDDEN_CARDS_MODE, number>,
   usedRulesCount: string,
   hiddenCardsModeCount: string,
+  vanillaGamesCount: number,
   playerCount: number,
   // meltingGame: null,
   // spurtingGame: null,
