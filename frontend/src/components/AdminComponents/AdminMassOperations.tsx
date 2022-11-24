@@ -60,6 +60,20 @@ const AdminMassOperations = ({userName}: IProps) => {
     });
   };
 
+  const updateRulesFromOldGames = () => {
+    setOperationInProgress(true);
+    const request: IuiUserData = {
+      uuid: getMyId(),
+      userName: userName,
+      token: getToken(),
+    };
+    socket.emit("update logs from old data", request, (convertReport: string[]) => {
+      // console.log(convertReport);
+      setLogArray(convertReport);
+      setOperationInProgress(false);
+    });
+  };
+
   const renderLogArray = () => {
     return logArray.map((row, ind) => {
       return (
@@ -74,6 +88,8 @@ const AdminMassOperations = ({userName}: IProps) => {
         <Button onClick={() => updateAllStats()} disabled={operationInProgress}>Update all stats</Button>
         &nbsp;
         <Button onClick={() => convertAllData()} disabled={operationInProgress}>Convert old data</Button>
+        &nbsp;
+        <Button onClick={() => updateRulesFromOldGames()} disabled={operationInProgress}>Update rules from old data</Button>
       </div>
       <div>
         {renderLogArray()}

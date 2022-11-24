@@ -82,5 +82,6 @@ export interface ClientToServerEvents {
   "re-create game statistics": (reCreateGameStatisticsRequest: IuiReCreateGameStatisticsRequest, fn: (gamesResponse: IuiGetGamesResponse) => void) => void,
   "re-create all game statistics": (updateRequest: IuiUserData, fn: (gamesResponse: IuiGetGamesResponse) => void) => void,
   "convert old data": (updateRequest: IuiUserData, fn: (convertReport: string[]) => void) => void,
+  "update logs from old data": (updateRequest: IuiUserData, fn: (convertReport: string[]) => void) => void,
   "rename nick": (reNameNickRequest: IuiReNameNickRequest, fn: (reNameNickResponse: IuiReNameNickResponse) => void) => void,
 }
