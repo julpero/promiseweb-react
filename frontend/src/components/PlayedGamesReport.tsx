@@ -17,6 +17,8 @@ import OneGameReport from "./OneGameReport";
 
 import { format } from "date-fns";
 import { parseISO } from "date-fns/esm";
+import UsedRulesGraph from "./ReportComponents/UsedRulesGraph";
+import { HIDDEN_CARDS_MODE, RULE } from "../interfaces/IuiGameOptions";
 
 interface IProps {
   openPlayerReport: (playerName: string) => void,
@@ -229,13 +231,49 @@ const PlayedGamesReport = (props: IProps) => {
     setActiveGame("");
   };
 
+  const usedRulesToMap = (usedRulesJson: string): Map<RULE, number> => {
+    const retMap = new Map<RULE, number>(JSON.parse(usedRulesJson));
+    console.log(retMap);
+    return retMap;
+  };
+
+  const usedCardModesToMap = (usedCardModesJson: string): Map<HIDDEN_CARDS_MODE, number> => {
+    const retMap = new Map<HIDDEN_CARDS_MODE, number>(JSON.parse(usedCardModesJson));
+    console.log(retMap);
+    return retMap;
+  };
+
   return (
     <div>
       <hr />
       {reportData &&
-        <div>
-          <p>Total of {reportData?.gamesPlayed} games and {reportData?.roundsPlayed} rounds played so far...</p>
-          <p>... and there were {reportData?.playerCount} players in those games and they hit {reportData?.totalCardsHit} cards while playing.</p>
+        <div className="row">
+          <div className="col">
+            <p>Total of {reportData?.gamesPlayed} games and {reportData?.roundsPlayed} rounds played so far...</p>
+            <p>... and there were {reportData?.playerCount} players in those games and they hit {reportData?.totalCardsHit} cards while playing.</p>
+          </div>
+          <div className="col">
+            <p>Last five games</p>
+            <ul>
+              {reportData?.lastGames?.map((game, ind) => {
+                return (
+                  <li key={ind}>
+                    <span onClick={() => setActiveGame(game.gameId)} style={{cursor: "pointer"}}>{format(parseISO(game.played.toString()), "dd MMM yyyy HH:mm:ss")}</span>
+                    &nbsp;-&nbsp;
+                    <span>{game.humanPlayers.map((player, idx) => {
+                      if (idx === 0) {
+                        return <strong key={idx}>{`${player}, `}</strong>;
+                      } else if (idx === game.humanPlayers.length-1) {
+                        return player;
+                      } else {
+                        return `${player}, `;
+                      }
+                    })}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
       }
       {reportData &&
@@ -257,31 +295,14 @@ const PlayedGamesReport = (props: IProps) => {
         />
       }
       {reportData &&
-        <div>
-          <p>Last five games</p>
-          <ul>
-            {reportData?.lastGames?.map((game, ind) => {
-              return (
-                <li key={ind}>
-                  <span onClick={() => setActiveGame(game.gameId)} style={{cursor: "pointer"}}>{format(parseISO(game.played.toString()), "dd MMM yyyy HH:mm:ss")}</span>
-                  &nbsp;-&nbsp;
-                  <span>{game.humanPlayers.map((player, idx) => {
-                    if (idx === 0) {
-                      return <strong key={idx}>{`${player}, `}</strong>;
-                    } else if (idx === game.humanPlayers.length-1) {
-                      return player;
-                    } else {
-                      return `${player}, `;
-                    }
-                  })}</span>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+        <PlayedGamesByPlayerCount gameReportData={reportData?.playersTotal} max={reportData?.gamesPlayed ?? 0} />
       }
       {reportData &&
-        <PlayedGamesByPlayerCount gameReportData={reportData?.playersTotal} max={reportData?.gamesPlayed ?? 0} />
+        <UsedRulesGraph
+          vanillaGamesCount={reportData?.vanillaGamesCount}
+          usedRulesCount={usedRulesToMap(reportData.usedRulesCount)}
+          hiddenCardsModeCount={usedCardModesToMap(reportData.hiddenCardsModeCount)}
+        />
       }
       {reportData && activeGame !== "" &&
         <Modal

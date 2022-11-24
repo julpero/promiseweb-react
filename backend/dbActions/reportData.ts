@@ -208,7 +208,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
     }},
   ]);
   if (usedRulesCountResult && usedRulesCountResult.length === 1) {
-    console.log(usedRulesCountResult);
+    // console.log(usedRulesCountResult);
     const values = usedRulesCountResult.at(0);
     if (values) {
       usedRulesCount.set(RULE.noEvenPromisesAllowed, values.evenPromisesDisallowedCount);
