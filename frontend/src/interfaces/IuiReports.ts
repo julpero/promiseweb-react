@@ -1,3 +1,4 @@
+import { IuiRules } from "./IuiGameList";
 import { IuiAuth, IuiUserData } from "./IuiUser";
 
 export const PlayerCountColor = {
@@ -39,6 +40,7 @@ export interface IuiOneGameData {
   playersInGame: number,
   scorePoints: number,
   opponents: string[],
+  rules: IuiRules;
 }
 
 export interface IuiOnePlayerReportData {

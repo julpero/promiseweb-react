@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { GAME_STATUS, HIDDEN_CARDS_MODE, RULE } from "../../frontend/src/interfaces/IuiGameOptions";
 import { IuiGamesByPlayer, IuiPlayedGame, IuiPlayedGamesReport, IuiPlayersInGameReport } from "../../frontend/src/interfaces/IuiGameReports";
 import { IuiGameReport, IuiOneGameData } from "../../frontend/src/interfaces/IuiReports";
+import { rulesToRuleObj } from "../common/model";
 import { getGameReport } from "../common/reportFunctions";
 import GameOptions from "../models/GameOptions";
 
@@ -303,6 +304,16 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
     createDateTime: 1,
     gameStatistics: 1,
     humanPlayersCount: 1,
+    evenPromisesAllowed: 1,
+    visiblePromiseRound: 1,
+    onlyTotalPromise: 1,
+    freeTrump: 1,
+    hiddenTrump: 1,
+    speedPromise: 1,
+    privateSpeedGame: 1,
+    opponentPromiseCardValue: 1,
+    opponentGameCardValue: 1,
+    hiddenCardsMode: 1,
   }).sort({
     createDateTime: 1,
   }).lean();
@@ -322,6 +333,7 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
         playersInGame: gameInDb.humanPlayersCount,
         scorePoints: playerStats.scorePoints,
         opponents: gameInDb.gameStatistics?.playersStatistics.filter(stats => stats.playerName !== playerName).flatMap(stats => stats.playerName).sort((a: string, b: string) => a.localeCompare(b)),
+        rules: rulesToRuleObj(gameInDb),
       } as IuiOneGameData);
     }
   });

@@ -33,7 +33,7 @@ ChartJS.register(
 interface IProps {
   usedRulesCount: Map<RULE, number>,
   hiddenCardsModeCount: Map<HIDDEN_CARDS_MODE, number>,
-  vanillaGamesCount: number,
+  vanillaGamesCount?: number,
 }
 
 const UsedRulesGraph = ({usedRulesCount, hiddenCardsModeCount, vanillaGamesCount}: IProps) => {
@@ -48,7 +48,7 @@ const UsedRulesGraph = ({usedRulesCount, hiddenCardsModeCount, vanillaGamesCount
 
   const getDataSetsData = (): ChartDataset<"bar">[] => {
     const dataSetsData: ChartDataset<"bar">[] = [];
-    if (!vanillaGamesCount) return dataSetsData;
+    if (!usedRulesCount) return dataSetsData;
     // console.log(gameReportData);
 
     const inGamesArr: number[] = [...Array.from(usedRulesCount.values()), ...Array.from(hiddenCardsModeCount.values())];
@@ -96,7 +96,7 @@ const UsedRulesGraph = ({usedRulesCount, hiddenCardsModeCount, vanillaGamesCount
     },
     plugins: {
       title: {
-        display: true,
+        display: vanillaGamesCount !== undefined,
         text: `Vanilla games: ${vanillaGamesCount}`
       },
       tooltip: {
