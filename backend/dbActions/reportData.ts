@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
-import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
+import { GAME_STATUS, HIDDEN_CARDS_MODE, RULE } from "../../frontend/src/interfaces/IuiGameOptions";
 import { IuiGamesByPlayer, IuiPlayedGame, IuiPlayedGamesReport, IuiPlayersInGameReport } from "../../frontend/src/interfaces/IuiGameReports";
 import { IuiGameReport, IuiOneGameData } from "../../frontend/src/interfaces/IuiReports";
+import { rulesToRuleObj } from "../common/model";
 import { getGameReport } from "../common/reportFunctions";
 import GameOptions from "../models/GameOptions";
 
@@ -156,6 +157,94 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
   });
   // console.timeEnd("reportData player count");
 
+  // console.time("reportData used rules");
+  // used rules in games
+  interface usedRulesCountAgg {
+    _id: string,
+    evenPromisesDisallowedCount: number,
+    hiddenPromiseRoundCount: number,
+    onlyTotalPromiseCount: number,
+    mustTrumpCount: number,
+    hiddenTrumpCount: number,
+    speedPromiseCount: number,
+    privateSpeedGameCount: number,
+    opponentPromiseCardValueCount: number,
+    opponentGameCardValueCount: number,
+    showOnlyCardInChargeCount: number,
+    showCardInChargeAndWinningCardCount: number,
+  }
+  const usedRulesCount = new Map<RULE, number>();
+  const hiddenCardsModeCount = new Map<HIDDEN_CARDS_MODE, number>();
+  const usedRulesCountResult = await GameOptions.aggregate<usedRulesCountAgg>([
+    {$match: {
+      "gameStatus": {$eq: GAME_STATUS.played},
+      "thisIsDemoGame": {$in: [null, false]},
+    }}, {$project: {
+      item: 1,
+      evenPromisesDisallowed: {$cond: [{ $eq: ["$evenPromisesAllowed", false]}, 1, 0]},
+      hiddenPromiseRound: {$cond: [{ $eq: ["$visiblePromiseRound", false]}, 1, 0]},
+      onlyTotalPromise: {$cond: [{ $eq: ["$onlyTotalPromise", true]}, 1, 0]},
+      mustTrump: {$cond: [{ $eq: ["$freeTrump", false]}, 1, 0]},
+      hiddenTrump: {$cond: [{ $eq: ["$hiddenTrump", true]}, 1, 0]},
+      speedPromise: {$cond: [{ $eq: ["$speedPromise", true]}, 1, 0]},
+      privateSpeedGame: {$cond: [{ $eq: ["$privateSpeedGame", true]}, 1, 0]},
+      opponentPromiseCardValue: {$cond: [{ $eq: ["$opponentPromiseCardValue", true]}, 1, 0]},
+      opponentGameCardValue: {$cond: [{ $eq: ["$opponentGameCardValue", true]}, 1, 0]},
+      showOnlyCardInCharge: {$cond: [{ $eq: ["$hiddenCardsMode", 1]}, 1, 0]},
+      showCardInChargeAndWinningCard: {$cond: [{ $eq: ["$hiddenCardsMode", 2]}, 1, 0]},
+    }},
+    {$group: {
+      _id: "$item",
+      evenPromisesDisallowedCount: {$sum: "$evenPromisesDisallowed"},
+      hiddenPromiseRoundCount: {$sum: "$hiddenPromiseRound"},
+      onlyTotalPromiseCount: {$sum: "$onlyTotalPromise"},
+      mustTrumpCount: {$sum: "$mustTrump"},
+      hiddenTrumpCount: {$sum: "$hiddenTrump"},
+      speedPromiseCount: {$sum: "$speedPromise"},
+      privateSpeedGameCount: {$sum: "$privateSpeedGame"},
+      opponentPromiseCardValueCount: {$sum: "$opponentPromiseCardValue"},
+      opponentGameCardValueCount: {$sum: "$opponentGameCardValue"},
+      showOnlyCardInChargeCount: {$sum: "$showOnlyCardInCharge"},
+      showCardInChargeAndWinningCardCount: {$sum: "$showCardInChargeAndWinningCard"},
+    }},
+  ]);
+  if (usedRulesCountResult && usedRulesCountResult.length === 1) {
+    // console.log(usedRulesCountResult);
+    const values = usedRulesCountResult.at(0);
+    if (values) {
+      usedRulesCount.set(RULE.noEvenPromisesAllowed, values.evenPromisesDisallowedCount);
+      usedRulesCount.set(RULE.hiddenPromiseRound, values.hiddenPromiseRoundCount);
+      usedRulesCount.set(RULE.onlyTotalPromise, values.onlyTotalPromiseCount);
+      usedRulesCount.set(RULE.mustPlayTrump, values.mustTrumpCount);
+      usedRulesCount.set(RULE.hiddenTrump, values.hiddenTrumpCount);
+      usedRulesCount.set(RULE.speedPromise, values.speedPromiseCount);
+      usedRulesCount.set(RULE.privateSpeedGame, values.privateSpeedGameCount);
+      usedRulesCount.set(RULE.opponentPromiseCardValue, values.opponentPromiseCardValueCount);
+      usedRulesCount.set(RULE.opponentGameCardValue, values.opponentGameCardValueCount);
+      hiddenCardsModeCount.set(HIDDEN_CARDS_MODE.onlyCardInCharge, values.showOnlyCardInChargeCount);
+      hiddenCardsModeCount.set(HIDDEN_CARDS_MODE.cardInChargeAndWinning, values.showCardInChargeAndWinningCardCount);
+    }
+  }
+  // console.timeEnd("reportData used rules");
+
+  // console.time("reportData vanilla games count");
+  // count vanilla games (no rules)
+  const vanillaGameCount = await GameOptions.count({
+    "gameStatus": {$eq: GAME_STATUS.played},
+    "thisIsDemoGame": {$in: [null, false]},
+    "evenPromisesAllowed": {$in: [null, true]},
+    "visiblePromiseRound": {$in: [null, true]},
+    "onlyTotalPromise": {$in: [null, false]},
+    "freeTrump": {$in: [null, true]},
+    "hiddenTrump": {$in: [null, false]},
+    "speedPromise": {$in: [null, false]},
+    "privateSpeedGame": {$in: [null, false]},
+    "opponentPromiseCardValue": {$in: [null, false]},
+    "opponentGameCardValue": {$in: [null, false]},
+    "hiddenCardsMode": {$in: [null, 0]},
+  });
+  // console.timeEnd("reportData vanilla games count");
+
   // console.time("reportData last games");
   const lastGames = await GameOptions.find({
     "gameStatus": {$eq: GAME_STATUS.played},
@@ -175,6 +264,9 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
     totalCardsHit: roundsAndCards[0]?.totalCardsHit ?? 0,
     roundsPlayed: roundsAndCards[0]?.roundsPlayed ?? 0,
     playerCount: roundsAndCards[0]?.playerCount ?? 0,
+    usedRulesCount: JSON.stringify(Array.from(usedRulesCount)),
+    hiddenCardsModeCount: JSON.stringify(Array.from(hiddenCardsModeCount)),
+    vanillaGamesCount: vanillaGameCount,
     gamesByPlayer: Array.from(playerReport.values()),
     lastGames: lastGames.map(game => {
       return {
@@ -212,13 +304,23 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
     createDateTime: 1,
     gameStatistics: 1,
     humanPlayersCount: 1,
+    evenPromisesAllowed: 1,
+    visiblePromiseRound: 1,
+    onlyTotalPromise: 1,
+    freeTrump: 1,
+    hiddenTrump: 1,
+    speedPromise: 1,
+    privateSpeedGame: 1,
+    opponentPromiseCardValue: 1,
+    opponentGameCardValue: 1,
+    hiddenCardsMode: 1,
   }).sort({
     createDateTime: 1,
   }).lean();
   // console.timeEnd("onePlayerReportData");
   gamesInDb.forEach(gameInDb => {
-    const playerStats = gameInDb.gameStatistics?.playersStatistics.find(player => player.playerName === playerName);
     const gameStats = gameInDb.gameStatistics;
+    const playerStats = gameStats?.playersStatistics.find(player => player.playerName === playerName);
     if (playerStats && gameStats && gameStats.roundsPlayed > 0) {
       gameArr.push({
         gameId: gameInDb._id.toString(),
@@ -231,6 +333,7 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
         playersInGame: gameInDb.humanPlayersCount,
         scorePoints: playerStats.scorePoints,
         opponents: gameInDb.gameStatistics?.playersStatistics.filter(stats => stats.playerName !== playerName).flatMap(stats => stats.playerName).sort((a: string, b: string) => a.localeCompare(b)),
+        rules: rulesToRuleObj(gameInDb),
       } as IuiOneGameData);
     }
   });

@@ -31,7 +31,7 @@ import { IuiGetOneGameReportRequest, IuiOneGameReport, IuiOnePlayerReportRequest
 import { IuiAuth, IuiLoginRequest, IuiLoginResponse, IuiRefreshLoginResponse, IuiUserData, LOGIN_RESPONSE } from "./frontend/src/interfaces/IuiUser";
 import { handleLoginRequest } from "./backend/actions/login";
 import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickRequest, IuiReNameNickResponse, RENAME_STATUS } from "./frontend/src/interfaces/IuiAdminOperations";
-import { convertOldData, getGamesForAdmin, reCreateAllGameStats, reCreateGameStats, reNameNick } from "./backend/actions/adminActions";
+import { convertOldData, getGamesForAdmin, reCreateAllGameStats, reCreateGameStats, reNameNick, updateRulesFromOldData } from "./backend/actions/adminActions";
 import { getValidToken, isUserAuthenticated, isValidAdminUser, isValidUser, signUserToken } from "./backend/common/userValidation";
 import { deletePing, doPing } from "./backend/actions/pingHandler";
 
@@ -290,6 +290,22 @@ connectDB().then(() => {
 
       if (isAuthenticated) {
         const response = await convertOldData(userName);
+        fn(response);
+      } else {
+        return null;
+      }
+    });
+
+    socket.on("update logs from old data", async (convertRequest: IuiUserData, fn: (response: string[]) => void) => {
+      // console.log("update logs from old data", convertRequest);
+      const {uuid, userName, token} = convertRequest;
+      if (!isValidAdminUser(userName, uuid)) return null;
+      if (!csm.isUserAdmin(userName, socket.id, uuid)) return null;
+      const lastTimestamp = csm.getLastTimestamp(userName);
+      const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
+
+      if (isAuthenticated) {
+        const response = await updateRulesFromOldData(userName);
         fn(response);
       } else {
         return null;

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
+import { GAME_STATUS, HIDDEN_CARDS_MODE } from "../../frontend/src/interfaces/IuiGameOptions";
 import { generateGameStats } from "../common/statsFunctions";
 import { ICard, ICardPlayed, IGame, IGameOptions, IHumanPlayer, IPlayer, IRound, IRoundPlayer } from "../interfaces/IGameOptions";
 import { OLD_PROMISEWEB_COLLECTION } from "../models/Collections";
@@ -155,6 +155,75 @@ const convertOldGameToNew = (game: IDummy): IGame => {
     rounds: convertOldRoundsToNew(game.rounds),
   };
   return newGame;
+};
+
+export const addUsedRules = async (): Promise<string[]> => {
+  console.time("convertOldData addUsedRules");
+  const retArr: string[] = [];
+  const oldDb = mongoose.connection.db;
+
+  const rulesNotImported = await GameOptions.find({
+    oldId: {$ne: null},
+    evenPromisesAllowed: {$exists: true},
+    onlyTotalPromise: {$exists: false},
+    // "humanPlayers.name": {$eq: "ju-ha"},
+  }).limit(150);
+
+  for (let i = 0; i < rulesNotImported.length; i++) {
+    const game = rulesNotImported[i];
+    const oldId = game.oldId;
+    if (oldId) {
+      const dateCompareStr = game.createDateTime.toISOString();
+      console.log(dateCompareStr);
+      const oldGame = await oldDb.collection(OLD_PROMISEWEB_COLLECTION).findOne({
+        createDateTime: dateCompareStr,
+        adminName: game.adminName,
+        humanPlayersCount: game.humanPlayersCount,
+      });
+
+      if (oldGame) {
+        try {
+          const evenPromisesAllowed = oldGame.evenPromisesAllowed as boolean;
+          const visiblePromiseRound = oldGame.visiblePromiseRound as boolean;
+          const onlyTotalPromise = oldGame.onlyTotalPromise as boolean;
+          const freeTrump = oldGame.freeTrump as boolean;
+          const hiddenTrump = oldGame.hiddenTrump as boolean;
+          const speedPromise = oldGame.speedPromise as boolean;
+          const privateSpeedGame = oldGame.privateSpeedGame as boolean;
+          const opponentPromiseCardValue = oldGame.opponentPromiseCardValue as boolean;
+          const opponentGameCardValue = oldGame.opponentGameCardValue as boolean;
+          const hiddenCardsMode = oldGame.hiddenCardsMode as HIDDEN_CARDS_MODE;
+
+          console.log(oldId, evenPromisesAllowed, visiblePromiseRound, onlyTotalPromise, freeTrump, hiddenTrump, speedPromise, privateSpeedGame, opponentPromiseCardValue, opponentGameCardValue, hiddenCardsMode);
+
+          game.evenPromisesAllowed = evenPromisesAllowed;
+          game.visiblePromiseRound = visiblePromiseRound;
+          game.onlyTotalPromise = onlyTotalPromise;
+          game.freeTrump = freeTrump;
+          game.hiddenTrump = hiddenTrump;
+          game.speedPromise = speedPromise;
+          game.privateSpeedGame = privateSpeedGame;
+          game.opponentPromiseCardValue = opponentPromiseCardValue;
+          game.opponentGameCardValue = opponentGameCardValue;
+          game.hiddenCardsMode = hiddenCardsMode;
+          const savedGame = await game.save();
+          if (savedGame) {
+            retArr.push(`${game.id} - ${oldId}`);
+          } else {
+            console.error("NO!");
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        console.log("oldGame not found");
+      }
+    }
+  }
+
+  console.timeEnd("convertOldData addUsedRules");
+
+  return retArr;
 };
 
 export const convertOldDataToNew = async (): Promise<string[]> => {

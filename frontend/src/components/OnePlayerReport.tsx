@@ -16,6 +16,9 @@ import Form from "react-bootstrap/Form";
 import OnePlayerStatsPerOpponents from "./ReportComponents/OnePlayerStatsPerOpponents";
 import OnePlayerStatsPerPlayersInGame from "./ReportComponents/OnePlayerStatsPerPlayersInGame";
 import OnePlayerStatsSummary from "./ReportComponents/OnePlayerStatsSummary";
+import { HIDDEN_CARDS_MODE, RULE } from "../interfaces/IuiGameOptions";
+import { ruleToStr } from "../common/enumFunctions";
+import UsedRulesGraph from "./ReportComponents/UsedRulesGraph";
 
 interface IProps {
   playerName: string,
@@ -27,6 +30,8 @@ const OnePlayerReport = ({playerName}: IProps) => {
 
   const [yearFilter, setYearFilter] = useState("");
   const [playerFilter, setPlayerFilter] = useState<string[]>([]);
+  const [ruleFilter, setRuleFilter] = useState<RULE[]>([]);
+  const [vanillaFilter, setVanillaFilter] = useState<boolean>(false);
 
   const user = useSelector(getUser);
   const dispatch = useDispatch();
@@ -149,10 +154,28 @@ const OnePlayerReport = ({playerName}: IProps) => {
         reportToShow.gamesData = gamesToReport;
         // console.log("reportToShow 2", reportToShow);
       }
+      if (reportToShow?.gamesData && ruleFilter.length > 0) {
+        const gamesToReport: IuiOneGameData[] = [];
+        reportToShow?.gamesData.forEach(game => {
+          let includeGame = true;
+          ruleFilter.forEach(filter => {
+            if (!game.rules.ruleList.some(rule => rule === filter)) {
+              includeGame = false;
+            }
+          });
+          if (includeGame) {
+            gamesToReport.push(game);
+          }
+          // console.log(`game ${game.gameId} to report ${includeGame}`);
+        });
+        reportToShow.gamesData = gamesToReport;
+      }
+      if (reportToShow?.gamesData && vanillaFilter) {
+        reportToShow.gamesData = reportToShow.gamesData.filter(game => game.rules.ruleList.length === 0 && game.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal);
+      }
       setReportDataToShow(reportToShow);
-
     }
-  }, [yearFilter, playerFilter, playerName, allReportData]);
+  }, [yearFilter, playerFilter, ruleFilter, vanillaFilter, playerName, allReportData]);
 
   const renderYearButtons = () => {
     const yearArr = allReportData?.flatMap(data => getYear(parseISO(data.started.toString())).toString()) ?? [];
@@ -209,25 +232,111 @@ const OnePlayerReport = ({playerName}: IProps) => {
     setPlayerFilter(currentFilter);
   };
 
+  const handleRuleFilterClick = (rule: RULE, filterOn: boolean) => {
+    // console.log(rule, filterOn);
+    let currentFilter = [...ruleFilter];
+    if (filterOn) {
+      if (!currentFilter.some(curRule => curRule === rule)) {
+        currentFilter.push(rule);
+      }
+    } else {
+      currentFilter = currentFilter.filter(curRule => curRule !== rule);
+    }
+    // console.log(currentFilter);
+    setRuleFilter(currentFilter);
+  };
+
   const renderPlayerButtons = () => {
     // console.log("allReportData", allReportData);
     const playersArr = allReportData?.flatMap(data => data.opponents) ?? [];
     const distinctPlayersArr = Array.from(new Set( [...playersArr] ));
     return distinctPlayersArr.sort((a: string, b: string) => a.localeCompare(b)).map((player, ind) => {
       return (
-        <Form.Check inline type="switch" id={`inline-switch-${ind}`} key={ind} label={player} name={player} onChange={(e) => handleOpponentFilterClick(e.target.name, e.target.checked)} />
+        <Form.Check
+          inline
+          className="smaller"
+          type="switch"
+          id={`inline-switch-${ind}`}
+          key={ind} label={player}
+          name={player}
+          onChange={(e) => handleOpponentFilterClick(e.target.name, e.target.checked)}
+        />
       );
     });
   };
 
-  const renderPlayerSwitch = () => {
+  const renderRulesButtons = () => {
+    const rulesArr = Object.values(RULE).filter((v) => !isNaN(Number(v))) as RULE[];
+    return (
+      <React.Fragment>
+        <Form.Check
+          inline
+          className="smaller"
+          type="switch"
+          id="inline-switch-vanilla"
+          label="Vanilla game"
+          onChange={(e) => setVanillaFilter(e.target.checked)}
+        />
+
+        {
+          rulesArr.map((rule, ind) => {
+            return (
+              <Form.Check
+                inline
+                className="smaller"
+                type="switch"
+                key={ind}
+                id={`inline-switch-${rule}`}
+                label={ruleToStr(rule)}
+                onChange={(e) => handleRuleFilterClick(rule, e.target.checked)}
+              />
+            );
+          })
+        }
+      </React.Fragment>
+    );
+  };
+
+  const renderSwitches = (type: "players" | "rules") => {
     return (
       <Form>
         <div key="inline-switch" className="mb-3">
-          {renderPlayerButtons()}
+          {type === "players" ? renderPlayerButtons() : renderRulesButtons()}
         </div>
       </Form>
     );
+  };
+
+  const hiddenCardsModeCount = (): Map<HIDDEN_CARDS_MODE, number> => {
+    const retMap = new Map<HIDDEN_CARDS_MODE, number>();
+    if (reportDataToShow) {
+      const onlyCardInCharge = reportDataToShow.gamesData.filter(game => game.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.onlyCardInCharge).length;
+      if (onlyCardInCharge) {
+        retMap.set(HIDDEN_CARDS_MODE.onlyCardInCharge, onlyCardInCharge);
+      }
+      const cardInChargeAndWinning = reportDataToShow.gamesData.filter(game => game.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.cardInChargeAndWinning).length;
+      if (cardInChargeAndWinning) {
+        retMap.set(HIDDEN_CARDS_MODE.cardInChargeAndWinning, cardInChargeAndWinning);
+      }
+    }
+    return retMap;
+  };
+
+  const usedRulesCount = (): Map<RULE, number> => {
+    const rulesArr = Object.values(RULE).filter((v) => !isNaN(Number(v))) as RULE[];
+    const retMap = new Map<RULE, number>();
+    if (reportDataToShow) {
+      reportDataToShow.gamesData.forEach(game => {
+        rulesArr.forEach(ruleInArr => {
+          if (game.rules.ruleList.some(rule => rule === ruleInArr)) {
+            const ruleCount = retMap.get(ruleInArr) ?? 0;
+            retMap.set(ruleInArr, ruleCount+1);
+          }
+        });
+      });
+    }
+    // console.log("retMap", retMap);
+    return retMap;
   };
 
   return (
@@ -240,7 +349,10 @@ const OnePlayerReport = ({playerName}: IProps) => {
         renderTimeLine()
       }
       {allReportData &&
-        renderPlayerSwitch()
+        renderSwitches("players")
+      }
+      {allReportData &&
+        renderSwitches("rules")
       }
       {reportDataToShow &&
         <OnePlayerStatsSummary description="Filtered" gameReportData={reportDataToShow} />
@@ -248,6 +360,7 @@ const OnePlayerReport = ({playerName}: IProps) => {
 
       <OnePlayerStatsPerOpponents gameReportData={reportDataToShow} />
       <OnePlayerStatsPerPlayers gameReportData={reportDataToShow} />
+      <UsedRulesGraph usedRulesCount={usedRulesCount()} hiddenCardsModeCount={hiddenCardsModeCount()} />
       <OnePlayerStatsPerPlayersInGame gameReportData={reportDataToShow} />
       <OnePlayerStats gameReportData={reportDataToShow} />
     </React.Fragment>

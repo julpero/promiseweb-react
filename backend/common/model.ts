@@ -13,15 +13,15 @@ export const playersToArr = (players: IHumanPlayer[]): string[] => {
 const rulesToArr = (gameOptions: IGameOptions | IGameForList): RULE[] => {
   const rulesArr: RULE[] = [];
 
-  if (!gameOptions.evenPromisesAllowed) rulesArr.push(RULE.noEvenPromisesAllowed);
-  if (!gameOptions.visiblePromiseRound) rulesArr.push(RULE.hiddenPromiseRound);
-  if (gameOptions.onlyTotalPromise) rulesArr.push(RULE.onlyTotalPromise);
-  if (!gameOptions.freeTrump) rulesArr.push(RULE.mustPlayTrump);
-  if (gameOptions.hiddenTrump) rulesArr.push(RULE.hiddenTrump);
-  if (gameOptions.speedPromise) rulesArr.push(RULE.speedPromise);
-  if (gameOptions.privateSpeedGame) rulesArr.push(RULE.privateSpeedGame);
-  if (gameOptions.opponentPromiseCardValue) rulesArr.push(RULE.opponentPromiseCardValue);
-  if (gameOptions.opponentGameCardValue) rulesArr.push(RULE.opponentGameCardValue);
+  if (gameOptions.evenPromisesAllowed === false) rulesArr.push(RULE.noEvenPromisesAllowed);
+  if (gameOptions.visiblePromiseRound === false) rulesArr.push(RULE.hiddenPromiseRound);
+  if (gameOptions.onlyTotalPromise === true) rulesArr.push(RULE.onlyTotalPromise);
+  if (gameOptions.freeTrump === false) rulesArr.push(RULE.mustPlayTrump);
+  if (gameOptions.hiddenTrump === true) rulesArr.push(RULE.hiddenTrump);
+  if (gameOptions.speedPromise === true) rulesArr.push(RULE.speedPromise);
+  if (gameOptions.privateSpeedGame === true) rulesArr.push(RULE.privateSpeedGame);
+  if (gameOptions.opponentPromiseCardValue === true) rulesArr.push(RULE.opponentPromiseCardValue);
+  if (gameOptions.opponentGameCardValue === true) rulesArr.push(RULE.opponentGameCardValue);
 
   return rulesArr;
 };
