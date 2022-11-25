@@ -74,7 +74,7 @@ const OnePlayerStatsSummary = ({description, gameReportData}: IProps) => {
 
   return (
     <div>
-      <h5>{description} {gamesData.length} games, {winCount()} wins, {totalRounds()} rounds, {totalPoints()} points</h5>
+      <h6>{description} {gamesData.length} games, {winCount()} wins, {totalRounds()} rounds, {totalPoints()} points</h6>
       Summary:
       [win%: {winPercentage()}]
       [keep%: {keepPercentage()}]

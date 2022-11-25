@@ -319,8 +319,8 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
   }).lean();
   // console.timeEnd("onePlayerReportData");
   gamesInDb.forEach(gameInDb => {
-    const playerStats = gameInDb.gameStatistics?.playersStatistics.find(player => player.playerName === playerName);
     const gameStats = gameInDb.gameStatistics;
+    const playerStats = gameStats?.playersStatistics.find(player => player.playerName === playerName);
     if (playerStats && gameStats && gameStats.roundsPlayed > 0) {
       gameArr.push({
         gameId: gameInDb._id.toString(),

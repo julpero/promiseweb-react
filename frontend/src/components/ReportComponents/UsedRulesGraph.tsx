@@ -37,6 +37,25 @@ interface IProps {
 }
 
 const UsedRulesGraph = ({usedRulesCount, hiddenCardsModeCount, vanillaGamesCount}: IProps) => {
+  const dataArr = (): number[] => {
+    const arr: number[] = [];
+    if (usedRulesCount) {
+      const rules = Object.values(RULE).filter((v) => !isNaN(Number(v))) as RULE[];
+      rules.forEach(rule => {
+        const val = usedRulesCount.get(rule);
+        if (val !== undefined) arr.push(val);
+      });
+    }
+    if (hiddenCardsModeCount) {
+      const hiddenCards = Object.values(HIDDEN_CARDS_MODE).filter((v) => !isNaN(Number(v))) as HIDDEN_CARDS_MODE[];
+      hiddenCards.forEach(rule => {
+        const val = hiddenCardsModeCount.get(rule);
+        if (val !== undefined) arr.push(val);
+      });
+    }
+    return arr;
+  };
+
   const getRulesColors = () => {
     const colorArr: string[] = [];
     const opponents = getLabels();
@@ -49,9 +68,11 @@ const UsedRulesGraph = ({usedRulesCount, hiddenCardsModeCount, vanillaGamesCount
   const getDataSetsData = (): ChartDataset<"bar">[] => {
     const dataSetsData: ChartDataset<"bar">[] = [];
     if (!usedRulesCount) return dataSetsData;
-    // console.log(gameReportData);
+    // console.log("usedRulesCount", usedRulesCount);
+    // console.log("hiddenCardsModeCount", hiddenCardsModeCount);
 
-    const inGamesArr: number[] = [...Array.from(usedRulesCount.values()), ...Array.from(hiddenCardsModeCount.values())];
+    const inGamesArr = dataArr();
+    // console.log("inGamesArr", inGamesArr);
 
     const label = "Rule used in games";
     dataSetsData.push({
@@ -110,7 +131,10 @@ const UsedRulesGraph = ({usedRulesCount, hiddenCardsModeCount, vanillaGamesCount
   };
 
   const getLabels = () => {
-    const rules = [...Array.from(usedRulesCount.keys()).map(key => ruleToStr(key)), ...Array.from(hiddenCardsModeCount.keys()).map(key => hiddenCardsModeToStr(key))];
+    const rules = [
+      ...Array.from(usedRulesCount.keys()).sort((a: RULE, b: RULE) => a - b).map(key => ruleToStr(key)),
+      ...Array.from(hiddenCardsModeCount.keys()).sort((a: HIDDEN_CARDS_MODE, b: HIDDEN_CARDS_MODE) => a - b).map(key => hiddenCardsModeToStr(key))
+    ];
     return rules;
   };
 

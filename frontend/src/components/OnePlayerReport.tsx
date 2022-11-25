@@ -31,6 +31,7 @@ const OnePlayerReport = ({playerName}: IProps) => {
   const [yearFilter, setYearFilter] = useState("");
   const [playerFilter, setPlayerFilter] = useState<string[]>([]);
   const [ruleFilter, setRuleFilter] = useState<RULE[]>([]);
+  const [vanillaFilter, setVanillaFilter] = useState<boolean>(false);
 
   const user = useSelector(getUser);
   const dispatch = useDispatch();
@@ -169,10 +170,12 @@ const OnePlayerReport = ({playerName}: IProps) => {
         });
         reportToShow.gamesData = gamesToReport;
       }
+      if (reportToShow?.gamesData && vanillaFilter) {
+        reportToShow.gamesData = reportToShow.gamesData.filter(game => game.rules.ruleList.length === 0 && game.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal);
+      }
       setReportDataToShow(reportToShow);
-
     }
-  }, [yearFilter, playerFilter, ruleFilter, playerName, allReportData]);
+  }, [yearFilter, playerFilter, ruleFilter, vanillaFilter, playerName, allReportData]);
 
   const renderYearButtons = () => {
     const yearArr = allReportData?.flatMap(data => getYear(parseISO(data.started.toString())).toString()) ?? [];
@@ -263,19 +266,18 @@ const OnePlayerReport = ({playerName}: IProps) => {
   };
 
   const renderRulesButtons = () => {
-    const rulesArr: RULE[] = [
-      RULE.noEvenPromisesAllowed,
-      RULE.hiddenPromiseRound,
-      RULE.onlyTotalPromise,
-      RULE.mustPlayTrump,
-      RULE.hiddenTrump,
-      RULE.speedPromise,
-      RULE.privateSpeedGame,
-      RULE.opponentPromiseCardValue,
-      RULE.opponentGameCardValue,
-    ];
+    const rulesArr = Object.values(RULE).filter((v) => !isNaN(Number(v))) as RULE[];
     return (
       <React.Fragment>
+        <Form.Check
+          inline
+          className="smaller"
+          type="switch"
+          id="inline-switch-vanilla"
+          label="Vanilla game"
+          onChange={(e) => setVanillaFilter(e.target.checked)}
+        />
+
         {
           rulesArr.map((rule, ind) => {
             return (
@@ -308,32 +310,32 @@ const OnePlayerReport = ({playerName}: IProps) => {
   const hiddenCardsModeCount = (): Map<HIDDEN_CARDS_MODE, number> => {
     const retMap = new Map<HIDDEN_CARDS_MODE, number>();
     if (reportDataToShow) {
-      retMap.set(HIDDEN_CARDS_MODE.onlyCardInCharge, reportDataToShow.gamesData.filter(game => game.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.onlyCardInCharge).length);
-      retMap.set(HIDDEN_CARDS_MODE.cardInChargeAndWinning, reportDataToShow.gamesData.filter(game => game.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.cardInChargeAndWinning).length);
+      const onlyCardInCharge = reportDataToShow.gamesData.filter(game => game.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.onlyCardInCharge).length;
+      if (onlyCardInCharge) {
+        retMap.set(HIDDEN_CARDS_MODE.onlyCardInCharge, onlyCardInCharge);
+      }
+      const cardInChargeAndWinning = reportDataToShow.gamesData.filter(game => game.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.cardInChargeAndWinning).length;
+      if (cardInChargeAndWinning) {
+        retMap.set(HIDDEN_CARDS_MODE.cardInChargeAndWinning, cardInChargeAndWinning);
+      }
     }
     return retMap;
   };
 
   const usedRulesCount = (): Map<RULE, number> => {
-    const rulesArr: RULE[] = [
-      RULE.noEvenPromisesAllowed,
-      RULE.hiddenPromiseRound,
-      RULE.onlyTotalPromise,
-      RULE.mustPlayTrump,
-      RULE.hiddenTrump,
-      RULE.speedPromise,
-      RULE.privateSpeedGame,
-      RULE.opponentPromiseCardValue,
-      RULE.opponentGameCardValue,
-    ];
+    const rulesArr = Object.values(RULE).filter((v) => !isNaN(Number(v))) as RULE[];
     const retMap = new Map<RULE, number>();
     if (reportDataToShow) {
       reportDataToShow.gamesData.forEach(game => {
         rulesArr.forEach(ruleInArr => {
-          if (game.rules.ruleList.some(rule => rule === ruleInArr)) retMap.set(ruleInArr, (retMap.get(ruleInArr) ?? 0)+1);
+          if (game.rules.ruleList.some(rule => rule === ruleInArr)) {
+            const ruleCount = retMap.get(ruleInArr) ?? 0;
+            retMap.set(ruleInArr, ruleCount+1);
+          }
         });
       });
     }
+    // console.log("retMap", retMap);
     return retMap;
   };
 
