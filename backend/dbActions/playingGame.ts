@@ -238,7 +238,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
         round.roundPlayers[winnerIndexInRound].keeps++;
         response.winnerOfPlay = winner.name;
         response.winCount = round.roundPlayers[winnerIndexInRound].keeps;
-        if (response.winCount === (round.roundPlayers[winnerIndexInRound].promise ?? -1) +1) {
+        if ((response.winCount === (round.roundPlayers[winnerIndexInRound].promise ?? -1) +1) && !isRuleActive(gameInDb, RULE.onlyTotalPromise)) {
           response.playWentOver = true;
         }
       }

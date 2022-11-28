@@ -1,3 +1,4 @@
+import { HIDDEN_CARDS_MODE, RULE } from "./IuiGameOptions";
 import { IuiAuth } from "./IuiUser";
 
 export interface IuiPlayersInGameReport {
@@ -32,7 +33,10 @@ export interface IuiPlayedGamesReport extends IuiAuth {
   // avgZerosPerPlayer: null,
   // avgKeepsPerPlayer: null, this is obsolete
   // vanillaGamesCount: number,
-  // usedRulesCount: null,
+  // usedRulesCount: Map<RULE | HIDDEN_CARDS_MODE, number>,
+  usedRulesCount: string,
+  hiddenCardsModeCount: string,
+  vanillaGamesCount: number,
   playerCount: number,
   // meltingGame: null,
   // spurtingGame: null,

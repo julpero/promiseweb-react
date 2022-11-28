@@ -1,7 +1,7 @@
 import { IuiAdminGame, IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickRequest, RENAME_STATUS } from "../../frontend/src/interfaces/IuiAdminOperations";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
 import { LOGIN_RESPONSE } from "../../frontend/src/interfaces/IuiUser";
-import { convertOldDataToNew, reCreateAllGamesStatistic, reCreateGameStatistic, reNameNickInGame } from "../dbActions/adminOperations";
+import { addUsedRules, convertOldDataToNew, reCreateAllGamesStatistic, reCreateGameStatistic, reNameNickInGame } from "../dbActions/adminOperations";
 import { getGamesByStatus } from "../dbActions/games";
 import { getGameWithPlayer } from "../dbActions/playingGame";
 import { checkLogin } from "../dbActions/users";
@@ -51,6 +51,11 @@ export const reCreateAllGameStats = async (userName: string): Promise<boolean> =
 export const convertOldData = async (userName: string): Promise<string[]> => {
   if (!await allowAdminActions(userName)) return [];
   return await convertOldDataToNew();
+};
+
+export const updateRulesFromOldData = async (userName: string): Promise<string[]> => {
+  if (!await allowAdminActions(userName)) return [];
+  return await addUsedRules();
 };
 
 export const reNameNick = async (reNameNickRequest: IuiReNameNickRequest): Promise<RENAME_STATUS> => {
