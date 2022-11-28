@@ -517,11 +517,11 @@
     "@babel/helper-plugin-utils" "^7.8.0"
 
 "@babel/plugin-syntax-jsx@^7.0.0", "@babel/plugin-syntax-jsx@^7.16.7":
-  "integrity" "sha512-Esxmk7YjA8QysKeT3VhTXvF6y77f/a91SIs4pWb4H2eWGQkCKFgQaG6hdoEVZtGsrAcb2K5BW66XsOErD4WU3Q=="
-  "resolved" "https://registry.npmjs.org/@babel/plugin-syntax-jsx/-/plugin-syntax-jsx-7.16.7.tgz"
-  "version" "7.16.7"
+  "integrity" "sha512-6mmljtAedFGTWu2p/8WIORGwy+61PLgOMPOdazc7YoJ9ZCWUyFy3A6CpPkRKLKD1ToAesxX8KGEViAiLo9N+7Q=="
+  "resolved" "https://registry.npmjs.org/@babel/plugin-syntax-jsx/-/plugin-syntax-jsx-7.18.6.tgz"
+  "version" "7.18.6"
   dependencies:
-    "@babel/helper-plugin-utils" "^7.16.7"
+    "@babel/helper-plugin-utils" "^7.18.6"
 
 "@babel/plugin-syntax-logical-assignment-operators@^7.10.4", "@babel/plugin-syntax-logical-assignment-operators@^7.8.3":
   "integrity" "sha512-d8waShlpFDinQ5MtvGU9xDAOzKH47+FFoney2baFIoMr952hKOLp1HR7VszoZvOsV/4+RRszNY7D17ba0te0ig=="
@@ -1478,13 +1478,13 @@
     "@nodelib/fs.scandir" "2.1.5"
     "fastq" "^1.6.0"
 
-"@playwright/test@^1.28.0":
-  "integrity" "sha512-vrHs5DFTPwYox5SGKq/7TDn/S4q6RA1zArd7uhO6EyP9hj3XgZBBM12ktMbnDQNxh/fL1IUKsTNLxihmsU38lQ=="
-  "resolved" "https://registry.npmjs.org/@playwright/test/-/test-1.28.0.tgz"
-  "version" "1.28.0"
+"@playwright/test@^1.28.1":
+  "integrity" "sha512-xN6spdqrNlwSn9KabIhqfZR7IWjPpFK1835tFNgjrlysaSezuX8PYUwaz38V/yI8TJLG9PkAMEXoHRXYXlpTPQ=="
+  "resolved" "https://registry.npmjs.org/@playwright/test/-/test-1.28.1.tgz"
+  "version" "1.28.1"
   dependencies:
     "@types/node" "*"
-    "playwright-core" "1.28.0"
+    "playwright-core" "1.28.1"
 
 "@pmmmwh/react-refresh-webpack-plugin@^0.5.3":
   "integrity" "sha512-zZbZeHQDnoTlt2AF+diQT0wsSXpvWiaIOZwBRdltNFhG1+I3ozyaw7U/nBiUwyJ0D+zwdXp0E3bWOl38Ag2BMw=="
@@ -2407,7 +2407,7 @@
   "resolved" "https://registry.npmjs.org/@types/stack-utils/-/stack-utils-2.0.1.tgz"
   "version" "2.0.1"
 
-"@types/tabulator-tables@^5.4.1":
+"@types/tabulator-tables@^5.4.2":
   "integrity" "sha512-sLbwDdWZCd7PFL6J0vc3JRNZ2znZjEwF/P+0Mw0lSdc+oY2PlXo+4cCLHc2QpatV5AuCfWMu7OY3kKrYRNqpnQ=="
   "resolved" "https://registry.npmjs.org/@types/tabulator-tables/-/tabulator-tables-5.32.1.tgz"
   "version" "5.32.1"
@@ -8735,10 +8735,10 @@
   dependencies:
     "find-up" "^3.0.0"
 
-"playwright-core@1.28.0":
-  "integrity" "sha512-nJLknd28kPBiCNTbqpu6Wmkrh63OEqJSFw9xOfL9qxfNwody7h6/L3O2dZoWQ6Oxcm0VOHjWmGiCUGkc0X3VZA=="
-  "resolved" "https://registry.npmjs.org/playwright-core/-/playwright-core-1.28.0.tgz"
-  "version" "1.28.0"
+"playwright-core@1.28.1":
+  "integrity" "sha512-3PixLnGPno0E8rSBJjtwqTwJe3Yw72QwBBBxNoukIj3lEeBNXwbNiKrNuB1oyQgTBw5QHUhNO3SteEtHaMK6ag=="
+  "resolved" "https://registry.npmjs.org/playwright-core/-/playwright-core-1.28.1.tgz"
+  "version" "1.28.1"
 
 "pointer-events-polyfill@^0.4.4-pre":
   "integrity" "sha512-t7iitVY5jW9mGOFZEHphJOzB8eMhoYaE6I5HqsUX14rjsPa9F6OlMOCj3EpqDzNb/8XtMk2BxMpOyePPyuefHw=="
@@ -9769,10 +9769,10 @@
   "resolved" "https://registry.npmjs.org/react-tag-autocomplete/-/react-tag-autocomplete-5.13.1.tgz"
   "version" "5.13.1"
 
-"react-tooltip@^4.5.0":
-  "integrity" "sha512-mJNurq29atce+TJc9Xe+/FHrcEs3K9J7wkjZZXwbK5Yq6uG5SZeKSFHwd0wcRPUipVwx5crmgzSW8Zu1xyvLTQ=="
-  "resolved" "https://registry.npmjs.org/react-tooltip/-/react-tooltip-4.5.0.tgz"
-  "version" "4.5.0"
+"react-tooltip@^4.5.1":
+  "integrity" "sha512-Zo+CSFUGXar1uV+bgXFFDe7VeS2iByeIp5rTgTcc2HqtuOS5D76QapejNNfx320MCY91TlhTQat36KGFTqgcvw=="
+  "resolved" "https://registry.npmjs.org/react-tooltip/-/react-tooltip-4.5.1.tgz"
+  "version" "4.5.1"
   dependencies:
     "prop-types" "^15.8.1"
     "uuid" "^7.0.3"
