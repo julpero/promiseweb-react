@@ -19,6 +19,7 @@ import OnePlayerStatsSummary from "./ReportComponents/OnePlayerStatsSummary";
 import { HIDDEN_CARDS_MODE, RULE } from "../interfaces/IuiGameOptions";
 import { ruleToStr } from "../common/enumFunctions";
 import UsedRulesGraph from "./ReportComponents/UsedRulesGraph";
+import MultiStateToggle from "./FormComponents/MultiStateToggle";
 
 interface IProps {
   playerName: string,
@@ -29,9 +30,9 @@ const OnePlayerReport = ({playerName}: IProps) => {
   const [reportDataToShow, setReportDataToShow] = useState<IuiOnePlayerReportData>();
 
   const [yearFilter, setYearFilter] = useState("");
-  const [playerFilter, setPlayerFilter] = useState<string[]>([]);
-  const [ruleFilter, setRuleFilter] = useState<RULE[]>([]);
-  const [vanillaFilter, setVanillaFilter] = useState<boolean>(false);
+  const [playerFilter, setPlayerFilter] = useState<Map<string, string>>(new Map<string, string>());
+  const [ruleFilter, setRuleFilter] = useState<Map<RULE, string>>(new Map<RULE, string>());
+  const [vanillaFilter, setVanillaFilter] = useState<string>("default");
 
   const user = useSelector(getUser);
   const dispatch = useDispatch();
@@ -135,15 +136,26 @@ const OnePlayerReport = ({playerName}: IProps) => {
       // console.log("allReportData", allReportData);
       const reportToShow = handleTimeLineReportFilter();
       // console.log("reportToShow 1", reportToShow);
-      if (reportToShow?.gamesData && playerFilter.length > 0) {
-        // console.log("playerFilter", playerFilter);
 
+      if (reportToShow?.gamesData && playerFilter.size > 0) {
+        // console.log("playerFilter", playerFilter);
         const gamesToReport: IuiOneGameData[] = [];
         reportToShow?.gamesData.forEach(game => {
           let includeGame = true;
-          playerFilter.forEach(filter => {
-            if (!game.opponents.some(opponent => opponent === filter)) {
-              includeGame = false;
+          playerFilter.forEach((filter, player) => {
+            switch (filter) {
+              case "in": {
+                if (!game.opponents.some(opponent => opponent === player)) {
+                  includeGame = false;
+                }
+                break;
+              }
+              case "out": {
+                if (game.opponents.some(opponent => opponent === player)) {
+                  includeGame = false;
+                }
+                break;
+              }
             }
           });
           if (includeGame) {
@@ -154,13 +166,25 @@ const OnePlayerReport = ({playerName}: IProps) => {
         reportToShow.gamesData = gamesToReport;
         // console.log("reportToShow 2", reportToShow);
       }
-      if (reportToShow?.gamesData && ruleFilter.length > 0) {
+
+      if (reportToShow?.gamesData && ruleFilter.size > 0) {
         const gamesToReport: IuiOneGameData[] = [];
         reportToShow?.gamesData.forEach(game => {
           let includeGame = true;
-          ruleFilter.forEach(filter => {
-            if (!game.rules.ruleList.some(rule => rule === filter)) {
-              includeGame = false;
+          ruleFilter.forEach((filter, rule) => {
+            switch (filter) {
+              case "in": {
+                if (!game.rules.ruleList.some(ruleInGame => ruleInGame === rule)) {
+                  includeGame = false;
+                }
+                break;
+              }
+              case "out": {
+                if (game.rules.ruleList.some(ruleInGame => ruleInGame === rule)) {
+                  includeGame = false;
+                }
+                break;
+              }
             }
           });
           if (includeGame) {
@@ -170,9 +194,20 @@ const OnePlayerReport = ({playerName}: IProps) => {
         });
         reportToShow.gamesData = gamesToReport;
       }
-      if (reportToShow?.gamesData && vanillaFilter) {
-        reportToShow.gamesData = reportToShow.gamesData.filter(game => game.rules.ruleList.length === 0 && game.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal);
+
+      if (reportToShow?.gamesData && vanillaFilter !== "default") {
+        switch (vanillaFilter) {
+          case "in": {
+            reportToShow.gamesData = reportToShow.gamesData.filter(game => game.rules.ruleList.length === 0 && game.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal);
+            break;
+          }
+          case "out": {
+            reportToShow.gamesData = reportToShow.gamesData.filter(game => game.rules.ruleList.length > 0 || game.rules.hiddenCardsMode !== HIDDEN_CARDS_MODE.normal);
+            break;
+          }
+        }
       }
+
       setReportDataToShow(reportToShow);
     }
   }, [yearFilter, playerFilter, ruleFilter, vanillaFilter, playerName, allReportData]);
@@ -218,30 +253,18 @@ const OnePlayerReport = ({playerName}: IProps) => {
     );
   };
 
-  const handleOpponentFilterClick = (opponentName: string, filterOn: boolean) => {
+  const handleOpponentFilterClick = (opponentName: string, filter: string) => {
     // console.log(opponentName, filterOn);
-    let currentFilter = [...playerFilter];
-    if (filterOn) {
-      if (!currentFilter.some(opponent => opponent === opponentName)) {
-        currentFilter.push(opponentName);
-      }
-    } else {
-      currentFilter = currentFilter.filter(opponent => opponent !== opponentName);
-    }
+    const currentFilter = new Map<string, string>(playerFilter);
+    currentFilter.set(opponentName, filter);
     // console.log(currentFilter);
     setPlayerFilter(currentFilter);
   };
 
-  const handleRuleFilterClick = (rule: RULE, filterOn: boolean) => {
-    // console.log(rule, filterOn);
-    let currentFilter = [...ruleFilter];
-    if (filterOn) {
-      if (!currentFilter.some(curRule => curRule === rule)) {
-        currentFilter.push(rule);
-      }
-    } else {
-      currentFilter = currentFilter.filter(curRule => curRule !== rule);
-    }
+  const handleRuleFilterClick = (rule: RULE, filter: string) => {
+    // console.log(rule, filter);
+    const currentFilter = new Map<RULE, string>(ruleFilter);
+    currentFilter.set(rule, filter);
     // console.log(currentFilter);
     setRuleFilter(currentFilter);
   };
@@ -252,14 +275,12 @@ const OnePlayerReport = ({playerName}: IProps) => {
     const distinctPlayersArr = Array.from(new Set( [...playersArr] ));
     return distinctPlayersArr.sort((a: string, b: string) => a.localeCompare(b)).map((player, ind) => {
       return (
-        <Form.Check
-          inline
-          className="smaller"
-          type="switch"
-          id={`inline-switch-${ind}`}
-          key={ind} label={player}
-          name={player}
-          onChange={(e) => handleOpponentFilterClick(e.target.name, e.target.checked)}
+        <MultiStateToggle
+          key={ind}
+          states={["default", "in", "out"]}
+          labels={["-", "O", "X"]}
+          label={player}
+          onChange={(filter: string) => handleOpponentFilterClick(player, filter)}
         />
       );
     });
@@ -269,26 +290,22 @@ const OnePlayerReport = ({playerName}: IProps) => {
     const rulesArr = Object.values(RULE).filter((v) => !isNaN(Number(v))) as RULE[];
     return (
       <React.Fragment>
-        <Form.Check
-          inline
-          className="smaller"
-          type="switch"
-          id="inline-switch-vanilla"
+        <MultiStateToggle
+          states={["default", "in", "out"]}
+          labels={["-", "O", "X"]}
+          onChange={(filter: string) => setVanillaFilter(filter)}
           label="Vanilla game"
-          onChange={(e) => setVanillaFilter(e.target.checked)}
         />
 
         {
           rulesArr.map((rule, ind) => {
             return (
-              <Form.Check
-                inline
-                className="smaller"
-                type="switch"
+              <MultiStateToggle
                 key={ind}
-                id={`inline-switch-${rule}`}
+                states={["default", "in", "out"]}
+                labels={["-", "O", "X"]}
                 label={ruleToStr(rule)}
-                onChange={(e) => handleRuleFilterClick(rule, e.target.checked)}
+                onChange={(filter: string) => handleRuleFilterClick(rule, filter)}
               />
             );
           })
