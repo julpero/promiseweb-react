@@ -1,4 +1,3 @@
-import { HIDDEN_CARDS_MODE, RULE } from "./IuiGameOptions";
 import { IuiAuth } from "./IuiUser";
 
 export interface IuiPlayersInGameReport {
@@ -9,6 +8,8 @@ export interface IuiPlayersInGameReport {
 export interface IuiGamesByPlayer {
   playerName: string,
   count: number, // mostGamesPlayed
+  gamesCreated: number,
+  gamesCreationPercentage: number,
   wins: number, // playerTotalWins
   avgPoints: number, // avgPointsPerPlayer
   avgScorePoints: number, // avgScorePointsPerPlayer
