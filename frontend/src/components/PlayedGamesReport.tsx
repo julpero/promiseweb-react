@@ -197,6 +197,36 @@ const PlayedGamesReport = (props: IProps) => {
         legendColor:"#000000",
       },
     },
+    {
+      title: "created games",
+      headerTooltip: "Number of games player has created",
+      field: "gamesCreated",
+      sorter: "number",
+      formatter: "progress",
+      formatterParams: {
+        min: 0,
+        max: Math.max(...(reportData?.gamesByPlayer.map(o => o.gamesCreated) ?? [])),
+        color: colorArr,
+        legend: (val) => val,
+        legendAlign: "left",
+        legendColor:"#000000",
+      },
+    },
+    {
+      title: "game creation %",
+      headerTooltip: "Percentage of played games that are created by yourself",
+      field: "gamesCreationPercentage",
+      sorter: "number",
+      formatter: "progress",
+      formatterParams: {
+        min: 0,
+        max: Math.max(...(reportData?.gamesByPlayer.map(o => o.gamesCreationPercentage) ?? [])),
+        color: colorArr,
+        legend: (val) => `${parseFloat(val).toFixed(1)}%`,
+        legendAlign: "left",
+        legendColor:"#000000",
+      },
+    },
   ];
 
   useEffect(() => {
