@@ -157,13 +157,12 @@ export const getMyCards = (name: string, round: IRound, speedPromise: boolean, o
  * @param round
  * @param playIndex
  */
-export const getPlayableCardIndexes = (myCards: IuiCard[], round: IRound, playIndex: number): number[] => {
+export const getPlayableCardIndexes = (myCards: IuiCard[], round: IRound, playIndex: number, mustPlayTrump: boolean): number[] => {
   if (round.cardsPlayed[playIndex].length === 0) {
     // I started this turn so I can hit any card I like
     return Array.from(myCards.keys());
   } else {
     const suiteInCharge = round.cardsPlayed[playIndex][0].card.suite;
-    // const playableCardIndexes = Array.from(myCards.keys(card => card.suite === suiteInCharge));
     const playableCardIndexes: number[] = [];
     myCards.forEach((card, idx) => {
       if (card.suite === suiteInCharge) playableCardIndexes.push(idx);
@@ -172,7 +171,15 @@ export const getPlayableCardIndexes = (myCards: IuiCard[], round: IRound, playIn
     // if there is one or more suitable cards in hand then play with them
     if (playableCardIndexes.length > 0) return playableCardIndexes;
 
-    // TODO must play trump
+    // if must play trump rule is active
+    if (mustPlayTrump) {
+      const roundTrumpSuite = round.trumpCard.suite;
+      myCards.forEach((card, idx) => {
+        if (card.suite === roundTrumpSuite) playableCardIndexes.push(idx);
+      });
+      if (playableCardIndexes.length > 0) return playableCardIndexes;
+    }
+
     // else return all indexes
     return Array.from(myCards.keys());
   }

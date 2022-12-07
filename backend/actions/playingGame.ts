@@ -232,7 +232,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, o
     dealerPositionIndex: round.dealerPositionIndex,
     starterPositionIndex: round.starterPositionIndex,
     myCards: myCards, // TODO speed promise
-    playableCards: isNowMyTurn ? getPlayableCardIndexes(myCards, round, playIndex) : [],
+    playableCards: isNowMyTurn ? getPlayableCardIndexes(myCards, round, playIndex, isRuleActive(gameInDb, RULE.mustPlayTrump)) : [],
     players: getRoundPlayers(name, round, playIndex, showPlayerPromisesInRound(round, hiddenPromiseRoundRule, onlyTotalPromiseRule), originalPlayerName),
     trumpCard: ICardToIuiCard(round.trumpCard), // TODO hidden trump mode
     myPlayedCard: myPlayedCard ? ICardToIuiCard(myPlayedCard) : null,

@@ -204,7 +204,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
       return response;
     }
     const playIndex = getCurrentPlayIndex(round);
-    const playableCardIndexes = getPlayableCardIndexes(playerCards, round, playIndex);
+    const playableCardIndexes = getPlayableCardIndexes(playerCards, round, playIndex, isRuleActive(gameInDb, RULE.mustPlayTrump));
     if (!playableCardIndexes.some(ind => ind === playedCardIndex)) {
       response.playResponse = PLAY_CARD_RESPONSE.invalidCard;
       return response;

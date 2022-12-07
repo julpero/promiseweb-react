@@ -5,7 +5,7 @@ import { getCurrentCardInCharge, getCurrentPlayIndex, getCurrentRoundInd, getDea
 import { IuiCard, ROUND_PHASE } from "../frontend/src/interfaces/IuiPlayingGame";
 import { ICard, IPlayerInTurn } from "../backend/interfaces/IGameOptions";
 
-describe("testing first round and first player", () => {
+describe("testing first round and first player - must play trump", () => {
   test("getCurrentRoundInd", () => {
     const currentRoundInd = getCurrentRoundInd(firstRoundFirstPlayer.game);
     expect(currentRoundInd).toBe(0);
@@ -54,7 +54,7 @@ describe("testing first round and first player", () => {
   test("getPlayableCardIndexes", () => {
     const myCards = getMyCards("Vika", firstRoundFirstPlayer.game.rounds[0], false);
     const playIndex = getCurrentPlayIndex(firstRoundFirstPlayer.game.rounds[0]);
-    const myIndexes = getPlayableCardIndexes(myCards, firstRoundFirstPlayer.game.rounds[0], playIndex, false);
+    const myIndexes = getPlayableCardIndexes(myCards, firstRoundFirstPlayer.game.rounds[0], playIndex, true);
     expect(myIndexes).toContain(0);
     expect(myIndexes).toContain(1);
     expect(myIndexes).toContain(2);
@@ -69,7 +69,7 @@ describe("testing first round and first player", () => {
   });
 });
 
-describe("testing first round and second player", () => {
+describe("testing first round and second player - must play trump", () => {
   test("getCurrentRoundInd", () => {
     const currentRoundInd = getCurrentRoundInd(firstRoundSecondPlayer.game);
     expect(currentRoundInd).toBe(0);
@@ -114,7 +114,7 @@ describe("testing first round and second player", () => {
   test("getPlayableCardIndexes", () => {
     const myCards = getMyCards("Toka", firstRoundSecondPlayer.game.rounds[0], false);
     const playIndex = getCurrentPlayIndex(firstRoundSecondPlayer.game.rounds[0]);
-    const myIndexes = getPlayableCardIndexes(myCards, firstRoundSecondPlayer.game.rounds[0], playIndex, false);
+    const myIndexes = getPlayableCardIndexes(myCards, firstRoundSecondPlayer.game.rounds[0], playIndex, true);
     expect(myIndexes).not.toContain(0);
     expect(myIndexes).not.toContain(1);
     expect(myIndexes).not.toContain(2);
@@ -130,7 +130,7 @@ describe("testing first round and second player", () => {
   });
 });
 
-describe("testing first round and second hit first player", () => {
+describe("testing first round and second hit first player - must play trump", () => {
   test("getCurrentRoundInd", () => {
     const currentRoundInd = getCurrentRoundInd(firstRoundSecondHitFirstPlayer.game);
     expect(currentRoundInd).toBe(0);
@@ -175,7 +175,7 @@ describe("testing first round and second hit first player", () => {
   test("getPlayableCardIndexes", () => {
     const myCards = getMyCards("Toka", firstRoundSecondHitFirstPlayer.game.rounds[0], false);
     const playIndex = getCurrentPlayIndex(firstRoundSecondHitFirstPlayer.game.rounds[0]);
-    const myIndexes = getPlayableCardIndexes(myCards, firstRoundSecondHitFirstPlayer.game.rounds[0], playIndex, false);
+    const myIndexes = getPlayableCardIndexes(myCards, firstRoundSecondHitFirstPlayer.game.rounds[0], playIndex, true);
     expect(myIndexes).toContain(0);
     expect(myIndexes).toContain(1);
     expect(myIndexes).toContain(2);
@@ -190,7 +190,7 @@ describe("testing first round and second hit first player", () => {
   });
 });
 
-describe("testing first round and third hit second player", () => {
+describe("testing first round and third hit second player - must play trump", () => {
   test("getCurrentRoundInd", () => {
     const currentRoundInd = getCurrentRoundInd(firstRoundThirdHitSecondPlayer.game);
     expect(currentRoundInd).toBe(0);
@@ -235,8 +235,8 @@ describe("testing first round and third hit second player", () => {
   test("getPlayableCardIndexes", () => {
     const myCards = getMyCards("Vika", firstRoundThirdHitSecondPlayer.game.rounds[0], false);
     const playIndex = getCurrentPlayIndex(firstRoundThirdHitSecondPlayer.game.rounds[0]);
-    const myIndexes = getPlayableCardIndexes(myCards, firstRoundThirdHitSecondPlayer.game.rounds[0], playIndex, false);
-    expect(myIndexes).toContain(0);
+    const myIndexes = getPlayableCardIndexes(myCards, firstRoundThirdHitSecondPlayer.game.rounds[0], playIndex, true);
+    expect(myIndexes).not.toContain(0);
     expect(myIndexes).toContain(1);
     expect(myIndexes).toContain(2);
     expect(myIndexes).toContain(3);
