@@ -112,6 +112,11 @@ const CreateGame = (props: IProps) => {
           <div>If player has no charging suite but has trump, then player must play trump.</div>
         );
       }
+      case "hiddenTrump": {
+        return (
+          <div>Trump card is revealed after all players have made their promise.</div>
+        );
+      }
       case "opponentPromiseCardValue": {
         return (
           <div>Players see other players hand value while promising.</div>
@@ -278,7 +283,6 @@ const CreateGame = (props: IProps) => {
                   <div className="row">
                     <div className="col">
                       <Field
-                        disabled
                         name="hiddenTrump"
                         type="checkbox"
                         component={CheckboxInput}
@@ -287,6 +291,8 @@ const CreateGame = (props: IProps) => {
                         onChange={(checked: boolean) => {
                           form.change("hiddenTrump", checked);
                         }}
+                        data-for="ruleInfoTooltip"
+                        data-tip="hiddenTrump"
                       />
                     </div>
                     <div className="col">
