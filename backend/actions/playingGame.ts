@@ -232,9 +232,9 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, o
     dealerPositionIndex: round.dealerPositionIndex,
     starterPositionIndex: round.starterPositionIndex,
     myCards: myCards, // TODO speed promise
-    playableCards: isNowMyTurn ? getPlayableCardIndexes(myCards, round, playIndex) : [],
+    playableCards: isNowMyTurn ? getPlayableCardIndexes(myCards, round, playIndex, isRuleActive(gameInDb, RULE.mustPlayTrump)) : [],
     players: getRoundPlayers(name, round, playIndex, showPlayerPromisesInRound(round, hiddenPromiseRoundRule, onlyTotalPromiseRule), originalPlayerName),
-    trumpCard: ICardToIuiCard(round.trumpCard), // TODO hidden trump mode
+    trumpCard: isRuleActive(gameInDb, RULE.hiddenTrump) && roundPhase === ROUND_PHASE.onPromises ? null : ICardToIuiCard(round.trumpCard),
     myPlayedCard: myPlayedCard ? ICardToIuiCard(myPlayedCard) : null,
     playerInCharge: playerInCharge,
     cardInCharge: cardInCharge ? ICardToIuiCard(cardInCharge) : null, // TODO hidden cards
@@ -242,8 +242,8 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, o
     cardsPlayed: getCardsPlayed(round, playIndex), // TODO hidden cards
     gameOver: gameInDb.gameStatus === GAME_STATUS.played,
     whoseTurn: playerInTurn?.name ?? "",
-    isMyTurn: isNowMyTurn, // TODO
-    isMyPromiseTurn: isMyPromiseTurn(name, round, originalPlayerName), // TODO ?
+    isMyTurn: isNowMyTurn,
+    isMyPromiseTurn: isMyPromiseTurn(name, round, originalPlayerName),
     handValues: getHandValues(round, roundPhase, isRuleActive(gameInDb, RULE.opponentPromiseCardValue), isRuleActive(gameInDb, RULE.opponentGameCardValue)),
     obsGame: null, // TODO obsGameToRoundObj
     promiseTable: getPromiseTable(gameInDb),
@@ -272,11 +272,9 @@ const gameToGameInfo = (gameIdStr: string, gameInDb: IGameOptions): IuiGetGameIn
         playerStats: parsePlayerStats(gameInDb, player.name),
         playedBy: player.playedBy,
       } as IuiParsedHumanPlayer;
-    }), // TODO
+    }),
     hasPassword: gameInDb.password.length > 0,
     currentRound: getCurrentRound(gameInDb.game.rounds),
-    reloaded: false, // TODO
-    eventInfo: false, // TODO
     thisIsDemoGame: gameInDb.thisIsDemoGame,
     rules: rulesToRuleObj(gameInDb),
   } as IuiGetGameInfoResponse;

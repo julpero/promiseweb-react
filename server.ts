@@ -755,13 +755,6 @@ connectDB().then(() => {
             winnerOfGame,
             playWentOver,
           } = playCardResponse;
-          const chatLine = `${playerName} hit card in ${(playTime/1000).toFixed(1)} seconds`;
-          const chatObj: IuiChatNotification = {
-            chatLine: chatLine,
-            focusedPlayer: playerName,
-            type: CHAT_TYPE.hit,
-          };
-          io.to(gameId).emit("new chat line", chatObj);
 
           const cardPlayedNotificationToMySelf: IuiCardPlayedNotification = {
             playerName: playerName,
@@ -788,6 +781,14 @@ connectDB().then(() => {
 
           socket.emit("card played", cardPlayedNotificationToMySelf);
           socket.to(gameId).emit("card played", cardPlayedNotification);
+
+          const chatLine = `${playerName} hit card in ${(playTime/1000).toFixed(1)} seconds`;
+          const chatObj: IuiChatNotification = {
+            chatLine: chatLine,
+            focusedPlayer: playerName,
+            type: CHAT_TYPE.hit,
+          };
+          io.to(gameId).emit("new chat line", chatObj);
 
           if (newPlayAfterHit) {
             const chatLine = `${winnerOfPlay} won this play`;

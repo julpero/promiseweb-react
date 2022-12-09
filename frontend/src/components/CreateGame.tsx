@@ -107,6 +107,16 @@ const CreateGame = (props: IProps) => {
           <div>Only the total sum of promises is visible. While promising phase, this is same as the &quot;Hidden promise round&quot; rule.</div>
         );
       }
+      case "mustTrump": {
+        return (
+          <div>If player has no charging suite but has trump, then player must play trump.</div>
+        );
+      }
+      case "hiddenTrump": {
+        return (
+          <div>Trump card is revealed after all players have made their promise.</div>
+        );
+      }
       case "opponentPromiseCardValue": {
         return (
           <div>Players see other players hand value while promising.</div>
@@ -257,7 +267,6 @@ const CreateGame = (props: IProps) => {
                     </div>
                     <div className="col">
                       <Field
-                        disabled
                         name="mustTrump"
                         type="checkbox"
                         component={CheckboxInput}
@@ -266,13 +275,14 @@ const CreateGame = (props: IProps) => {
                         onChange={(checked: boolean) => {
                           form.change("mustTrump", checked);
                         }}
+                        data-for="ruleInfoTooltip"
+                        data-tip="mustTrump"
                       />
                     </div>
                   </div>
                   <div className="row">
                     <div className="col">
                       <Field
-                        disabled
                         name="hiddenTrump"
                         type="checkbox"
                         component={CheckboxInput}
@@ -281,6 +291,8 @@ const CreateGame = (props: IProps) => {
                         onChange={(checked: boolean) => {
                           form.change("hiddenTrump", checked);
                         }}
+                        data-for="ruleInfoTooltip"
+                        data-tip="hiddenTrump"
                       />
                     </div>
                     <div className="col">

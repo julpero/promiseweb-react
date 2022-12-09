@@ -35,7 +35,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
 
   // console.time("reportData player report");
   // players and played games count, total points, win count
-  interface playersAgg {_id: string, count: number, totalPoints: number, wins: number, avgScorePoints: number, avgPercentagePoints: number}
+  interface playersAgg {_id: string, count: number, gamesCreated: number, totalPoints: number, wins: number, avgScorePoints: number, avgPercentagePoints: number}
   const players = await GameOptions.aggregate<playersAgg>([
     {$match: {
       "gameStatus": {$eq: GAME_STATUS.played},
@@ -51,6 +51,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
     {$group: {
       _id: "$gameStatistics.playersStatistics.playerName",
       count: {$sum:1},
+      gamesCreated: {$sum: {$cond: [{$eq: ["$gameStatistics.playersStatistics.playerName", "$adminName"]}, 1, 0]}},
       totalPoints: {$sum: "$gameStatistics.playersStatistics.totalPoints"},
       wins: {$sum: {$cond: [{$eq: ["$gameStatistics.playersStatistics.playerName", "$gameStatistics.winnerName"]}, 1, 0]}},
       avgScorePoints: {$avg: "$gameStatistics.playersStatistics.scorePoints"},
@@ -62,6 +63,8 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
       playerReport.set(player._id, {
         playerName: player._id,
         count: player.count,
+        gamesCreated: player.gamesCreated,
+        gamesCreationPercentage: (player.gamesCreated/player.count)*100,
         wins: player.wins,
         winPercentage: (player.wins/player.count)*100,
         avgPoints: 0,

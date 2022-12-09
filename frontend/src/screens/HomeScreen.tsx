@@ -196,18 +196,6 @@ const HomeScreen = () => {
     }
   };
 
-  const renderPlayedGamesReport = () => {
-    if (user.isUserLoggedIn) {
-      return (
-        <PlayedGamesReport
-          openPlayerReport={openOnePlayerReport}
-        />
-      );
-    } else {
-      return null;
-    }
-  };
-
   return(
     <div className="container-fluid">
       <Accordion>
@@ -231,7 +219,11 @@ const HomeScreen = () => {
         </Accordion.Item>
       </Accordion>
 
-      {renderPlayedGamesReport()}
+      {user.isUserLoggedIn &&
+        <PlayedGamesReport
+          openPlayerReport={openOnePlayerReport}
+        />
+      }
 
       <div className="adminButtonDiv">
         <Button variant="warning" onClick={() => logOutUser()} disabled={!user.isUserLoggedIn}>Log Out <i>{user.userName}</i></Button>

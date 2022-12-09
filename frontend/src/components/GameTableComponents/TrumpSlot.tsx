@@ -23,9 +23,8 @@ const TrumpSlot = ({styleProps, animationTimes}: IProps) => {
   }, [currentRoundInfo]);
 
   useEffect(() => {
-    if (trump) {
-      setCardFace(getCardFace(cardAsString(trump), CARD_PLAYABLE.played));
-    }
+    const cardStr = trump ? cardAsString(trump): "backSide";
+    setCardFace(getCardFace(cardStr, CARD_PLAYABLE.played));
   }, [trump]);
 
   useEffect(() => {

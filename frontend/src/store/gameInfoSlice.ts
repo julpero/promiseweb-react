@@ -25,7 +25,6 @@ const initialState: GameInfoState = {
     humanPlayers: [],
     hasPassword: false,
     currentRound: null,
-    reloaded: false,
     thisIsDemoGame: false,
   },
   gameId: "",

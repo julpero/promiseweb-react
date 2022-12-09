@@ -103,7 +103,6 @@ export interface IuiGetGameInfoResponse extends IuiAuth {
   hasPassword: boolean,
   /** index of rounds array */
   currentRound: number | null,
-  reloaded: boolean,
   thisIsDemoGame: boolean,
 }
 
