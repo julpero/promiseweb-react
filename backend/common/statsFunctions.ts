@@ -129,6 +129,14 @@ const playerPointsByRounds = (rounds: IRound[], playerName: string): number[] =>
   return pointsArr;
 };
 
+const playerEvenBreakingPointsByRounds = (rounds: IRound[], playerName: string): number[] => {
+  const pointsArr: number[] = [];
+  rounds.forEach(round => {
+    pointsArr.push(round.roundPlayers.find(player => player.name === playerName)?.evenBreakingBonus ?? 0);
+  });
+  return pointsArr;
+};
+
 const playerCumulativePointsByRounds = (rounds: IRound[], playerName: string): number[] => {
   const cumulativePointsArr: number[] = [];
   let cumulativeValue = 0;
@@ -171,6 +179,7 @@ const getPlayerStatistics = (game: IGame): IPlayerStatistic[] => {
       playTime: countTotalPlayTime(game.rounds, playerName),
       promiseTime: countTotalPromiseTime(game.rounds, playerName),
       pointsPerRound: playerPointsByRounds(game.rounds, playerName),
+      evenBreakingPointsPerRound: playerEvenBreakingPointsByRounds(game.rounds, playerName),
       cumulativePointsPerRound: playerCumulativePointsByRounds(game.rounds, playerName),
     } as IPlayerStatistic);
   });

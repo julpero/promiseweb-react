@@ -105,9 +105,15 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
       promiseResponse.promiseResponse = PROMISE_RESPONSE.evenPromiseNotAllowed;
       return promiseResponse;
     }
+    const isEvenBreakingPromise = isRuleActive(gameInDb, RULE.bonusNonEvenPromise) && !round.roundPlayers.some(player => player.evenBreakingBonus !== null) && (
+      (isRoundsLastPromiser(round) && (promise + getCurrentPromiseTotal(round) !== round.cardsInRound))
+      ||
+      (!isRoundsLastPromiser(round) && (promise + getCurrentPromiseTotal(round) > round.cardsInRound))
+    );
 
     // All checks made, let's make promise
     round.roundPlayers[promiser.index].promise = promise as PromiseValue;
+    if (isEvenBreakingPromise) round.roundPlayers[promiser.index].evenBreakingBonus = 0;
     if (!round.totalPromise) {
       round.totalPromise = promise;
     } else {

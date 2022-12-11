@@ -26,6 +26,7 @@ const gameOptionsSchema: Schema = new Schema<IGameOptions>({
   privateSpeedGame: {type: Boolean, required: false},
   opponentPromiseCardValue: {type: Boolean, required: false},
   opponentGameCardValue: {type: Boolean, required: false},
+  bonusNonEvenPromise: {type: Boolean, required: false},
   thisIsDemoGame: {type: Boolean, required: false},
   hiddenCardsMode: {type: Number, required: false},
   game: {type: gameSchema, required: false},

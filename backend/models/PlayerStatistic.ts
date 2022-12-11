@@ -26,6 +26,7 @@ const playerStatisticSchema: Schema = new Schema<IPlayerStatistic>({
   promiseTime: {type: Number, required: false},
   pointsPerRound: {type: [Number], required: false},
   cumulativePointsPerRound: {type: [Number], required: false},
+  evenBreakingPointsPerRound: {type: [Number], required: false},
 });
 
 export default playerStatisticSchema;

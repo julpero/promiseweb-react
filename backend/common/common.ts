@@ -239,4 +239,10 @@ export const countRoundPoints = (roundPlayers: IRoundPlayer[], bigRound: boolean
       player.points = 0;
     }
   }
+  const evenBreaker = roundPlayers.find(player => player.evenBreakingBonus === 0 && player.promise === player.keeps);
+  if (evenBreaker && evenBreaker.points !== null) {
+    const bonusPoints = roundPlayers.filter(player => player.promise !== player.keeps).length * 2;
+    evenBreaker.evenBreakingBonus = bonusPoints;
+    evenBreaker.points += bonusPoints;
+  }
 };

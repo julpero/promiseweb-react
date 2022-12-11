@@ -25,6 +25,7 @@ export interface IGameOptions {
   privateSpeedGame: boolean,
   opponentPromiseCardValue: boolean,
   opponentGameCardValue: boolean,
+  bonusNonEvenPromise: boolean,
   thisIsDemoGame: boolean,
   hiddenCardsMode: HIDDEN_CARDS_MODE,
   game: IGame,
@@ -99,6 +100,7 @@ export interface IPlayerStatistic extends IGameInfoForStats, IGameHandCardsForSt
   promiseTime: number,
   pointsPerRound: number[],
   cumulativePointsPerRound: number[],
+  evenBreakingPointsPerRound: number[],
 }
 
 export interface ISpurtAndMelt {
@@ -137,6 +139,7 @@ export interface IRoundPlayer extends IPlayer {
   cardsToDebug: ICard[],
   speedPromisePoints: number | null,
   speedPromiseTotal: number | null,
+  evenBreakingBonus: number | null,
 }
 
 export interface ICardPlayed {

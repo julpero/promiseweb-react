@@ -22,6 +22,7 @@ const rulesToArr = (gameOptions: IGameOptions | IGameForList): RULE[] => {
   if (gameOptions.privateSpeedGame === true) rulesArr.push(RULE.privateSpeedGame);
   if (gameOptions.opponentPromiseCardValue === true) rulesArr.push(RULE.opponentPromiseCardValue);
   if (gameOptions.opponentGameCardValue === true) rulesArr.push(RULE.opponentGameCardValue);
+  if (gameOptions.bonusNonEvenPromise === true) rulesArr.push(RULE.bonusNonEvenPromise);
 
   return rulesArr;
 };
@@ -66,6 +67,9 @@ export const isRuleActive = (gameOptions: IGameOptions, rule: RULE): boolean => 
     }
     case RULE.opponentGameCardValue: {
       return gameOptions.opponentGameCardValue;
+    }
+    case RULE.bonusNonEvenPromise: {
+      return gameOptions.bonusNonEvenPromise;
     }
     default: return false;
   }

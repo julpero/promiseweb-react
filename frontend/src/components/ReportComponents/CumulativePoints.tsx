@@ -134,10 +134,11 @@ const CumulativePoints = ({gameReportData}: IProps) => {
             const label = tooltipItem.dataset.label || "";
             const val = tooltipItem.formattedValue;
             const pointsFromRound = gameReportData?.pointsPerRound[dataInd][roundInd] ?? 0;
+            const bonusPointsFromRound = gameReportData?.evenBreakingPointsPerRound[dataInd][roundInd] ?? 0;
             if (roundInd === 0) {
               return `${label}: ${val}`;
             } else {
-              return `${label}: ${val} (${pointsFromRound})`;
+              return bonusPointsFromRound ? `${label}: ${val} (${pointsFromRound} [${bonusPointsFromRound}])` : `${label}: ${val} (${pointsFromRound})`;
             }
           },
           title: (tooltipItems) => {

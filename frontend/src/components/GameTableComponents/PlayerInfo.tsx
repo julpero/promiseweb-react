@@ -8,6 +8,7 @@ import { ROUND_PHASE } from "../../interfaces/IuiPlayingGame";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 import { getUser } from "../../store/userSlice";
 import AnimatedProgressBar from "./AnimatedProgressBar";
+import { BsFillLightningChargeFill } from "react-icons/bs";
 
 interface IProps {
   /** index goes clockwise, starting from you 0 and rest players from 1 to 5 */
@@ -75,7 +76,7 @@ const PlayerInfo = ({index}: IProps) => {
       return (
         <ProgressBar style={{"border": "solid 1px orange"}}>
           <ProgressBar variant="success" now={keeps} max={max} key={1} />
-          <ProgressBar variant="warning" now={promise - keeps} max={max} key={2} />
+          <ProgressBar variant="warning" now={promise - keeps} max={max} key={2}/>
           {renderShowMyTurn(3, promise)}
         </ProgressBar>
       );
@@ -90,12 +91,17 @@ const PlayerInfo = ({index}: IProps) => {
     }
   };
 
+  const renderEvenBreaker = () => {
+    return player.evenBreakingBonus === 0 ? <BsFillLightningChargeFill color="yellow" /> : null;
+  };
+
   const bgColor = window.getComputedStyle(document.body, null).getPropertyValue("background-color");
 
   return (
     <div className="playerInfoRow">
       <div className="playerNameCol" style={{"backgroundImage": `linear-gradient(90deg, ${colorize(player.name)}, ${bgColor})`}}>
         {player.name.substring(0, 10)}
+        {renderEvenBreaker()}
       </div>
       <div className="playerInfoCol">
         k: {renderKeeps()} p: {renderPromise()}

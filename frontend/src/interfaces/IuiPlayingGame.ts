@@ -41,6 +41,7 @@ export enum PROMISE_RESPONSE {
   evenPromiseNotAllowed,
   notMyTurn,
   noPromisePhase,
+  evenBreakingPromise,
   unknownError,
 }
 
@@ -122,6 +123,7 @@ export interface IuiRoundPlayer {
   cardPlayed: IuiCard | null,
   speedPromisePoints: number | null,
   speedPromiseTotal: number | null,
+  evenBreakingBonus: number | null,
 }
 
 export interface IuiCardPlayed {
@@ -135,6 +137,7 @@ export interface IuiPlayerPromise {
   points: number,
   speedPromisePoints: number,
   speedPromiseTotal: number,
+  evenBreakingBonus: number| null,
 }
 
 export interface IuiRoundTotalPromise {

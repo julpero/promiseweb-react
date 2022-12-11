@@ -11,6 +11,7 @@ export const PlayerCountColor = {
 export interface IuiGameReport extends IuiAuth {
   players: string[],
   pointsPerRound: number[][],
+  evenBreakingPointsPerRound: number[][],
   cumulativePointsPerRound: number[][],
   rounds: number[],
   cardsInRound: number[],
