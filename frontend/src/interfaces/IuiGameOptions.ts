@@ -27,6 +27,7 @@ export enum RULE {
   privateSpeedGame,
   opponentPromiseCardValue,
   opponentGameCardValue,
+  bonusNonEvenPromise,
 }
 
 export interface IuiRoundInfo {

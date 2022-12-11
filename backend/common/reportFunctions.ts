@@ -34,6 +34,7 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
   const retObj: IuiGameReport = {
     players: [],
     pointsPerRound: [],
+    evenBreakingPointsPerRound: [],
     cumulativePointsPerRound: [],
     rounds: [],
     cardsInRound: [],
@@ -60,6 +61,7 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
   const keepsBigArr: number[] = [];
   const keepsSmallArr: number[] = [];
   const pointsPerRoundArr: number[][] = [];
+  const playerEvenBreakingPointsPerRoundArr: number[][] = [];
   const cumulativePointsPerRoundArr: number[][] = [];
   const trumpsArr: number[] = [];
   const bigCardsArr: number[] = [];
@@ -80,6 +82,7 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
       keepsBigArr.push(playerStats.totalKeepsBig);
       keepsSmallArr.push(playerStats.totalKeepsSmall);
       pointsPerRoundArr.push([0, ...playerStats.pointsPerRound]);
+      playerEvenBreakingPointsPerRoundArr.push([0, ...playerStats.evenBreakingPointsPerRound ?? []]);
       cumulativePointsPerRoundArr.push([0, ...playerStats.cumulativePointsPerRound]);
       trumpsArr.push(playerStats.trumpsInGame);
       bigCardsArr.push(playerStats.bigsCardsInGame);
@@ -97,6 +100,7 @@ export const getGameReport = (gameInDb: IGameOptions, onlyName?: string): IuiGam
   });
 
   retObj.pointsPerRound = pointsPerRoundArr;
+  retObj.evenBreakingPointsPerRound = playerEvenBreakingPointsPerRoundArr;
   retObj.cumulativePointsPerRound = cumulativePointsPerRoundArr;
   retObj.rounds = roundsArr;
   retObj.cardsInRound = cardsInRound;

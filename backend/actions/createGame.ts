@@ -39,6 +39,7 @@ const createGameOptions = async (values: IuiCreateGameRequest): Promise<IGameOpt
     privateSpeedGame: values.privateSpeedGame,
     opponentPromiseCardValue: values.opponentPromiseCardValue,
     opponentGameCardValue: values.opponentGameCardValue,
+    bonusNonEvenPromise: values.bonusNonEvenPromise,
     thisIsDemoGame: values.thisIsDemoGame,
     hiddenCardsMode: hiddenCardsModeToEnum(values.hiddenCardsMode),
   } as IGameOptions;

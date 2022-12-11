@@ -44,8 +44,8 @@ const PromiseTable = () => {
   const renderPlayerPromiseTooltip = (promisesAsStr: string) => {
     if (!promisesAsStr) return null;
     const promises = promisesAsStr.split("|");
-    if (promises.length !== 3) return null;
-    const [promised, keep, points] = promises;
+    if (promises.length !== 4) return null;
+    const [promised, keep, points, evenBreakingBonus] = promises;
     const promiseState = parseInt(keep, 10) - (parseInt(promised, 10) ?? 0);
     let promiseStateString = "Kept";
     if (promiseState > 0) promiseStateString = "Over";
@@ -56,6 +56,12 @@ const PromiseTable = () => {
         {promiseStateString} {keep} / {promised ?? 0}
         <br />
         {points} points
+        {evenBreakingBonus !== "null" &&
+          <React.Fragment>
+            <br />
+            {`includes ${evenBreakingBonus} bonus points`}
+          </React.Fragment>
+        }
       </div>
     );
   };
@@ -75,7 +81,8 @@ const PromiseTable = () => {
   const playerPromiseClass = (roundInd: number, promise: IuiPlayerPromise): string => {
     const classArr: string[] = ["tableCell"];
     if (roundInd === currentRoundInfo.roundInd) classArr.push("currentRound");
-    const {promise: promised, keep} = promise;
+    const {promise: promised, keep, evenBreakingBonus} = promise;
+    if (evenBreakingBonus !== null) classArr.push("evenBreakingBonus");
     if (promised !== null) {
       if (promised > keep) classArr.push("underKept");
       if (promised === keep) classArr.push("evenKept");
@@ -105,10 +112,10 @@ const PromiseTable = () => {
     );
   };
 
-  const renderPlayerPromises = (idx: number) => {
+  const renderPlayerPromises = (playerIdx: number) => {
     if (!promiseTable) return null;
     return (
-      promiseTable.promisesByPlayers[idx].map((promise, idx) => {
+      promiseTable.promisesByPlayers[playerIdx].map((promise, idx) => {
         if (promise.promise === null) {
           return (
             <td key={idx} className={playerPromiseClass(idx, promise)}>
@@ -117,7 +124,12 @@ const PromiseTable = () => {
           );
         } else {
           return (
-            <td key={idx} data-for="promisesTdTooltip" data-tip={`${promise.promise}|${promise.keep}|${promise.points ?? ""}`} className={playerPromiseClass(idx, promise)}>
+            <td
+              key={idx}
+              data-for="promisesTdTooltip"
+              data-tip={`${promise.promise}|${promise.keep}|${promise.points ?? ""}|${promise.evenBreakingBonus}`}
+              className={playerPromiseClass(idx, promise)}
+            >
               {promise.promise}
             </td>
           );

@@ -105,6 +105,7 @@ const getRoundPlayers = (name: string, round: IRound, playIndex: number, showPro
       dealer: round.dealerPositionIndex === idx,
       name: player.name,
       promise: showPromises || thisIsMe ? player.promise : (player.promise === null) ? null : -1,
+      evenBreakingBonus: showPromises || thisIsMe ? player.evenBreakingBonus : null,
       keeps: player.keeps,
       cardPlayed: getPlayerPlayedCard(player.name, round.cardsPlayed[playIndex], returnCard),
       speedPromisePoints: player.speedPromisePoints,
@@ -136,12 +137,14 @@ const getPromisesByPlayers = (gameInDb: IGameOptions): IuiPlayerPromise[][] => {
     const playerPromises: IuiPlayerPromise[] = [];
     for (let j = 0; j < game.rounds.length; j++) {
       const roundPlayer = game.rounds[j].roundPlayers[i];
+      const showPromises = showPlayerPromisesInRound(game.rounds[j], hiddenPromiseRoundRule, onlyTotalPromiseRule);
       playerPromises.push({
-        promise: showPlayerPromisesInRound(game.rounds[j], hiddenPromiseRoundRule, onlyTotalPromiseRule) ? roundPlayer.promise : null,
+        promise: showPromises ? roundPlayer.promise : null,
         keep: roundPlayer.keeps,
         points: roundPlayer.points,
         speedPromisePoints: roundPlayer.speedPromisePoints,
         speedPromiseTotal: roundPlayer.speedPromiseTotal,
+        evenBreakingBonus: showPromises ? roundPlayer.evenBreakingBonus : null,
       } as IuiPlayerPromise);
     }
     promisesByPlayers.push(playerPromises);
