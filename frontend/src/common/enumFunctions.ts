@@ -11,6 +11,7 @@ export const ruleToStr = (rule: RULE): string => {
     case RULE.privateSpeedGame: return "speed game";
     case RULE.opponentPromiseCardValue: return "show opponent hand value when promising";
     case RULE.opponentGameCardValue: return "show opponent hand value in game";
+    case RULE.bonusNonEvenPromise: return "bonus points for even breaker";
     default: return "unknown rule";
   }
 };

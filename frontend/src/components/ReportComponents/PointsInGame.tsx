@@ -29,6 +29,14 @@ interface IProps {
 const PointsInGame = ({gameReportData}: IProps) => {
   const chartRef = useRef<ChartJS<"bar">>(null);
 
+  const evenBreakingPointsPerPlayer = () => {
+    const pointsArr: number[] = [];
+    gameReportData?.evenBreakingPointsPerRound.forEach(arr => {
+      pointsArr.push(arr.reduce((count, val) => {return count + val;}, 0));
+    });
+    return pointsArr;
+  };
+
   const getDataSetsData = (): ChartDataset<"bar">[] => {
     const dataSetsData: ChartDataset<"bar">[] = [];
     dataSetsData.push({
@@ -36,12 +44,21 @@ const PointsInGame = ({gameReportData}: IProps) => {
       data: gameReportData?.pointsBig ?? [],
       borderWidth: 1,
       backgroundColor: "rgba(255,153,0,0.6)",
+      stack: "stack 0",
     });
     dataSetsData.push({
       label: "Small rounds",
       data: gameReportData?.pointsSmall ?? [],
       borderWidth: 1,
       backgroundColor: "lightgreen",
+      stack: "stack 0",
+    });
+    dataSetsData.push({
+      label: "Bonus points",
+      data: evenBreakingPointsPerPlayer(),
+      borderWidth: 1,
+      backgroundColor: "lightblue",
+      stack: "stack 1",
     });
     return dataSetsData;
   };
@@ -71,7 +88,9 @@ const PointsInGame = ({gameReportData}: IProps) => {
             let total = 0;
             if (chart) {
               for (let i = 0; i < chart.data.datasets.length; i++) {
-                total += chart.data.datasets[i].data[tooltipItem[0].dataIndex] as number;
+                if (chart.data.datasets[i].stack === "stack 0") {
+                  total += chart.data.datasets[i].data[tooltipItem[0].dataIndex] as number;
+                }
               }
             }
             return "TOTAL: "+total;

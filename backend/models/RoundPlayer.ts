@@ -14,6 +14,7 @@ const roundPlayerSchema = new Schema<IRoundPlayer>({
   type: {type: String, required: true},
   speedPromisePoints: {type: Number, required: false},
   speedPromiseTotal: {type: Number, required: false},
+  evenBreakingBonus: {type: Number, required: false},
 });
 
 export default roundPlayerSchema;

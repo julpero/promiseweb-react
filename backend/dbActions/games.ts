@@ -23,6 +23,7 @@ export interface IGameForList {
   privateSpeedGame: boolean,
   opponentPromiseCardValue: boolean,
   opponentGameCardValue: boolean,
+  bonusNonEvenPromise: boolean,
   thisIsDemoGame: boolean,
   hiddenCardsMode: HIDDEN_CARDS_MODE,
 }
@@ -55,6 +56,7 @@ export const getGamesByStatus = async (gameStatus: GAME_STATUS): Promise<IGameFo
     opponentGameCardValue: 1,
     thisIsDemoGame: 1,
     hiddenCardsMode: 1,
+    bonusNonEvenPromise: 1,
   }).lean();
   // console.timeEnd("getGamesByStatus "+gameStatus);
 

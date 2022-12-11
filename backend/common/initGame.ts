@@ -88,6 +88,7 @@ const initRound = (roundIndex: number, cardsInRound: number, players: IPlayer[],
       type: "human",
       speedPromisePoints: speedPromise ? 1 : null,
       speedPromiseTotal: null,
+      evenBreakingBonus: null,
     } as IRoundPlayer);
   });
 

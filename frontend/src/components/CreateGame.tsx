@@ -127,6 +127,11 @@ const CreateGame = (props: IProps) => {
           <div>Players see other players hand value while playing.</div>
         );
       }
+      case "bonusNonEvenPromise": {
+        return (
+          <div>If player makes non even promise and keeps his/her own promise, he/she will get two bonus points from every player who doesn&apos;t keep promise. Only ohe player can be even breaker on one round. Dealer can be even breaker if round is under promised.</div>
+        );
+      }
       case "thisIsDemoGame": {
         return (
           <div>This game won&apos;t affect stats.</div>
@@ -366,6 +371,20 @@ const CreateGame = (props: IProps) => {
                     </div>
                   </div>
                   <div className="row">
+                    <div className="col">
+                      <Field
+                        name="bonusNonEvenPromise"
+                        type="checkbox"
+                        component={CheckboxInput}
+                        label="Bonus points for even breaker"
+                        value={form.getFieldState("bonusNonEvenPromise")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("bonusNonEvenPromise", checked);
+                        }}
+                        data-for="ruleInfoTooltip"
+                        data-tip="bonusNonEvenPromise"
+                      />
+                    </div>
                     <div className="col">
                       <Field
                         name="thisIsDemoGame"
