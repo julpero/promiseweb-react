@@ -90,7 +90,7 @@ jobs:
 
     - name: Install Playwright
       working-directory: ./frontend
-      run: npx playwright install --with-deps
+      run: npx playwright install chrome --with-deps
 
     - name: Run Playwright tests
       working-directory: ./frontend
