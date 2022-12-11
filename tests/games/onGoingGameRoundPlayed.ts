@@ -157,6 +157,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
   "opponentGameCardValue": false,
   "thisIsDemoGame": false,
   "hiddenCardsMode": 0,
+  "bonusNonEvenPromise": false,
   "game": {
     "playerOrder": [
       {
@@ -195,6 +196,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664132455376,
             "keeps": 2,
             "points": 0,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -259,6 +261,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664132353780,
             "keeps": 0,
             "points": 0,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -323,6 +326,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664132382866,
             "keeps": 3,
             "points": 13,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -387,6 +391,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664132412917,
             "keeps": 3,
             "points": 0,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -451,6 +456,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664132442295,
             "keeps": 2,
             "points": 12,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1052,6 +1058,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664132944813,
             "keeps": 2,
             "points": 12,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1111,6 +1118,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664132964749,
             "keeps": 2,
             "points": 12,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1170,6 +1178,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664132885951,
             "keeps": 1,
             "points": 11,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1229,6 +1238,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664132896623,
             "keeps": 1,
             "points": 0,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1288,6 +1298,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664132937051,
             "keeps": 3,
             "points": 13,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1832,6 +1843,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133372967,
             "keeps": 2,
             "points": 12,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1886,6 +1898,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133392616,
             "keeps": 1,
             "points": 11,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1940,6 +1953,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133398439,
             "keeps": 1,
             "points": 11,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1994,6 +2008,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133333169,
             "keeps": 2,
             "points": 12,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2048,6 +2063,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133365847,
             "keeps": 2,
             "points": 12,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2535,6 +2551,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133666143,
             "keeps": 0,
             "points": 15,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2584,6 +2601,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133670688,
             "keeps": 1,
             "points": 11,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2633,6 +2651,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133678969,
             "keeps": 2,
             "points": 12,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2682,6 +2701,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133684878,
             "keeps": 3,
             "points": 0,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2731,6 +2751,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133658437,
             "keeps": 1,
             "points": 0,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -3161,6 +3182,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133889273,
             "keeps": 2,
             "points": 12,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -3205,6 +3227,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133894473,
             "keeps": 0,
             "points": 15,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "diamonds",
@@ -3249,6 +3272,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133900280,
             "keeps": 1,
             "points": 11,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -3293,6 +3317,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133906927,
             "keeps": 1,
             "points": 11,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -3337,6 +3362,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664133917547,
             "keeps": 2,
             "points": 12,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -3710,6 +3736,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134138673,
             "keeps": 1,
             "points": 11,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "diamonds",
@@ -3749,6 +3776,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134081112,
             "keeps": 1,
             "points": 11,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -3788,6 +3816,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134109179,
             "keeps": 2,
             "points": 0,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -3827,6 +3856,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134117254,
             "keeps": 0,
             "points": 0,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -3866,6 +3896,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134121401,
             "keeps": 1,
             "points": 11,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -4182,6 +4213,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134264011,
             "keeps": 0,
             "points": 5,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -4216,6 +4248,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134268098,
             "keeps": 1,
             "points": 11,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "diamonds",
@@ -4250,6 +4283,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134251649,
             "keeps": 1,
             "points": 11,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -4284,6 +4318,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134254486,
             "keeps": 2,
             "points": 0,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -4318,6 +4353,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134261315,
             "keeps": 0,
             "points": 0,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -4577,6 +4613,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134380141,
             "keeps": 0,
             "points": 0,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -4606,6 +4643,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134391601,
             "keeps": 0,
             "points": 5,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -4635,6 +4673,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134428491,
             "keeps": 2,
             "points": 0,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -4664,6 +4703,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134364604,
             "keeps": 0,
             "points": 5,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "diamonds",
@@ -4693,6 +4733,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
             "promiseMade": 1664134372468,
             "keeps": 1,
             "points": 11,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "diamonds",
@@ -4932,6 +4973,27 @@ export const onGoingGameRoundPlayed: IGameOptions = {
           12,
           11
         ],
+        "evenBreakingPointsPerRound": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
         "cumulativePointsPerRound": [
           13,
           24,
@@ -4995,6 +5057,27 @@ export const onGoingGameRoundPlayed: IGameOptions = {
           12,
           12,
           15,
+          0,
+          0
+        ],
+        "evenBreakingPointsPerRound": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
           0,
           0
         ],
@@ -5064,6 +5147,27 @@ export const onGoingGameRoundPlayed: IGameOptions = {
           13,
           0
         ],
+        "evenBreakingPointsPerRound": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
         "cumulativePointsPerRound": [
           12,
           25,
@@ -5130,6 +5234,27 @@ export const onGoingGameRoundPlayed: IGameOptions = {
           11,
           12
         ],
+        "evenBreakingPointsPerRound": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
         "cumulativePointsPerRound": [
           0,
           12,
@@ -5194,6 +5319,27 @@ export const onGoingGameRoundPlayed: IGameOptions = {
           11,
           0,
           15,
+          0
+        ],
+        "evenBreakingPointsPerRound": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
           0
         ],
         "cumulativePointsPerRound": [

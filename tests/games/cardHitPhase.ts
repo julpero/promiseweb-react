@@ -43,6 +43,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
   "opponentGameCardValue": false,
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
+  "bonusNonEvenPromise": false,
   "game": {
     "playerOrder": [
       {
@@ -104,6 +105,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
             "promiseMade": 1664262743053,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -179,6 +181,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
             "promiseMade": 1664262189283,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -254,6 +257,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
             "promiseMade": 1664262211666,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -342,6 +346,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -407,6 +412,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -472,6 +478,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -560,6 +567,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "diamonds",
@@ -635,6 +643,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -710,6 +719,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "diamonds",
@@ -808,6 +818,7 @@ export const firstRoundSecondPlayer: IGameOptions = {
   "opponentGameCardValue": false,
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
+  "bonusNonEvenPromise": false,
   "game": {
     "playerOrder": [
       {
@@ -869,6 +880,7 @@ export const firstRoundSecondPlayer: IGameOptions = {
             "promiseMade": 1664262743053,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -939,6 +951,7 @@ export const firstRoundSecondPlayer: IGameOptions = {
             "promiseMade": 1664262189283,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1014,6 +1027,7 @@ export const firstRoundSecondPlayer: IGameOptions = {
             "promiseMade": 1664262211666,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1113,6 +1127,7 @@ export const firstRoundSecondPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1178,6 +1193,7 @@ export const firstRoundSecondPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1243,6 +1259,7 @@ export const firstRoundSecondPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1331,6 +1348,7 @@ export const firstRoundSecondPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "diamonds",
@@ -1406,6 +1424,7 @@ export const firstRoundSecondPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1481,6 +1500,7 @@ export const firstRoundSecondPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "diamonds",
@@ -1564,6 +1584,11 @@ export const firstRoundSecondPlayer: IGameOptions = {
           0,
           0
         ],
+        "evenBreakingPointsPerRound": [
+          0,
+          0,
+          0
+        ],
         "cumulativePointsPerRound": [
           0,
           0,
@@ -1598,6 +1623,11 @@ export const firstRoundSecondPlayer: IGameOptions = {
           0,
           0
         ],
+        "evenBreakingPointsPerRound": [
+          0,
+          0,
+          0
+        ],
         "cumulativePointsPerRound": [
           0,
           0,
@@ -1628,6 +1658,11 @@ export const firstRoundSecondPlayer: IGameOptions = {
         "playTime": 1699635,
         "promiseTime": 5738295,
         "pointsPerRound": [
+          0,
+          0,
+          0
+        ],
+        "evenBreakingPointsPerRound": [
           0,
           0,
           0
@@ -1699,6 +1734,7 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
   "opponentGameCardValue": false,
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
+  "bonusNonEvenPromise": false,
   "game": {
     "playerOrder": [
       {
@@ -1755,6 +1791,7 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
             "promiseMade": 1664262743053,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1825,6 +1862,7 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
             "promiseMade": 1664262189283,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -1895,6 +1933,7 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
             "promiseMade": 1664262211666,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2015,6 +2054,7 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2080,6 +2120,7 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2145,6 +2186,7 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2233,6 +2275,7 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "diamonds",
@@ -2308,6 +2351,7 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2383,6 +2427,7 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "diamonds",
@@ -2466,6 +2511,11 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
           0,
           0
         ],
+        "evenBreakingPointsPerRound": [
+          0,
+          0,
+          0
+        ],
         "cumulativePointsPerRound": [
           0,
           0,
@@ -2500,6 +2550,11 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
           0,
           0
         ],
+        "evenBreakingPointsPerRound": [
+          0,
+          0,
+          0
+        ],
         "cumulativePointsPerRound": [
           0,
           0,
@@ -2530,6 +2585,11 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
         "playTime": 1699635,
         "promiseTime": 5738295,
         "pointsPerRound": [
+          0,
+          0,
+          0
+        ],
+        "evenBreakingPointsPerRound": [
           0,
           0,
           0
@@ -2601,6 +2661,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
   "opponentGameCardValue": false,
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
+  "bonusNonEvenPromise": false,
   "game": {
     "playerOrder": [
       {
@@ -2647,6 +2708,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
             "promiseMade": 1664262743053,
             "keeps": 1,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2712,6 +2774,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
             "promiseMade": 1664262189283,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2777,6 +2840,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
             "promiseMade": 1664262211666,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -2940,6 +3004,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -3005,6 +3070,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -3070,6 +3136,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -3158,6 +3225,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "diamonds",
@@ -3233,6 +3301,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "hearts",
@@ -3308,6 +3377,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
             "promiseMade": null,
             "keeps": 0,
             "points": null,
+            "evenBreakingBonus": null,
             "cardsToDebug": [
               {
                 "suite": "diamonds",
@@ -3391,6 +3461,11 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
           0,
           0
         ],
+        "evenBreakingPointsPerRound": [
+          0,
+          0,
+          0
+        ],
         "cumulativePointsPerRound": [
           0,
           0,
@@ -3425,6 +3500,11 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
           0,
           0
         ],
+        "evenBreakingPointsPerRound": [
+          0,
+          0,
+          0
+        ],
         "cumulativePointsPerRound": [
           0,
           0,
@@ -3455,6 +3535,11 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
         "playTime": 4092841,
         "promiseTime": 19983,
         "pointsPerRound": [
+          0,
+          0,
+          0
+        ],
+        "evenBreakingPointsPerRound": [
           0,
           0,
           0
