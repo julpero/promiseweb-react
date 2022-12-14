@@ -7,7 +7,7 @@ import { getCurrentGameInfo } from "../store/gameInfoSlice";
 import { Table } from "react-bootstrap";
 import { IuiPlayerPromise } from "../interfaces/IuiPlayingGame";
 import ReactTooltip from "react-tooltip";
-import { colorize, isRuleActive } from "../common/commonFunctions";
+import { colorize, getTextColorForName, hexToRgb, isRuleActive } from "../common/commonFunctions";
 import { RULE } from "../interfaces/IuiGameOptions";
 
 /**
@@ -145,7 +145,7 @@ const PromiseTable = () => {
       promiseTable.players.map((player, idx) => {
         return (
           <tr key={idx}>
-            <th className="tableCell tableHeading" style={{"backgroundImage": `linear-gradient(90deg, ${colorize(player)}, ${bgColor})`}}>
+            <th className="tableCell tableHeading" style={{"backgroundImage": `linear-gradient(90deg, ${colorize(player)}, ${bgColor})`, "color": getTextColorForName(hexToRgb(colorize(player)))}}>
               {player.substring(0, 10)}
             </th>
             {renderPlayerPromises(idx)}
