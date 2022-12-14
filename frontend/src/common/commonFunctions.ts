@@ -78,3 +78,26 @@ export const increase_brightness = (hex: string, percent: number): string => {
      ((0|(1<<8) + b + (256 - b) * percent / 100).toString(16)).substring(1) +
      a;
 };
+
+export interface iRGB {
+  r: number,
+  g: number,
+  b: number,
+}
+
+export const hexToRgb = (hex: string): iRGB | null => {
+  // turn hex val to RGB
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    }
+    : null;
+};
+
+export const getTextColorForName = (rgb: iRGB | null): string => {
+  if (rgb === null) return "black";
+  return (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000 > 120 ? "black" : "white";
+};

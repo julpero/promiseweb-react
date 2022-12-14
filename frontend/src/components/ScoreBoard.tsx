@@ -2,7 +2,7 @@ import React from "react";
 import { Table } from "react-bootstrap";
 import ReactTooltip from "react-tooltip";
 import { useSelector } from "react-redux";
-import { colorize } from "../common/commonFunctions";
+import { colorize, getTextColorForName, hexToRgb } from "../common/commonFunctions";
 import { IuiGetGameInfoResponse, IuiGetRoundResponse } from "../interfaces/IuiPlayingGame";
 import { getCurrentGameInfo } from "../store/gameInfoSlice";
 import { getCurrentRoundInfo } from "../store/roundInfoSlice";
@@ -51,7 +51,7 @@ const ScoreBoard = () => {
     return (
       promiseTable.players.map((playerName, idx) => {
         return (
-          <td key={idx} className="tableCell tableHeading" data-for="scoreBoardThTooltip" data-tip={playerName} style={{"backgroundImage": `linear-gradient(90deg, ${colorize(playerName)}, ${bgColor})`}}>
+          <td key={idx} className="tableCell tableHeading" data-for="scoreBoardThTooltip" data-tip={playerName} style={{"backgroundImage": `linear-gradient(90deg, ${colorize(playerName)}, ${bgColor})`, "color": getTextColorForName(hexToRgb(colorize(playerName)))}}>
             {playerName.substring(0, truncInd)}
           </td>
         );
