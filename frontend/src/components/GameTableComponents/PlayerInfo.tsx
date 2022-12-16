@@ -2,7 +2,7 @@ import React from "react";
 import { ProgressBar } from "react-bootstrap";
 import { useSelector } from "react-redux";
 
-import { colorize } from "../../common/commonFunctions";
+import { colorize, getTextColorForName, hexToRgb } from "../../common/commonFunctions";
 import { playerFromIndex } from "../../common/playingGame";
 import { ROUND_PHASE } from "../../interfaces/IuiPlayingGame";
 import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
@@ -99,7 +99,7 @@ const PlayerInfo = ({index}: IProps) => {
 
   return (
     <div className="playerInfoRow">
-      <div className="playerNameCol" style={{"backgroundImage": `linear-gradient(90deg, ${colorize(player.name)}, ${bgColor})`}}>
+      <div className="playerNameCol" style={{"backgroundImage": `linear-gradient(90deg, ${colorize(player.name)}, ${bgColor})`, "color": getTextColorForName(hexToRgb(colorize(player.name)))}}>
         {player.name.substring(0, 10)}
         {renderEvenBreaker()}
       </div>
