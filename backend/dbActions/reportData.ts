@@ -175,6 +175,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
     opponentGameCardValueCount: number,
     showOnlyCardInChargeCount: number,
     showCardInChargeAndWinningCardCount: number,
+    bonusNonEvenPromiseCount: number,
   }
   const usedRulesCount = new Map<RULE, number>();
   const hiddenCardsModeCount = new Map<HIDDEN_CARDS_MODE, number>();
@@ -195,6 +196,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
       opponentGameCardValue: {$cond: [{ $eq: ["$opponentGameCardValue", true]}, 1, 0]},
       showOnlyCardInCharge: {$cond: [{ $eq: ["$hiddenCardsMode", 1]}, 1, 0]},
       showCardInChargeAndWinningCard: {$cond: [{ $eq: ["$hiddenCardsMode", 2]}, 1, 0]},
+      bonusNonEvenPromiseRule: {$cond: [{ $eq: ["$bonusNonEvenPromise", true]}, 1, 0]},
     }},
     {$group: {
       _id: "$item",
@@ -209,6 +211,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
       opponentGameCardValueCount: {$sum: "$opponentGameCardValue"},
       showOnlyCardInChargeCount: {$sum: "$showOnlyCardInCharge"},
       showCardInChargeAndWinningCardCount: {$sum: "$showCardInChargeAndWinningCard"},
+      bonusNonEvenPromiseCount: {$sum: "$bonusNonEvenPromiseRule"},
     }},
   ]);
   if (usedRulesCountResult && usedRulesCountResult.length === 1) {
@@ -224,6 +227,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
       usedRulesCount.set(RULE.privateSpeedGame, values.privateSpeedGameCount);
       usedRulesCount.set(RULE.opponentPromiseCardValue, values.opponentPromiseCardValueCount);
       usedRulesCount.set(RULE.opponentGameCardValue, values.opponentGameCardValueCount);
+      usedRulesCount.set(RULE.bonusNonEvenPromise, values.bonusNonEvenPromiseCount);
       hiddenCardsModeCount.set(HIDDEN_CARDS_MODE.onlyCardInCharge, values.showOnlyCardInChargeCount);
       hiddenCardsModeCount.set(HIDDEN_CARDS_MODE.cardInChargeAndWinning, values.showCardInChargeAndWinningCardCount);
     }
@@ -245,6 +249,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
     "opponentPromiseCardValue": {$in: [null, false]},
     "opponentGameCardValue": {$in: [null, false]},
     "hiddenCardsMode": {$in: [null, 0]},
+    "bonusNonEvenPromise": {$in: [null, 0]},
   });
   // console.timeEnd("reportData vanilla games count");
 
@@ -308,6 +313,7 @@ export const onePlayerReportData = async (playerName: string): Promise<IuiOneGam
     gameStatistics: 1,
     humanPlayersCount: 1,
     evenPromisesAllowed: 1,
+    bonusNonEvenPromise: 1,
     visiblePromiseRound: 1,
     onlyTotalPromise: 1,
     freeTrump: 1,
