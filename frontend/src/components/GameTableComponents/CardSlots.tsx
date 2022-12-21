@@ -74,7 +74,7 @@ const CardSlots = ({player, slotCount, cards, playedSlot, align, animationTimes}
   const slots: JSX.Element[] = [];
   for (let i = 0; i < slotCount; i++) {
     const openFaceCard = cards.find(card => card.originalIndex === i && card.originalIndex !== playedSlot);
-    const cardToRender = openFaceCard ?? (cards.length == 0 && i < cardsRemainingCount ? null : undefined);
+    const cardToRender = openFaceCard ?? (cards.length === 0 && i < cardsRemainingCount ? null : undefined);
     const classStrArr: string[] = [];
 
     if (cardToRender === undefined) {
