@@ -153,7 +153,7 @@ const getPlayerStatistics = (game: IGame): IPlayerStatistic[] => {
     const playerName = player.name;
     const totalPoints = getGamePointsForPlayer(game.rounds, playerName);
     const gameInfo = getPlayerGameInfoForStats(game, playerName);
-    const pointsPerKeeps = gameInfo.totalKeeps == 0 ? 0 : totalPoints/gameInfo.totalKeeps;
+    const pointsPerKeeps = gameInfo.totalKeeps === 0 ? 0 : totalPoints/gameInfo.totalKeeps;
     const cards = countHandCardsByTypes(game.rounds, playerName);
     players.push({
       playerName: playerName,

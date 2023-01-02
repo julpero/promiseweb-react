@@ -195,7 +195,7 @@ export const setWaiting = (userName: string, timestamp: number, socketId: string
 export const isWaitingGame = (userName: string, socketId: string, asAPlayer: string, gameId: string): boolean => {
   const user = userSocketIdMap.get(userName);
   if (user && user.waitingToJoin) {
-    return user.waitingToJoin.socketId === socketId && user.waitingToJoin.asAPlayer == asAPlayer && user.waitingToJoin.gameId === gameId;
+    return user.waitingToJoin.socketId === socketId && user.waitingToJoin.asAPlayer === asAPlayer && user.waitingToJoin.gameId === gameId;
   }
   return false;
 };
