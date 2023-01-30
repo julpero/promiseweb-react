@@ -89,7 +89,7 @@ const PromiseTable = () => {
           );
         } else {
           return (
-            <th key={idx} data-for="promisesThTooltip" data-tip={idx} className={promiseHeaderClass(idx)}>
+            <th key={idx} data-for="promisesThTooltip" className={promiseHeaderClass(idx)}>
               <TooltipWrapper tooltipId="promisesThTooltip" content={renderTotalPromiseTooltip(idx)}>
                 {round.cardsInRound}
               </TooltipWrapper>
@@ -114,8 +114,6 @@ const PromiseTable = () => {
           return (
             <td
               key={idx}
-              data-for="promisesTdTooltip"
-              data-tip={`${promise.promise}|${promise.keep}|${promise.points ?? ""}|${promise.evenBreakingBonus}`}
               className={playerPromiseClass(idx, promise)}
             >
               <TooltipWrapper tooltipId="promisesTdTooltip" html={renderPlayerPromiseTooltip(`${promise.promise}|${promise.keep}|${promise.points ?? ""}|${promise.evenBreakingBonus}`)}>

@@ -212,6 +212,7 @@ const CreateGame = (props: IProps) => {
                     <div className="col">
                       <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("noEvenPromises")}>
                         <Field
+                          id="noEvenPromises"
                           name="noEvenPromises"
                           type="checkbox"
                           component={CheckboxInput}
@@ -226,6 +227,7 @@ const CreateGame = (props: IProps) => {
                     <div className="col">
                       <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("hidePromiseRound")}>
                         <Field
+                          id="hidePromiseRound"
                           name="hidePromiseRound"
                           type="checkbox"
                           component={CheckboxInput}
@@ -242,6 +244,7 @@ const CreateGame = (props: IProps) => {
                     <div className="col">
                       <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("onlyTotalPromise")}>
                         <Field
+                          id="onlyTotalPromise"
                           name="onlyTotalPromise"
                           type="checkbox"
                           component={CheckboxInput}
@@ -250,14 +253,13 @@ const CreateGame = (props: IProps) => {
                           onChange={(checked: boolean) => {
                             form.change("onlyTotalPromise", checked);
                           }}
-                          data-for="ruleInfoTooltip"
-                          data-tip="onlyTotalPromise"
                         />
                       </TooltipWrapper>
                     </div>
                     <div className="col">
                       <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("mustTrump")}>
                         <Field
+                          id="mustTrump"
                           name="mustTrump"
                           type="checkbox"
                           component={CheckboxInput}
@@ -266,8 +268,6 @@ const CreateGame = (props: IProps) => {
                           onChange={(checked: boolean) => {
                             form.change("mustTrump", checked);
                           }}
-                          data-for="ruleInfoTooltip"
-                          data-tip="mustTrump"
                         />
                       </TooltipWrapper>
                     </div>
@@ -276,6 +276,7 @@ const CreateGame = (props: IProps) => {
                     <div className="col">
                       <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("hiddenTrump")}>
                         <Field
+                          id="hiddenTrump"
                           name="hiddenTrump"
                           type="checkbox"
                           component={CheckboxInput}
@@ -284,14 +285,13 @@ const CreateGame = (props: IProps) => {
                           onChange={(checked: boolean) => {
                             form.change("hiddenTrump", checked);
                           }}
-                          data-for="ruleInfoTooltip"
-                          data-tip="hiddenTrump"
                         />
                       </TooltipWrapper>
                     </div>
                     <div className="col">
                       <Field
                         disabled
+                        id="speedPromise"
                         name="speedPromise"
                         type="checkbox"
                         component={CheckboxInput}
@@ -307,6 +307,7 @@ const CreateGame = (props: IProps) => {
                     <div className="col">
                       <Field
                         disabled
+                        id="privateSpeedGame"
                         name="privateSpeedGame"
                         type="checkbox"
                         component={CheckboxInput}
@@ -333,6 +334,7 @@ const CreateGame = (props: IProps) => {
                     <div className="col">
                       <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("opponentPromiseCardValue")}>
                         <Field
+                          id="opponentPromiseCardValue"
                           name="opponentPromiseCardValue"
                           type="checkbox"
                           component={CheckboxInput}
@@ -341,14 +343,13 @@ const CreateGame = (props: IProps) => {
                           onChange={(checked: boolean) => {
                             form.change("opponentPromiseCardValue", checked);
                           }}
-                          data-for="ruleInfoTooltip"
-                          data-tip="opponentPromiseCardValue"
                         />
                       </TooltipWrapper>
                     </div>
                     <div className="col">
                       <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("opponentGameCardValue")}>
                         <Field
+                          id="opponentGameCardValue"
                           name="opponentGameCardValue"
                           type="checkbox"
                           component={CheckboxInput}
@@ -357,8 +358,6 @@ const CreateGame = (props: IProps) => {
                           onChange={(checked: boolean) => {
                             form.change("opponentGameCardValue", checked);
                           }}
-                          data-for="ruleInfoTooltip"
-                          data-tip="opponentGameCardValue"
                         />
                       </TooltipWrapper>
                     </div>
@@ -367,6 +366,7 @@ const CreateGame = (props: IProps) => {
                     <div className="col">
                       <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("bonusNonEvenPromise")}>
                         <Field
+                          id="bonusNonEvenPromise"
                           name="bonusNonEvenPromise"
                           type="checkbox"
                           component={CheckboxInput}
@@ -375,14 +375,13 @@ const CreateGame = (props: IProps) => {
                           onChange={(checked: boolean) => {
                             form.change("bonusNonEvenPromise", checked);
                           }}
-                          data-for="ruleInfoTooltip"
-                          data-tip="bonusNonEvenPromise"
                         />
                       </TooltipWrapper>
                     </div>
                     <div className="col">
                       <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("thisIsDemoGame")}>
                         <Field
+                          id="thisIsDemoGame"
                           name="thisIsDemoGame"
                           type="checkbox"
                           component={CheckboxInput}
@@ -391,8 +390,6 @@ const CreateGame = (props: IProps) => {
                           onChange={(checked: boolean) => {
                             form.change("thisIsDemoGame", checked);
                           }}
-                          data-for="ruleInfoTooltip"
-                          data-tip="thisIsDemoGame"
                         />
                       </TooltipWrapper>
                     </div>
@@ -403,6 +400,7 @@ const CreateGame = (props: IProps) => {
             <div className="row">
               <div className="col">
                 <Field<string>
+                  id="newGamePassword"
                   name="newGamePassword"
                   component={TextInput}
                   label="Password for the new game, leave empty if this is a public game"
