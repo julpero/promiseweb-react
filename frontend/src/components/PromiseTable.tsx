@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import { useSelector } from "react-redux";
 import { getCurrentRoundInfo } from "../store/roundInfoSlice";
@@ -6,7 +6,10 @@ import { getCurrentGameInfo } from "../store/gameInfoSlice";
 
 import { Table } from "react-bootstrap";
 import { IuiPlayerPromise } from "../interfaces/IuiPlayingGame";
-import ReactTooltip from "react-tooltip";
+
+import { Tooltip, TooltipProvider, TooltipWrapper } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
+
 import { colorize, getTextColorForName, hexToRgb, isRuleActive } from "../common/commonFunctions";
 import { RULE } from "../interfaces/IuiGameOptions";
 
@@ -18,52 +21,35 @@ const PromiseTable = () => {
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
   const currentGameInfo = useSelector(getCurrentGameInfo);
 
-  useEffect(() => {
-    ReactTooltip.rebuild();
-  });
-
   if (!currentRoundInfo.gameId) return null;
   const promiseTable = currentRoundInfo.roundToPlayer.promiseTable;
 
-  const renderTotalPromiseTooltip = (roundIndAsStr: string) => {
-    if (!roundIndAsStr) return null;
-    const roundInd = parseInt(roundIndAsStr, 10);
+  const renderTotalPromiseTooltip = (roundInd: number): string => {
     const {cardsInRound, totalPromise} = promiseTable.rounds[roundInd];
     const promiseState = cardsInRound - (totalPromise ?? 0);
     let promiseStateString = "Even promised";
     if (promiseState > 0) promiseStateString = "Under promised";
     if (promiseState < 0) promiseStateString = "Over promised";
 
-    return (
-      <div>
-        {promiseStateString} {totalPromise ?? 0} / {cardsInRound}
-      </div>
-    );
+    return `${promiseStateString} ${totalPromise ?? 0} / ${cardsInRound}`;
   };
 
-  const renderPlayerPromiseTooltip = (promisesAsStr: string) => {
-    if (!promisesAsStr) return null;
+  const renderPlayerPromiseTooltip = (promisesAsStr: string): string => {
+    if (!promisesAsStr) return "";
     const promises = promisesAsStr.split("|");
-    if (promises.length !== 4) return null;
+    if (promises.length !== 4) return "";
     const [promised, keep, points, evenBreakingBonus] = promises;
     const promiseState = parseInt(keep, 10) - (parseInt(promised, 10) ?? 0);
     let promiseStateString = "Kept";
     if (promiseState > 0) promiseStateString = "Over";
     if (promiseState < 0) promiseStateString = "Under";
 
-    return (
-      <div>
-        {promiseStateString} {keep} / {promised ?? 0}
-        <br />
-        {points} points
-        {evenBreakingBonus !== "null" &&
-          <React.Fragment>
-            <br />
-            {`includes ${evenBreakingBonus} bonus points`}
-          </React.Fragment>
-        }
-      </div>
-    );
+    promiseStateString += ` ${keep} / ${promised ?? 0}<br />${points} points`;
+    if (evenBreakingBonus && evenBreakingBonus !== "null") {
+      promiseStateString += `<br />${`includes ${evenBreakingBonus} bonus points`}`;
+    }
+
+    return promiseStateString;
   };
 
   const promiseHeaderClass = (roundInd: number): string => {
@@ -104,7 +90,9 @@ const PromiseTable = () => {
         } else {
           return (
             <th key={idx} data-for="promisesThTooltip" data-tip={idx} className={promiseHeaderClass(idx)}>
-              {round.cardsInRound}
+              <TooltipWrapper tooltipId="promisesThTooltip" content={renderTotalPromiseTooltip(idx)}>
+                {round.cardsInRound}
+              </TooltipWrapper>
             </th>
           );
         }
@@ -130,7 +118,9 @@ const PromiseTable = () => {
               data-tip={`${promise.promise}|${promise.keep}|${promise.points ?? ""}|${promise.evenBreakingBonus}`}
               className={playerPromiseClass(idx, promise)}
             >
-              {promise.promise}
+              <TooltipWrapper tooltipId="promisesTdTooltip" html={renderPlayerPromiseTooltip(`${promise.promise}|${promise.keep}|${promise.points ?? ""}|${promise.evenBreakingBonus}`)}>
+                {promise.promise}
+              </TooltipWrapper>
             </td>
           );
         }
@@ -166,21 +156,23 @@ const PromiseTable = () => {
   };
 
   return (
-    <div id="promisetableArea">
-      <ReactTooltip id="promisesThTooltip" getContent={(dataTip) => renderTotalPromiseTooltip(dataTip)} />
-      <ReactTooltip id="promisesTdTooltip" getContent={(dataTip) => renderPlayerPromiseTooltip(dataTip)} />
-      <Table size="sm">
-        <thead>
-          <tr>
-            <td className="totalPromiseCell">{renderRoundTotalPromise()}</td>
-            {renderPromiseTableHeader()}
-          </tr>
-        </thead>
-        <tbody>
-          {renderPromiseTableBody()}
-        </tbody>
-      </Table>
-    </div>
+    <TooltipProvider>
+      <div id="promisetableArea">
+        <Tooltip id="promisesThTooltip" />
+        <Tooltip id="promisesTdTooltip" />
+        <Table size="sm">
+          <thead>
+            <tr>
+              <td className="totalPromiseCell">{renderRoundTotalPromise()}</td>
+              {renderPromiseTableHeader()}
+            </tr>
+          </thead>
+          <tbody>
+            {renderPromiseTableBody()}
+          </tbody>
+        </Table>
+      </div>
+    </TooltipProvider>
   );
 };
 

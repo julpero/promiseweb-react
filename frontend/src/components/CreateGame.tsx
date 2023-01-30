@@ -10,7 +10,8 @@ import SelectInput from "./FormComponents/SelectInput";
 import TextInput from "./FormComponents/TextInput";
 import CheckboxInput from "./FormComponents/CheckBoxInput";
 
-import ReactTooltip from "react-tooltip";
+import { Tooltip, TooltipProvider, TooltipWrapper } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
 
 import { IuiNewGameForm, initialNewGameValues, IuiCreateGameRequest, IuiCreateGameResponse, CREATE_GAME_STATUS } from "../interfaces/IuiNewGame";
 import { useDispatch, useSelector } from "react-redux";
@@ -93,56 +94,38 @@ const CreateGame = (props: IProps) => {
   const renderRuleTooltip = (rule: string) => {
     switch (rule) {
       case "noEvenPromises": {
-        return (
-          <div>Sum of round promises must be different than card count of players.</div>
-        );
+        return "Sum of round promises must be different than card count of players";
       }
       case "hidePromiseRound": {
-        return (
-          <div>Promises of the other players are visible only after all promises are made.</div>
-        );
+        return "Promises of the other players are visible only after all promises are made.";
       }
       case "onlyTotalPromise": {
-        return (
-          <div>Only the total sum of promises is visible. While promising phase, this is same as the &quot;Hidden promise round&quot; rule.</div>
-        );
+        return "Only the total sum of promises is visible.<br />While promising phase, this is same as the &quot;Hidden promise round&quot; rule.";
       }
       case "mustTrump": {
-        return (
-          <div>If player has no charging suite but has trump, then player must play trump.</div>
-        );
+        return "If player has no charging suite but has trump, then player must play trump.";
       }
       case "hiddenTrump": {
-        return (
-          <div>Trump card is revealed after all players have made their promise.</div>
-        );
+        return "Trump card is revealed after all players have made their promise.";
       }
       case "opponentPromiseCardValue": {
-        return (
-          <div>Players see other players hand value while promising.</div>
-        );
+        return "Players see other players hand value while promising.";
       }
       case "opponentGameCardValue": {
-        return (
-          <div>Players see other players hand value while playing.</div>
-        );
+        return "Players see other players hand value while playing.";
       }
       case "bonusNonEvenPromise": {
-        return (
-          <div>If player makes non even promise and keeps his/her own promise, he/she will get two bonus points from every player who doesn&apos;t keep promise. Only ohe player can be even breaker on one round. Dealer can be even breaker if round is under promised.</div>
-        );
+        return "If player makes non even promise and keeps his/her own promise,<br />he/she will get two bonus points from every player who doesn&apos;t keep promise.<br />Only ohe player can be even breaker on one round. Dealer can be even breaker if round is under promised.";
       }
       case "thisIsDemoGame": {
-        return (
-          <div>This game won&apos;t affect stats.</div>
-        );
+        return "This game won&apos;t affect stats.";
       }
     }
-    return null;
+    return "";
   };
 
   return (
-    <React.Fragment>
+    <TooltipProvider>
       <Form
         onSubmit={onSubmit}
         initialValues={initialValues}
@@ -227,78 +210,84 @@ const CreateGame = (props: IProps) => {
                 <div className="content">
                   <div className="row">
                     <div className="col">
-                      <Field
-                        name="noEvenPromises"
-                        type="checkbox"
-                        component={CheckboxInput}
-                        label="Do not allow even promises"
-                        value={form.getFieldState("noEvenPromises")?.value}
-                        onChange={(checked: boolean) => {
-                          form.change("noEvenPromises", checked);
-                        }}
-                        data-for="ruleInfoTooltip"
-                        data-tip="noEvenPromises"
-                      />
+                      <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("noEvenPromises")}>
+                        <Field
+                          name="noEvenPromises"
+                          type="checkbox"
+                          component={CheckboxInput}
+                          label="Do not allow even promises"
+                          value={form.getFieldState("noEvenPromises")?.value}
+                          onChange={(checked: boolean) => {
+                            form.change("noEvenPromises", checked);
+                          }}
+                        />
+                      </TooltipWrapper>
                     </div>
                     <div className="col">
-                      <Field
-                        name="hidePromiseRound"
-                        type="checkbox"
-                        component={CheckboxInput}
-                        label="Hidden promise round"
-                        value={form.getFieldState("hidePromiseRound")?.value}
-                        onChange={(checked: boolean) => {
-                          form.change("hidePromiseRound", checked);
-                        }}
-                        data-for="ruleInfoTooltip"
-                        data-tip="hidePromiseRound"
-                      />
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="col">
-                      <Field
-                        name="onlyTotalPromise"
-                        type="checkbox"
-                        component={CheckboxInput}
-                        label="Show only total promises"
-                        value={form.getFieldState("onlyTotalPromise")?.value}
-                        onChange={(checked: boolean) => {
-                          form.change("onlyTotalPromise", checked);
-                        }}
-                        data-for="ruleInfoTooltip"
-                        data-tip="onlyTotalPromise"
-                      />
-                    </div>
-                    <div className="col">
-                      <Field
-                        name="mustTrump"
-                        type="checkbox"
-                        component={CheckboxInput}
-                        label="Must play trump"
-                        value={form.getFieldState("mustTrump")?.value}
-                        onChange={(checked: boolean) => {
-                          form.change("mustTrump", checked);
-                        }}
-                        data-for="ruleInfoTooltip"
-                        data-tip="mustTrump"
-                      />
+                      <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("hidePromiseRound")}>
+                        <Field
+                          name="hidePromiseRound"
+                          type="checkbox"
+                          component={CheckboxInput}
+                          label="Hidden promise round"
+                          value={form.getFieldState("hidePromiseRound")?.value}
+                          onChange={(checked: boolean) => {
+                            form.change("hidePromiseRound", checked);
+                          }}
+                        />
+                      </TooltipWrapper>
                     </div>
                   </div>
                   <div className="row">
                     <div className="col">
-                      <Field
-                        name="hiddenTrump"
-                        type="checkbox"
-                        component={CheckboxInput}
-                        label="Trump is hidden when promising"
-                        value={form.getFieldState("hiddenTrump")?.value}
-                        onChange={(checked: boolean) => {
-                          form.change("hiddenTrump", checked);
-                        }}
-                        data-for="ruleInfoTooltip"
-                        data-tip="hiddenTrump"
-                      />
+                      <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("onlyTotalPromise")}>
+                        <Field
+                          name="onlyTotalPromise"
+                          type="checkbox"
+                          component={CheckboxInput}
+                          label="Show only total promises"
+                          value={form.getFieldState("onlyTotalPromise")?.value}
+                          onChange={(checked: boolean) => {
+                            form.change("onlyTotalPromise", checked);
+                          }}
+                          data-for="ruleInfoTooltip"
+                          data-tip="onlyTotalPromise"
+                        />
+                      </TooltipWrapper>
+                    </div>
+                    <div className="col">
+                      <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("mustTrump")}>
+                        <Field
+                          name="mustTrump"
+                          type="checkbox"
+                          component={CheckboxInput}
+                          label="Must play trump"
+                          value={form.getFieldState("mustTrump")?.value}
+                          onChange={(checked: boolean) => {
+                            form.change("mustTrump", checked);
+                          }}
+                          data-for="ruleInfoTooltip"
+                          data-tip="mustTrump"
+                        />
+                      </TooltipWrapper>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col">
+                      <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("hiddenTrump")}>
+                        <Field
+                          name="hiddenTrump"
+                          type="checkbox"
+                          component={CheckboxInput}
+                          label="Trump is hidden when promising"
+                          value={form.getFieldState("hiddenTrump")?.value}
+                          onChange={(checked: boolean) => {
+                            form.change("hiddenTrump", checked);
+                          }}
+                          data-for="ruleInfoTooltip"
+                          data-tip="hiddenTrump"
+                        />
+                      </TooltipWrapper>
                     </div>
                     <div className="col">
                       <Field
@@ -342,62 +331,70 @@ const CreateGame = (props: IProps) => {
                   </div>
                   <div className="row">
                     <div className="col">
-                      <Field
-                        name="opponentPromiseCardValue"
-                        type="checkbox"
-                        component={CheckboxInput}
-                        label="Show hand value when promising"
-                        value={form.getFieldState("opponentPromiseCardValue")?.value}
-                        onChange={(checked: boolean) => {
-                          form.change("opponentPromiseCardValue", checked);
-                        }}
-                        data-for="ruleInfoTooltip"
-                        data-tip="opponentPromiseCardValue"
-                      />
+                      <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("opponentPromiseCardValue")}>
+                        <Field
+                          name="opponentPromiseCardValue"
+                          type="checkbox"
+                          component={CheckboxInput}
+                          label="Show hand value when promising"
+                          value={form.getFieldState("opponentPromiseCardValue")?.value}
+                          onChange={(checked: boolean) => {
+                            form.change("opponentPromiseCardValue", checked);
+                          }}
+                          data-for="ruleInfoTooltip"
+                          data-tip="opponentPromiseCardValue"
+                        />
+                      </TooltipWrapper>
                     </div>
                     <div className="col">
-                      <Field
-                        name="opponentGameCardValue"
-                        type="checkbox"
-                        component={CheckboxInput}
-                        label="Show hand value in the game"
-                        value={form.getFieldState("opponentGameCardValue")?.value}
-                        onChange={(checked: boolean) => {
-                          form.change("opponentGameCardValue", checked);
-                        }}
-                        data-for="ruleInfoTooltip"
-                        data-tip="opponentGameCardValue"
-                      />
+                      <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("opponentGameCardValue")}>
+                        <Field
+                          name="opponentGameCardValue"
+                          type="checkbox"
+                          component={CheckboxInput}
+                          label="Show hand value in the game"
+                          value={form.getFieldState("opponentGameCardValue")?.value}
+                          onChange={(checked: boolean) => {
+                            form.change("opponentGameCardValue", checked);
+                          }}
+                          data-for="ruleInfoTooltip"
+                          data-tip="opponentGameCardValue"
+                        />
+                      </TooltipWrapper>
                     </div>
                   </div>
                   <div className="row">
                     <div className="col">
-                      <Field
-                        name="bonusNonEvenPromise"
-                        type="checkbox"
-                        component={CheckboxInput}
-                        label="Bonus points for even breaker"
-                        value={form.getFieldState("bonusNonEvenPromise")?.value}
-                        onChange={(checked: boolean) => {
-                          form.change("bonusNonEvenPromise", checked);
-                        }}
-                        data-for="ruleInfoTooltip"
-                        data-tip="bonusNonEvenPromise"
-                      />
+                      <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("bonusNonEvenPromise")}>
+                        <Field
+                          name="bonusNonEvenPromise"
+                          type="checkbox"
+                          component={CheckboxInput}
+                          label="Bonus points for even breaker"
+                          value={form.getFieldState("bonusNonEvenPromise")?.value}
+                          onChange={(checked: boolean) => {
+                            form.change("bonusNonEvenPromise", checked);
+                          }}
+                          data-for="ruleInfoTooltip"
+                          data-tip="bonusNonEvenPromise"
+                        />
+                      </TooltipWrapper>
                     </div>
                     <div className="col">
-                      <Field
-                        name="thisIsDemoGame"
-                        type="checkbox"
-                        component={CheckboxInput}
-                        label="This is demo game"
-                        value={form.getFieldState("thisIsDemoGame")?.value}
-                        onChange={(checked: boolean) => {
-                          form.change("thisIsDemoGame", checked);
-                        }}
-                        data-for="ruleInfoTooltip"
-                        data-tip="thisIsDemoGame"
-                      />
+                      <TooltipWrapper tooltipId="ruleInfoTooltip" html={renderRuleTooltip("thisIsDemoGame")}>
+                        <Field
+                          name="thisIsDemoGame"
+                          type="checkbox"
+                          component={CheckboxInput}
+                          label="This is demo game"
+                          value={form.getFieldState("thisIsDemoGame")?.value}
+                          onChange={(checked: boolean) => {
+                            form.change("thisIsDemoGame", checked);
+                          }}
+                          data-for="ruleInfoTooltip"
+                          data-tip="thisIsDemoGame"
+                        />
+                      </TooltipWrapper>
                     </div>
                   </div>
                 </div>
@@ -435,8 +432,8 @@ const CreateGame = (props: IProps) => {
           {createGameErrorStr()}
         </Modal.Body>
       </Modal>
-      <ReactTooltip place="bottom" id="ruleInfoTooltip" getContent={(dataTip) => renderRuleTooltip(dataTip)} />
-    </React.Fragment>
+      <Tooltip place="bottom" id="ruleInfoTooltip" noArrow={true} />
+    </TooltipProvider>
   );
 };
 
