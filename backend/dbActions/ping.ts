@@ -6,6 +6,7 @@ export const pingInsert = async (ping: IPing): Promise<IPing> => {
   const newPing = new Ping(ping);
   try {
     const insertedPing = await newPing.save();
+    // console.log("insertedPing", insertedPing);
     return {
       timestamp: insertedPing.timestamp,
       returnId: insertedPing.id,
@@ -20,8 +21,9 @@ export const pingDelete = async (id: string): Promise<boolean> => {
   if (!mongoose.isValidObjectId(id)) return false;
   try {
     const deleteResult = await Ping.deleteOne({
-      id: id,
+      _id: id,
     });
+    // console.log("deleteResult", deleteResult, id);
     return deleteResult.deletedCount === 1;
   } catch (e) {
     console.error(e);

@@ -76,7 +76,11 @@ connectDB().then(() => {
         // console.timeEnd("ping");
         res.send({now: now, ver: ver});
         return null;
+      } else {
+        console.error("deleteOk", deleteOk);
       }
+    } else {
+      console.error("pingPong", pingPong);
     }
     // console.timeEnd("ping");
     res.sendStatus(500);
