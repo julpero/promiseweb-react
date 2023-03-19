@@ -31,7 +31,7 @@ const App = () => {
   const getToken = (): string => window.localStorage.getItem("token") ?? "";
 
   const handleOnGoingResponse = useCallback((response: IuiCheckIfOngoingGameResponse) => {
-    console.log("check response", response);
+    // console.log("check response", response);
     if (response.isAuthenticated) {
       handleAuthenticatedRequest(response.token);
       setGameStatus(response.checkStatus);
@@ -69,6 +69,7 @@ const App = () => {
       }
     }
 
+    // console.log("user.isUserLoggedIn", user.isUserLoggedIn);
     if (user.isUserLoggedIn) {
       const checkGameRequest: IuiUserData = {
         uuid: getMyId(),
@@ -86,6 +87,7 @@ const App = () => {
           uuid: myId,
           token: token,
         };
+        // console.log("loginRequest", loginRequest);
         socket.emit("do refresh login", loginRequest, (loginResponse: IuiRefreshLoginResponse) => {
           console.log(loginResponse);
           dispatch(setSpinnerVisible(false));
