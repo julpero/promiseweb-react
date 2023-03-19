@@ -7,7 +7,7 @@ import { getCurrentGameInfo } from "../store/gameInfoSlice";
 import { Table } from "react-bootstrap";
 import { IuiPlayerPromise } from "../interfaces/IuiPlayingGame";
 
-import { Tooltip, TooltipProvider, TooltipWrapper } from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
 
 import { colorize, getTextColorForName, hexToRgb, isRuleActive } from "../common/commonFunctions";
@@ -89,10 +89,14 @@ const PromiseTable = () => {
           );
         } else {
           return (
-            <th key={idx} data-for="promisesThTooltip" className={promiseHeaderClass(idx)}>
-              <TooltipWrapper tooltipId="promisesThTooltip" content={renderTotalPromiseTooltip(idx)}>
-                {round.cardsInRound}
-              </TooltipWrapper>
+            <th
+              key={idx}
+              data-for="promisesThTooltip"
+              data-tooltip-id="promisesThTooltip"
+              data-tooltip-content={renderTotalPromiseTooltip(idx)}
+              className={promiseHeaderClass(idx)}
+            >
+              {round.cardsInRound}
             </th>
           );
         }
@@ -114,11 +118,11 @@ const PromiseTable = () => {
           return (
             <td
               key={idx}
+              data-tooltip-id="promisesTdTooltip"
+              data-tooltip-data-tooltip-html={renderPlayerPromiseTooltip(`${promise.promise}|${promise.keep}|${promise.points ?? ""}|${promise.evenBreakingBonus}`)}
               className={playerPromiseClass(idx, promise)}
             >
-              <TooltipWrapper tooltipId="promisesTdTooltip" html={renderPlayerPromiseTooltip(`${promise.promise}|${promise.keep}|${promise.points ?? ""}|${promise.evenBreakingBonus}`)}>
-                {promise.promise}
-              </TooltipWrapper>
+              {promise.promise}
             </td>
           );
         }
@@ -154,7 +158,7 @@ const PromiseTable = () => {
   };
 
   return (
-    <TooltipProvider>
+    <React.Fragment>
       <div id="promisetableArea">
         <Tooltip id="promisesThTooltip" />
         <Tooltip id="promisesTdTooltip" />
@@ -170,7 +174,7 @@ const PromiseTable = () => {
           </tbody>
         </Table>
       </div>
-    </TooltipProvider>
+    </React.Fragment>
   );
 };
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Table } from "react-bootstrap";
 
-import { Tooltip, TooltipProvider, TooltipWrapper } from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
 
 import { useSelector } from "react-redux";
@@ -42,10 +42,14 @@ const ScoreBoard = () => {
     return (
       promiseTable.players.map((playerName, idx) => {
         return (
-          <td key={idx} className="tableCell tableHeading" style={{"backgroundImage": `linear-gradient(90deg, ${colorize(playerName)}, ${bgColor})`, "color": getTextColorForName(hexToRgb(colorize(playerName)))}}>
-            <TooltipWrapper tooltipId="scoreBoardThTooltip" content={playerName}>
-              {playerName.substring(0, truncInd)}
-            </TooltipWrapper>
+          <td
+            key={idx}
+            data-tooltip-id="scoreBoardThTooltip"
+            data-tooltip-content={playerName}
+            className="tableCell tableHeading"
+            style={{"backgroundImage": `linear-gradient(90deg, ${colorize(playerName)}, ${bgColor})`, "color": getTextColorForName(hexToRgb(colorize(playerName)))}}
+          >
+            {playerName.substring(0, truncInd)}
           </td>
         );
       })
@@ -92,13 +96,13 @@ const ScoreBoard = () => {
       const classStr = "tableCell " + playerScoreClass(str);
       if (str) {
         colArr.push(
-          <td key={i} className={classStr}>
-            <TooltipWrapper
-              tooltipId="scoreBoardAvgTooltip"
-              content={renderAvgTooltip(`${i}|${rowInd}|${playersCumulativePointsInRound}`)}
-            >
-              {str}
-            </TooltipWrapper>
+          <td
+            key={i}
+            data-tooltip-id="scoreBoardThTooltip"
+            data-tooltip-content={renderAvgTooltip(`${i}|${rowInd}|${playersCumulativePointsInRound}`)}
+            className={classStr}
+          >
+            {str}
           </td>
         );
       } else {
@@ -130,23 +134,21 @@ const ScoreBoard = () => {
   };
 
   return (
-    <TooltipProvider>
-      <div id="scoretableArea">
-        <Table size="sm">
-          <thead>
-            <tr>
-              {renderScoreBoardHeader()}
-            </tr>
-          </thead>
-          <tbody className="scoreBoardTableBody">
-            {renderScoreBoardRows()}
-          </tbody>
-        </Table>
-        <Tooltip place="left" id="scoreBoardThTooltip" />
-        <Tooltip place="left" id="scoreBoardAvgTooltip" />
-        <RuleList rules={currentGameInfo.rules} classStr="smallList" />
-      </div>
-    </TooltipProvider>
+    <div id="scoretableArea">
+      <Table size="sm">
+        <thead>
+          <tr>
+            {renderScoreBoardHeader()}
+          </tr>
+        </thead>
+        <tbody className="scoreBoardTableBody">
+          {renderScoreBoardRows()}
+        </tbody>
+      </Table>
+      <Tooltip place="left" id="scoreBoardThTooltip" />
+      <Tooltip place="left" id="scoreBoardAvgTooltip" />
+      <RuleList rules={currentGameInfo.rules} classStr="smallList" />
+    </div>
   );
 };
 
