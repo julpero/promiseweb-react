@@ -6,8 +6,8 @@ interface Context {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>,
 }
 
-console.log("import.meta.env", import.meta.env);
-console.log("window.location.host", window.location.host);
+// console.log("import.meta.env", import.meta.env);
+// console.log("window.location.host", window.location.host);
 const socketUrl = import.meta.env.PROD ? "window.location.host" : "http://localhost:5000";
 console.log("socketUrl", socketUrl);
 
