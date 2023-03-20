@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { testCheckLoginSuccess, testLogIn } from "./commons/methods";
 import { pageUrl, userInDatabase } from "./commons/testvariables";
+import { ruleText } from "./commons/texts";
 
 test("Create and dismiss game", async ({ page }) => {
   await page.goto(pageUrl);
@@ -16,12 +17,13 @@ test("Create and dismiss game", async ({ page }) => {
   await expect(createGameButton).toBeEnabled();
 
   // rules
-  await page.locator("input[data-tip='noEvenPromises']").check();
-  await page.locator("input[data-tip='hidePromiseRound']").check();
-  await page.locator("input[data-tip='onlyTotalPromise']").check();
-  await page.locator("input[data-tip='opponentPromiseCardValue']").check();
-  await page.locator("input[data-tip='opponentGameCardValue']").check();
-  await page.locator("input[data-tip='thisIsDemoGame']").check();
+  await page.getByLabel(ruleText.noEvenPromises).check();
+  await page.getByLabel(ruleText.hidePromiseRound).check();
+  await page.getByLabel(ruleText.onlyTotalPromise).check();
+  await page.getByLabel(ruleText.opponentPromiseCardValue).check();
+  await page.getByLabel(ruleText.opponentGameCardValue).check();
+  await page.getByLabel(ruleText.bonusNonEvenPromise).check();
+  await page.getByLabel(ruleText.thisIsDemoGame).check();
 
   await createGameButton.click();
 

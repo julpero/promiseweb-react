@@ -13,3 +13,17 @@ export const buttonText = {
 export const notificationText = {
   leavedGame: "You have just left the game",
 };
+
+export const ruleText = {
+  noEvenPromises: "Do not allow even promises",
+  hidePromiseRound: "Hidden promise round",
+  onlyTotalPromise: "Show only total promises",
+  mustTrump: "Must play trump",
+  hiddenTrump: "Trump is hidden when promising",
+  speedPromise: "Speed promise",
+  privateSpeedGame: "Private speed game",
+  opponentPromiseCardValue: "Show hand value when promising",
+  opponentGameCardValue: "Show hand value in the game",
+  bonusNonEvenPromise: "Bonus points for even breaker",
+  thisIsDemoGame: "This is demo game",
+};

@@ -100,7 +100,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
       promiseResponse.promiseResponse = PROMISE_RESPONSE.notMyTurn;
       return promiseResponse;
     }
-    if (isRuleActive(gameInDb, RULE.noEvenPromisesAllowed) && isRoundsLastPromiser(round) && (promise + getCurrentPromiseTotal(round) == round.cardsInRound)) {
+    if (isRuleActive(gameInDb, RULE.noEvenPromisesAllowed) && isRoundsLastPromiser(round) && (promise + getCurrentPromiseTotal(round) === round.cardsInRound)) {
       console.log("promising, even promises not allowed");
       promiseResponse.promiseResponse = PROMISE_RESPONSE.evenPromiseNotAllowed;
       return promiseResponse;

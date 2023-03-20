@@ -9,6 +9,7 @@ const pingSchema: Schema = new Schema({
 }, {
   collection: PING_COLLECTION,
   timestamps: false,
+  strictQuery: "throw",
 });
 
 export default model<IPing>("Ping", pingSchema);

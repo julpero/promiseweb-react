@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { playGame, testCheckLoginSuccess, testGameBoardVisible, testLogIn, waitAndCloseOneGameReport } from "./commons/methods";
 import { pageUrl, ekaUser, tokaUser, vikaUser, gameVariables } from "./commons/testvariables";
+import { ruleText } from "./commons/texts";
 
 test.describe.configure({ mode: "parallel" });
 
@@ -31,12 +32,12 @@ test("Play game as creator Eka", async ({ page }) => {
     await page.selectOption("[label='End round of the game']", gameVariables.end);
 
     // rules
-    await page.locator("input[data-tip='thisIsDemoGame']").check();
+    await page.getByLabel(ruleText.thisIsDemoGame).check();
     if (gameVariables.hidePromiseRound) {
-      await page.locator("input[data-tip='hidePromiseRound']").check();
+      await page.getByLabel(ruleText.hidePromiseRound).check();
     }
     if (gameVariables.onlyTotalPromise) {
-      await page.locator("input[data-tip='onlyTotalPromise']").check();
+      await page.getByLabel(ruleText.onlyTotalPromise).check();
     }
     await createGameButton.click();
 

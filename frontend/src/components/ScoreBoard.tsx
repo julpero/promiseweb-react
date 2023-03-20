@@ -1,6 +1,9 @@
 import React from "react";
 import { Table } from "react-bootstrap";
-import ReactTooltip from "react-tooltip";
+
+import { Tooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
+
 import { useSelector } from "react-redux";
 import { colorize, getTextColorForName, hexToRgb } from "../common/commonFunctions";
 import { IuiGetGameInfoResponse, IuiGetRoundResponse } from "../interfaces/IuiPlayingGame";
@@ -18,18 +21,10 @@ const ScoreBoard = () => {
 
   const { promiseTable } = currentRoundInfo.roundToPlayer;
 
-  const renderNameTooltip = (playerName: string) => {
-    return (
-      <div>
-        {playerName}
-      </div>
-    );
-  };
-
-  const renderAvgTooltip = (playerAndRoundAndPoints: string) => {
-    if (!playerAndRoundAndPoints) return null;
+  const renderAvgTooltip = (playerAndRoundAndPoints: string): string => {
+    if (!playerAndRoundAndPoints) return "";
     const dataArr = playerAndRoundAndPoints.split("|");
-    if (dataArr.length !== 3) return null;
+    if (dataArr.length !== 3) return "";
     const curPoints = parseInt(dataArr[2], 10);
     let toolTipStr = `Total ${curPoints}`;
     const playerInd = parseInt(dataArr[0], 10);
@@ -38,11 +33,7 @@ const ScoreBoard = () => {
     if (avgPoints !== null) {
       toolTipStr+= ` = ${(curPoints - avgPoints).toFixed(1)} points in average`;
     }
-    return (
-      <div>
-        {toolTipStr}
-      </div>
-    );
+    return toolTipStr;
   };
 
   const renderScoreBoardHeader = () => {
@@ -51,7 +42,13 @@ const ScoreBoard = () => {
     return (
       promiseTable.players.map((playerName, idx) => {
         return (
-          <td key={idx} className="tableCell tableHeading" data-for="scoreBoardThTooltip" data-tip={playerName} style={{"backgroundImage": `linear-gradient(90deg, ${colorize(playerName)}, ${bgColor})`, "color": getTextColorForName(hexToRgb(colorize(playerName)))}}>
+          <td
+            key={idx}
+            data-tooltip-id="scoreBoardThTooltip"
+            data-tooltip-content={playerName}
+            className="tableCell tableHeading"
+            style={{"backgroundImage": `linear-gradient(90deg, ${colorize(playerName)}, ${bgColor})`, "color": getTextColorForName(hexToRgb(colorize(playerName)))}}
+          >
             {playerName.substring(0, truncInd)}
           </td>
         );
@@ -99,7 +96,14 @@ const ScoreBoard = () => {
       const classStr = "tableCell " + playerScoreClass(str);
       if (str) {
         colArr.push(
-          <td className={classStr} data-for="scoreBoardAvgTooltip" data-tip={`${i}|${rowInd}|${playersCumulativePointsInRound}`} key={i}>{str}</td>
+          <td
+            key={i}
+            data-tooltip-id="scoreBoardThTooltip"
+            data-tooltip-content={renderAvgTooltip(`${i}|${rowInd}|${playersCumulativePointsInRound}`)}
+            className={classStr}
+          >
+            {str}
+          </td>
         );
       } else {
         const avgPoint = playerAvgPoint(i, rowInd);
@@ -141,8 +145,8 @@ const ScoreBoard = () => {
           {renderScoreBoardRows()}
         </tbody>
       </Table>
-      <ReactTooltip place="left" id="scoreBoardThTooltip" getContent={(dataTip) => renderNameTooltip(dataTip)} />
-      <ReactTooltip place="left" id="scoreBoardAvgTooltip" getContent={(dataTip) => renderAvgTooltip(dataTip)} />
+      <Tooltip place="left" id="scoreBoardThTooltip" />
+      <Tooltip place="left" id="scoreBoardAvgTooltip" />
       <RuleList rules={currentGameInfo.rules} classStr="smallList" />
     </div>
   );
