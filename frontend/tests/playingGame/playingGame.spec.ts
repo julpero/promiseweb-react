@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
-import { playGame, testCheckLoginSuccess, testGameBoardVisible, testLogIn, waitAndCloseOneGameReport } from "./commons/methods";
-import { pageUrl, ekaUser, tokaUser, vikaUser, gameVariables } from "./commons/testvariables";
-import { ruleText } from "./commons/texts";
+import { playGame, testCheckLoginSuccess, testGameBoardVisible, testLogIn, waitAndCloseOneGameReport } from "../commons/methods";
+import { pageUrl, ekaUser, tokaUser, vikaUser, gameVariables } from "../commons/testvariables";
+import { ruleText } from "../commons/texts";
 
 test.describe.configure({ mode: "parallel" });
 

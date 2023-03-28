@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { pageUrl, userNotInDatabase } from "./commons/testvariables";
-import { textsLogIn } from "./commons/texts";
+import { pageUrl, userNotInDatabase } from "../commons/testvariables";
+import { textsLogIn } from "../commons/texts";
 
 test.beforeEach(async ({page}) => {
   await page.goto(pageUrl);
