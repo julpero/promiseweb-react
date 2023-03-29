@@ -84,6 +84,10 @@ jobs:
       with:
         node-version: '18.x'
 
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+
     - name: Install Playwright
       working-directory: ./frontend
       run: npx playwright install chromium --with-deps
