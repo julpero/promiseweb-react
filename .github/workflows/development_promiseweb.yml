@@ -21,16 +21,25 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-
-      - name: npm install, build, and test in backend
+          
+      - name: Install backend packages with yarn
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install # will run `yarn install` command
+          
+      - name: Install frontend packages with yarn
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install # will run `yarn install` command
+          dir: 'frontend'
+          
+      - name: npm build and test in backend
         run: |
-          npm install
           npm run build --if-present
           npm run test --if-present
 
-      - name: npm install, build and test in frontend
+      - name: npm build and test in frontend
         run: |
-          npm install
           npm run build --if-present
         working-directory: ./frontend
 
