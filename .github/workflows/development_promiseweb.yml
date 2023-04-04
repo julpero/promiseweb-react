@@ -24,13 +24,13 @@ jobs:
           
       - name: npm install, build, and test in backend
         run: |
-          npm ci
+          npm install
           npm run build --if-present
           npm run test --if-present
 
       - name: npm install, build and test in frontend
         run: |
-          npm ci
+          npm install
           npm run build --if-present
         working-directory: ./frontend
 
@@ -86,7 +86,7 @@ jobs:
 
     - name: Install dependencies
       working-directory: ./frontend
-      run: npm ci
+      run: npm install
 
     - name: Install Playwright
       working-directory: ./frontend
