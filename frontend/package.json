@@ -48,7 +48,7 @@
     "react-redux": "^8.0.5",
     "react-spring": "^9.7.1",
     "react-tabulator": "^0.18.1",
-    "react-tooltip": "^5.10.5",
+    "react-tooltip": "^5.11.1",
     "socket.io-client": "^4.6.1",
     "source-map-explorer": "^2.5.3",
     "uuid": "^9.0.0"
