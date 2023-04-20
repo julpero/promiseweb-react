@@ -102,7 +102,7 @@ const ScoreBoard = () => {
         colArr.push(
           <td
             key={i}
-            data-tooltip-id="scoreBoardThTooltip"
+            data-tooltip-id="scoreBoardAvgTooltip"
             data-tooltip-html={renderAvgTooltip(`${i}|${rowInd}|${playersCumulativePointsInRound}|${points}|${evenBreakingBonus}`)}
             className={classStr}
           >
