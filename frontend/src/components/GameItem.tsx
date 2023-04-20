@@ -64,7 +64,7 @@ const GameItem = (props: IuiGameListItem & IProps) => {
 
   const renderPlayerList = () => {
     return props.humanPlayers.map(player => {
-      return <li key={player}>{player}</li>;
+      return <li className="playersInGame" key={player}>{player}</li>;
     });
   };
 
