@@ -41,7 +41,7 @@ test("Play game as creator Eka", async ({ page }) => {
     }
     await createGameButton.click();
 
-    await expect(page.locator("li", {hasText: ekaUser.name})).toHaveCount(1);
+    await expect(page.locator("li.playersInGame", {hasText: ekaUser.name})).toHaveCount(1);
     console.log("Eka created game");
 
     const joinGameButton = page.locator("button", {hasText: `JOIN GAME - created by ${ekaUser.name}`});
@@ -88,7 +88,7 @@ test("Play game as Toka", async ({ page }) => {
     const createGameAccordionButton = page.locator("button", {hasText: "Open Games"});
     await createGameAccordionButton.click();
 
-    await expect(page.locator("li", {hasText: creatorUser.name})).toHaveCount(1);
+    await expect(page.locator("li.playersInGame", {hasText: creatorUser.name})).toHaveCount(1);
 
     const joinGameButton = page.locator("button", {hasText: `JOIN GAME - created by ${creatorUser.name}`});
     const leaveGameButton = page.locator("button", {hasText: `LEAVE GAME - created by ${creatorUser.name}`});
@@ -138,7 +138,7 @@ test("Play game as Vika", async ({ page }) => {
     const createGameAccordionButton = page.locator("button", {hasText: "Open Games"});
     await createGameAccordionButton.click();
 
-    await expect(page.locator("li", {hasText: creatorUser.name})).toHaveCount(1);
+    await expect(page.locator("li.playersInGame", {hasText: creatorUser.name})).toHaveCount(1);
 
     const joinGameButton = page.locator("button", {hasText: `JOIN GAME - created by ${creatorUser.name}`});
     const leaveGameButton = page.locator("button", {hasText: `LEAVE GAME - created by ${creatorUser.name}`});
