@@ -120,7 +120,7 @@ export const playGame = async (page: Page, roundsInGame: number) => {
 };
 
 export const waitAndCloseOneGameReport = async (page: Page) => {
-  const closeButton = page.locator("button", {hasText: "Close Report and Game"});
+  const closeButton = page.locator("button", {hasText: "Close Report"});
   await expect(closeButton).toBeVisible({ timeout: timeOut.eternity });
   await expect(closeButton).toBeEnabled({ timeout: timeOut.eternity });
   await closeButton.click();
