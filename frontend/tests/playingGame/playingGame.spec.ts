@@ -152,7 +152,7 @@ test("Play game as Vika", async ({ page }) => {
     console.log(`${myName} buttons ok`);
 
     // Vika joins last, wait until Toka has joined
-    await expect(page.locator("li", {hasText: tokaUser.name})).toHaveCount(1);
+    await expect(page.locator("li.playersInGame", {hasText: tokaUser.name})).toHaveCount(1);
 
     await joinGameButton.click();
 
