@@ -110,9 +110,20 @@ const playRound = async (page: Page, cardsInRound: number) => {
   await playRoundCards(page, cardsInRound);
 };
 
+const checkNameHover = async (page: Page) => {
+  console.log("checking score board header hover");
+  const popUp = page.locator("#scoreBoardThTooltip");
+  await page.locator("#scoretableArea > table > thead > tr > td:first-child").hover();
+  await expect(popUp).toBeVisible({ timeout: timeOut.common });
+  console.log("checked score board header hover");
+};
+
 export const playGame = async (page: Page, roundsInGame: number) => {
   for (let i = 0; i < roundsInGame; i++) {
     console.log(`start round ${i+1}`);
+    if (i === 0) {
+      await checkNameHover(page);
+    }
     const cardsInRound = await getCardCountInRound(page);
     await playRound(page, cardsInRound);
     console.log(`round ${i+1} played`);
