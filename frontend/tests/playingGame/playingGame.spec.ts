@@ -63,7 +63,7 @@ test("Play game as creator Eka", async ({ page }) => {
     const roundsInGame = await page.locator(".prHead").count();
     console.log(`${myName} rounds in game ${roundsInGame}`);
 
-    await playGame(page, roundsInGame);
+    await playGame(page, roundsInGame, myName);
 
     await waitAndCloseOneGameReport(page);
 
@@ -112,7 +112,7 @@ test("Play game as Toka", async ({ page }) => {
     const roundsInGame = await page.locator(".prHead").count();
     console.log(`${myName} rounds in game ${roundsInGame}`);
 
-    await playGame(page, roundsInGame);
+    await playGame(page, roundsInGame, myName);
 
     await waitAndCloseOneGameReport(page);
 
@@ -164,7 +164,7 @@ test("Play game as Vika", async ({ page }) => {
     const roundsInGame = await page.locator(".prHead").count();
     console.log(`${myName} rounds in game ${roundsInGame}`);
 
-    await playGame(page, roundsInGame);
+    await playGame(page, roundsInGame, myName);
 
     await waitAndCloseOneGameReport(page);
 
