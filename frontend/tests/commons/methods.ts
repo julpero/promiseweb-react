@@ -118,6 +118,14 @@ const checkNameHover = async (page: Page) => {
   console.log("checked score board header hover");
 };
 
+const checkPointsHover = async (page: Page) => {
+  console.log("checking score board points hover");
+  const popUp = page.locator("#scoreBoardAvgTooltip", {hasText: "Round"});
+  await page.locator("#scoretableArea > table > tbody > tr:first-child > td:first-child").hover();
+  await expect(popUp).toBeVisible({ timeout: timeOut.common });
+  console.log("checked score board points hover");
+};
+
 export const playGame = async (page: Page, roundsInGame: number) => {
   for (let i = 0; i < roundsInGame; i++) {
     console.log(`start round ${i+1}`);
@@ -125,6 +133,9 @@ export const playGame = async (page: Page, roundsInGame: number) => {
       await checkNameHover(page);
     }
     const cardsInRound = await getCardCountInRound(page);
+    if (i === 1) {
+      await checkPointsHover(page);
+    }
     await playRound(page, cardsInRound);
     console.log(`round ${i+1} played`);
   }
