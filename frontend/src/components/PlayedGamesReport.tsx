@@ -288,17 +288,19 @@ const PlayedGamesReport = (props: IProps) => {
               {reportData?.lastGames?.map((game, ind) => {
                 return (
                   <li key={ind}>
-                    <span onClick={() => setActiveGame(game.gameId)} style={{cursor: "pointer"}}>{format(parseISO(game.played.toString()), "dd MMM yyyy HH:mm:ss")}</span>
-                    &nbsp;-&nbsp;
-                    <span>{game.humanPlayers.map((player, idx) => {
-                      if (idx === 0) {
-                        return <strong key={idx}>{`${player}, `}</strong>;
-                      } else if (idx === game.humanPlayers.length-1) {
-                        return player;
-                      } else {
-                        return `${player}, `;
-                      }
-                    })}</span>
+                    <span onClick={() => setActiveGame(game.gameId)} style={{cursor: "pointer"}}>
+                      {format(parseISO(game.played.toString()), "dd MMM yyyy HH:mm:ss")}
+                      &nbsp;-&nbsp;
+                      {game.humanPlayers.map((player, idx) => {
+                        if (idx === 0) {
+                          return <strong key={idx}>{`${player}, `}</strong>;
+                        } else if (idx === game.humanPlayers.length-1) {
+                          return player;
+                        } else {
+                          return `${player}, `;
+                        }
+                      })}
+                    </span>
                   </li>
                 );
               })}

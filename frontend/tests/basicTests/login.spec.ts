@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
-import { testLogIn } from "./commons/methods";
-import { pageUrl, userInDatabase } from "./commons/testvariables";
-import { textsLogIn } from "./commons/texts";
+import { testLogIn } from "../commons/methods";
+import { pageUrl, userInDatabase } from "../commons/testvariables";
+import { textsLogIn } from "../commons/texts";
 
 test.beforeEach(async ({page}) => {
   await page.goto(pageUrl);

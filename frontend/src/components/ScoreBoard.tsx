@@ -24,14 +24,20 @@ const ScoreBoard = () => {
   const renderAvgTooltip = (playerAndRoundAndPoints: string): string => {
     if (!playerAndRoundAndPoints) return "";
     const dataArr = playerAndRoundAndPoints.split("|");
-    if (dataArr.length !== 3) return "";
-    const curPoints = parseInt(dataArr[2], 10);
-    let toolTipStr = `Total ${curPoints}`;
+    if (dataArr.length !== 5) return "";
+    const currPoints = parseInt(dataArr[3], 10);
+    const evenBreakingBonus = parseInt(dataArr[4], 10);
+    const cumulativePoints = parseInt(dataArr[2], 10);
+    let toolTipStr = `Round points: ${currPoints}<br>`;
+    if (evenBreakingBonus) {
+      toolTipStr+= `&nbsp;-&nbsp;includes ${evenBreakingBonus} even breaking bonus<br>`;
+    }
+    toolTipStr+= `Total: ${cumulativePoints}`;
     const playerInd = parseInt(dataArr[0], 10);
     const roundInd = parseInt(dataArr[1], 10);
     const avgPoints = playerAvgPoint(playerInd, roundInd);
     if (avgPoints !== null) {
-      toolTipStr+= ` = ${(curPoints - avgPoints).toFixed(1)} points in average`;
+      toolTipStr+= ` = ${(cumulativePoints - avgPoints).toFixed(1)} points in average`;
     }
     return toolTipStr;
   };
@@ -88,18 +94,16 @@ const ScoreBoard = () => {
   const renderScoreBoardCols = (rowInd: number) => {
     const colArr: JSX.Element[] = [];
     for (let i = 0; i < promiseTable.promisesByPlayers.length; i++) {
-      const currentPromise = promiseTable.promisesByPlayers[i][rowInd].promise;
-      // const keep = promiseTable.promisesByPlayers[i][rowInd].keep;
-      const currentRoundPoints = promiseTable.promisesByPlayers[i][rowInd].points;
+      const { promise, points, evenBreakingBonus } = promiseTable.promisesByPlayers[i][rowInd];
       const playersCumulativePointsInRound = cumulativePointsInRound(i, rowInd);
-      const str = pointsStr(playersCumulativePointsInRound, currentRoundPoints, currentRoundPoints === null || currentPromise === null);
+      const str = pointsStr(playersCumulativePointsInRound, points, points === null || promise === null);
       const classStr = "tableCell " + playerScoreClass(str);
       if (str) {
         colArr.push(
           <td
             key={i}
-            data-tooltip-id="scoreBoardThTooltip"
-            data-tooltip-content={renderAvgTooltip(`${i}|${rowInd}|${playersCumulativePointsInRound}`)}
+            data-tooltip-id="scoreBoardAvgTooltip"
+            data-tooltip-html={renderAvgTooltip(`${i}|${rowInd}|${playersCumulativePointsInRound}|${points}|${evenBreakingBonus}`)}
             className={classStr}
           >
             {str}

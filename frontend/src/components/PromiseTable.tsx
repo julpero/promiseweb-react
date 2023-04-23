@@ -91,7 +91,6 @@ const PromiseTable = () => {
           return (
             <th
               key={idx}
-              data-for="promisesThTooltip"
               data-tooltip-id="promisesThTooltip"
               data-tooltip-content={renderTotalPromiseTooltip(idx)}
               className={promiseHeaderClass(idx)}
@@ -119,7 +118,7 @@ const PromiseTable = () => {
             <td
               key={idx}
               data-tooltip-id="promisesTdTooltip"
-              data-tooltip-data-tooltip-html={renderPlayerPromiseTooltip(`${promise.promise}|${promise.keep}|${promise.points ?? ""}|${promise.evenBreakingBonus}`)}
+              data-tooltip-html={renderPlayerPromiseTooltip(`${promise.promise}|${promise.keep}|${promise.points ?? ""}|${promise.evenBreakingBonus}`)}
               className={playerPromiseClass(idx, promise)}
             >
               {promise.promise}

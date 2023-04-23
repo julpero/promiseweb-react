@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
-import { playGame, testCheckLoginSuccess, testGameBoardVisible, testLogIn, waitAndCloseOneGameReport } from "./commons/methods";
-import { pageUrl, ekaUser, tokaUser, vikaUser, gameVariables } from "./commons/testvariables";
-import { ruleText } from "./commons/texts";
+import { playGame, testCheckLoginSuccess, testGameBoardVisible, testLogIn, waitAndCloseOneGameReport } from "../commons/methods";
+import { pageUrl, ekaUser, tokaUser, vikaUser, gameVariables } from "../commons/testvariables";
+import { ruleText } from "../commons/texts";
 
 test.describe.configure({ mode: "parallel" });
 
@@ -41,7 +41,7 @@ test("Play game as creator Eka", async ({ page }) => {
     }
     await createGameButton.click();
 
-    await expect(page.locator("li", {hasText: ekaUser.name})).toHaveCount(1);
+    await expect(page.locator("li.playersInGame", {hasText: ekaUser.name})).toHaveCount(1);
     console.log("Eka created game");
 
     const joinGameButton = page.locator("button", {hasText: `JOIN GAME - created by ${ekaUser.name}`});
@@ -63,7 +63,7 @@ test("Play game as creator Eka", async ({ page }) => {
     const roundsInGame = await page.locator(".prHead").count();
     console.log(`${myName} rounds in game ${roundsInGame}`);
 
-    await playGame(page, roundsInGame);
+    await playGame(page, roundsInGame, myName);
 
     await waitAndCloseOneGameReport(page);
 
@@ -88,7 +88,7 @@ test("Play game as Toka", async ({ page }) => {
     const createGameAccordionButton = page.locator("button", {hasText: "Open Games"});
     await createGameAccordionButton.click();
 
-    await expect(page.locator("li", {hasText: creatorUser.name})).toHaveCount(1);
+    await expect(page.locator("li.playersInGame", {hasText: creatorUser.name})).toHaveCount(1);
 
     const joinGameButton = page.locator("button", {hasText: `JOIN GAME - created by ${creatorUser.name}`});
     const leaveGameButton = page.locator("button", {hasText: `LEAVE GAME - created by ${creatorUser.name}`});
@@ -112,7 +112,7 @@ test("Play game as Toka", async ({ page }) => {
     const roundsInGame = await page.locator(".prHead").count();
     console.log(`${myName} rounds in game ${roundsInGame}`);
 
-    await playGame(page, roundsInGame);
+    await playGame(page, roundsInGame, myName);
 
     await waitAndCloseOneGameReport(page);
 
@@ -138,7 +138,7 @@ test("Play game as Vika", async ({ page }) => {
     const createGameAccordionButton = page.locator("button", {hasText: "Open Games"});
     await createGameAccordionButton.click();
 
-    await expect(page.locator("li", {hasText: creatorUser.name})).toHaveCount(1);
+    await expect(page.locator("li.playersInGame", {hasText: creatorUser.name})).toHaveCount(1);
 
     const joinGameButton = page.locator("button", {hasText: `JOIN GAME - created by ${creatorUser.name}`});
     const leaveGameButton = page.locator("button", {hasText: `LEAVE GAME - created by ${creatorUser.name}`});
@@ -152,7 +152,7 @@ test("Play game as Vika", async ({ page }) => {
     console.log(`${myName} buttons ok`);
 
     // Vika joins last, wait until Toka has joined
-    await expect(page.locator("li", {hasText: tokaUser.name})).toHaveCount(1);
+    await expect(page.locator("li.playersInGame", {hasText: tokaUser.name})).toHaveCount(1);
 
     await joinGameButton.click();
 
@@ -164,7 +164,7 @@ test("Play game as Vika", async ({ page }) => {
     const roundsInGame = await page.locator(".prHead").count();
     console.log(`${myName} rounds in game ${roundsInGame}`);
 
-    await playGame(page, roundsInGame);
+    await playGame(page, roundsInGame, myName);
 
     await waitAndCloseOneGameReport(page);
 

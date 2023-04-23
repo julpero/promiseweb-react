@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
-import { testCheckLoginSuccess, testLogIn } from "./commons/methods";
-import { pageUrl, userInDatabase } from "./commons/testvariables";
-import { ruleText } from "./commons/texts";
+import { testCheckLoginSuccess, testLogIn } from "../commons/methods";
+import { pageUrl, userInDatabase } from "../commons/testvariables";
+import { ruleText } from "../commons/texts";
 
 test("Create and dismiss game", async ({ page }) => {
   await page.goto(pageUrl);

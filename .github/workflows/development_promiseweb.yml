@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-
+          
       - name: npm install, build, and test in backend
         run: |
           npm install
@@ -86,14 +86,20 @@ jobs:
 
     - name: Install dependencies
       working-directory: ./frontend
-      run: npm ci
+      run: npm install
 
     - name: Install Playwright
       working-directory: ./frontend
       run: npx playwright install chromium --with-deps
 
-    - name: Run Playwright tests
+    - name: Run Playwright basic tests
       working-directory: ./frontend
-      run: npx playwright test --workers=7
+      run: npx playwright test tests/basicTests
+      env:
+        PLAYWRIGHT_TEST_BASE_URL: https://promiseweb.azurewebsites.net/
+        
+    - name: Run Playwright playing game tests
+      working-directory: ./frontend
+      run: npx playwright test tests/playingGame --workers=7
       env:
         PLAYWRIGHT_TEST_BASE_URL: https://promiseweb.azurewebsites.net/
