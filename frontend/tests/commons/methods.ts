@@ -118,12 +118,28 @@ const checkNameHover = async (page: Page) => {
   console.log("checked score board header hover");
 };
 
+const checkPromisesHeaderHover = async (page: Page) => {
+  console.log("checking promises table header hover");
+  const popUp = page.locator("#promisesThTooltip");
+  await page.locator("#promisetableArea > table > thead > tr:first-child > th.tableHeading.prHead").first().hover();
+  await expect(popUp).toBeVisible({ timeout: timeOut.common });
+  console.log("checked promises table header hover");
+};
+
 const checkPointsHover = async (page: Page) => {
   console.log("checking score board points hover");
   const popUp = page.locator("#scoreBoardAvgTooltip", {hasText: "Round"});
   await page.locator("#scoretableArea > table > tbody > tr:first-child > td:first-child").hover();
   await expect(popUp).toBeVisible({ timeout: timeOut.common });
   console.log("checked score board points hover");
+};
+
+const checkPromisesHover = async (page: Page) => {
+  console.log("checking promises table hover");
+  const popUp = page.locator("#promisesTdTooltip");
+  await page.locator("#promisetableArea > table > tbody > tr:first-child > td.tableCell").first().hover();
+  await expect(popUp).toBeVisible({ timeout: timeOut.common });
+  console.log("checked promises table hover");
 };
 
 export const playGame = async (page: Page, roundsInGame: number) => {
@@ -135,6 +151,8 @@ export const playGame = async (page: Page, roundsInGame: number) => {
     const cardsInRound = await getCardCountInRound(page);
     if (i === 1) {
       await checkPointsHover(page);
+      await checkPromisesHeaderHover(page);
+      await checkPromisesHover(page);
     }
     await playRound(page, cardsInRound);
     console.log(`round ${i+1} played`);
