@@ -27,3 +27,7 @@ export const ruleText = {
   bonusNonEvenPromise: "Bonus points for even breaker",
   thisIsDemoGame: "This is demo game",
 };
+
+export const commonText = {
+  lastFiveGames: "Last five games",
+};
