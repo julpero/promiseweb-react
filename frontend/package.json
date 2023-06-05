@@ -45,7 +45,7 @@
     "react-final-form": "^6.5.9",
     "react-icons": "^4.9.0",
     "react-loader-spinner": "^5.3.4",
-    "react-redux": "^8.0.5",
+    "react-redux": "^8.0.7",
     "react-spring": "^9.7.1",
     "react-tabulator": "^0.18.1",
     "react-tooltip": "^5.13.1",
