@@ -80,29 +80,33 @@ jobs:
     needs: deploy
     timeout-minutes: 60
     runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v3
     
-    - uses: actions/setup-node@v3
-      with:
-        node-version: '18.x'
-
-    - name: Install dependencies
-      working-directory: ./frontend
-      run: npm install
-
-    - name: Install Playwright
-      working-directory: ./frontend
-      run: npx playwright install chromium --with-deps
-
-    - name: Run Playwright basic tests
-      working-directory: ./frontend
-      run: npx playwright test tests/basicTests
-      env:
-        PLAYWRIGHT_TEST_BASE_URL: https://promiseweb.azurewebsites.net/
+    steps:
+      - name: check disk space
+        run: Get-Volume
         
-    - name: Run Playwright playing game tests
-      working-directory: ./frontend
-      run: npx playwright test tests/playingGame --workers=7
-      env:
-        PLAYWRIGHT_TEST_BASE_URL: https://promiseweb.azurewebsites.net/
+      - uses: actions/checkout@v3
+    
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Install Playwright
+        working-directory: ./frontend
+        run: npx playwright install chromium --with-deps
+
+      - name: Run Playwright basic tests
+        working-directory: ./frontend
+        run: npx playwright test tests/basicTests
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: https://promiseweb.azurewebsites.net/
+
+      - name: Run Playwright playing game tests
+        working-directory: ./frontend
+        run: npx playwright test tests/playingGame --workers=7
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: https://promiseweb.azurewebsites.net/
