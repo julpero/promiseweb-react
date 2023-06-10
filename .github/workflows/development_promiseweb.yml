@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: check disk space
-        run: dir
+        run: Get-Volume
 
       - uses: actions/checkout@v3
       
