@@ -15,8 +15,11 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: check disk space
+        run: dir
 
+      - uses: actions/checkout@v3
+      
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
