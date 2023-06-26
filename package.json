@@ -40,7 +40,7 @@
     "jsonwebtoken": "^9.0.0",
     "knuth-shuffle": "^1.0.8",
     "mongoose": "^7.3.0",
-    "socket.io": "^4.6.2",
+    "socket.io": "^4.7.0",
     "uuid": "^9.0.0"
   }
 }
