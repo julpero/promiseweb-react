@@ -61,7 +61,7 @@
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.5.1",
     "@types/node": "^20.7.1",
-    "@types/react": "^18.2.23",
+    "@types/react": "^18.2.25",
     "@types/react-bootstrap": "^0.32.33",
     "@types/react-dom": "^18.2.8",
     "@types/tabulator-tables": "^5.5.2",
