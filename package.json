@@ -20,7 +20,7 @@
     "@types/jsonwebtoken": "^9.0.3",
     "@types/knuth-shuffle": "^1.0.0",
     "@types/node": "^20.7.1",
-    "@types/uuid": "^9.0.4",
+    "@types/uuid": "^9.0.5",
     "@typescript-eslint/eslint-plugin": "^6.7.3",
     "@typescript-eslint/parser": "^6.7.3",
     "eslint": "^8.50.0",
