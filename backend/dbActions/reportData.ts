@@ -236,7 +236,7 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
 
   // console.time("reportData vanilla games count");
   // count vanilla games (no rules)
-  const vanillaGameCount = await GameOptions.count({
+  const vanillaGameCount = await GameOptions.countDocuments({
     "gameStatus": {$eq: GAME_STATUS.played},
     "thisIsDemoGame": {$in: [null, false]},
     "evenPromisesAllowed": {$in: [null, true]},
