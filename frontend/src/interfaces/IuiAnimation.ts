@@ -1,4 +1,4 @@
-import { easings } from "react-spring";
+import { easings } from "@react-spring/web";
 import { randomNegToPos } from "../common/commonFunctions";
 
 interface IuiSpringObjectCoord {

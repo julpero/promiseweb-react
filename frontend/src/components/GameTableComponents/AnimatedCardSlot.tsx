@@ -6,7 +6,7 @@ import { getEmptySlot, setEmptySlot } from "../../store/emptyAnimatedCardSlotSli
 import { getCollectCards, setCollectCards } from "../../store/collectAnimatedCardsSlice";
 import { setGetRoundInfo } from "../../store/getRoundInfoSlice";
 
-import { useSpring, animated, easings } from "react-spring";
+import { useSpring, animated, easings } from "@react-spring/web";
 import { cardAsString, randomNegToPos } from "../../common/commonFunctions";
 import getCardFace, { CARD_PLAYABLE } from "./Cards";
 import { IuiSpringObject } from "../../interfaces/IuiAnimation";

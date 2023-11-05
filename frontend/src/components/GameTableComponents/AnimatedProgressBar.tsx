@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ProgressBar } from "react-bootstrap";
-import { config, useSpring } from "react-spring";
+import { config, useSpring } from "@react-spring/web";
 
 interface IProps {
   pbKey: number,
