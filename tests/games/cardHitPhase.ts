@@ -44,6 +44,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
   "bonusNonEvenPromise": false,
+  "chosenAce": false,
   "game": {
     "playerOrder": [
       {
@@ -819,6 +820,7 @@ export const firstRoundSecondPlayer: IGameOptions = {
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
   "bonusNonEvenPromise": false,
+  "chosenAce": false,
   "game": {
     "playerOrder": [
       {
@@ -1735,6 +1737,7 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
   "bonusNonEvenPromise": false,
+  "chosenAce": false,
   "game": {
     "playerOrder": [
       {
@@ -2662,6 +2665,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
   "bonusNonEvenPromise": false,
+  "chosenAce": false,
   "game": {
     "playerOrder": [
       {

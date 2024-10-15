@@ -16,6 +16,7 @@ export interface IuiNewGameForm {
   opponentPromiseCardValue: boolean;
   opponentGameCardValue: boolean;
   bonusNonEvenPromise: boolean;
+  chosenAce: boolean;
   thisIsDemoGame: boolean;
   newGamePassword: string;
 }
@@ -36,6 +37,7 @@ export const initialNewGameValues: IuiNewGameForm = {
   opponentPromiseCardValue: false,
   opponentGameCardValue: false,
   bonusNonEvenPromise: false,
+  chosenAce: false,
   thisIsDemoGame: false,
   newGamePassword: "",
 };

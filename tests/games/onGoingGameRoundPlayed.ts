@@ -158,6 +158,7 @@ export const onGoingGameRoundPlayed: IGameOptions = {
   "thisIsDemoGame": false,
   "hiddenCardsMode": 0,
   "bonusNonEvenPromise": false,
+  "chosenAce": false,
   "game": {
     "playerOrder": [
       {

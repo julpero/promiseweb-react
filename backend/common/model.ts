@@ -23,6 +23,7 @@ const rulesToArr = (gameOptions: IGameOptions | IGameForList): RULE[] => {
   if (gameOptions.opponentPromiseCardValue === true) rulesArr.push(RULE.opponentPromiseCardValue);
   if (gameOptions.opponentGameCardValue === true) rulesArr.push(RULE.opponentGameCardValue);
   if (gameOptions.bonusNonEvenPromise === true) rulesArr.push(RULE.bonusNonEvenPromise);
+  if (gameOptions.chosenAce === true) rulesArr.push(RULE.chosenAce);
 
   return rulesArr;
 };
@@ -70,6 +71,9 @@ export const isRuleActive = (gameOptions: IGameOptions, rule: RULE): boolean => 
     }
     case RULE.bonusNonEvenPromise: {
       return gameOptions.bonusNonEvenPromise;
+    }
+    case RULE.chosenAce: {
+      return gameOptions.chosenAce;
     }
     default: return false;
   }

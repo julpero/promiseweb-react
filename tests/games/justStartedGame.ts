@@ -44,6 +44,7 @@ export const justStartedGame: IGameOptions = {
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
   "bonusNonEvenPromise": false,
+  "chosenAce": false,
   "game": {
     "playerOrder": [
       {
@@ -819,6 +820,7 @@ export const justStartedLastPromiser: IGameOptions = {
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
   "bonusNonEvenPromise": false,
+  "chosenAce": false,
   "game": {
     "playerOrder": [
       {

@@ -26,6 +26,7 @@ export interface IGameOptions {
   opponentPromiseCardValue: boolean,
   opponentGameCardValue: boolean,
   bonusNonEvenPromise: boolean,
+  chosenAce: boolean,
   thisIsDemoGame: boolean,
   hiddenCardsMode: HIDDEN_CARDS_MODE,
   game: IGame,

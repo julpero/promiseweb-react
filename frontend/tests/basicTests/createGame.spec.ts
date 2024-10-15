@@ -23,6 +23,7 @@ test("Create and dismiss game", async ({ page }) => {
   await page.getByLabel(ruleText.opponentPromiseCardValue).check();
   await page.getByLabel(ruleText.opponentGameCardValue).check();
   await page.getByLabel(ruleText.bonusNonEvenPromise).check();
+  await page.getByLabel(ruleText.chosenAce).check();
   await page.getByLabel(ruleText.thisIsDemoGame).check();
 
   await createGameButton.click();

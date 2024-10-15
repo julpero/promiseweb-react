@@ -117,6 +117,9 @@ const CreateGame = (props: IProps) => {
       case "bonusNonEvenPromise": {
         return "If player makes non even promise and keeps his/her own promise,<br />he/she will get two bonus points from every player who doesn&apos;t keep promise.<br />Only ohe player can be even breaker on one round. Dealer can be even breaker if round is under promised.";
       }
+      case "chosenAce": {
+        return "When player hits an ace into the table he/she can choose if the ace value is 1 or 14.";
+      }
       case "thisIsDemoGame": {
         return "This game won&apos;t affect stats.";
       }
@@ -362,6 +365,21 @@ const CreateGame = (props: IProps) => {
                         }}
                       />
                     </div>
+                    <div className="col" data-tooltip-id="ruleInfoTooltip" data-tooltip-html={renderRuleTooltip("chosenAce")}>
+                      <Field
+                        id="chosenAce"
+                        name="chosenAce"
+                        type="checkbox"
+                        component={CheckboxInput}
+                        label="Player can choose ace value"
+                        value={form.getFieldState("chosenAce")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("chosenAce", checked);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="row">
                     <div className="col" data-tooltip-id="ruleInfoTooltip" data-tooltip-html={renderRuleTooltip("thisIsDemoGame")}>
                       <Field
                         id="thisIsDemoGame"

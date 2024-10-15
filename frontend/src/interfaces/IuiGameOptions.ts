@@ -28,6 +28,7 @@ export enum RULE {
   opponentPromiseCardValue,
   opponentGameCardValue,
   bonusNonEvenPromise,
+  chosenAce,
 }
 
 export interface IuiRoundInfo {
