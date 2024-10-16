@@ -43,7 +43,7 @@ jobs:
         run: Compress-Archive -Update ./serverBuild/* release.zip
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: node-app
           path: release.zip
@@ -57,7 +57,7 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.8
         with:
           name: node-app
 
@@ -65,7 +65,7 @@ jobs:
         run: unzip release.zip
 
       - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3.0.1
         id: deploy-to-webapp
         with:
           app-name: 'promiseweb'
