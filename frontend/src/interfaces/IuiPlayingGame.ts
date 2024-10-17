@@ -48,6 +48,7 @@ export enum PROMISE_RESPONSE {
 export enum ROUND_PHASE {
   initial,
   onPromises,
+  onRePromises,
   onPlay,
   played,
 }

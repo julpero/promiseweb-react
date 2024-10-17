@@ -82,7 +82,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
       return promiseResponse;
     }
     const round = gameInDb.game.rounds[currentRoundInd];
-    const roundPhase = getRoundPhase(round);
+    const roundPhase = getRoundPhase(round, isRuleActive(gameInDb, RULE.rePromise) || isRuleActive(gameInDb, RULE.hiddenRePromise));
     if (roundPhase !== ROUND_PHASE.onPromises) {
       console.warn("promising, round not in onPromises phase");
       promiseResponse.promiseResponse = PROMISE_RESPONSE.noPromisePhase;
@@ -183,7 +183,7 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
       return response;
     }
     const round = gameInDb.game.rounds[currentRoundInd];
-    const roundPhase = getRoundPhase(round);
+    const roundPhase = getRoundPhase(round, isRuleActive(gameInDb, RULE.rePromise) || isRuleActive(gameInDb, RULE.hiddenRePromise));
     if (roundPhase !== ROUND_PHASE.onPlay) {
       console.warn("playing card, round not in onPlay phase");
       response.playResponse = PLAY_CARD_RESPONSE.notMyTurn;

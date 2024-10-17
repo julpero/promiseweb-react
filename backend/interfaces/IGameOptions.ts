@@ -134,6 +134,7 @@ export interface ICard {
 export interface IRoundPlayer extends IPlayer {
   cards: ICard[],
   promise: PromiseValue | null,
+  rePromise: PromiseValue | null,
   promiseStarted: number | null,
   promiseMade: number | null,
   keeps: number,
@@ -142,6 +143,7 @@ export interface IRoundPlayer extends IPlayer {
   speedPromisePoints: number | null,
   speedPromiseTotal: number | null,
   evenBreakingBonus: number | null,
+  rePromiseBonus: number | null,
 }
 
 export interface ICardPlayed {
