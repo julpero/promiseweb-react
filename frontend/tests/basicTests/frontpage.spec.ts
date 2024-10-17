@@ -33,5 +33,5 @@ test("homepage has PromiseWeb in title and Log In button works with new user", a
 test("ping page", async ({request}) => {
   const pingPage = await request.get(`${pageUrl}ping?ver=1`);
   expect(pingPage.ok()).toBeTruthy();
-  expect((await pingPage.text()).includes("v18.")).toBeTruthy();
+  expect((await pingPage.text()).includes("v20.")).toBeTruthy();
 });

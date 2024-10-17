@@ -15,8 +15,7 @@ import { setSpinnerVisible } from "../store/spinnerSlice";
 import { Button, Modal } from "react-bootstrap";
 import OneGameReport from "./OneGameReport";
 
-import { format } from "date-fns";
-import { parseISO } from "date-fns/esm";
+import { format, parseISO } from "date-fns";
 import UsedRulesGraph from "./ReportComponents/UsedRulesGraph";
 import { HIDDEN_CARDS_MODE, RULE } from "../interfaces/IuiGameOptions";
 
