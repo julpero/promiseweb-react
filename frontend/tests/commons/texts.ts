@@ -25,6 +25,8 @@ export const ruleText = {
   opponentPromiseCardValue: "Show hand value when promising",
   opponentGameCardValue: "Show hand value in the game",
   bonusNonEvenPromise: "Bonus points for even breaker",
+  rePromise: "Additional promise round",
+  hiddenRePromise: "Additional hidden promise round",
   thisIsDemoGame: "This is demo game",
 };
 
