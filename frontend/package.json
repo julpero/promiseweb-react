@@ -38,7 +38,7 @@
     "chart.js": "^4.4.5",
     "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-plugin-annotation": "^3.1.0",
-    "date-fns": "^2.30.0",
+    "date-fns": "^4.1.0",
     "final-form": "^4.20.10",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.5",
