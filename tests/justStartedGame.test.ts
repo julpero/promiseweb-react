@@ -18,7 +18,7 @@ describe("testing just created game methods", () => {
   });
 
   test("getRoundPhase", () => {
-    const roundPhase = getRoundPhase(justStartedGame.game.rounds[0]);
+    const roundPhase = getRoundPhase(justStartedGame.game.rounds[0], false);
     expect(roundPhase).toBe(ROUND_PHASE.onPromises);
   });
 

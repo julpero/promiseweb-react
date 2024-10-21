@@ -12,7 +12,7 @@ describe("testing first round and first player", () => {
   });
 
   test("getRoundPhase", () => {
-    const roundPhase = getRoundPhase(firstRoundFirstPlayer.game.rounds[0]);
+    const roundPhase = getRoundPhase(firstRoundFirstPlayer.game.rounds[0], false);
     expect(roundPhase).toBe(ROUND_PHASE.onPlay);
   });
 
@@ -76,7 +76,7 @@ describe("testing first round and second player", () => {
   });
 
   test("getRoundPhase", () => {
-    const roundPhase = getRoundPhase(firstRoundSecondPlayer.game.rounds[0]);
+    const roundPhase = getRoundPhase(firstRoundSecondPlayer.game.rounds[0], false);
     expect(roundPhase).toBe(ROUND_PHASE.onPlay);
   });
 
@@ -141,7 +141,7 @@ describe("testing first round and second hit first player", () => {
   });
 
   test("getRoundPhase", () => {
-    const roundPhase = getRoundPhase(firstRoundSecondHitFirstPlayer.game.rounds[0]);
+    const roundPhase = getRoundPhase(firstRoundSecondHitFirstPlayer.game.rounds[0], false);
     expect(roundPhase).toBe(ROUND_PHASE.onPlay);
   });
 
@@ -201,7 +201,7 @@ describe("testing first round and third hit second player", () => {
   });
 
   test("getRoundPhase", () => {
-    const roundPhase = getRoundPhase(firstRoundThirdHitSecondPlayer.game.rounds[0]);
+    const roundPhase = getRoundPhase(firstRoundThirdHitSecondPlayer.game.rounds[0], false);
     expect(roundPhase).toBe(ROUND_PHASE.onPlay);
   });
 
