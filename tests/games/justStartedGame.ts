@@ -103,6 +103,8 @@ export const justStartedGame: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -179,6 +181,8 @@ export const justStartedGame: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -255,6 +259,8 @@ export const justStartedGame: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -344,6 +350,8 @@ export const justStartedGame: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -410,6 +418,8 @@ export const justStartedGame: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -476,6 +486,8 @@ export const justStartedGame: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -565,6 +577,8 @@ export const justStartedGame: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -641,6 +655,8 @@ export const justStartedGame: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -717,6 +733,8 @@ export const justStartedGame: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -880,6 +898,8 @@ export const justStartedLastPromiser: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -956,6 +976,8 @@ export const justStartedLastPromiser: IGameOptions = {
               }
             ],
             "promise": 2,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664256450988,
             "promiseMade": 1664262189283,
             "keeps": 0,
@@ -1032,6 +1054,8 @@ export const justStartedLastPromiser: IGameOptions = {
               }
             ],
             "promise": 2,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664262191683,
             "promiseMade": 1664262211666,
             "keeps": 0,
@@ -1121,6 +1145,8 @@ export const justStartedLastPromiser: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -1187,6 +1213,8 @@ export const justStartedLastPromiser: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -1253,6 +1281,8 @@ export const justStartedLastPromiser: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -1342,6 +1372,8 @@ export const justStartedLastPromiser: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -1418,6 +1450,8 @@ export const justStartedLastPromiser: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -1494,6 +1528,8 @@ export const justStartedLastPromiser: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,

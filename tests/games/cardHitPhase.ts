@@ -103,6 +103,8 @@ export const firstRoundFirstPlayer: IGameOptions = {
               }
             ],
             "promise": 1,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664262214066,
             "promiseMade": 1664262743053,
             "keeps": 0,
@@ -179,6 +181,8 @@ export const firstRoundFirstPlayer: IGameOptions = {
               }
             ],
             "promise": 2,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664256450988,
             "promiseMade": 1664262189283,
             "keeps": 0,
@@ -255,6 +259,8 @@ export const firstRoundFirstPlayer: IGameOptions = {
               }
             ],
             "promise": 2,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664262191683,
             "promiseMade": 1664262211666,
             "keeps": 0,
@@ -344,6 +350,8 @@ export const firstRoundFirstPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -410,6 +418,8 @@ export const firstRoundFirstPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -476,6 +486,8 @@ export const firstRoundFirstPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -565,6 +577,8 @@ export const firstRoundFirstPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -641,6 +655,8 @@ export const firstRoundFirstPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -717,6 +733,8 @@ export const firstRoundFirstPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -880,6 +898,8 @@ export const firstRoundSecondPlayer: IGameOptions = {
               }
             ],
             "promise": 1,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664262214066,
             "promiseMade": 1664262743053,
             "keeps": 0,
@@ -951,6 +971,8 @@ export const firstRoundSecondPlayer: IGameOptions = {
               }
             ],
             "promise": 2,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664256450988,
             "promiseMade": 1664262189283,
             "keeps": 0,
@@ -1027,6 +1049,8 @@ export const firstRoundSecondPlayer: IGameOptions = {
               }
             ],
             "promise": 2,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664262191683,
             "promiseMade": 1664262211666,
             "keeps": 0,
@@ -1127,6 +1151,8 @@ export const firstRoundSecondPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -1193,6 +1219,8 @@ export const firstRoundSecondPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -1259,6 +1287,8 @@ export const firstRoundSecondPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -1348,6 +1378,8 @@ export const firstRoundSecondPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -1424,6 +1456,8 @@ export const firstRoundSecondPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -1500,6 +1534,8 @@ export const firstRoundSecondPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -1793,6 +1829,8 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
               }
             ],
             "promise": 1,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664262214066,
             "promiseMade": 1664262743053,
             "keeps": 0,
@@ -1864,6 +1902,8 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
               }
             ],
             "promise": 2,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664256450988,
             "promiseMade": 1664262189283,
             "keeps": 0,
@@ -1935,6 +1975,8 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
               },
             ],
             "promise": 2,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664262191683,
             "promiseMade": 1664262211666,
             "keeps": 0,
@@ -2056,6 +2098,8 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -2122,6 +2166,8 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -2188,6 +2234,8 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -2277,6 +2325,8 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -2353,6 +2403,8 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -2429,6 +2481,8 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -2712,6 +2766,8 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
               },
             ],
             "promise": 1,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664262214066,
             "promiseMade": 1664262743053,
             "keeps": 1,
@@ -2778,6 +2834,8 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
               }
             ],
             "promise": 2,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664256450988,
             "promiseMade": 1664262189283,
             "keeps": 0,
@@ -2844,6 +2902,8 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
               },
             ],
             "promise": 2,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": 1664262191683,
             "promiseMade": 1664262211666,
             "keeps": 0,
@@ -3008,6 +3068,8 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -3074,6 +3136,8 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -3140,6 +3204,8 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -3229,6 +3295,8 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -3305,6 +3373,8 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
@@ -3381,6 +3451,8 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
               }
             ],
             "promise": null,
+            "rePromise": null,
+            "rePromiseBonus": null,
             "promiseStarted": null,
             "promiseMade": null,
             "keeps": 0,
