@@ -69,13 +69,24 @@ export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
   return null;
 };
 
-export const getPromiser = (round: IRound): IPromiser | null => {
+export const getPromiser = (round: IRound, gameHasRePromiseRule: boolean): IPromiser | null => {
   const {roundPlayers, starterPositionIndex} = round;
+  const playerCount = roundPlayers.length;
   if (roundPlayers.some(player => player.promise === null)) {
-    const playerCount = roundPlayers.length;
     for (let i = starterPositionIndex; i < starterPositionIndex + playerCount; i++) {
       const checkInd = i >= playerCount ? i - playerCount : i;
       if (roundPlayers[checkInd].promise === null) {
+        return {
+          name: roundPlayers[checkInd].name,
+          type: roundPlayers[checkInd].type,
+          index: checkInd,
+        } as IPromiser;
+      }
+    }
+  } else if (gameHasRePromiseRule && roundPlayers.some(player => player.rePromise === null)) {
+    for (let i = starterPositionIndex; i < starterPositionIndex + playerCount; i++) {
+      const checkInd = i >= playerCount ? i - playerCount : i;
+      if (roundPlayers[checkInd].rePromise === null) {
         return {
           name: roundPlayers[checkInd].name,
           type: roundPlayers[checkInd].type,
@@ -91,10 +102,20 @@ export const isRoundsLastPromiser = (round: IRound): boolean => {
   return round.roundPlayers.length - round.roundPlayers.filter(player => player.promise !== null).length === 1;
 };
 
+export const isRoundsLastRePromiser = (round: IRound): boolean => {
+  return round.roundPlayers.length - round.roundPlayers.filter(player => player.rePromise !== null).length === 1;
+};
+
 export const getCurrentPromiseTotal = (round: IRound): number => {
   let totalPromise = 0;
   round.roundPlayers.map(player => totalPromise+=(player.promise ?? 0));
   return totalPromise;
+};
+
+export const getCurrentRePromiseTotal = (round: IRound): number => {
+  let totalRePromise = 0;
+  round.roundPlayers.map(player => totalRePromise+=(player.rePromise ?? 0));
+  return totalRePromise;
 };
 
 export const getCurrentPlayIndex = (round: IRound): number => {

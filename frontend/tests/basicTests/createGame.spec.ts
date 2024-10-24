@@ -18,11 +18,13 @@ test("Create and dismiss game", async ({ page }) => {
 
   // rules
   await page.getByLabel(ruleText.noEvenPromises).check();
-  await page.getByLabel(ruleText.hidePromiseRound).check();
+  await page.getByLabel(ruleText.hidePromiseRound, {exact: true}).check();
   await page.getByLabel(ruleText.onlyTotalPromise).check();
   await page.getByLabel(ruleText.opponentPromiseCardValue).check();
   await page.getByLabel(ruleText.opponentGameCardValue).check();
   await page.getByLabel(ruleText.bonusNonEvenPromise).check();
+  await page.getByLabel(ruleText.rePromise, {exact: true}).check();
+  await page.getByLabel(ruleText.hiddenRePromise, {exact: true}).check();
   await page.getByLabel(ruleText.thisIsDemoGame).check();
 
   await createGameButton.click();

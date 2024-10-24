@@ -80,6 +80,7 @@ const initRound = (roundIndex: number, cardsInRound: number, players: IPlayer[],
       name: player.name,
       cards: sortedCards,
       promise: null,
+      rePromise: null,
       promiseStarted: null,
       promiseMade: null,
       keeps: 0,
@@ -89,6 +90,7 @@ const initRound = (roundIndex: number, cardsInRound: number, players: IPlayer[],
       speedPromisePoints: speedPromise ? 1 : null,
       speedPromiseTotal: null,
       evenBreakingBonus: null,
+      rePromiseBonus: null,
     } as IRoundPlayer);
   });
 

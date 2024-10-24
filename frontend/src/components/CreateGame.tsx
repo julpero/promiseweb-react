@@ -117,6 +117,12 @@ const CreateGame = (props: IProps) => {
       case "bonusNonEvenPromise": {
         return "If player makes non even promise and keeps his/her own promise,<br />he/she will get two bonus points from every player who doesn&apos;t keep promise.<br />Only ohe player can be even breaker on one round. Dealer can be even breaker if round is under promised.";
       }
+      case "rePromise": {
+        return "There is a new identical promise round after all promises given. If player changes his/hers promise there will be deductions to points.";
+      }
+      case "hiddenRePromise": {
+        return "After all promises are given players may change their promise. This additional promise round is hidden.";
+      }
       case "thisIsDemoGame": {
         return "This game won&apos;t affect stats.";
       }
@@ -344,6 +350,36 @@ const CreateGame = (props: IProps) => {
                         value={form.getFieldState("opponentGameCardValue")?.value}
                         onChange={(checked: boolean) => {
                           form.change("opponentGameCardValue", checked);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col" data-tooltip-id="ruleInfoTooltip" data-tooltip-html={renderRuleTooltip("rePromise")}>
+                      <Field
+                        id="rePromise"
+                        name="rePromise"
+                        type="checkbox"
+                        component={CheckboxInput}
+                        label="Additional promise round"
+                        value={form.getFieldState("rePromise")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("rePromise", checked);
+                          form.change("hiddenRePromise", !checked);
+                        }}
+                      />
+                    </div>
+                    <div className="col" data-tooltip-id="ruleInfoTooltip" data-tooltip-html={renderRuleTooltip("hiddenRePromise")}>
+                      <Field
+                        id="hiddenRePromise"
+                        name="hiddenRePromise"
+                        type="checkbox"
+                        component={CheckboxInput}
+                        label="Additional hidden promise round"
+                        value={form.getFieldState("hiddenRePromise")?.value}
+                        onChange={(checked: boolean) => {
+                          form.change("hiddenRePromise", checked);
+                          form.change("rePromise", !checked);
                         }}
                       />
                     </div>
