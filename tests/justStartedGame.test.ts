@@ -32,7 +32,7 @@ describe("testing just created game methods", () => {
       type: "human",
       index: 1,
     } as IPromiser;
-    expect(getPromiser(justStartedGame.game.rounds[0])).toStrictEqual(promiser);
+    expect(getPromiser(justStartedGame.game.rounds[0], false)).toStrictEqual(promiser);
   });
 
   test("isRoundsLastPromiser", () => {
@@ -63,7 +63,7 @@ describe("last promiser", () => {
       type: "human",
       index: 0,
     } as IPromiser;
-    expect(getPromiser(justStartedLastPromiser.game.rounds[0])).toStrictEqual(promiser);
+    expect(getPromiser(justStartedLastPromiser.game.rounds[0], false)).toStrictEqual(promiser);
   });
 
   test("isRoundsLastPromiser", () => {

@@ -181,8 +181,8 @@ const getPromiseTable = (gameInDb: IGameOptions): IuiPromiseTable => {
   } as IuiPromiseTable;
 };
 
-const isMyPromiseTurn = (name: string, round: IRound, originalPlayerName?: string): boolean => {
-  const promiser = getPromiser(round);
+const isMyPromiseTurn = (name: string, round: IRound, gameHasRePromiseRule: boolean, originalPlayerName?: string): boolean => {
+  const promiser = getPromiser(round, gameHasRePromiseRule);
   if (promiser) {
     return promiser.name === name || promiser.name === originalPlayerName;
   } else {
@@ -233,8 +233,8 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, o
   const playerInCharge = gameIsPlayed ? "" : starterOfThisPlay(round, playIndex);
   const cardInCharge = getCurrentCardInCharge(round.cardsPlayed);
   const myPlayedCard = round.cardsPlayed[playIndex].find(playedCard => playedCard.name === name || playedCard.name === originalPlayerName)?.card;
-  const rePromiseIsInUse = isRuleActive(gameInDb, RULE.rePromise) || isRuleActive(gameInDb, RULE.hiddenRePromise);
-  const roundPhase = getRoundPhase(round, rePromiseIsInUse);
+  const gameHasRePromiseRule = isRuleActive(gameInDb, RULE.rePromise) || isRuleActive(gameInDb, RULE.hiddenRePromise);
+  const roundPhase = getRoundPhase(round, gameHasRePromiseRule);
   const hiddenPromiseRoundRule = isRuleActive(gameInDb, RULE.hiddenPromiseRound);
   const onlyTotalPromiseRule = isRuleActive(gameInDb, RULE.onlyTotalPromise);
 
@@ -254,7 +254,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, o
     gameOver: gameInDb.gameStatus === GAME_STATUS.played,
     whoseTurn: playerInTurn?.name ?? "",
     isMyTurn: isNowMyTurn,
-    isMyPromiseTurn: isMyPromiseTurn(name, round, originalPlayerName),
+    isMyPromiseTurn: isMyPromiseTurn(name, round, gameHasRePromiseRule, originalPlayerName),
     handValues: getHandValues(round, roundPhase, isRuleActive(gameInDb, RULE.opponentPromiseCardValue), isRuleActive(gameInDb, RULE.opponentGameCardValue)),
     obsGame: null, // TODO obsGameToRoundObj
     promiseTable: getPromiseTable(gameInDb),
