@@ -47,6 +47,14 @@ const createGameOptions = async (values: IuiCreateGameRequest): Promise<IGameOpt
   } as IGameOptions;
 };
 
+export const rulesOk = (createGameRequest: IuiCreateGameRequest): boolean => {
+  const {rePromise, hiddenRePromise, speedPromise} = createGameRequest;
+  if ([rePromise, hiddenRePromise, speedPromise].filter(Boolean).length > 1) {
+    return false;
+  }
+  return true;
+};
+
 export const createGame = async (createGameRequest: IuiCreateGameRequest): Promise<IuiCreateGameResponse> => {
   const {userName, newGameStartRound, newGameTurnRound, newGameEndRound, newGameHumanPlayersCount} = createGameRequest;
   const response: IuiCreateGameResponse = {
@@ -68,6 +76,10 @@ export const createGame = async (createGameRequest: IuiCreateGameRequest): Promi
     return response;
   }
 
+  if (!rulesOk(createGameRequest)) {
+    return response;
+  }
+
   const okToCreate = !(await hasOngoingOrCreatedGame(userName));
   if (!okToCreate) {
     response.responseStatus = CREATE_GAME_STATUS.onGoingGame;
@@ -78,10 +90,6 @@ export const createGame = async (createGameRequest: IuiCreateGameRequest): Promi
   if (okToCreate) {
     const gameOptions = await createGameOptions(createGameRequest);
     // console.log("gameOptions", gameOptions);
-
-    if (gameOptions.rePromise && gameOptions.hiddenRePromise) {
-      return response;
-    }
 
     const createdGameIdStr = await insertNewGame(gameOptions);
     // console.log("create game - gameOptions inserted with _id: " + createdGameIdStr);
