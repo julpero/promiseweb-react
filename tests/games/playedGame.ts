@@ -198,7 +198,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664132442295,
             "promiseMade": 1664132455376,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -265,7 +265,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664132282893,
             "promiseMade": 1664132353780,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -332,7 +332,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664132353780,
             "promiseMade": 1664132382866,
-            "keeps": 3,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 3,
             "points": 13,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -399,7 +399,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664132382866,
             "promiseMade": 1664132412917,
-            "keeps": 3,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 3,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -466,7 +466,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664132412917,
             "promiseMade": 1664132442295,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -531,7 +531,7 @@ export const playedGame: IGameOptions = {
           "value": 13,
           "rank": "K",
         },
-        "totalPromise": 7,
+        "totalRePromise": null, "totalPromise": 7,
         "cardsPlayed": [
           [
             {
@@ -1070,7 +1070,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664132937051,
             "promiseMade": 1664132944813,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -1132,7 +1132,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664132944813,
             "promiseMade": 1664132964749,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -1194,7 +1194,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664132863489,
             "promiseMade": 1664132885951,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -1256,7 +1256,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664132885951,
             "promiseMade": 1664132896623,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -1318,7 +1318,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664132896623,
             "promiseMade": 1664132937051,
-            "keeps": 3,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 3,
             "points": 13,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -1378,7 +1378,7 @@ export const playedGame: IGameOptions = {
           "value": 14,
           "rank": "A",
         },
-        "totalPromise": 8,
+        "totalRePromise": null, "totalPromise": 8,
         "cardsPlayed": [
           [
             {
@@ -1865,7 +1865,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133365847,
             "promiseMade": 1664133372967,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -1922,7 +1922,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133372967,
             "promiseMade": 1664133392616,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -1979,7 +1979,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133392616,
             "promiseMade": 1664133398439,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -2036,7 +2036,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133317153,
             "promiseMade": 1664133333169,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -2093,7 +2093,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133333169,
             "promiseMade": 1664133365847,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -2148,7 +2148,7 @@ export const playedGame: IGameOptions = {
           "value": 8,
           "rank": "8",
         },
-        "totalPromise": 8,
+        "totalRePromise": null, "totalPromise": 8,
         "cardsPlayed": [
           [
             {
@@ -2583,7 +2583,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133658437,
             "promiseMade": 1664133666143,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 15,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -2635,7 +2635,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133666143,
             "promiseMade": 1664133670688,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -2687,7 +2687,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133670688,
             "promiseMade": 1664133678969,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -2739,7 +2739,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133678969,
             "promiseMade": 1664133684878,
-            "keeps": 3,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 3,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -2791,7 +2791,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133644208,
             "promiseMade": 1664133658437,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -2841,7 +2841,7 @@ export const playedGame: IGameOptions = {
           "value": 6,
           "rank": "6",
         },
-        "totalPromise": 7,
+        "totalRePromise": null, "totalPromise": 7,
         "cardsPlayed": [
           [
             {
@@ -3224,7 +3224,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133877911,
             "promiseMade": 1664133889273,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -3271,7 +3271,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133889273,
             "promiseMade": 1664133894473,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 15,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -3318,7 +3318,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133894473,
             "promiseMade": 1664133900280,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -3365,7 +3365,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133900280,
             "promiseMade": 1664133906927,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -3412,7 +3412,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664133906927,
             "promiseMade": 1664133917547,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -3457,7 +3457,7 @@ export const playedGame: IGameOptions = {
           "value": 12,
           "rank": "Q",
         },
-        "totalPromise": 6,
+        "totalRePromise": null, "totalPromise": 6,
         "cardsPlayed": [
           [
             {
@@ -3788,7 +3788,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134121401,
             "promiseMade": 1664134138673,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -3830,7 +3830,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134053303,
             "promiseMade": 1664134081112,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -3872,7 +3872,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134081112,
             "promiseMade": 1664134109179,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -3914,7 +3914,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134109179,
             "promiseMade": 1664134117254,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -3956,7 +3956,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134117254,
             "promiseMade": 1664134121401,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -3996,7 +3996,7 @@ export const playedGame: IGameOptions = {
           "value": 5,
           "rank": "5",
         },
-        "totalPromise": 5,
+        "totalRePromise": null, "totalPromise": 5,
         "cardsPlayed": [
           [
             {
@@ -4275,7 +4275,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134261315,
             "promiseMade": 1664134264011,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -4312,7 +4312,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134264011,
             "promiseMade": 1664134268098,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -4349,7 +4349,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134241585,
             "promiseMade": 1664134251649,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -4386,7 +4386,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134251649,
             "promiseMade": 1664134254486,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -4423,7 +4423,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134254486,
             "promiseMade": 1664134261315,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -4458,7 +4458,7 @@ export const playedGame: IGameOptions = {
           "value": 5,
           "rank": "5",
         },
-        "totalPromise": 4,
+        "totalRePromise": null, "totalPromise": 4,
         "cardsPlayed": [
           [
             {
@@ -4685,7 +4685,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134372468,
             "promiseMade": 1664134380141,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -4717,7 +4717,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134380141,
             "promiseMade": 1664134391601,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -4749,7 +4749,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134391601,
             "promiseMade": 1664134428491,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -4781,7 +4781,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134351538,
             "promiseMade": 1664134364604,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -4813,7 +4813,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134364604,
             "promiseMade": 1664134372468,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -4843,7 +4843,7 @@ export const playedGame: IGameOptions = {
           "value": 8,
           "rank": "8",
         },
-        "totalPromise": 3,
+        "totalRePromise": null, "totalPromise": 3,
         "cardsPlayed": [
           [
             {
@@ -5018,7 +5018,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134529438,
             "promiseMade": 1664134536469,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5045,7 +5045,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134536469,
             "promiseMade": 1664134550341,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5072,7 +5072,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134550341,
             "promiseMade": 1664134593646,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5099,7 +5099,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134593646,
             "promiseMade": 1664134598757,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5126,7 +5126,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134496631,
             "promiseMade": 1664134529438,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5151,7 +5151,7 @@ export const playedGame: IGameOptions = {
           "value": 4,
           "rank": "4",
         },
-        "totalPromise": 2,
+        "totalRePromise": null, "totalPromise": 2,
         "cardsPlayed": [
           [
             {
@@ -5274,7 +5274,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134663857,
             "promiseMade": 1664134676632,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5296,7 +5296,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134676632,
             "promiseMade": 1664134692879,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5318,7 +5318,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134692879,
             "promiseMade": 1664134697870,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5340,7 +5340,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134697870,
             "promiseMade": 1664134699991,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5362,7 +5362,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134699991,
             "promiseMade": 1664134703053,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5382,7 +5382,7 @@ export const playedGame: IGameOptions = {
           "value": 5,
           "rank": "5",
         },
-        "totalPromise": 2,
+        "totalRePromise": null, "totalPromise": 2,
         "cardsPlayed": [
           [
             {
@@ -5453,7 +5453,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134762266,
             "promiseMade": 1664134765329,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5480,7 +5480,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134719568,
             "promiseMade": 1664134736940,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5507,7 +5507,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134736940,
             "promiseMade": 1664134742150,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5534,7 +5534,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134742150,
             "promiseMade": 1664134745959,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5561,7 +5561,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134745960,
             "promiseMade": 1664134762266,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5586,7 +5586,7 @@ export const playedGame: IGameOptions = {
           "value": 3,
           "rank": "3",
         },
-        "totalPromise": 0,
+        "totalRePromise": null, "totalPromise": 0,
         "cardsPlayed": [
           [
             {
@@ -5709,7 +5709,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134829767,
             "promiseMade": 1664134845953,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5741,7 +5741,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134845954,
             "promiseMade": 1664134856429,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5773,7 +5773,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134802976,
             "promiseMade": 1664134816776,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5805,7 +5805,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134816776,
             "promiseMade": 1664134820725,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5837,7 +5837,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134820725,
             "promiseMade": 1664134829767,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -5867,7 +5867,7 @@ export const playedGame: IGameOptions = {
           "value": 2,
           "rank": "2",
         },
-        "totalPromise": 4,
+        "totalRePromise": null, "totalPromise": 4,
         "cardsPlayed": [
           [
             {
@@ -6042,7 +6042,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134953163,
             "promiseMade": 1664134957328,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -6079,7 +6079,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134957328,
             "promiseMade": 1664134961632,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -6116,7 +6116,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134961632,
             "promiseMade": 1664134982052,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -6153,7 +6153,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134916184,
             "promiseMade": 1664134938961,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -6190,7 +6190,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664134938961,
             "promiseMade": 1664134953163,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -6225,7 +6225,7 @@ export const playedGame: IGameOptions = {
           "value": 5,
           "rank": "5",
         },
-        "totalPromise": 5,
+        "totalRePromise": null, "totalPromise": 5,
         "cardsPlayed": [
           [
             {
@@ -6452,7 +6452,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135118998,
             "promiseMade": 1664135125054,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -6494,7 +6494,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135125054,
             "promiseMade": 1664135136100,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -6536,7 +6536,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135136100,
             "promiseMade": 1664135167600,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 5,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -6578,7 +6578,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135167600,
             "promiseMade": 1664135181100,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -6620,7 +6620,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135098009,
             "promiseMade": 1664135118998,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -6660,7 +6660,7 @@ export const playedGame: IGameOptions = {
           "value": 13,
           "rank": "K",
         },
-        "totalPromise": 7,
+        "totalRePromise": null, "totalPromise": 7,
         "cardsPlayed": [
           [
             {
@@ -6939,7 +6939,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135461748,
             "promiseMade": 1664135476867,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -6986,7 +6986,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135476867,
             "promiseMade": 1664135489784,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -7033,7 +7033,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135489784,
             "promiseMade": 1664135502491,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 15,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -7080,7 +7080,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135502491,
             "promiseMade": 1664135520736,
-            "keeps": 3,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 3,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -7127,7 +7127,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135520736,
             "promiseMade": 1664135531336,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 15,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -7172,7 +7172,7 @@ export const playedGame: IGameOptions = {
           "value": 9,
           "rank": "9",
         },
-        "totalPromise": 4,
+        "totalRePromise": null, "totalPromise": 4,
         "cardsPlayed": [
           [
             {
@@ -7503,7 +7503,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135762706,
             "promiseMade": 1664135780219,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -7555,7 +7555,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135706503,
             "promiseMade": 1664135718785,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -7607,7 +7607,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135718785,
             "promiseMade": 1664135736557,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -7659,7 +7659,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135736557,
             "promiseMade": 1664135743763,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -7711,7 +7711,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664135743763,
             "promiseMade": 1664135762706,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -7761,7 +7761,7 @@ export const playedGame: IGameOptions = {
           "value": 11,
           "rank": "J",
         },
-        "totalPromise": 7,
+        "totalRePromise": null, "totalPromise": 7,
         "cardsPlayed": [
           [
             {
@@ -8144,7 +8144,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136099783,
             "promiseMade": 1664136114184,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 15,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -8201,7 +8201,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136114184,
             "promiseMade": 1664136131349,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -8258,7 +8258,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136009023,
             "promiseMade": 1664136032660,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -8315,7 +8315,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136032660,
             "promiseMade": 1664136037301,
-            "keeps": 3,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 3,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -8372,7 +8372,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136037301,
             "promiseMade": 1664136099783,
-            "keeps": 3,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 3,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -8427,7 +8427,7 @@ export const playedGame: IGameOptions = {
           "value": 6,
           "rank": "6",
         },
-        "totalPromise": 7,
+        "totalRePromise": null, "totalPromise": 7,
         "cardsPlayed": [
           [
             {
@@ -8862,7 +8862,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136496284,
             "promiseMade": 1664136505360,
-            "keeps": 3,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 3,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -8924,7 +8924,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136505360,
             "promiseMade": 1664136511421,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -8986,7 +8986,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136511421,
             "promiseMade": 1664136533875,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -9048,7 +9048,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136451011,
             "promiseMade": 1664136486246,
-            "keeps": 0,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": 15,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -9110,7 +9110,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136486246,
             "promiseMade": 1664136496284,
-            "keeps": 3,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 3,
             "points": 13,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -9170,7 +9170,7 @@ export const playedGame: IGameOptions = {
           "value": 3,
           "rank": "3",
         },
-        "totalPromise": 8,
+        "totalRePromise": null, "totalPromise": 8,
         "cardsPlayed": [
           [
             {
@@ -9657,7 +9657,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136784619,
             "promiseMade": 1664136788300,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -9724,7 +9724,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136788301,
             "promiseMade": 1664136798306,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 12,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -9791,7 +9791,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136798306,
             "promiseMade": 1664136803974,
-            "keeps": 1,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 1,
             "points": 11,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -9858,7 +9858,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136803981,
             "promiseMade": 1664136838884,
-            "keeps": 4,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 4,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -9925,7 +9925,7 @@ export const playedGame: IGameOptions = {
             "rePromiseBonus": null,
             "promiseStarted": 1664136727504,
             "promiseMade": 1664136784619,
-            "keeps": 2,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 2,
             "points": 0,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -9990,7 +9990,7 @@ export const playedGame: IGameOptions = {
           "value": 9,
           "rank": "9",
         },
-        "totalPromise": 10,
+        "totalRePromise": null, "totalPromise": 10,
         "cardsPlayed": [
           [
             {

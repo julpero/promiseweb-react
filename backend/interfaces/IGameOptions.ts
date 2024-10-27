@@ -121,6 +121,7 @@ export interface IRound {
   roundPlayers: IRoundPlayer[],
   trumpCard: ICard,
   totalPromise: number | null,
+  totalRePromise: number | null,
   cardsPlayed: ICardPlayed[][],
   roundStatus: ROUND_STATUS,
 }
@@ -137,6 +138,8 @@ export interface IRoundPlayer extends IPlayer {
   rePromise: PromiseValue | null,
   promiseStarted: number | null,
   promiseMade: number | null,
+  rePromiseStarted: number | null,
+  rePromiseMade: number | null,
   keeps: number,
   points: number | null,
   cardsToDebug: ICard[],
