@@ -1,4 +1,8 @@
-import { justStartedRePromiseGame, justStartedRePromiseGameLastPromiser, justStartedRePromiseGameLastPromiserPromised } from "./games/rePromiseGame";
+import { justStartedRePromiseGame,
+  justStartedRePromiseGameLastPromiser,
+  justStartedRePromiseGameLastPromiserPromised,
+  justStartedRePromiseGameLastPromiserJustPromised,
+} from "./games/rePromiseGame";
 
 import { getCurrentPlayIndex, getCurrentPromiseTotal, getCurrentRePromiseTotal, getCurrentRoundInd, getDealerNameForRound, getPromiser, isRoundsLastPromiser, isRoundsLastRePromiser } from "../backend/common/common";
 import { isRuleActive } from "../backend/common/model";
@@ -105,6 +109,33 @@ describe("last promiser in first promise round just promised in re-promise game"
 
   test("isRoundsLastRePromiser", () => {
     expect(isRoundsLastRePromiser(justStartedRePromiseGameLastPromiserPromised.game.rounds[0])).toBeFalsy();
+  });
+});
+
+describe("last promiser in first promise round last re-promise given in re-promise game", () => {
+  test("getRoundPhase", () => {
+    const roundPhase = getRoundPhase(justStartedRePromiseGameLastPromiserJustPromised.game.rounds[0], true);
+    expect(roundPhase).toBe(ROUND_PHASE.onPlay);
+  });
+
+  test("getCurrentPromiseTotal", () => {
+    expect(getCurrentPromiseTotal(justStartedRePromiseGameLastPromiserJustPromised.game.rounds[0])).toBe(5);
+  });
+
+  test("getCurrentRePromiseTotal", () => {
+    expect(getCurrentRePromiseTotal(justStartedRePromiseGameLastPromiserJustPromised.game.rounds[0])).toBe(4);
+  });
+
+  test("getPromiser", () => {
+    expect(getPromiser(justStartedRePromiseGameLastPromiserJustPromised.game.rounds[0], true)).toStrictEqual(null);
+  });
+
+  test("isRoundsLastPromiser", () => {
+    expect(isRoundsLastPromiser(justStartedRePromiseGameLastPromiserJustPromised.game.rounds[0])).toBeFalsy();
+  });
+
+  test("isRoundsLastRePromiser", () => {
+    expect(isRoundsLastRePromiser(justStartedRePromiseGameLastPromiserJustPromised.game.rounds[0])).toBeFalsy();
   });
 });
 
