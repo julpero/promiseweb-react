@@ -250,20 +250,40 @@ export const countRoundPoints = (roundPlayers: IRoundPlayer[], bigRound: boolean
   // TODO speed play points
   for (let i = 0; i < roundPlayers.length; i++) {
     const player = roundPlayers[i];
-    if (player.promise === player.keeps) {
-      if (player.promise === 0) {
+    const checkPromise = player.rePromise ?? player.promise;
+    if (checkPromise === player.keeps) {
+      if (checkPromise === 0) {
         player.points = bigRound ? 15 : 5;
       } else {
-        player.points = 10 + player.promise;
+        player.points = 10 + checkPromise;
       }
     } else {
       player.points = 0;
     }
   }
+
   const evenBreaker = roundPlayers.find(player => player.evenBreakingBonus === 0 && player.promise === player.keeps);
   if (evenBreaker && evenBreaker.points !== null) {
     const bonusPoints = roundPlayers.filter(player => player.promise !== player.keeps).length * 2;
     evenBreaker.evenBreakingBonus = bonusPoints;
     evenBreaker.points += bonusPoints;
   }
+
+  // re-promise changes for those players who changed original promise
+  const rePromiseKeepMultiplier = bigRound ? -3 : -1;
+  const rePromiseFailMultiplier = bigRound ? -1 : -2;
+  roundPlayers.filter(player => player.rePromise !== null && player.promise !== player.rePromise).forEach(player => {
+    if (player.points == null) player.points = 0;
+
+    let rePromiseBonus = 0;
+    if (player.keeps === player.rePromise) {
+      // player kept re-promise, slightly good
+      rePromiseBonus = rePromiseKeepMultiplier * Math.abs(player.rePromise - (player.promise ?? 0));
+    } else if (player.keeps === player.promise) {
+      // player kept original promise after re-promising something else -> not good
+      rePromiseBonus = rePromiseFailMultiplier * Math.abs(player.keeps - player.promise);
+    }
+    player.rePromiseBonus = rePromiseBonus;
+    player.points += rePromiseBonus;
+  });
 };
