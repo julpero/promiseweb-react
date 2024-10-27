@@ -38,6 +38,7 @@ export enum PLAY_CARD_RESPONSE {
 
 export enum PROMISE_RESPONSE {
   promiseOk,
+  rePromiseOk,
   evenPromiseNotAllowed,
   notMyTurn,
   noPromisePhase,

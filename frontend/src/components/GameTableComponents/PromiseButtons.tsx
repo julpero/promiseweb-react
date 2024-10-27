@@ -6,7 +6,7 @@ import { getCurrentRoundInfo } from "../../store/roundInfoSlice";
 
 import { useSocket } from "../../socket";
 import { Button } from "react-bootstrap";
-import { IuiMakePromiseRequest, IuiMakePromiseResponse, IuiRoundPlayer, PROMISE_RESPONSE } from "../../interfaces/IuiPlayingGame";
+import { IuiMakePromiseRequest, IuiMakePromiseResponse, IuiRoundPlayer, PROMISE_RESPONSE, ROUND_PHASE } from "../../interfaces/IuiPlayingGame";
 import { isRuleActive } from "../../common/commonFunctions";
 import { currentTotalPromise } from "../../common/playingGame";
 import { RULE } from "../../interfaces/IuiGameOptions";
@@ -17,9 +17,11 @@ const PromiseButtons = () => {
   const [clicked, setClicked] = useState(false);
   const currentGameInfo = useSelector(getCurrentGameInfo);
   const currentRoundInfo = useSelector(getCurrentRoundInfo);
+  const isRePromise = (isRuleActive(currentGameInfo.rules, RULE.rePromise) || isRuleActive(currentGameInfo.rules, RULE.hiddenRePromise)) && currentRoundInfo.roundToPlayer.roundPhase === ROUND_PHASE.onRePromises;
   const user = useSelector(getUser);
   const { gameId, roundInd } = currentRoundInfo;
-  const { cardsInRound, isMyPromiseTurn } = currentRoundInfo.roundToPlayer;
+  const { cardsInRound, isMyPromiseTurn, players } = currentRoundInfo.roundToPlayer;
+  console.log(currentRoundInfo.roundToPlayer);
 
   const dispatch = useDispatch();
 
@@ -37,8 +39,8 @@ const PromiseButtons = () => {
 
   const disableButton = (): number => {
     // this handles also hidden promise round rule because then total promise is negative
-    if (isRuleActive(currentGameInfo.rules, RULE.noEvenPromisesAllowed) && amILastPromiser(currentRoundInfo.roundToPlayer.players)) {
-      const totalPromise = currentTotalPromise(currentRoundInfo.roundToPlayer.players);
+    if (isRuleActive(currentGameInfo.rules, RULE.noEvenPromisesAllowed) && amILastPromiser(players)) {
+      const totalPromise = currentTotalPromise(players);
       return currentRoundInfo.roundToPlayer.cardsInRound - totalPromise;
     }
     return -1;
@@ -53,7 +55,7 @@ const PromiseButtons = () => {
     return {left: `${ind * 72}px`};
   };
 
-  const doPromise = (promise: number) => {
+  const doPromise = (promise: number, rePromise: boolean) => {
     if (user.isUserLoggedIn) {
       if (promise === disabledButton) return;
       setClicked(true);
@@ -80,16 +82,32 @@ const PromiseButtons = () => {
     }
   };
 
+  const originalPromise = (): number => {
+    return players.find(player => player.thisIsMe)?.promise ?? -1;
+  }
+
   const renderPromiseButtons = (): JSX.Element[] => {
     const buttons: JSX.Element[] = [];
     for (let i = 0; i <= cardsInRound; i++) {
-      buttons.push(
-        <div key={i} className="promiseButton" style={promiseButtonStyle(i)}>
-          <Button onClick={() => doPromise(i)} disabled={!isMyPromiseTurn || clicked || disabledButton === i}>
-            {i}
-          </Button>
-        </div>
-      );
+      if (isRePromise) {
+        const rePromiseButtonVariant = i === originalPromise() ? "success" : "info";
+        buttons.push(
+          <div key={i} className="promiseButton" style={promiseButtonStyle(i)}>
+            <Button variant={rePromiseButtonVariant} onClick={() => doPromise(i, true)} disabled={!isMyPromiseTurn || clicked || disabledButton === i}>
+              {i}
+            </Button>
+          </div>
+        );
+      } else {
+        buttons.push(
+          <div key={i} className="promiseButton" style={promiseButtonStyle(i)}>
+            <Button onClick={() => doPromise(i, false)} disabled={!isMyPromiseTurn || clicked || disabledButton === i}>
+              {i}
+            </Button>
+          </div>
+        );
+      }
+
     }
     for (let i = cardsInRound + 1; i <= 10; i++) {
       buttons.push(
