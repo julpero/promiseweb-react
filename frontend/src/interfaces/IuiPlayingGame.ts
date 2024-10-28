@@ -191,6 +191,7 @@ export interface IuiMakePromiseRequest extends IuiUserData {
   roundInd: number,
   promise: number,
   isSpeedPromise: boolean,
+  isRePromise: boolean,
 }
 
 export interface IuiMakePromiseResponse extends IuiAuth {

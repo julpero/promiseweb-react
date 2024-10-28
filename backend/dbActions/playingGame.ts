@@ -58,8 +58,8 @@ export const getGameWithPlayer = async (gameIdStr: string, playerName: string): 
   return gameInDb;
 };
 
-export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequest, isRePromise: boolean): Promise<IuiMakePromiseResponse> => {
-  const { gameId, userName, roundInd, promise } = makePromiseRequest;
+export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequest): Promise<IuiMakePromiseResponse> => {
+  const { gameId, userName, roundInd, promise, isRePromise } = makePromiseRequest;
   const promiseResponse: IuiMakePromiseResponse = {
     promiseResponse: PROMISE_RESPONSE.unknownError,
     promise: -1,

@@ -69,6 +69,7 @@ const PromiseButtons = () => {
         roundInd: roundInd,
         promise: promise,
         isSpeedPromise: false,
+        isRePromise: isRePromise,
       };
       socket.emit("make promise", promiseRequest, (promiseResponse: IuiMakePromiseResponse) => {
         // console.log("promiseResponse", promiseResponse);

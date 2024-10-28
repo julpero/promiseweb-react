@@ -292,8 +292,8 @@ const gameToGameInfo = (gameIdStr: string, gameInDb: IGameOptions): IuiGetGameIn
   } as IuiGetGameInfoResponse;
 };
 
-export const makePromise = async (makePromiseRequest: IuiMakePromiseRequest, isRePromise: boolean): Promise<IuiMakePromiseResponse> => {
-  const promiseResponse = await makePromiseToPlayer(makePromiseRequest, isRePromise);
+export const makePromise = async (makePromiseRequest: IuiMakePromiseRequest): Promise<IuiMakePromiseResponse> => {
+  const promiseResponse = await makePromiseToPlayer(makePromiseRequest);
   return promiseResponse;
 };
 
