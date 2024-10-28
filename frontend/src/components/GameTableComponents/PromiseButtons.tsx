@@ -34,7 +34,9 @@ const PromiseButtons = () => {
   if (!currentRoundInfo.gameId) return null;
 
   const amILastPromiser = (players: IuiRoundPlayer[]): boolean => {
-    return players.length - players.filter(player => player.promise !== null).length === 1;
+    return isRePromise
+      ? players.length - players.filter(player => player.rePromise !== null).length === 1
+      : players.length - players.filter(player => player.promise !== null).length === 1;
   };
 
   const disableButton = (): number => {
@@ -55,7 +57,7 @@ const PromiseButtons = () => {
     return {left: `${ind * 72}px`};
   };
 
-  const doPromise = (promise: number, rePromise: boolean) => {
+  const doPromise = (promise: number) => {
     if (user.isUserLoggedIn) {
       if (promise === disabledButton) return;
       setClicked(true);
@@ -89,26 +91,19 @@ const PromiseButtons = () => {
   const renderPromiseButtons = (): JSX.Element[] => {
     const buttons: JSX.Element[] = [];
     for (let i = 0; i <= cardsInRound; i++) {
-      if (isRePromise) {
-        const rePromiseButtonVariant = i === originalPromise() ? "success" : "info";
-        buttons.push(
-          <div key={i} className="promiseButton" style={promiseButtonStyle(i)}>
-            <Button variant={rePromiseButtonVariant} onClick={() => doPromise(i, true)} disabled={!isMyPromiseTurn || clicked || disabledButton === i}>
-              {i}
-            </Button>
-          </div>
-        );
-      } else {
-        buttons.push(
-          <div key={i} className="promiseButton" style={promiseButtonStyle(i)}>
-            <Button onClick={() => doPromise(i, false)} disabled={!isMyPromiseTurn || clicked || disabledButton === i}>
-              {i}
-            </Button>
-          </div>
-        );
-      }
+      const rePromiseButtonVariant = isRePromise
+        ? (i === originalPromise() ? "success" : "info")
+        : "primary";
 
+      buttons.push(
+        <div key={i} className="promiseButton" style={promiseButtonStyle(i)}>
+          <Button variant={rePromiseButtonVariant} onClick={() => doPromise(i)} disabled={!isMyPromiseTurn || clicked || disabledButton === i}>
+            {i}
+          </Button>
+        </div>
+      );
     }
+
     for (let i = cardsInRound + 1; i <= 10; i++) {
       buttons.push(
         <div key={i} className="promiseButton" style={promiseButtonStyle(i)}>

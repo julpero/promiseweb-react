@@ -121,6 +121,7 @@ export interface IuiRoundPlayer {
   dealer: boolean,
   name: string,
   promise: number | null,
+  rePromise: number | null,
   keeps: number,
   cardPlayed: IuiCard | null,
   speedPromisePoints: number | null,

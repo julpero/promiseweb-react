@@ -105,6 +105,7 @@ const getRoundPlayers = (name: string, round: IRound, playIndex: number, showPro
       dealer: round.dealerPositionIndex === idx,
       name: player.name,
       promise: showPromises || thisIsMe ? player.promise : (player.promise === null) ? null : -1,
+      rePromise: showPromises || thisIsMe ? player.rePromise : (player.rePromise === null) ? null : -1,
       evenBreakingBonus: showPromises || thisIsMe ? player.evenBreakingBonus : null,
       keeps: player.keeps,
       cardPlayed: getPlayerPlayedCard(player.name, round.cardsPlayed[playIndex], returnCard),
