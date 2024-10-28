@@ -31,6 +31,7 @@ describe("testing just created game methods", () => {
       name: "Vika",
       type: "human",
       index: 1,
+      rePromiser: false,
     } as IPromiser;
     expect(getPromiser(justStartedGame.game.rounds[0], false)).toStrictEqual(promiser);
   });
@@ -62,6 +63,7 @@ describe("last promiser", () => {
       name: "Eka",
       type: "human",
       index: 0,
+      rePromiser: false,
     } as IPromiser;
     expect(getPromiser(justStartedLastPromiser.game.rounds[0], false)).toStrictEqual(promiser);
   });

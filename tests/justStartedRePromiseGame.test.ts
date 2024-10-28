@@ -35,6 +35,7 @@ describe("testing just created re-promise game methods", () => {
       name: "Vika",
       type: "human",
       index: 1,
+      rePromiser: false,
     } as IPromiser;
     expect(getPromiser(justStartedRePromiseGame.game.rounds[0], true)).toStrictEqual(promiser);
   });
@@ -71,6 +72,7 @@ describe("last promiser in first promise round in re-promise game", () => {
       name: "Eka",
       type: "human",
       index: 0,
+      rePromiser: false,
     } as IPromiser;
     expect(getPromiser(justStartedRePromiseGameLastPromiser.game.rounds[0], true)).toStrictEqual(promiser);
   });
@@ -99,6 +101,7 @@ describe("last promiser in first promise round just promised in re-promise game"
       name: "Vika",
       type: "human",
       index: 1,
+      rePromiser: true,
     } as IPromiser;
     expect(getPromiser(justStartedRePromiseGameLastPromiserPromised.game.rounds[0], true)).toStrictEqual(promiser);
   });

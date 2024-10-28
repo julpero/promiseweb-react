@@ -80,6 +80,7 @@ export const getPromiser = (round: IRound, gameHasRePromiseRule: boolean): IProm
           name: roundPlayers[checkInd].name,
           type: roundPlayers[checkInd].type,
           index: checkInd,
+          rePromiser: false,
         } as IPromiser;
       }
     }
@@ -91,6 +92,7 @@ export const getPromiser = (round: IRound, gameHasRePromiseRule: boolean): IProm
           name: roundPlayers[checkInd].name,
           type: roundPlayers[checkInd].type,
           index: checkInd,
+          rePromiser: true,
         } as IPromiser;
       }
     }

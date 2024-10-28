@@ -162,4 +162,5 @@ export interface IPlayerInTurn extends IPlayer {
 
 export interface IPromiser extends IPlayer {
   index: number,
+  rePromiser: boolean,
 }
