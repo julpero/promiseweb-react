@@ -95,7 +95,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
     }
 
     const promiser: IPromiser | null = getPromiser(round, gameHasRePromiseRule);
-    if (!promiser) {
+    if (!promiser || promiser.rePromiser !== isRePromise) {
       console.warn("promising, possible not promising phase");
       return promiseResponse;
     }
