@@ -707,9 +707,10 @@ connectDB().then(() => {
           };
           io.to(gameId).emit("promise made", promiseNotification);
 
+          const promiseTimeToStr = (promiseTime/1000).toFixed(1);
           const chatLine = (promiseResponse.promise === -1)
-            ? `${promiser} promised in ${(promiseTime/1000).toFixed(1)} seconds`
-            : `${promiser} promised ${promise} in ${(promiseTime/1000).toFixed(1)} seconds`;
+            ? `${promiser} promised in ${promiseTimeToStr} seconds`
+            : `${promiser} promised ${promise} in ${promiseTimeToStr} seconds`;
           const chatObj: IuiChatNotification = {
             chatLine: chatLine,
             focusedPlayer: userName,
