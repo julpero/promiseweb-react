@@ -6,10 +6,7 @@ import { IuiOneGameData, IuiOnePlayerReportData, IuiOnePlayerReportRequest, IuiO
 import { useSocket } from "../socket";
 import { getUser } from "../store/userSlice";
 import OnePlayerStats from "./ReportComponents/OnePlayerStats";
-import parseISO from "date-fns/parseISO";
-import getYear from "date-fns/getYear";
-import isAfter from "date-fns/isAfter";
-import sub from "date-fns/sub";
+import { parseISO, getYear, isAfter, sub } from "date-fns";
 import { setSpinnerVisible } from "../store/spinnerSlice";
 import OnePlayerStatsPerPlayers from "./ReportComponents/OnePlayerStatsPerPlayers";
 import Form from "react-bootstrap/Form";

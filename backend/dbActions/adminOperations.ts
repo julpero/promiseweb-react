@@ -161,6 +161,7 @@ export const addUsedRules = async (): Promise<string[]> => {
   console.time("convertOldData addUsedRules");
   const retArr: string[] = [];
   const oldDb = mongoose.connection.db;
+  if (oldDb == undefined) return [];
 
   const rulesNotImported = await GameOptions.find({
     oldId: {$ne: null},
@@ -241,6 +242,7 @@ export const convertOldDataToNew = async (): Promise<string[]> => {
   console.log("convertedIds", convertedIds);
 
   const oldDb = mongoose.connection.db;
+  if (oldDb == undefined) return [];
   const gamesQuery = {
     "gameStatus": {$eq: GAME_STATUS.played},
     _id: {$nin: convertedIds},
