@@ -14,10 +14,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.1
 
       - name: Set up Node.js version
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6.1.0
         with:
           node-version: '20.x'
 
@@ -39,7 +39,7 @@ jobs:
         run: Compress-Archive -Update ./serverBuild/* release.zip
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v5.0.0
         with:
           name: node-app
           path: release.zip
@@ -53,7 +53,7 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v6.0.0
         with:
           name: node-app
 
@@ -61,7 +61,7 @@ jobs:
         run: unzip release.zip
 
       - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
+        uses: azure/webapps-deploy@v3.0.6
         id: deploy-to-webapp
         with:
           app-name: 'prw'
