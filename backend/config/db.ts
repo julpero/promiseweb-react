@@ -1,4 +1,3 @@
-import { ServerApiVersion } from "mongodb";
 import mongoose from "mongoose";
 import { ConnectionOptions } from "tls";
 
@@ -8,7 +7,6 @@ const connectDB = async () => {
     const connect = await mongoose.connect(process.env.MONGO_URI as string, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverApi: ServerApiVersion.v1,
     } as ConnectionOptions);
     console.log("Database is connected");
   } catch (error: unknown) {
