@@ -1,5 +1,5 @@
 import { IGameOptions } from "../../backend/interfaces/IGameOptions";
-export const firstRoundFirstPlayer: IGameOptions = {
+export const justStartedRePromiseGame: IGameOptions = {
   "humanPlayersCount": 3,
   "botPlayersCount": 0,
   "startRound": 6,
@@ -33,7 +33,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
   ],
   "createDateTime": new Date("2022-09-27T05:27:19.345+00:00"),
   "evenPromisesAllowed": false,
-  "visiblePromiseRound": false,
+  "visiblePromiseRound": true,
   "onlyTotalPromise": false,
   "freeTrump": true,
   "hiddenTrump": false,
@@ -44,7 +44,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
   "bonusNonEvenPromise": false,
-  "rePromise": false,
+  "rePromise": true,
   "hiddenRePromise": false,
   "game": {
     "playerOrder": [
@@ -102,11 +102,11 @@ export const firstRoundFirstPlayer: IGameOptions = {
                 "rank": "4",
               }
             ],
-            "promise": 1,
+            "promise": null,
             "rePromise": null,
             "rePromiseBonus": null,
-            "promiseStarted": 1664262214066,
-            "promiseMade": 1664262743053,
+            "promiseStarted": null,
+            "promiseMade": null,
             "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": null,
             "evenBreakingBonus": null,
@@ -180,11 +180,11 @@ export const firstRoundFirstPlayer: IGameOptions = {
                 "rank": "10",
               }
             ],
-            "promise": 2,
+            "promise": null,
             "rePromise": null,
             "rePromiseBonus": null,
-            "promiseStarted": 1664256450988,
-            "promiseMade": 1664262189283,
+            "promiseStarted": null,
+            "promiseMade": null,
             "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": null,
             "evenBreakingBonus": null,
@@ -258,11 +258,11 @@ export const firstRoundFirstPlayer: IGameOptions = {
                 "rank": "Q",
               }
             ],
-            "promise": 2,
+            "promise": null,
             "rePromise": null,
             "rePromiseBonus": null,
-            "promiseStarted": 1664262191683,
-            "promiseMade": 1664262211666,
+            "promiseStarted": null,
+            "promiseMade": null,
             "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": null,
             "evenBreakingBonus": null,
@@ -308,7 +308,7 @@ export const firstRoundFirstPlayer: IGameOptions = {
           "value": 14,
           "rank": "A",
         },
-        "totalRePromise": null, "totalPromise": 5,
+        "totalRePromise": null, "totalPromise": null,
         "cardsPlayed": [
           []
         ],
@@ -789,12 +789,12 @@ export const firstRoundFirstPlayer: IGameOptions = {
         "roundStatus": 0,
       }
     ],
-    "lastTimeStamp": 1664262743053,
+    "lastTimeStamp": 1664256448588,
   },
   "gameStarted": new Date("2022-09-27T05:27:28.588+00:00"),
 };
 
-export const firstRoundSecondPlayer: IGameOptions = {
+export const justStartedRePromiseGameLastPromiser: IGameOptions = {
   "humanPlayersCount": 3,
   "botPlayersCount": 0,
   "startRound": 6,
@@ -828,7 +828,7 @@ export const firstRoundSecondPlayer: IGameOptions = {
   ],
   "createDateTime": new Date("2022-09-27T05:27:19.345+00:00"),
   "evenPromisesAllowed": false,
-  "visiblePromiseRound": false,
+  "visiblePromiseRound": true,
   "onlyTotalPromise": false,
   "freeTrump": true,
   "hiddenTrump": false,
@@ -839,7 +839,7 @@ export const firstRoundSecondPlayer: IGameOptions = {
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
   "bonusNonEvenPromise": false,
-  "rePromise": false,
+  "rePromise": true,
   "hiddenRePromise": false,
   "game": {
     "playerOrder": [
@@ -897,11 +897,11 @@ export const firstRoundSecondPlayer: IGameOptions = {
                 "rank": "4",
               }
             ],
-            "promise": 1,
+            "promise": null,
             "rePromise": null,
             "rePromiseBonus": null,
-            "promiseStarted": 1664262214066,
-            "promiseMade": 1664262743053,
+            "promiseStarted": null,
+            "promiseMade": null,
             "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": null,
             "evenBreakingBonus": null,
@@ -953,6 +953,11 @@ export const firstRoundSecondPlayer: IGameOptions = {
                 "suite": "diamonds",
                 "value": 6,
                 "rank": "6",
+              },
+              {
+                "suite": "clubs",
+                "value": 2,
+                "rank": "2",
               },
               {
                 "suite": "clubs",
@@ -1098,20 +1103,9 @@ export const firstRoundSecondPlayer: IGameOptions = {
           "value": 14,
           "rank": "A",
         },
-        "totalRePromise": null, "totalPromise": 5,
+        "totalRePromise": null, "totalPromise": 4,
         "cardsPlayed": [
-          [
-            {
-              "name": "Vika",
-              "card": {
-                "suite": "clubs",
-                "value": 2,
-                "rank": "2",
-              },
-              "playedTime": 1664264442688,
-              "playStarted": 1664262743053,
-            }
-          ]
+          []
         ],
         "roundStatus": 1,
       },
@@ -1590,147 +1584,12 @@ export const firstRoundSecondPlayer: IGameOptions = {
         "roundStatus": 0,
       }
     ],
-    "lastTimeStamp": 1664264442688,
+    "lastTimeStamp": 1664262211666,
   },
   "gameStarted": new Date("2022-09-27T05:27:28.588+00:00"),
-  "gameStatistics": {
-    "generated": 1664264442694,
-    "playersStatistics": [
-      {
-        "playerName": "Eka",
-        "totalPoints": 0,
-        "totalKeeps": 0,
-        "bigPointsByZero": 0,
-        "bigZeroKeepPromisesCount": 0,
-        "bigZeroFailPromisesCount": 0,
-        "smallPointsNotZero": 0,
-        "smallNotZeroKeepPromisesCount": 0,
-        "smallNotZeroFailPromisesCount": 0,
-        "totalPointsBig": 0,
-        "totalPointsSmall": 0,
-        "totalKeepsBig": 0,
-        "totalKeepsSmall": 0,
-        "pointsPerKeeps": 0,
-        "position": 1,
-        "scorePoints": 0.6666666666666666,
-        "trumpsInGame": 5,
-        "bigsCardsInGame": 5,
-        "smallCardsInGame": 3,
-        "otherCardsInGame": 4,
-        "playTime": 0,
-        "promiseTime": 528987,
-        "pointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "evenBreakingPointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "cumulativePointsPerRound": [
-          0,
-          0,
-          0
-        ],
-      },
-      {
-        "playerName": "Toka",
-        "totalPoints": 0,
-        "totalKeeps": 0,
-        "bigPointsByZero": 0,
-        "bigZeroKeepPromisesCount": 0,
-        "bigZeroFailPromisesCount": 0,
-        "smallPointsNotZero": 0,
-        "smallNotZeroKeepPromisesCount": 0,
-        "smallNotZeroFailPromisesCount": 0,
-        "totalPointsBig": 0,
-        "totalPointsSmall": 0,
-        "totalKeepsBig": 0,
-        "totalKeepsSmall": 0,
-        "pointsPerKeeps": 0,
-        "position": 2,
-        "scorePoints": 0.3333333333333333,
-        "trumpsInGame": 3,
-        "bigsCardsInGame": 3,
-        "smallCardsInGame": 3,
-        "otherCardsInGame": 8,
-        "playTime": 0,
-        "promiseTime": 19983,
-        "pointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "evenBreakingPointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "cumulativePointsPerRound": [
-          0,
-          0,
-          0
-        ],
-      },
-      {
-        "playerName": "Vika",
-        "totalPoints": 0,
-        "totalKeeps": 0,
-        "bigPointsByZero": 0,
-        "bigZeroKeepPromisesCount": 0,
-        "bigZeroFailPromisesCount": 0,
-        "smallPointsNotZero": 0,
-        "smallNotZeroKeepPromisesCount": 0,
-        "smallNotZeroFailPromisesCount": 0,
-        "totalPointsBig": 0,
-        "totalPointsSmall": 0,
-        "totalKeepsBig": 0,
-        "totalKeepsSmall": 0,
-        "pointsPerKeeps": 0,
-        "position": 3,
-        "scorePoints": 0,
-        "trumpsInGame": 7,
-        "bigsCardsInGame": 2,
-        "smallCardsInGame": 5,
-        "otherCardsInGame": 3,
-        "playTime": 1699635,
-        "promiseTime": 5738295,
-        "pointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "evenBreakingPointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "cumulativePointsPerRound": [
-          0,
-          0,
-          0
-        ],
-      }
-    ],
-    "winnerName": "",
-    "winnerPoints": 0,
-    "roundsPlayed": 0,
-    "bigRoundsPlayed": 0,
-    "smallRoundsPlayed": 0,
-    "cardsHit": 1,
-    "spurtAndMelt": {
-      "spurtGap": null,
-      "spurtFrom": null,
-      "meltGap": null,
-      "meltFrom": null,
-      "melter": null,
-    },
-  }
 };
 
-export const firstRoundSecondHitFirstPlayer: IGameOptions = {
+export const justStartedRePromiseGameLastPromiserPromised: IGameOptions = {
   "humanPlayersCount": 3,
   "botPlayersCount": 0,
   "startRound": 6,
@@ -1764,7 +1623,7 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
   ],
   "createDateTime": new Date("2022-09-27T05:27:19.345+00:00"),
   "evenPromisesAllowed": false,
-  "visiblePromiseRound": false,
+  "visiblePromiseRound": true,
   "onlyTotalPromise": false,
   "freeTrump": true,
   "hiddenTrump": false,
@@ -1775,7 +1634,7 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
   "bonusNonEvenPromise": false,
-  "rePromise": false,
+  "rePromise": true,
   "hiddenRePromise": false,
   "game": {
     "playerOrder": [
@@ -1814,6 +1673,11 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
               },
               {
                 "suite": "clubs",
+                "value": 8,
+                "rank": "8",
+              },
+              {
+                "suite": "clubs",
                 "value": 11,
                 "rank": "J",
               },
@@ -1831,8 +1695,8 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
             "promise": 1,
             "rePromise": null,
             "rePromiseBonus": null,
-            "promiseStarted": 1664262214066,
-            "promiseMade": 1664262743053,
+            "promiseStarted": null,
+            "promiseMade": null,
             "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": null,
             "evenBreakingBonus": null,
@@ -1884,6 +1748,11 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
                 "suite": "diamonds",
                 "value": 6,
                 "rank": "6",
+              },
+              {
+                "suite": "clubs",
+                "value": 2,
+                "rank": "2",
               },
               {
                 "suite": "clubs",
@@ -1973,6 +1842,11 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
                 "value": 9,
                 "rank": "9",
               },
+              {
+                "suite": "clubs",
+                "value": 12,
+                "rank": "Q",
+              }
             ],
             "promise": 2,
             "rePromise": null,
@@ -2024,41 +1898,9 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
           "value": 14,
           "rank": "A",
         },
-        "totalRePromise": null, "totalPromise": 5,
+        "totalRePromise": null, "totalPromise": 4,
         "cardsPlayed": [
-          [
-            {
-              "name": "Vika",
-              "card": {
-                "suite": "clubs",
-                "value": 2,
-                "rank": "2",
-              },
-              "playedTime": 1664264442688,
-              "playStarted": 1664262743053,
-            },
-            {
-              "name": "Toka",
-              "card": {
-                "suite": "clubs",
-                "value": 12,
-                "rank": "Q",
-              },
-              "playedTime": 1664265290453,
-              "playStarted": 1664264443788,
-            },
-            {
-              "name": "Eka",
-              "card": {
-                "suite": "clubs",
-                "value": 8,
-                "rank": "8",
-              },
-              "playedTime": 1664265306102,
-              "playStarted": 1664265291553,
-            },
-          ],
-          [],
+          []
         ],
         "roundStatus": 1,
       },
@@ -2537,147 +2379,12 @@ export const firstRoundSecondHitFirstPlayer: IGameOptions = {
         "roundStatus": 0,
       }
     ],
-    "lastTimeStamp": 1664265306102,
+    "lastTimeStamp": 1664262211666,
   },
   "gameStarted": new Date("2022-09-27T05:27:28.588+00:00"),
-  "gameStatistics": {
-    "generated": 1664265306105,
-    "playersStatistics": [
-      {
-        "playerName": "Eka",
-        "totalPoints": 0,
-        "totalKeeps": 0,
-        "bigPointsByZero": 0,
-        "bigZeroKeepPromisesCount": 0,
-        "bigZeroFailPromisesCount": 0,
-        "smallPointsNotZero": 0,
-        "smallNotZeroKeepPromisesCount": 0,
-        "smallNotZeroFailPromisesCount": 0,
-        "totalPointsBig": 0,
-        "totalPointsSmall": 0,
-        "totalKeepsBig": 0,
-        "totalKeepsSmall": 0,
-        "pointsPerKeeps": 0,
-        "position": 1,
-        "scorePoints": 0.6666666666666666,
-        "trumpsInGame": 5,
-        "bigsCardsInGame": 5,
-        "smallCardsInGame": 3,
-        "otherCardsInGame": 4,
-        "playTime": 14549,
-        "promiseTime": 528987,
-        "pointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "evenBreakingPointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "cumulativePointsPerRound": [
-          0,
-          0,
-          0
-        ],
-      },
-      {
-        "playerName": "Toka",
-        "totalPoints": 0,
-        "totalKeeps": 0,
-        "bigPointsByZero": 0,
-        "bigZeroKeepPromisesCount": 0,
-        "bigZeroFailPromisesCount": 0,
-        "smallPointsNotZero": 0,
-        "smallNotZeroKeepPromisesCount": 0,
-        "smallNotZeroFailPromisesCount": 0,
-        "totalPointsBig": 0,
-        "totalPointsSmall": 0,
-        "totalKeepsBig": 0,
-        "totalKeepsSmall": 0,
-        "pointsPerKeeps": 0,
-        "position": 2,
-        "scorePoints": 0.3333333333333333,
-        "trumpsInGame": 3,
-        "bigsCardsInGame": 3,
-        "smallCardsInGame": 3,
-        "otherCardsInGame": 8,
-        "playTime": 846665,
-        "promiseTime": 19983,
-        "pointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "evenBreakingPointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "cumulativePointsPerRound": [
-          0,
-          0,
-          0
-        ],
-      },
-      {
-        "playerName": "Vika",
-        "totalPoints": 0,
-        "totalKeeps": 0,
-        "bigPointsByZero": 0,
-        "bigZeroKeepPromisesCount": 0,
-        "bigZeroFailPromisesCount": 0,
-        "smallPointsNotZero": 0,
-        "smallNotZeroKeepPromisesCount": 0,
-        "smallNotZeroFailPromisesCount": 0,
-        "totalPointsBig": 0,
-        "totalPointsSmall": 0,
-        "totalKeepsBig": 0,
-        "totalKeepsSmall": 0,
-        "pointsPerKeeps": 0,
-        "position": 3,
-        "scorePoints": 0,
-        "trumpsInGame": 7,
-        "bigsCardsInGame": 2,
-        "smallCardsInGame": 5,
-        "otherCardsInGame": 3,
-        "playTime": 1699635,
-        "promiseTime": 5738295,
-        "pointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "evenBreakingPointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "cumulativePointsPerRound": [
-          0,
-          0,
-          0
-        ],
-      }
-    ],
-    "winnerName": "",
-    "winnerPoints": 0,
-    "roundsPlayed": 0,
-    "bigRoundsPlayed": 0,
-    "smallRoundsPlayed": 0,
-    "cardsHit": 3,
-    "spurtAndMelt": {
-      "spurtGap": null,
-      "spurtFrom": null,
-      "meltGap": null,
-      "meltFrom": null,
-      "melter": null,
-    },
-  }
 };
 
-export const firstRoundThirdHitSecondPlayer: IGameOptions = {
+export const justStartedRePromiseGameLastPromiserJustPromised: IGameOptions = {
   "humanPlayersCount": 3,
   "botPlayersCount": 0,
   "startRound": 6,
@@ -2711,7 +2418,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
   ],
   "createDateTime": new Date("2022-09-27T05:27:19.345+00:00"),
   "evenPromisesAllowed": false,
-  "visiblePromiseRound": false,
+  "visiblePromiseRound": true,
   "onlyTotalPromise": false,
   "freeTrump": true,
   "hiddenTrump": false,
@@ -2722,7 +2429,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
   "thisIsDemoGame": true,
   "hiddenCardsMode": 0,
   "bonusNonEvenPromise": false,
-  "rePromise": false,
+  "rePromise": true,
   "hiddenRePromise": false,
   "game": {
     "playerOrder": [
@@ -2755,6 +2462,16 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
                 "rank": "9",
               },
               {
+                "suite": "diamonds",
+                "value": 11,
+                "rank": "J",
+              },
+              {
+                "suite": "clubs",
+                "value": 8,
+                "rank": "8",
+              },
+              {
                 "suite": "clubs",
                 "value": 11,
                 "rank": "J",
@@ -2764,15 +2481,18 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
                 "value": 3,
                 "rank": "3",
               },
+              {
+                "suite": "spades",
+                "value": 4,
+                "rank": "4",
+              }
             ],
             "promise": 1,
-            "rePromise": null,
+            "rePromise": 3,
             "rePromiseBonus": null,
-            "promiseStarted": 1664262214066,
-            "promiseMade": 1664262743053,
-            "rePromiseStarted": null,
-            "rePromiseMade": null,
-            "keeps": 1,
+            "promiseStarted": null,
+            "promiseMade": null,
+            "rePromiseStarted": null, "rePromiseMade": null, "keeps": 0,
             "points": null,
             "evenBreakingBonus": null,
             "cardsToDebug": [
@@ -2820,6 +2540,16 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
                 "rank": "3",
               },
               {
+                "suite": "diamonds",
+                "value": 6,
+                "rank": "6",
+              },
+              {
+                "suite": "clubs",
+                "value": 2,
+                "rank": "2",
+              },
+              {
                 "suite": "clubs",
                 "value": 6,
                 "rank": "6",
@@ -2836,7 +2566,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
               }
             ],
             "promise": 2,
-            "rePromise": null,
+            "rePromise": 1,
             "rePromiseBonus": null,
             "promiseStarted": 1664256450988,
             "promiseMade": 1664262189283,
@@ -2902,9 +2632,19 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
                 "value": 2,
                 "rank": "2",
               },
+              {
+                "suite": "diamonds",
+                "value": 9,
+                "rank": "9",
+              },
+              {
+                "suite": "clubs",
+                "value": 12,
+                "rank": "Q",
+              }
             ],
             "promise": 2,
-            "rePromise": null,
+            "rePromise": 0,
             "rePromiseBonus": null,
             "promiseStarted": 1664262191683,
             "promiseMade": 1664262211666,
@@ -2953,84 +2693,9 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
           "value": 14,
           "rank": "A",
         },
-        "totalRePromise": null, "totalPromise": 5,
+        "totalRePromise": null, "totalPromise": 4,
         "cardsPlayed": [
-          [
-            {
-              "name": "Vika",
-              "card": {
-                "suite": "clubs",
-                "value": 2,
-                "rank": "2",
-              },
-              "playedTime": 1664264442688,
-              "playStarted": 1664262743053,
-            },
-            {
-              "name": "Toka",
-              "card": {
-                "suite": "clubs",
-                "value": 12,
-                "rank": "Q",
-              },
-              "playedTime": 1664265290453,
-              "playStarted": 1664264443788,
-            },
-            {
-              "name": "Eka",
-              "card": {
-                "suite": "clubs",
-                "value": 8,
-                "rank": "8",
-              },
-              "playedTime": 1664265306102,
-              "playStarted": 1664265291553,
-            },
-          ],
-          [
-            {
-              "name": "Toka",
-              "card": {
-                "suite": "diamonds",
-                "value": 9,
-                "rank": "9",
-              },
-              "playedTime": 1664268554678,
-              "playStarted": 1664265308502,
-            },
-            {
-              "name": "Eka",
-              "card": {
-                "suite": "diamonds",
-                "value": 11,
-                "rank": "J",
-              },
-              "playedTime": 1664268557156,
-              "playStarted": 1664268555778,
-            },
-            {
-              "name": "Vika",
-              "card": {
-                "suite": "diamonds",
-                "value": 6,
-                "rank": "6",
-              },
-              "playedTime": 1664268559777,
-              "playStarted": 1664268558256,
-            },
-          ],
-          [
-            {
-              "name": "Eka",
-              "card": {
-                "suite": "spades",
-                "value": 4,
-                "rank": "4",
-              },
-              "playedTime": 1664268569561,
-              "playStarted": 1664268562177,
-            },
-          ],
+          []
         ],
         "roundStatus": 1,
       },
@@ -3509,142 +3174,7 @@ export const firstRoundThirdHitSecondPlayer: IGameOptions = {
         "roundStatus": 0,
       }
     ],
-    "lastTimeStamp": 1664268569561,
+    "lastTimeStamp": 1664262211666,
   },
   "gameStarted": new Date("2022-09-27T05:27:28.588+00:00"),
-  "gameStatistics": {
-    "generated": 1664268569563,
-    "playersStatistics": [
-      {
-        "playerName": "Eka",
-        "totalPoints": 0,
-        "totalKeeps": 1,
-        "bigPointsByZero": 0,
-        "bigZeroKeepPromisesCount": 0,
-        "bigZeroFailPromisesCount": 0,
-        "smallPointsNotZero": 0,
-        "smallNotZeroKeepPromisesCount": 0,
-        "smallNotZeroFailPromisesCount": 0,
-        "totalPointsBig": 0,
-        "totalPointsSmall": 0,
-        "totalKeepsBig": 1,
-        "totalKeepsSmall": 0,
-        "pointsPerKeeps": 0,
-        "position": 1,
-        "scorePoints": 0.6666666666666666,
-        "trumpsInGame": 5,
-        "bigsCardsInGame": 5,
-        "smallCardsInGame": 3,
-        "otherCardsInGame": 4,
-        "playTime": 23311,
-        "promiseTime": 528987,
-        "pointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "evenBreakingPointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "cumulativePointsPerRound": [
-          0,
-          0,
-          0
-        ],
-      },
-      {
-        "playerName": "Vika",
-        "totalPoints": 0,
-        "totalKeeps": 0,
-        "bigPointsByZero": 0,
-        "bigZeroKeepPromisesCount": 0,
-        "bigZeroFailPromisesCount": 0,
-        "smallPointsNotZero": 0,
-        "smallNotZeroKeepPromisesCount": 0,
-        "smallNotZeroFailPromisesCount": 0,
-        "totalPointsBig": 0,
-        "totalPointsSmall": 0,
-        "totalKeepsBig": 0,
-        "totalKeepsSmall": 0,
-        "pointsPerKeeps": 0,
-        "position": 2,
-        "scorePoints": 0.3333333333333333,
-        "trumpsInGame": 7,
-        "bigsCardsInGame": 2,
-        "smallCardsInGame": 5,
-        "otherCardsInGame": 3,
-        "playTime": 1701156,
-        "promiseTime": 5738295,
-        "pointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "evenBreakingPointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "cumulativePointsPerRound": [
-          0,
-          0,
-          0
-        ],
-      },
-      {
-        "playerName": "Toka",
-        "totalPoints": 0,
-        "totalKeeps": 0,
-        "bigPointsByZero": 0,
-        "bigZeroKeepPromisesCount": 0,
-        "bigZeroFailPromisesCount": 0,
-        "smallPointsNotZero": 0,
-        "smallNotZeroKeepPromisesCount": 0,
-        "smallNotZeroFailPromisesCount": 0,
-        "totalPointsBig": 0,
-        "totalPointsSmall": 0,
-        "totalKeepsBig": 0,
-        "totalKeepsSmall": 0,
-        "pointsPerKeeps": 0,
-        "position": 3,
-        "scorePoints": 0,
-        "trumpsInGame": 3,
-        "bigsCardsInGame": 3,
-        "smallCardsInGame": 3,
-        "otherCardsInGame": 8,
-        "playTime": 4092841,
-        "promiseTime": 19983,
-        "pointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "evenBreakingPointsPerRound": [
-          0,
-          0,
-          0
-        ],
-        "cumulativePointsPerRound": [
-          0,
-          0,
-          0
-        ],
-      }
-    ],
-    "winnerName": "",
-    "winnerPoints": 0,
-    "roundsPlayed": 0,
-    "bigRoundsPlayed": 0,
-    "smallRoundsPlayed": 0,
-    "cardsHit": 7,
-    "spurtAndMelt": {
-      "spurtGap": null,
-      "spurtFrom": null,
-      "meltGap": null,
-      "meltFrom": null,
-      "melter": null,
-    },
-  }
 };

@@ -69,10 +69,10 @@ export const getPlayerInTurn = (round: IRound): IPlayerInTurn | null => {
   return null;
 };
 
-export const getPromiser = (round: IRound): IPromiser | null => {
+export const getPromiser = (round: IRound, gameHasRePromiseRule: boolean): IPromiser | null => {
   const {roundPlayers, starterPositionIndex} = round;
+  const playerCount = roundPlayers.length;
   if (roundPlayers.some(player => player.promise === null)) {
-    const playerCount = roundPlayers.length;
     for (let i = starterPositionIndex; i < starterPositionIndex + playerCount; i++) {
       const checkInd = i >= playerCount ? i - playerCount : i;
       if (roundPlayers[checkInd].promise === null) {
@@ -80,6 +80,19 @@ export const getPromiser = (round: IRound): IPromiser | null => {
           name: roundPlayers[checkInd].name,
           type: roundPlayers[checkInd].type,
           index: checkInd,
+          rePromiser: false,
+        } as IPromiser;
+      }
+    }
+  } else if (gameHasRePromiseRule && roundPlayers.some(player => player.rePromise === null)) {
+    for (let i = starterPositionIndex; i < starterPositionIndex + playerCount; i++) {
+      const checkInd = i >= playerCount ? i - playerCount : i;
+      if (roundPlayers[checkInd].rePromise === null) {
+        return {
+          name: roundPlayers[checkInd].name,
+          type: roundPlayers[checkInd].type,
+          index: checkInd,
+          rePromiser: true,
         } as IPromiser;
       }
     }
@@ -91,10 +104,20 @@ export const isRoundsLastPromiser = (round: IRound): boolean => {
   return round.roundPlayers.length - round.roundPlayers.filter(player => player.promise !== null).length === 1;
 };
 
+export const isRoundsLastRePromiser = (round: IRound): boolean => {
+  return round.roundPlayers.length - round.roundPlayers.filter(player => player.rePromise !== null).length === 1;
+};
+
 export const getCurrentPromiseTotal = (round: IRound): number => {
   let totalPromise = 0;
   round.roundPlayers.map(player => totalPromise+=(player.promise ?? 0));
   return totalPromise;
+};
+
+export const getCurrentRePromiseTotal = (round: IRound): number => {
+  let totalRePromise = 0;
+  round.roundPlayers.map(player => totalRePromise+=(player.rePromise ?? 0));
+  return totalRePromise;
 };
 
 export const getCurrentPlayIndex = (round: IRound): number => {
@@ -229,20 +252,40 @@ export const countRoundPoints = (roundPlayers: IRoundPlayer[], bigRound: boolean
   // TODO speed play points
   for (let i = 0; i < roundPlayers.length; i++) {
     const player = roundPlayers[i];
-    if (player.promise === player.keeps) {
-      if (player.promise === 0) {
+    const checkPromise = player.rePromise ?? player.promise;
+    if (checkPromise === player.keeps) {
+      if (checkPromise === 0) {
         player.points = bigRound ? 15 : 5;
       } else {
-        player.points = 10 + player.promise;
+        player.points = 10 + checkPromise;
       }
     } else {
       player.points = 0;
     }
   }
+
   const evenBreaker = roundPlayers.find(player => player.evenBreakingBonus === 0 && player.promise === player.keeps);
   if (evenBreaker && evenBreaker.points !== null) {
     const bonusPoints = roundPlayers.filter(player => player.promise !== player.keeps).length * 2;
     evenBreaker.evenBreakingBonus = bonusPoints;
     evenBreaker.points += bonusPoints;
   }
+
+  // re-promise changes for those players who changed original promise
+  const rePromiseKeepMultiplier = bigRound ? -3 : -1;
+  const rePromiseFailMultiplier = bigRound ? -1 : -2;
+  roundPlayers.filter(player => player.rePromise !== null && player.promise !== player.rePromise).forEach(player => {
+    if (player.points == null) player.points = 0;
+
+    let rePromiseBonus = 0;
+    if (player.keeps === player.rePromise) {
+      // player kept re-promise, slightly good
+      rePromiseBonus = rePromiseKeepMultiplier * Math.abs(player.rePromise - (player.promise ?? 0));
+    } else if (player.keeps === player.promise) {
+      // player kept original promise after re-promising something else -> not good
+      rePromiseBonus = rePromiseFailMultiplier * Math.abs(player.keeps - player.promise);
+    }
+    player.rePromiseBonus = rePromiseBonus;
+    player.points += rePromiseBonus;
+  });
 };

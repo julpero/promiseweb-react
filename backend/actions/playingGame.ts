@@ -105,6 +105,7 @@ const getRoundPlayers = (name: string, round: IRound, playIndex: number, showPro
       dealer: round.dealerPositionIndex === idx,
       name: player.name,
       promise: showPromises || thisIsMe ? player.promise : (player.promise === null) ? null : -1,
+      rePromise: showPromises || thisIsMe ? player.rePromise : (player.rePromise === null) ? null : -1,
       evenBreakingBonus: showPromises || thisIsMe ? player.evenBreakingBonus : null,
       keeps: player.keeps,
       cardPlayed: getPlayerPlayedCard(player.name, round.cardsPlayed[playIndex], returnCard),
@@ -118,7 +119,8 @@ const getRoundPlayers = (name: string, round: IRound, playIndex: number, showPro
 };
 
 const showPlayerPromisesInRound = (round: IRound, hiddenPromiseRoundRule: boolean, onlyTotalPromiseRule: boolean): boolean => {
-  switch (getRoundPhase(round)) {
+  // in this context we do not have re-promise
+  switch (getRoundPhase(round, false)) {
     case ROUND_PHASE.initial: return false;
     case ROUND_PHASE.onPromises: return !hiddenPromiseRoundRule && !onlyTotalPromiseRule;
     case ROUND_PHASE.onPlay: return !onlyTotalPromiseRule;
@@ -153,7 +155,8 @@ const getPromisesByPlayers = (gameInDb: IGameOptions): IuiPlayerPromise[][] => {
 };
 
 const showTotalPromisesInRound = (round: IRound, hiddenPromiseRoundRule: boolean, onlyTotalPromiseRule: boolean): boolean => {
-  switch (getRoundPhase(round)) {
+  // in this context we do not have re-promise
+  switch (getRoundPhase(round, false)) {
     case ROUND_PHASE.initial: return false;
     case ROUND_PHASE.onPromises: return !hiddenPromiseRoundRule && !onlyTotalPromiseRule;
     case ROUND_PHASE.onPlay: return true;
@@ -179,8 +182,8 @@ const getPromiseTable = (gameInDb: IGameOptions): IuiPromiseTable => {
   } as IuiPromiseTable;
 };
 
-const isMyPromiseTurn = (name: string, round: IRound, originalPlayerName?: string): boolean => {
-  const promiser = getPromiser(round);
+const isMyPromiseTurn = (name: string, round: IRound, gameHasRePromiseRule: boolean, originalPlayerName?: string): boolean => {
+  const promiser = getPromiser(round, gameHasRePromiseRule);
   if (promiser) {
     return promiser.name === name || promiser.name === originalPlayerName;
   } else {
@@ -188,11 +191,16 @@ const isMyPromiseTurn = (name: string, round: IRound, originalPlayerName?: strin
   }
 };
 
-export const getRoundPhase = (round: IRound): ROUND_PHASE => {
+export const getRoundPhase = (round: IRound, rePromiseIsInUse: boolean): ROUND_PHASE => {
   const cardsInRound = round.cardsInRound;
   const playerCount = round.roundPlayers.length;
   if (round.cardsPlayed.filter(play => play.length === playerCount).length === cardsInRound) return ROUND_PHASE.played;
-  if (round.roundPlayers.filter(player => player.promise !== null).length === playerCount) return ROUND_PHASE.onPlay;
+  if (rePromiseIsInUse) {
+    if (round.roundPlayers.filter(player => player.promise !== null && player.rePromise !== null).length === playerCount) return ROUND_PHASE.onPlay;
+    if (round.roundPlayers.filter(player => player.promise !== null).length === playerCount && round.roundPlayers.filter(player => player.rePromise !== null).length !== playerCount) return ROUND_PHASE.onRePromises;
+  } else {
+    if (round.roundPlayers.filter(player => player.promise !== null).length === playerCount) return ROUND_PHASE.onPlay;
+  }
   if (round.roundPlayers.filter(player => player.promise !== null).length !== playerCount) return ROUND_PHASE.onPromises;
   return ROUND_PHASE.initial;
 };
@@ -226,7 +234,8 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, o
   const playerInCharge = gameIsPlayed ? "" : starterOfThisPlay(round, playIndex);
   const cardInCharge = getCurrentCardInCharge(round.cardsPlayed);
   const myPlayedCard = round.cardsPlayed[playIndex].find(playedCard => playedCard.name === name || playedCard.name === originalPlayerName)?.card;
-  const roundPhase = getRoundPhase(round);
+  const gameHasRePromiseRule = isRuleActive(gameInDb, RULE.rePromise) || isRuleActive(gameInDb, RULE.hiddenRePromise);
+  const roundPhase = getRoundPhase(round, gameHasRePromiseRule);
   const hiddenPromiseRoundRule = isRuleActive(gameInDb, RULE.hiddenPromiseRound);
   const onlyTotalPromiseRule = isRuleActive(gameInDb, RULE.onlyTotalPromise);
 
@@ -237,7 +246,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, o
     myCards: myCards, // TODO speed promise
     playableCards: isNowMyTurn ? getPlayableCardIndexes(myCards, round, playIndex, isRuleActive(gameInDb, RULE.mustPlayTrump)) : [],
     players: getRoundPlayers(name, round, playIndex, showPlayerPromisesInRound(round, hiddenPromiseRoundRule, onlyTotalPromiseRule), originalPlayerName),
-    trumpCard: isRuleActive(gameInDb, RULE.hiddenTrump) && roundPhase === ROUND_PHASE.onPromises ? null : ICardToIuiCard(round.trumpCard),
+    trumpCard: isRuleActive(gameInDb, RULE.hiddenTrump) && (roundPhase === ROUND_PHASE.onPromises || roundPhase === ROUND_PHASE.onRePromises) ? null : ICardToIuiCard(round.trumpCard),
     myPlayedCard: myPlayedCard ? ICardToIuiCard(myPlayedCard) : null,
     playerInCharge: playerInCharge,
     cardInCharge: cardInCharge ? ICardToIuiCard(cardInCharge) : null, // TODO hidden cards
@@ -246,7 +255,7 @@ const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, o
     gameOver: gameInDb.gameStatus === GAME_STATUS.played,
     whoseTurn: playerInTurn?.name ?? "",
     isMyTurn: isNowMyTurn,
-    isMyPromiseTurn: isMyPromiseTurn(name, round, originalPlayerName),
+    isMyPromiseTurn: isMyPromiseTurn(name, round, gameHasRePromiseRule, originalPlayerName),
     handValues: getHandValues(round, roundPhase, isRuleActive(gameInDb, RULE.opponentPromiseCardValue), isRuleActive(gameInDb, RULE.opponentGameCardValue)),
     obsGame: null, // TODO obsGameToRoundObj
     promiseTable: getPromiseTable(gameInDb),

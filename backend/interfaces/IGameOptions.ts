@@ -27,6 +27,8 @@ export interface IGameOptions {
   opponentGameCardValue: boolean,
   bonusNonEvenPromise: boolean,
   thisIsDemoGame: boolean,
+  rePromise: boolean,
+  hiddenRePromise: boolean,
   hiddenCardsMode: HIDDEN_CARDS_MODE,
   game: IGame,
   gameStarted: Date,
@@ -119,6 +121,7 @@ export interface IRound {
   roundPlayers: IRoundPlayer[],
   trumpCard: ICard,
   totalPromise: number | null,
+  totalRePromise: number | null,
   cardsPlayed: ICardPlayed[][],
   roundStatus: ROUND_STATUS,
 }
@@ -132,14 +135,18 @@ export interface ICard {
 export interface IRoundPlayer extends IPlayer {
   cards: ICard[],
   promise: PromiseValue | null,
+  rePromise: PromiseValue | null,
   promiseStarted: number | null,
   promiseMade: number | null,
+  rePromiseStarted: number | null,
+  rePromiseMade: number | null,
   keeps: number,
   points: number | null,
   cardsToDebug: ICard[],
   speedPromisePoints: number | null,
   speedPromiseTotal: number | null,
   evenBreakingBonus: number | null,
+  rePromiseBonus: number | null,
 }
 
 export interface ICardPlayed {
@@ -155,4 +162,5 @@ export interface IPlayerInTurn extends IPlayer {
 
 export interface IPromiser extends IPlayer {
   index: number,
+  rePromiser: boolean,
 }

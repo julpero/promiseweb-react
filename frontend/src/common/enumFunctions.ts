@@ -12,6 +12,8 @@ export const ruleToStr = (rule: RULE): string => {
     case RULE.opponentPromiseCardValue: return "show opponent hand value when promising";
     case RULE.opponentGameCardValue: return "show opponent hand value in game";
     case RULE.bonusNonEvenPromise: return "bonus points for even breaker";
+    case RULE.rePromise: return "re-promise round";
+    case RULE.hiddenRePromise: return "hidden re-promise round";
     default: return "unknown rule";
   }
 };

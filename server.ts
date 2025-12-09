@@ -679,7 +679,7 @@ connectDB().then(() => {
 
     socket.on("make promise", async (makePromiseRequest: IuiMakePromiseRequest, fn: (promiseResponse: IuiMakePromiseResponse) => void) => {
       // console.log("make promise", makePromiseRequest);
-      const { gameId, roundInd, token, uuid, userName, promise } = makePromiseRequest;
+      const { gameId, roundInd, token, uuid, userName, promise, isRePromise } = makePromiseRequest;
       const lastTimestamp = csm.getLastTimestamp(userName);
       const isAuthenticated = isUserAuthenticated(token, userName, uuid, lastTimestamp);
 
@@ -690,6 +690,7 @@ connectDB().then(() => {
 
         const promiseResponse: IuiMakePromiseResponse = await makePromise(makePromiseRequest);
         if (promiseResponse.promiseResponse === PROMISE_RESPONSE.evenPromiseNotAllowed) {
+          // TODO handle re-promise and no even promises
           const chatLine = "You can't promise " + promise + " because even promises are not allowed!";
           const chatObj: IuiChatNotification = {
             chatLine: chatLine,
@@ -697,7 +698,7 @@ connectDB().then(() => {
             type: CHAT_TYPE.promiseError,
           };
           socket.emit("new chat line", chatObj);
-        } else if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
+        } else if (!isRePromise && promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
           const { promiser, promise, promiseTime } = promiseResponse;
           const promiseNotification: IuiPromiseMadeNotification = {
             playerName: promiser,
@@ -706,9 +707,10 @@ connectDB().then(() => {
           };
           io.to(gameId).emit("promise made", promiseNotification);
 
+          const promiseTimeToStr = (promiseTime/1000).toFixed(1);
           const chatLine = (promiseResponse.promise === -1)
-            ? `${promiser} promised in ${(promiseTime/1000).toFixed(1)} seconds`
-            : `${promiser} promised ${promise} in ${(promiseTime/1000).toFixed(1)} seconds`;
+            ? `${promiser} promised in ${promiseTimeToStr} seconds`
+            : `${promiser} promised ${promise} in ${promiseTimeToStr} seconds`;
           const chatObj: IuiChatNotification = {
             chatLine: chatLine,
             focusedPlayer: userName,

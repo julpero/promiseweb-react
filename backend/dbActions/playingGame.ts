@@ -18,6 +18,7 @@ import {
   getCurrentAnimationTime,
   getCurrentPlayIndex,
   getCurrentPromiseTotal,
+  getCurrentRePromiseTotal,
   getCurrentRoundInd,
   getDealerNameForRound,
   getMyCards,
@@ -26,6 +27,7 @@ import {
   getPlayerInTurn,
   getPromiser,
   isRoundsLastPromiser,
+  isRoundsLastRePromiser,
   winnerOfPlay,
 } from "../common/common";
 import { startRound } from "../common/game";
@@ -57,7 +59,7 @@ export const getGameWithPlayer = async (gameIdStr: string, playerName: string): 
 };
 
 export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequest): Promise<IuiMakePromiseResponse> => {
-  const { gameId, userName, roundInd, promise } = makePromiseRequest;
+  const { gameId, userName, roundInd, promise, isRePromise } = makePromiseRequest;
   const promiseResponse: IuiMakePromiseResponse = {
     promiseResponse: PROMISE_RESPONSE.unknownError,
     promise: -1,
@@ -82,15 +84,18 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
       return promiseResponse;
     }
     const round = gameInDb.game.rounds[currentRoundInd];
-    const roundPhase = getRoundPhase(round);
-    if (roundPhase !== ROUND_PHASE.onPromises) {
-      console.warn("promising, round not in onPromises phase");
+    const gameHasRePromiseRule = isRuleActive(gameInDb, RULE.rePromise) || isRuleActive(gameInDb, RULE.hiddenRePromise);
+    const treatAsRePromise = isRePromise && gameHasRePromiseRule;
+
+    const roundPhase = getRoundPhase(round, gameHasRePromiseRule);
+    if (roundPhase !== ROUND_PHASE.onPromises && roundPhase !== ROUND_PHASE.onRePromises) {
+      console.warn("promising, round not in onPromises/onRePromises phase");
       promiseResponse.promiseResponse = PROMISE_RESPONSE.noPromisePhase;
       return promiseResponse;
     }
 
-    const promiser: IPromiser | null = getPromiser(round);
-    if (!promiser) {
+    const promiser: IPromiser | null = getPromiser(round, gameHasRePromiseRule);
+    if (!promiser || promiser.rePromiser !== isRePromise) {
       console.warn("promising, possible not promising phase");
       return promiseResponse;
     }
@@ -100,24 +105,49 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
       promiseResponse.promiseResponse = PROMISE_RESPONSE.notMyTurn;
       return promiseResponse;
     }
-    if (isRuleActive(gameInDb, RULE.noEvenPromisesAllowed) && isRoundsLastPromiser(round) && (promise + getCurrentPromiseTotal(round) === round.cardsInRound)) {
-      console.log("promising, even promises not allowed");
-      promiseResponse.promiseResponse = PROMISE_RESPONSE.evenPromiseNotAllowed;
-      return promiseResponse;
-    }
-    const isEvenBreakingPromise = isRuleActive(gameInDb, RULE.bonusNonEvenPromise) && !round.roundPlayers.some(player => player.evenBreakingBonus !== null) && (
-      (isRoundsLastPromiser(round) && (promise + getCurrentPromiseTotal(round) !== round.cardsInRound))
-      ||
-      (!isRoundsLastPromiser(round) && (promise + getCurrentPromiseTotal(round) > round.cardsInRound))
-    );
 
-    // All checks made, let's make promise
-    round.roundPlayers[promiser.index].promise = promise as PromiseValue;
-    if (isEvenBreakingPromise) round.roundPlayers[promiser.index].evenBreakingBonus = 0;
-    if (!round.totalPromise) {
-      round.totalPromise = promise;
+    if (treatAsRePromise) {
+      if (isRuleActive(gameInDb, RULE.noEvenPromisesAllowed) && isRoundsLastRePromiser(round) && (promise + getCurrentRePromiseTotal(round) === round.cardsInRound)) {
+        console.log("promising, even promises not allowed");
+        promiseResponse.promiseResponse = PROMISE_RESPONSE.evenPromiseNotAllowed;
+        return promiseResponse;
+      }
     } else {
-      round.totalPromise+= promise;
+      if (isRuleActive(gameInDb, RULE.noEvenPromisesAllowed) && isRoundsLastPromiser(round) && (promise + getCurrentPromiseTotal(round) === round.cardsInRound)) {
+        console.log("promising, even promises not allowed");
+        promiseResponse.promiseResponse = PROMISE_RESPONSE.evenPromiseNotAllowed;
+        return promiseResponse;
+      }
+    }
+
+    if (!treatAsRePromise) {
+      const isEvenBreakingPromise = isRuleActive(gameInDb, RULE.bonusNonEvenPromise) && !round.roundPlayers.some(player => player.evenBreakingBonus !== null) && (
+        (isRoundsLastPromiser(round) && (promise + getCurrentPromiseTotal(round) !== round.cardsInRound))
+        ||
+        (!isRoundsLastPromiser(round) && (promise + getCurrentPromiseTotal(round) > round.cardsInRound))
+      );
+      if (isEvenBreakingPromise) round.roundPlayers[promiser.index].evenBreakingBonus = 0;
+    }
+
+    // All checks made, let's make promise / re-promise
+    if (treatAsRePromise) {
+      round.roundPlayers[promiser.index].rePromise = promise as PromiseValue;
+    } else {
+      round.roundPlayers[promiser.index].promise = promise as PromiseValue;
+    }
+
+    if (treatAsRePromise) {
+      if (!round.totalRePromise) {
+        round.totalRePromise = promise;
+      } else {
+        round.totalRePromise+= promise;
+      }
+    } else {
+      if (!round.totalPromise) {
+        round.totalPromise = promise;
+      } else {
+        round.totalPromise+= promise;
+      }
     }
 
     const now = Date.now();
@@ -130,8 +160,14 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
       promiseTime = 0;
     }
 
-    round.roundPlayers[promiser.index].promiseStarted = gameInDb.game.lastTimeStamp + animationTime;
-    round.roundPlayers[promiser.index].promiseMade = now;
+    if (treatAsRePromise) {
+      round.roundPlayers[promiser.index].rePromiseStarted = gameInDb.game.lastTimeStamp + animationTime;
+      round.roundPlayers[promiser.index].rePromiseMade = now;
+    } else {
+      round.roundPlayers[promiser.index].promiseStarted = gameInDb.game.lastTimeStamp + animationTime;
+      round.roundPlayers[promiser.index].promiseMade = now;
+    }
+
     // TODO Speed promise points
     gameInDb.game.lastTimeStamp = now;
 
@@ -139,7 +175,7 @@ export const makePromiseToPlayer = async (makePromiseRequest: IuiMakePromiseRequ
       const gameAfter = await gameInDb.save();
       if (gameAfter) {
         if (!isRuleActive(gameAfter, RULE.hiddenPromiseRound) && !isRuleActive(gameAfter, RULE.onlyTotalPromise)) promiseResponse.promise = promise;
-        promiseResponse.promiseResponse = PROMISE_RESPONSE.promiseOk;
+        promiseResponse.promiseResponse = treatAsRePromise ? PROMISE_RESPONSE.rePromiseOk : PROMISE_RESPONSE.promiseOk;
         promiseResponse.promiser = promiser.name;
         promiseResponse.promiseTime = promiseTime;
       } else {
@@ -183,7 +219,8 @@ export const playerPlaysCard = async (playCardRequest: IuiPlayCardRequest): Prom
       return response;
     }
     const round = gameInDb.game.rounds[currentRoundInd];
-    const roundPhase = getRoundPhase(round);
+    const gameHasRePromiseRule = isRuleActive(gameInDb, RULE.rePromise) || isRuleActive(gameInDb, RULE.hiddenRePromise);
+    const roundPhase = getRoundPhase(round, gameHasRePromiseRule);
     if (roundPhase !== ROUND_PHASE.onPlay) {
       console.warn("playing card, round not in onPlay phase");
       response.playResponse = PLAY_CARD_RESPONSE.notMyTurn;

@@ -23,6 +23,8 @@ const rulesToArr = (gameOptions: IGameOptions | IGameForList): RULE[] => {
   if (gameOptions.opponentPromiseCardValue === true) rulesArr.push(RULE.opponentPromiseCardValue);
   if (gameOptions.opponentGameCardValue === true) rulesArr.push(RULE.opponentGameCardValue);
   if (gameOptions.bonusNonEvenPromise === true) rulesArr.push(RULE.bonusNonEvenPromise);
+  if (gameOptions.rePromise === true) rulesArr.push(RULE.rePromise);
+  if (gameOptions.hiddenRePromise === true) rulesArr.push(RULE.hiddenRePromise);
 
   return rulesArr;
 };
@@ -70,6 +72,12 @@ export const isRuleActive = (gameOptions: IGameOptions, rule: RULE): boolean => 
     }
     case RULE.bonusNonEvenPromise: {
       return gameOptions.bonusNonEvenPromise;
+    }
+    case RULE.rePromise: {
+      return gameOptions.rePromise;
+    }
+    case RULE.hiddenRePromise: {
+      return gameOptions.hiddenRePromise;
     }
     default: return false;
   }

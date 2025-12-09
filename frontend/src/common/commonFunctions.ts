@@ -37,6 +37,8 @@ export const isRuleActive = (rules: IuiRules, checkRule: RULE): boolean => {
     case RULE.mustPlayTrump:
     case RULE.onlyTotalPromise:
     case RULE.hiddenTrump:
+    case RULE.rePromise:
+    case RULE.hiddenRePromise:
     case RULE.speedPromise:
     case RULE.privateSpeedGame:
     case RULE.opponentPromiseCardValue:
