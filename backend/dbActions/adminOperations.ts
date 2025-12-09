@@ -209,7 +209,7 @@ export const addUsedRules = async (): Promise<string[]> => {
           game.hiddenCardsMode = hiddenCardsMode;
           const savedGame = await game.save();
           if (savedGame) {
-            retArr.push(`${game.id} - ${oldId}`);
+            retArr.push(`${game._id.toString()} - ${oldId}`);
           } else {
             console.error("NO!");
           }

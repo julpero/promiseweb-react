@@ -18,7 +18,7 @@ import AdminMassOperations from "../components/AdminComponents/AdminMassOperatio
 import { getUser, setUserLoggedIn } from "../store/userSlice";
 import { handleAuthenticatedRequest, handleUnauthenticatedRequest } from "../common/userFunctions";
 import OnePlayerReport from "../components/OnePlayerReport";
-import { BallTriangle } from "react-loader-spinner";
+import { Circles } from "react-loader-spinner";
 import { isSpinnerVisible } from "../store/spinnerSlice";
 import { setGameId } from "../store/gameInfoSlice";
 import { clearRoundInfo } from "../store/roundInfoSlice";
@@ -369,7 +369,7 @@ const HomeScreen = () => {
 
       {spinnerVisible &&
         <div className="spinnerContainer">
-          <BallTriangle
+          <Circles
             wrapperClass="spinnerClass"
             height="40vh"
             width="40vw"

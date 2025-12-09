@@ -10,6 +10,7 @@ const connectDB = async () => {
     } as ConnectionOptions);
     console.log("Database is connected");
   } catch (error: unknown) {
+    console.log("Database connection failed");
     console.log(error);
   }
 };

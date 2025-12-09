@@ -9,7 +9,7 @@ export const pingInsert = async (ping: IPing): Promise<IPing> => {
     // console.log("insertedPing", insertedPing);
     return {
       timestamp: insertedPing.timestamp,
-      returnId: insertedPing.id,
+      returnId: insertedPing._id.toString(),
     } as IPing;
   } catch (e) {
     console.error(e);

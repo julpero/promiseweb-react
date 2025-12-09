@@ -78,7 +78,10 @@ const PointsPerTimesUsedInGame = ({gameReportData}: IProps) => {
       tooltip: {
         callbacks: {
           label: function(context) {
-            return `${context.parsed.x.toFixed(2)} points per second`;
+            if (context.parsed.x !== undefined && context.parsed.x !== null) {
+              return `${context.parsed.x.toFixed(2)} points per second`;
+            }
+            return "";
           },
         }
       },
