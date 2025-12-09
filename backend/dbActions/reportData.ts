@@ -248,8 +248,18 @@ export const reportData = async (): Promise<IuiPlayedGamesReport> => {
     "privateSpeedGame": {$in: [null, false]},
     "opponentPromiseCardValue": {$in: [null, false]},
     "opponentGameCardValue": {$in: [null, false]},
-    "hiddenCardsMode": {$in: [null, 0]},
-    "bonusNonEvenPromise": {$in: [null, 0]},
+    "hiddenCardsMode": {
+        $or: [
+          { field: false },
+          { field: 0 }
+        ]
+      },
+    "bonusNonEvenPromise": {
+        $or: [
+          { field: false },
+          { field: 0 }
+        ]
+      },
   });
   // console.timeEnd("reportData vanilla games count");
 
