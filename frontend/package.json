@@ -55,7 +55,7 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.48.1",
+    "@playwright/test": "^1.57.0",
     "@react-spring/types": "^10.0.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
@@ -63,7 +63,7 @@
     "@types/node": "^25.0.2",
     "@types/react": "^18.3.27",
     "@types/react-bootstrap": "^1.1.0",
-    "@types/react-dom": "^19.2.3",
+    "@types/react-dom": "^18.3.7",
     "@types/tabulator-tables": "^6.3.0",
     "@types/uuid": "^11.0.0",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
