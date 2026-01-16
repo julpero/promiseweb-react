@@ -38,6 +38,7 @@ export enum PLAY_CARD_RESPONSE {
 
 export enum PROMISE_RESPONSE {
   promiseOk,
+  rePromiseOk,
   evenPromiseNotAllowed,
   notMyTurn,
   noPromisePhase,
@@ -48,6 +49,7 @@ export enum PROMISE_RESPONSE {
 export enum ROUND_PHASE {
   initial,
   onPromises,
+  onRePromises,
   onPlay,
   played,
 }
@@ -119,6 +121,7 @@ export interface IuiRoundPlayer {
   dealer: boolean,
   name: string,
   promise: number | null,
+  rePromise: number | null,
   keeps: number,
   cardPlayed: IuiCard | null,
   speedPromisePoints: number | null,
@@ -188,6 +191,7 @@ export interface IuiMakePromiseRequest extends IuiUserData {
   roundInd: number,
   promise: number,
   isSpeedPromise: boolean,
+  isRePromise: boolean,
 }
 
 export interface IuiMakePromiseResponse extends IuiAuth {

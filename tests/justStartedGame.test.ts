@@ -18,7 +18,7 @@ describe("testing just created game methods", () => {
   });
 
   test("getRoundPhase", () => {
-    const roundPhase = getRoundPhase(justStartedGame.game.rounds[0]);
+    const roundPhase = getRoundPhase(justStartedGame.game.rounds[0], false);
     expect(roundPhase).toBe(ROUND_PHASE.onPromises);
   });
 
@@ -31,8 +31,9 @@ describe("testing just created game methods", () => {
       name: "Vika",
       type: "human",
       index: 1,
+      rePromiser: false,
     } as IPromiser;
-    expect(getPromiser(justStartedGame.game.rounds[0])).toStrictEqual(promiser);
+    expect(getPromiser(justStartedGame.game.rounds[0], false)).toStrictEqual(promiser);
   });
 
   test("isRoundsLastPromiser", () => {
@@ -62,8 +63,9 @@ describe("last promiser", () => {
       name: "Eka",
       type: "human",
       index: 0,
+      rePromiser: false,
     } as IPromiser;
-    expect(getPromiser(justStartedLastPromiser.game.rounds[0])).toStrictEqual(promiser);
+    expect(getPromiser(justStartedLastPromiser.game.rounds[0], false)).toStrictEqual(promiser);
   });
 
   test("isRoundsLastPromiser", () => {

@@ -40,9 +40,19 @@ const createGameOptions = async (values: IuiCreateGameRequest): Promise<IGameOpt
     opponentPromiseCardValue: values.opponentPromiseCardValue,
     opponentGameCardValue: values.opponentGameCardValue,
     bonusNonEvenPromise: values.bonusNonEvenPromise,
+    rePromise: values.rePromise,
+    hiddenRePromise: values.hiddenRePromise,
     thisIsDemoGame: values.thisIsDemoGame,
     hiddenCardsMode: hiddenCardsModeToEnum(values.hiddenCardsMode),
   } as IGameOptions;
+};
+
+export const rulesOk = (createGameRequest: IuiCreateGameRequest): boolean => {
+  const {rePromise, hiddenRePromise, speedPromise} = createGameRequest;
+  if ([rePromise, hiddenRePromise, speedPromise].filter(Boolean).length > 1) {
+    return false;
+  }
+  return true;
 };
 
 export const createGame = async (createGameRequest: IuiCreateGameRequest): Promise<IuiCreateGameResponse> => {
@@ -63,6 +73,10 @@ export const createGame = async (createGameRequest: IuiCreateGameRequest): Promi
   }
 
   if (parseInt(newGameHumanPlayersCount, 10) > 5 && (startRound > 8 || endRound > 8)) {
+    return response;
+  }
+
+  if (!rulesOk(createGameRequest)) {
     return response;
   }
 

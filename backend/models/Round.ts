@@ -18,6 +18,7 @@ const roundSchema = new Schema<IRound>({
   roundPlayers: [roundPlayerSchema],
   trumpCard: cardSchema,
   totalPromise: {type: Number, required: false},
+  totalRePromise: {type: Number, required: false},
   cardsPlayed: [[cardPlayedSchema]],
   roundStatus: {type: Number, required: true},
 });
