@@ -39,6 +39,7 @@ export interface IHumanPlayer {
   active: boolean,
   playerStats?: IPlayerStats,
   playedBy?: string,
+  isBot?: boolean,
 }
 
 export interface IPlayerStats {

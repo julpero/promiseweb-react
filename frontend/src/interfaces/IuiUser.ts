@@ -5,6 +5,7 @@ export enum LOGIN_RESPONSE {
   password2Empty,
   passwordShort,
   justAdminCheck,
+  invalidUserName,
 }
 
 export interface IuiLoginRequest extends IuiUserData {

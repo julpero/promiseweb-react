@@ -67,7 +67,7 @@ const OpenGamesList = () => {
     };
   }, [user, dispatch, socket]);
 
-  const joinGameMethod = (gameId: string, password?: string) => {
+  const joinGameMethod = (gameId: string, password?: string, isBot?: boolean) => {
     if (disabledButtons) return;
     const joinGameRequest: IuiJoinLeaveGameRequest = {
       userName: user.userName,
@@ -75,11 +75,12 @@ const OpenGamesList = () => {
       token: getToken(),
       gameId: gameId,
       gamePassword: password ?? "",
+      isBot: isBot ?? false,
     };
     joinGame(joinGameRequest);
   };
 
-  const leaveGameMethod = (gameId: string) => {
+  const leaveGameMethod = (gameId: string, botName?: string) => {
     if (disabledButtons) return;
     const leaveGameRequest: IuiJoinLeaveGameRequest = {
       userName: user.userName,
@@ -87,6 +88,7 @@ const OpenGamesList = () => {
       token: getToken(),
       gameId: gameId,
       gamePassword: "",
+      botName: botName,
     };
     leaveGame(leaveGameRequest);
   };
@@ -152,8 +154,8 @@ const OpenGamesList = () => {
           imInTheGame={humanPlayers.some(player => player === user.userName)}
           playerCount= {playerCount}
           gameHasPassword={gameHasPassword}
-          onJoin={(gamePassword?: string) => {joinGameMethod(id, gamePassword);}}
-          onLeave={() => {leaveGameMethod(id);}}
+          onJoin={(gamePassword?: string, isBot?: boolean) => {joinGameMethod(id, gamePassword, isBot);}}
+          onLeave={(botName?: string) => {leaveGameMethod(id, botName);}}
           disabledButtons={disabledButtons}
           creator={creator}
         />

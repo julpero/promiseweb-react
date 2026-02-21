@@ -8,8 +8,8 @@ import RuleList from "./RuleList";
 import Form from "react-bootstrap/Form";
 
 interface IProps {
-  onJoin: (gamePassword?: string) => void,
-  onLeave: () => void,
+  onJoin: (gamePassword?: string, isBot?: boolean) => void,
+  onLeave: (botName?: string) => void,
   imInTheGame: boolean,
   disabledButtons: boolean,
 }
@@ -18,7 +18,15 @@ const GameItem = (props: IuiGameListItem & IProps) => {
   const passRef = useRef<HTMLInputElement | null>(null);
 
   const joinGameClick = (): void => {
-    props.onJoin(passRef.current?.value);
+    props.onJoin(passRef.current?.value, false);
+  };
+
+  const leaveBotClick = (botName: string): void => {
+    props.onLeave(botName);
+  }
+
+  const addBotClick = (): void => {
+    props.onJoin(passRef.current?.value, true);
   };
 
   const leaveGameClick = (): void => {
@@ -54,17 +62,43 @@ const GameItem = (props: IuiGameListItem & IProps) => {
     );
   };
 
+  const renderAddBotButton = () => {
+    return (<Button
+      className='btn-sm'
+      variant="info"
+      onClick={addBotClick}
+    >ADD BOT</Button>
+    );
+  };
+
+  const renderRemoveBotButton = (botName: string) => {
+    return (<Button
+      className='btn-sm'
+      variant="danger"
+      onClick={() => leaveBotClick(botName)}
+    >X</Button>
+    );
+  };
+
   const renderEmptyPlayers = () => {
     const emptyPlayers: JSX.Element[] = [];
     for (let i = props.humanPlayers.length; i < props.playerCount; i++) {
-      emptyPlayers.push(<li key={i}>[ ]</li>);
+      if (props.creator === "ju-ha" && props.rules.ruleList.length === 0 && props.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal) {
+        emptyPlayers.push(<li key={i}>{renderAddBotButton()}</li>);
+      } else {
+        emptyPlayers.push(<li key={i}>[ ]</li>);
+      }
     }
     return emptyPlayers;
   };
 
   const renderPlayerList = () => {
     return props.humanPlayers.map(player => {
-      return <li className="playersInGame" key={player}>{player}</li>;
+      if (player.startsWith("Bot-")) {
+        return <li className="playersInGame" key={player}>{player} {renderRemoveBotButton(player)}</li>;
+      } else {
+        return <li className="playersInGame" key={player}>{player}</li>;
+      }
     });
   };
 
