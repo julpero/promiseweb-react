@@ -37,7 +37,7 @@ import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickReq
 import { convertOldData, getGamesForAdmin, reCreateAllGameStats, reCreateGameStats, reNameNick, updateRulesFromOldData } from "./backend/actions/adminActions";
 import { getValidToken, isUserAuthenticated, isValidAdminUser, isValidUser, signUserToken } from "./backend/common/userValidation";
 import { deletePing, doPing } from "./backend/actions/pingHandler";
-import { IBotCardPlay, IBotPromise } from "./backend/interfaces/IBot";
+import { IBotCardPlay, IBotMakePromiseRequest, IBotPlayCardRequest, IBotPromise } from "./backend/interfaces/IBot";
 import { botPool } from "./backend/bot/botPoolManager";
 
 
@@ -761,25 +761,26 @@ connectDB().then(() => {
       }
     });
 
-    socket.on("make bot promise", async (makePromiseRequest: IuiMakePromiseRequest) => {
+    socket.on("make bot promise", async (makePromiseRequest: IBotMakePromiseRequest) => {
       console.log("make bot promise", makePromiseRequest);
-      const { gameId, roundInd, userName, promise } = makePromiseRequest;
+      const { gameId, roundInd, userName } = makePromiseRequest;
 
       if (!gameId) {
         return null;
       }
 
       const promiseResponse: IuiMakePromiseResponse = await makePromise(makePromiseRequest);
-      if (promiseResponse.promiseResponse === PROMISE_RESPONSE.evenPromiseNotAllowed) {
-        const chatLine = "You can't promise " + promise + " because even promises are not allowed!";
-        const chatObj: IuiChatNotification = {
-          chatLine: chatLine,
-          focusedPlayer: userName,
-          type: CHAT_TYPE.promiseError,
-        };
-        socket.emit("new chat line", chatObj);
-      } else if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
+      if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
         const { promiser, promise, promiseTime } = promiseResponse;
+
+        const botChatLine = `${promiser}: ${makePromiseRequest.promiseChatMessage}`;
+        const botChatObj: IuiChatNotification = {
+          chatLine: botChatLine,
+          focusedPlayer: promiser,
+          type: CHAT_TYPE.chat,
+        };
+        io.to(gameId).emit("new chat line", botChatObj);
+
         const promiseNotification: IuiPromiseMadeNotification = {
           playerName: promiser,
           promise: promise,
@@ -958,7 +959,7 @@ connectDB().then(() => {
       }
     });
 
-    socket.on("play bot card", async (playCardRequest: IuiPlayCardRequest) => {
+    socket.on("play bot card", async (playCardRequest: IBotPlayCardRequest) => {
       console.log("play bot card", playCardRequest);
       const { gameId, roundInd } = playCardRequest;
 
@@ -985,17 +986,6 @@ connectDB().then(() => {
           playWentOver,
         } = playCardResponse;
 
-        const cardPlayedNotificationToMySelf: IuiCardPlayedNotification = {
-          playerName: playerName,
-          playedFromSlot: playCardRequest.card.originalIndex ?? 0,
-          playedCard: card,
-          currentRoundIndex: roundInd,
-          newPlayAfterHit: newPlayAfterHit,
-          gameStatusAfterPlay: gameStatusAfterPlay,
-          roundStatusAfterPlay: roundStatusAfterPlay,
-          winnerOfPlay: winnerOfPlay,
-          winCount: winCount,
-        };
         const cardPlayedNotification: IuiCardPlayedNotification = {
           playerName: playerName,
           playedFromSlot: playedFromSlot,
@@ -1008,7 +998,14 @@ connectDB().then(() => {
           winCount: winCount,
         };
 
-        socket.emit("card played", cardPlayedNotificationToMySelf);
+        const botChatLine = `${playerName}: ${playCardRequest.cardPlayChatMessage}`;
+        const botChatObj: IuiChatNotification = {
+          chatLine: botChatLine,
+          focusedPlayer: playerName,
+          type: CHAT_TYPE.chat,
+        };
+        io.to(gameId).emit("new chat line", botChatObj);
+
         socket.to(gameId).emit("card played", cardPlayedNotification);
 
         const chatLine = `${playerName} hit card in ${(playTime/1000).toFixed(1)} seconds`;

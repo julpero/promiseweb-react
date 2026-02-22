@@ -1,4 +1,5 @@
 import { ICard, IGameOptions } from "../interfaces/IGameOptions";
+import { IuiMakePromiseRequest, IuiPlayCardRequest } from "../../frontend/src/interfaces/IuiPlayingGame";
 
 export interface IBotTask {
   task: "promise" | "play",
@@ -20,6 +21,11 @@ export interface IBotPromiseResponse {
   promiseChatMessage: string,
 }
 
+export interface IBotMakePromiseRequest extends IuiMakePromiseRequest {
+  promiseLogic: string,
+  promiseChatMessage: string,
+}
+
 export interface IBotCardPlay {
   gameId: string,
   roundInd: number,
@@ -32,4 +38,9 @@ export interface IBotCardPlayResponse {
   card: ICard,
   cardLogic: string,
   cardChatMessage: string,
+}
+
+export interface IBotPlayCardRequest extends IuiPlayCardRequest {
+  cardPlayLogic: string,
+  cardPlayChatMessage: string,
 }
