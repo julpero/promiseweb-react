@@ -216,7 +216,7 @@ const starterOfThisPlay = (round: IRound, playInd: number): string => {
   }
 };
 
-const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, originalPlayerName?: string): IuiRoundToPlayer => {
+export const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, originalPlayerName?: string): IuiRoundToPlayer => {
   const gameIsPlayed = gameInDb.gameStatus === GAME_STATUS.played;
   const round = gameInDb.game.rounds[roundInd];
   const playIndex = getCurrentPlayIndex(round);

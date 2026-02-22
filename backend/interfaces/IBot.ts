@@ -8,6 +8,7 @@ export interface IBotTask {
 
 export interface IBotPromise {
   gameId: string,
+  roundInd: number,
   game?: IGameOptions,
   isBotPromiseTurn: boolean,
   botName?: string,
@@ -21,6 +22,7 @@ export interface IBotPromiseResponse {
 
 export interface IBotCardPlay {
   gameId: string,
+  roundInd: number,
   game?: IGameOptions,
   isBotCardPlayTurn: boolean,
   botName?: string,

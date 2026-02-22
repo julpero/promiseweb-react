@@ -2,7 +2,9 @@ import Piscina from "piscina";
 import path from "path";
 import { IBotCardPlay, IBotCardPlayResponse, IBotPromise, IBotPromiseResponse, IBotTask } from "../interfaces/IBot";
 import io from "socket.io-client";
-import { IuiMakePromiseRequest } from "../../frontend/src/interfaces/IuiPlayingGame";
+import { IuiMakePromiseRequest, IuiPlayCardRequest } from "../../frontend/src/interfaces/IuiPlayingGame";
+import { roundToPlayer } from "../actions/playingGame";
+import { IGameOptions } from "../interfaces/IGameOptions";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 console.log(process.env.NODE_ENV);
@@ -42,7 +44,7 @@ export class BotPoolManager {
       socket.emit("make bot promise", {
         promise: result.promise,
         gameId: botPromise.gameId,
-        roundInd: 0,
+        roundInd: botPromise.roundInd,
         isSpeedPromise: false,
         userName: botPromise.botName,
         uuid: "",
@@ -62,6 +64,16 @@ export class BotPoolManager {
       const botTask = { task: "play", botCardPlay } as IBotTask;
       const result: IBotCardPlayResponse = await this.pool.run(botTask);
       console.log("Bot card play result from worker pool:", result);
+      const myRound = roundToPlayer(botCardPlay.game as IGameOptions, botCardPlay.roundInd, botCardPlay.botName || "unknown_bot");
+      const randomCard = myRound.playableCards.length > 0 ? myRound.myCards[myRound.playableCards[0]] : null;
+      socket.emit("play bot card", {
+        gameId: botCardPlay.gameId,
+        card: randomCard,
+        roundInd: botCardPlay.roundInd,
+        userName: botCardPlay.botName,
+        uuid: "",
+        isSpeedPlay: false,
+      } as IuiPlayCardRequest );
       return;
     } catch (err) {
       console.error("Worker Pool Error:", err);
