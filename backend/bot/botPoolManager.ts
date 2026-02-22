@@ -86,11 +86,11 @@ export class BotPoolManager {
       const botTask = { task: "play", botCardPlay } as IBotTask;
       const result: IBotCardPlayResponse = await this.pool.run(botTask);
       console.log("Bot card play result from worker pool:", result);
-      const randomCard = myRound.playableCards.length > 0 ? myRound.myCards[myRound.playableCards[0]] : null;
+      const thisTimeOut = result.success ? simulateThinkingTimeCard / 8 : simulateThinkingTimeCard; // If the bot failed to get a good card, respond faster with fallback logic
       setTimeout(() => {
         socket.emit("play bot card", {
           gameId: botCardPlay.gameId,
-          card: randomCard,
+          card: result.card,
           roundInd: botCardPlay.roundInd,
           userName: botCardPlay.botName,
           uuid: "",
@@ -98,7 +98,7 @@ export class BotPoolManager {
           cardPlayLogic: result.cardLogic,
           cardPlayChatMessage: result.cardChatMessage,
         } as IBotPlayCardRequest);
-      }, simulateThinkingTimeCard); // Simulate thinking time
+      }, thisTimeOut); // Simulate thinking time
       return;
     } catch (err) {
       console.error("Worker Pool Error:", err);

@@ -19,6 +19,7 @@ export interface IBotPromiseResponse {
   promise: number,
   promiseLogic: string,
   promiseChatMessage: string,
+  success?: boolean,
 }
 
 export interface IBotMakePromiseRequest extends IuiMakePromiseRequest {
@@ -38,6 +39,7 @@ export interface IBotCardPlayResponse {
   card: ICard,
   cardLogic: string,
   cardChatMessage: string,
+  success?: boolean,
 }
 
 export interface IBotPlayCardRequest extends IuiPlayCardRequest {
