@@ -41,7 +41,8 @@
     "knuth-shuffle": "^1.0.8",
     "mongoose": "^8.20.2",
     "piscina": "^5.1.4",
-    "socket.io": "4.8.1",
+    "socket.io": "4.8.3",
+    "socket.io-client": "^4.8.3",
     "uuid": "^13.0.0"
   }
 }

@@ -1,19 +1,32 @@
-import {
-  IuiGetRoundResponse,
-  IuiPlayCardRequest,
-} from "../../frontend/src/interfaces/IuiPlayingGame";
+import { IBotTask, IBotCardPlay, IBotCardPlayResponse, IBotPromise, IBotPromiseResponse } from "../interfaces/IBot";
+import { ICard } from "../interfaces/IGameOptions";
 
 // This function runs in a separate thread
-export default ( getRoundResponse : IuiGetRoundResponse): IuiPlayCardRequest => {
+const getBotPromise = (botPromise: IBotPromise): IBotPromiseResponse => {
   // Heavy computation/AI logic here
-  const playable = getRoundResponse.roundToPlayer.playableCards[0];
-
+  console.log("Bot is calculating promise with game state:", botPromise.game);
   return {
-    userName: "botPlayer",
-    uuid: "bot-uuid-1234",
-    gameId: getRoundResponse.gameId,
-    roundInd: getRoundResponse.roundInd,
-    card: getRoundResponse.roundToPlayer.myCards[playable],
-    isSpeedPlay: false,
-  } as IuiPlayCardRequest;
+    promise: 1,
+    promiseLogic: "Bot logic for making a promise",
+    promiseChatMessage: "Bot made a promise.",
+  } as IBotPromiseResponse;
+};
+
+const getBotCardPlay = (botCardPlay: IBotCardPlay): IBotCardPlayResponse => {
+  // Heavy computation/AI logic here
+  console.log("Bot is calculating card play with game state:", botCardPlay.game);
+  return {
+    card: {} as ICard,
+    cardLogic: "Bot logic for playing a card",
+    cardChatMessage: "Bot played a card.",
+  } as IBotCardPlayResponse;
+};
+
+// The DEFAULT export that Piscina calls
+export default (input: IBotTask) => {
+  if (input.task === "promise") {
+    return getBotPromise(input.botPromise as IBotPromise);
+  } else {
+    return getBotCardPlay(input.botCardPlay as IBotCardPlay);
+  }
 };

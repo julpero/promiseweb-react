@@ -36,7 +36,7 @@ const initPlayers = async (gameInDb: IGameOptions) => {
   gameInDb.game.playerOrder = knuthShuffle(players).map((player) => {
     return {
       name: player.name,
-      type: "human",
+      type: gameInDb.humanPlayers.find(p => p.name === player.name)?.isBot ? "bot" : "human",
     } as IPlayer;
   });
 
@@ -85,7 +85,7 @@ const initRound = (roundIndex: number, cardsInRound: number, players: IPlayer[],
       keeps: 0,
       points: null,
       cardsToDebug: sortedCards,
-      type: "human",
+      type: player.type,
       speedPromisePoints: speedPromise ? 1 : null,
       speedPromiseTotal: null,
       evenBreakingBonus: null,

@@ -94,7 +94,7 @@ const GameItem = (props: IuiGameListItem & IProps) => {
 
   const renderPlayerList = () => {
     return props.humanPlayers.map(player => {
-      if (player.startsWith("Bot-")) {
+      if (player.startsWith("Bot")) {
         return <li className="playersInGame" key={player}>{player} {renderRemoveBotButton(player)}</li>;
       } else {
         return <li className="playersInGame" key={player}>{player}</li>;

@@ -142,7 +142,7 @@ const HomeScreen = () => {
             break;
           }
           case LOGIN_RESPONSE.invalidUserName: {
-            setLoginFormValidationError("User name cannot start with 'Bot-'!");
+            setLoginFormValidationError("User name cannot start with 'Bot'!");
             break;
           }
           default: {

@@ -13,8 +13,8 @@ export const checkLogin = async ({userName, userPass1, userPass2, email, needsTo
     return loginObj;
   }
 
-  if (userName.startsWith("Bot-")) {
-    console.warn("invalid user name, can't start with Bot-", userName);
+  if (userName.startsWith("Bot")) {
+    console.warn("invalid user name, can't start with Bot", userName);
     loginObj.result = LOGIN_RESPONSE.invalidUserName;
     return loginObj;
   }

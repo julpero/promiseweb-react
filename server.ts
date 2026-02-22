@@ -1,9 +1,11 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import { Application, Request, Response } from "express";
 import http from "http";
 import { Server, Socket } from "socket.io";
 import cors from "cors";
-import dotenv from "dotenv";
 import path from "path";
 
 import connectDB from "./backend/config/db";
@@ -15,6 +17,7 @@ import { getOpenGamesList } from "./backend/actions/getGameList";
 import { joinGame } from "./backend/actions/joinGame";
 import { leaveGame } from "./backend/actions/leaveGame";
 import { checkIfObservableGame, checkIfOngoingGame } from "./backend/actions/checkIfOngoingGame";
+import { isBotPromiseTurn } from "./backend/actions/botActions";
 import { CREATE_GAME_STATUS, IuiCreateGameRequest, IuiCreateGameResponse } from "./frontend/src/interfaces/IuiNewGame";
 import { IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IuiGameList";
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameResponse } from "./frontend/src/interfaces/IuiCheckIfOngoingGame";
@@ -34,8 +37,9 @@ import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickReq
 import { convertOldData, getGamesForAdmin, reCreateAllGameStats, reCreateGameStats, reNameNick, updateRulesFromOldData } from "./backend/actions/adminActions";
 import { getValidToken, isUserAuthenticated, isValidAdminUser, isValidUser, signUserToken } from "./backend/common/userValidation";
 import { deletePing, doPing } from "./backend/actions/pingHandler";
+import { IBotPromise } from "./backend/interfaces/IBot";
+import { botPool } from "./backend/bot/botPoolManager";
 
-dotenv.config();
 
 const app: Application = express();
 const server = http.createServer(app);
@@ -46,6 +50,7 @@ app.use(express.json());
 
 // app.use("/", express.static(path.join(__dirname, "/build")));
 // app.use(express.static(path.join(__dirname, "../build")));
+console.log("server: " + process.env.NODE_ENV);
 if (process.env.NODE_ENV === "development") {
   app.use(express.static(path.join(__dirname, "./frontend/build")));
 } else {
@@ -466,6 +471,15 @@ connectDB().then(() => {
           io.to(gameId).emit("game begins", { gameId: gameId, asAObserver: false } as IuiGameBeginsNotification);
           io.to(gameId).socketsLeave("waiting lobby");
           io.to("waiting lobby").emit("changes in game players");
+
+          console.log("game begins - gameId", gameId);
+          // when game begins it is possible that first player is bot, so we need to check if it is bot turn and if it is we need to do bot turn
+          const botPromise: IBotPromise = await isBotPromiseTurn(gameId, 0);
+          if (botPromise.isBotPromiseTurn) {
+            // init bot promise
+            console.log("init bot promise for bot", botPromise.botName);
+            botPool.getBotPromise(botPromise);
+          }
         }
         csm.setLastTimestamp(userName, socket.id, timestamp);
         const newToken = signUserToken(userName, uuid, timestamp);
@@ -722,11 +736,69 @@ connectDB().then(() => {
         promiseResponse.isAuthenticated = true;
         promiseResponse.token = newToken;
         fn(promiseResponse);
+
+        if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
+          // check if it is bots turn to promise and if yes make promise for bot and notify
+          const botPromise: IBotPromise = await isBotPromiseTurn(gameId, roundInd);
+          if (botPromise.isBotPromiseTurn) {
+            // init bot promise
+            console.log("init bot promise for bot", botPromise.botName);
+            botPool.getBotPromise(botPromise);
+          }
+        }
+
       } else {
         fn({
           isAuthenticated: false,
         } as IuiMakePromiseResponse);
         return null;
+      }
+    });
+
+    socket.on("make bot promise", async (makePromiseRequest: IuiMakePromiseRequest) => {
+      console.log("make bot promise", makePromiseRequest);
+      const { gameId, roundInd, userName, promise } = makePromiseRequest;
+
+      if (!gameId) {
+        return null;
+      }
+
+      const promiseResponse: IuiMakePromiseResponse = await makePromise(makePromiseRequest);
+      if (promiseResponse.promiseResponse === PROMISE_RESPONSE.evenPromiseNotAllowed) {
+        const chatLine = "You can't promise " + promise + " because even promises are not allowed!";
+        const chatObj: IuiChatNotification = {
+          chatLine: chatLine,
+          focusedPlayer: userName,
+          type: CHAT_TYPE.promiseError,
+        };
+        socket.emit("new chat line", chatObj);
+      } else if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
+        const { promiser, promise, promiseTime } = promiseResponse;
+        const promiseNotification: IuiPromiseMadeNotification = {
+          playerName: promiser,
+          promise: promise,
+          currentRoundIndex: roundInd,
+        };
+        io.to(gameId).emit("promise made", promiseNotification);
+
+        const chatLine = (promiseResponse.promise === -1)
+          ? `${promiser} promised in ${(promiseTime/1000).toFixed(1)} seconds`
+          : `${promiser} promised ${promise} in ${(promiseTime/1000).toFixed(1)} seconds`;
+        const chatObj: IuiChatNotification = {
+          chatLine: chatLine,
+          focusedPlayer: userName,
+          type: CHAT_TYPE.promise,
+        };
+        io.to(gameId).emit("new chat line", chatObj);
+      }
+
+      if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
+        // check if it is bots turn to promise and if yes make promise for bot and notify
+        const botPromise: IBotPromise = await isBotPromiseTurn(gameId, roundInd);
+        if (botPromise.isBotPromiseTurn) {
+          // init bot promise
+          botPool.getBotPromise(botPromise);
+        }
       }
     });
 

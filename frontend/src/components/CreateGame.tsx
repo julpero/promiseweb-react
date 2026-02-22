@@ -137,7 +137,7 @@ const CreateGame = (props: IProps) => {
                 <Field<string>
                   name="newGameHumanPlayersCount"
                   component={SelectInput}
-                  label="Total number of human players"
+                  label="Total number of players"
                 >
                   <option value="3">3</option>
                   <option value="4">4</option>

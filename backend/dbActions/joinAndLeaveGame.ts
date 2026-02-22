@@ -41,13 +41,13 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
     }
   }
 
-  if (joinGameRequest.userName.startsWith("Bot-")) {
-    console.warn("player name cannot start with Bot-", joinGameRequest.userName);
+  if (joinGameRequest.userName.startsWith("Bot")) {
+    console.warn("player name cannot start with Bot", joinGameRequest.userName);
     return JOIN_LEAVE_RESULT.notOk;
   }
 
   const botName = (gameOptions: IGameOptions): string => {
-    return `Bot-${gameOptions.humanPlayers.filter(player => player.isBot).length}`;
+    return `Bot${gameOptions.humanPlayers.filter(player => player.isBot).length}`;
   };
 
   const newPlayer: IHumanPlayer = {
@@ -100,7 +100,7 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
     return JOIN_LEAVE_RESULT.notOk;
   }
 
-  if (leaveGameRequest.botName && leaveGameRequest.botName.startsWith("Bot-")) {
+  if (leaveGameRequest.botName && leaveGameRequest.botName.startsWith("Bot")) {
     if (!game.humanPlayers.find(player => player.name === leaveGameRequest.botName && player.isBot)) {
       console.warn("bot name is not in game", leaveGameRequest.botName);
       return JOIN_LEAVE_RESULT.notOk;
@@ -111,7 +111,7 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
   }
 
   // remove player from humanPlayers
-  if (leaveGameRequest.botName && leaveGameRequest.botName.startsWith("Bot-")) {
+  if (leaveGameRequest.botName && leaveGameRequest.botName.startsWith("Bot")) {
     game.humanPlayers = game.humanPlayers.filter(player => player.name !== leaveGameRequest.botName);
     game.botPlayersCount = Math.max(0, game.botPlayersCount - 1);
     if (game.botPlayersCount > 0) {
@@ -119,7 +119,7 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
       let botIndex = 0;
       game.humanPlayers.forEach(player => {
         if (player.isBot) {
-          player.name = `Bot-${botIndex}`;
+          player.name = `Bot${botIndex}`;
           botIndex += 1;
         }
       });
