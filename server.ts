@@ -156,7 +156,7 @@ connectDB().then(() => {
       const validToken = getValidToken(token);
       console.log("validToken?.timestamp", validToken?.timestamp);
       console.log("username", validToken?.userName ?? "");
-      console.log("timestamp fo username", csm.getLastTimestamp(validToken?.userName ?? ""));
+      console.log("timestamp for username", csm.getLastTimestamp(validToken?.userName ?? ""));
       if (validToken && validToken.uuid === uuid && userName === "dummy" && validToken.timestamp === csm.getLastTimestamp(validToken.userName)) {
         const userNameFromToken = validToken.userName;
         const timestamp = Date.now();

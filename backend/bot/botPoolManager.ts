@@ -37,7 +37,7 @@ export class BotPoolManager {
   }
 
   public async getBotPromise(botPromise: IBotPromise): Promise<void> {
-    console.log("Submitting bot promise task to worker pool with game state:", botPromise.game);
+    console.log("Submitting bot promise task to worker pool with game state...");
 
     try {
       // Offload task to the next available worker in the pool
@@ -78,7 +78,7 @@ export class BotPoolManager {
   }
 
   public async getBotCardPlay(botCardPlay: IBotCardPlay): Promise<void> {
-    console.log("Submitting bot card play task to worker pool with game state:", botCardPlay.game);
+    console.log("Submitting bot card play task to worker pool...");
     const myRound = roundToPlayer(botCardPlay.game as IGameOptions, botCardPlay.roundInd, botCardPlay.botName || "unknown_bot");
 
     try {
