@@ -2,8 +2,8 @@ import { AzureOpenAI } from "openai";
 
 import { IBotTask, IBotCardPlay, IBotCardPlayResponse, IBotPromise, IBotPromiseResponse } from "../interfaces/IBot";
 import { IGameOptions } from "../interfaces/IGameOptions";
-import { GameStateForTurn, PlayCardResult } from "./botTypes";
-import { cardCodeToCard, handlePlayCardCall, myRoundToGameStateForTurn, playCardTool } from "./botFunctions";
+import { AiPlayCardResult, AiPromiseResult, GameStateForPromise, GameStateForTurn } from "./botTypes";
+import { cardCodeToCard, handlePlayCardCall, handlePromiseCall, makePromiseTool, myRoundToGameStateForPromise, myRoundToGameStateForTurn, playCardTool } from "./botFunctions";
 import { ChatCompletionCreateParamsNonStreaming } from "openai/resources/index";
 
 const apiKey = process.env.AZURE_OPENAI_API_KEY;
@@ -93,6 +93,11 @@ PRIMARY/SECONDARY BEHAVIOR LOGIC
 
 You must always follow the rules above when making any decision.
 
+When deciding a promise, you MUST call the function "make_promise" with:
+- promise: an integer between 0 and the number of cards in the round, inclusive.
+- promiseLogic: a short explanation of the reasoning behind the promise, tied to the rules and strategies above.
+- promiseChatMessage: a message to show to the user when making the promise, never reveal your hand or strategy in this message, but you can be playful or misleading if you want.
+
 When deciding a move, you MUST call the function "play_card" with:
 - card: one of legal_cards
 - mode: "normal" unless promise is impossible, then "sabotage"; use "safe" when ahead and "risky" when behind
@@ -102,7 +107,19 @@ When deciding a move, you MUST call the function "play_card" with:
 Never output plain text decisions if the function is available.
 `;
 
-const stateToUserText = (state: GameStateForTurn): string => {
+const stateToUserTextMakePromise = (state: GameStateForPromise): string => {
+  return [
+    "Game state for your promise turn.",
+    "You will decide a promise by calling the function `make_promise`.",
+    "",
+    "JSON STATE:",
+    "```json",
+    JSON.stringify(state),
+    "```"
+  ].join("\n");
+};
+
+const stateToUserTextPlayCard = (state: GameStateForTurn): string => {
   return [
     "Game state for your turn.",
     "You will decide a move by calling the function `play_card`.",
@@ -115,13 +132,40 @@ const stateToUserText = (state: GameStateForTurn): string => {
 };
 
 // This function runs in a separate thread
-const getBotPromise = (botPromise: IBotPromise): IBotPromiseResponse => {
+const getBotPromise = async (botPromise: IBotPromise): Promise<IBotPromiseResponse> => {
   // Heavy computation/AI logic here
   console.log("Bot is calculating promise with game state:", botPromise.game);
+
+  const state = myRoundToGameStateForPromise(botPromise);
+  // console.log("Derived game state for bot's turn: ", state);
+  const parameterObject: ChatCompletionCreateParamsNonStreaming = {
+    model: modelName,
+    temperature: 0.2,
+    messages: [
+      { role: "system", content: [{ type: "text", text: systemPrompt }] },
+      { role: "user", content: stateToUserTextMakePromise(state) }
+    ],
+    tools: [makePromiseTool],
+    tool_choice: "auto", // allow the model to call make_promise
+  };
+  console.log("Sending the following parameters to Azure OpenAI:");
+  console.log(JSON.stringify(parameterObject));
+  const response = await client.chat.completions.create(parameterObject);
+  const choice = response.choices[0];
+  const toolCall = choice.message?.tool_calls?.[0];
+
+  let cardPlayResult: AiPromiseResult | null = null;
+  if (toolCall && toolCall.type === "function" && toolCall.function?.name === "make_promise") {
+    const toolArgs = JSON.parse(toolCall.function.arguments) as AiPromiseResult;
+    cardPlayResult = handlePromiseCall(toolArgs, state);
+  }
+
+  const promiseLogic = cardPlayResult?.reasoning || "Bot logic for playing a card";
+  const promiseChatMessage = cardPlayResult?.promiseChatMessage || "I just played a random card.";
   return {
     promise: Math.floor(Math.random() * ((botPromise.game as IGameOptions).game.rounds[botPromise.roundInd].cardsInRound + 1)),
-    promiseLogic: "Bot logic for making a promise",
-    promiseChatMessage: "I just made a random promise.",
+    promiseLogic: promiseLogic,
+    promiseChatMessage: promiseChatMessage,
   } as IBotPromiseResponse;
 };
 
@@ -136,7 +180,7 @@ const getBotCardPlay = async (botCardPlay: IBotCardPlay): Promise<IBotCardPlayRe
     temperature: 0.2,
     messages: [
       { role: "system", content: [{ type: "text", text: systemPrompt }] },
-      { role: "user", content: stateToUserText(state) }
+      { role: "user", content: stateToUserTextPlayCard(state) }
     ],
     tools: [playCardTool],
     tool_choice: "auto", // allow the model to call play_card
@@ -144,24 +188,22 @@ const getBotCardPlay = async (botCardPlay: IBotCardPlay): Promise<IBotCardPlayRe
   // console.log("Sending the following parameters to Azure OpenAI:");
   // console.log(JSON.stringify(parameterObject));
   const response = await client.chat.completions.create(parameterObject);
-
   // console.log("Raw response from Azure OpenAI:", response);
-
   const choice = response.choices[0];
   const toolCall = choice.message?.tool_calls?.[0];
 
-  let cardPlayResult: PlayCardResult | null = null;
+  let cardPlayResult: AiPlayCardResult | null = null;
   if (toolCall && toolCall.type === "function" && toolCall.function?.name === "play_card") {
-    const toolArgs = JSON.parse(toolCall.function.arguments) as PlayCardResult;
+    const toolArgs = JSON.parse(toolCall.function.arguments) as AiPlayCardResult;
     cardPlayResult = handlePlayCardCall(toolArgs, state);
   }
 
-  const cardLogic = "Bot logic for playing a card";
-  const cardChatMessage ="I just played a random card.";
+  const cardLogic = cardPlayResult?.reasoning || "Bot logic for playing a card";
+  const cardChatMessage = cardPlayResult?.cardChatMessage || "I just played a random card.";
   return {
     card: cardPlayResult?.card ? cardCodeToCard(cardPlayResult.card) : null,
-    cardLogic: cardPlayResult?.reasoning || cardLogic,
-    cardChatMessage: cardPlayResult?.cardChatMessage || cardChatMessage,
+    cardLogic: cardLogic,
+    cardChatMessage: cardChatMessage,
     success: true,
   } as IBotCardPlayResponse;
 };

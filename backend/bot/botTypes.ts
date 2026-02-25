@@ -5,9 +5,12 @@ export type CardCode = `${number}${Suit}` | `A${Suit}` | `K${Suit}` | `Q${Suit}`
 
 export interface PlayerPublicState {
   name: string;
-  promise: number;
-  tricksTaken: number;
+  promise?: number;
   score: number;
+}
+
+export interface PlayerPublicStateForPlay extends PlayerPublicState {
+  tricksTaken: number;
   doesNotHaveSuits: Suit[]; // Optional property to indicate if we know the player does not have a certain suits
 }
 
@@ -18,6 +21,14 @@ export interface TrickPlay {
 
 export type RoundType = "big" | "small";
 
+export interface GameStateForPromise {
+  hand: CardCode[];
+  trump: Suit;
+  deal_round: number;       // number of cards dealt to each player this deal
+  round_type: RoundType;    // "big" (>=6) | "small" (<=5)
+  other_players: PlayerPublicState[];
+}
+
 export interface GameStateForTurn {
   hand: CardCode[];
   legal_cards: CardCode[];
@@ -26,14 +37,22 @@ export interface GameStateForTurn {
   round_type: RoundType;    // "big" (>=6) | "small" (<=5)
   your_promise: number;
   your_tricks_taken: number;
-  other_players: PlayerPublicState[];
+  other_players: PlayerPublicStateForPlay[];
   trick_so_far: TrickPlay[]; // cards played in current trick in order
   cards_played: CardCode[];  // all cards played in the round so far
 }
 
 export type DecisionMode = "normal" | "sabotage" | "safe" | "risky";
 
-export interface PlayCardResult {
+export interface AiPromiseResult {
+  promise: number;
+  confidence?: number; // 0..1
+  mode?: DecisionMode;
+  reasoning: string;
+  promiseChatMessage?: string; // Optional message to say when playing the card
+}
+
+export interface AiPlayCardResult {
   card: CardCode;
   confidence?: number; // 0..1
   mode?: DecisionMode;

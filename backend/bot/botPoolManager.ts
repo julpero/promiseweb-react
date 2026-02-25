@@ -41,6 +41,7 @@ export class BotPoolManager {
       const botTask = { task: "promise", botPromise } as IBotTask;
       const result: IBotPromiseResponse = await this.pool.run(botTask);
       console.log("Bot promise result from worker pool:", result);
+      const thisTimeOut = result.success ? simulateThinkingTimePromise / 8 : simulateThinkingTimePromise; // If the bot failed to get a good promise, respond faster with fallback logic
       setTimeout(() => {
         socket.emit("make bot promise", {
           promise: result.promise,
@@ -52,7 +53,7 @@ export class BotPoolManager {
           promiseLogic: result.promiseLogic,
           promiseChatMessage: result.promiseChatMessage,
         } as IBotMakePromiseRequest);
-      }, simulateThinkingTimePromise); // Simulate thinking time
+      }, thisTimeOut); // Simulate thinking time
       return;
     } catch (err) {
       console.error("Worker Pool Error:", err);

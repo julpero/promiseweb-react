@@ -1,12 +1,51 @@
 import OpenAI from "openai";
 import { IuiCard } from "../../frontend/src/interfaces/IuiPlayingGame";
-import { CardCode, DecisionMode, GameStateForTurn, PlayCardResult, Suit } from "./botTypes";
+import { CardCode, DecisionMode, GameStateForPromise, GameStateForTurn, AiPlayCardResult, Suit, AiPromiseResult } from "./botTypes";
 import { IGameOptions } from "../interfaces/IGameOptions";
 import { roundToPlayer } from "../actions/playingGame";
-import { IBotCardPlay } from "../interfaces/IBot";
+import { IBotCardPlay, IBotPromise } from "../interfaces/IBot";
 import { getGamePointsForPlayer } from "../common/statsFunctions";
 
 // Correct tool definition
+export const makePromiseTool: OpenAI.Chat.Completions.ChatCompletionTool = {
+  type: "function",
+  function: {
+    name: "make_promise",
+    description: "Makes a promise for the current round.",
+    parameters: {
+      type: "object",
+      properties: {
+        promise: {
+          type: "number",
+          description:
+            "The number of tricks to promise."
+        },
+        confidence: {
+          type: "number",
+          description: "Confidence from 0.0 to 1.0.",
+          minimum: 0,
+          maximum: 1
+        },
+        mode: {
+          type: "string",
+          description: "Decision mode used by the agent.",
+          enum: ["normal", "sabotage", "safe", "risky"]
+        },
+        reasoning: {
+          type: "string",
+          description: "Short explanation referencing promise, trump, trick state, sabotage target, etc."
+        },
+        promiseChatMessage: {
+          type: "string",
+          description: "Message to say when making the promise but do not reveal your hand in any manner - of course you can fool other players. Max 500 chars."
+        }
+      },
+      required: ["promise", "reasoning", "promiseChatMessage" ],
+      additionalProperties: false
+    }
+  }
+};
+
 export const playCardTool: OpenAI.Chat.Completions.ChatCompletionTool = {
   type: "function",
   function: {
@@ -46,10 +85,41 @@ export const playCardTool: OpenAI.Chat.Completions.ChatCompletionTool = {
   }
 };
 
+export const handlePromiseCall = (
+  args: AiPromiseResult,
+  state: GameStateForPromise
+): AiPromiseResult => {
+  const { promise } = args;
+
+  if (promise < 0 || promise > state.hand.length) {
+    throw new Error(
+      `Illegal promise: ${promise}. Must be between 0 and ${state.hand.length}`
+    );
+  }
+
+  // Optionally enrich / clamp values
+  const confidence =
+    typeof args.confidence === "number"
+      ? Math.max(0, Math.min(1, args.confidence))
+      : undefined;
+
+  const mode: DecisionMode | undefined = args.mode && ["normal","sabotage","safe","risky"].includes(args.mode)
+    ? args.mode
+    : undefined;
+
+  return {
+    promise,
+    confidence,
+    mode,
+    reasoning: args.reasoning?.slice(0, 1000) ?? "No reasoning provided by the model.",
+    promiseChatMessage: args.promiseChatMessage?.slice(0, 500) // optional message to say when playing the card
+  } as AiPromiseResult;
+};
+
 export const handlePlayCardCall = (
-  args: PlayCardResult,
+  args: AiPlayCardResult,
   state: GameStateForTurn
-): PlayCardResult => {
+): AiPlayCardResult => {
   const { card } = args;
 
   if (!state.legal_cards.includes(card)) {
@@ -74,7 +144,7 @@ export const handlePlayCardCall = (
     mode,
     reasoning: args.reasoning?.slice(0, 1000) ?? "No reasoning provided by the model.",
     cardChatMessage: args.cardChatMessage?.slice(0, 500) // optional message to say when playing the card
-  };
+  } as AiPlayCardResult;
 };
 
 export const cardCodeToCard = (code: CardCode): IuiCard  => {
@@ -130,9 +200,27 @@ const playerHasNoSuits = (playerName: string, game: IGameOptions, roundInd: numb
   return suits;
 };
 
+export const myRoundToGameStateForPromise = (botPromise: IBotPromise): GameStateForPromise => {
+  const { game, roundInd, botName } = botPromise;
+  const myRound = roundToPlayer(game as IGameOptions, roundInd, botName || "unknown_bot");
+  // const myIndex = myRound.promiseTable.players.findIndex(p => p === botPromise.botName);
+
+  return {
+    hand: myRound.myCards.map(card => cardToCardCode(card)),
+    trump: myRound.trumpCard?.suite.toUpperCase() as GameStateForPromise["trump"] || "H", // default to Hearts if not provided
+    deal_round: myRound.cardsInRound,
+    round_type: myRound.cardsInRound >= 6 ? "big" : "small",
+    other_players: myRound.players.filter(p => p.name !== botName).map(p => ({
+      name: p.name,
+      promise: p.promise,
+      score: getGamePointsForPlayer(game!.game.rounds, p.name),
+    })),
+  } as GameStateForPromise;
+};
+
 export const myRoundToGameStateForTurn = (botCardPlay: IBotCardPlay): GameStateForTurn => {
-  const { roundInd, botName } = botCardPlay;
-  const myRound = roundToPlayer(botCardPlay.game as IGameOptions, roundInd, botName || "unknown_bot");
+  const { game, roundInd, botName } = botCardPlay;
+  const myRound = roundToPlayer(game as IGameOptions, roundInd, botName || "unknown_bot");
   // const myIndex = myRound.promiseTable.players.findIndex(p => p === botCardPlay.botName);
   const me = myRound.players.find(p => p.name === botName) || { promise: 0, keeps: 0, name: botName || "unknown_bot", score: 0 };
 
@@ -144,17 +232,17 @@ export const myRoundToGameStateForTurn = (botCardPlay: IBotCardPlay): GameStateF
     round_type: myRound.cardsInRound >= 6 ? "big" : "small",
     your_promise: me.promise ?? 0,
     your_tricks_taken: me.keeps ?? 0,
-    other_players: myRound.players.filter(p => p.name !== botCardPlay.botName).map(p => ({
+    other_players: myRound.players.filter(p => p.name !== botName).map(p => ({
       name: p.name,
       promise: p.promise ?? 0,
       tricksTaken: p.keeps,
-      score: getGamePointsForPlayer(botCardPlay.game!.game.rounds, p.name),
-      doesNotHaveSuits: playerHasNoSuits(p.name, botCardPlay.game as IGameOptions, roundInd),
+      score: getGamePointsForPlayer(game!.game.rounds, p.name),
+      doesNotHaveSuits: playerHasNoSuits(p.name, game as IGameOptions, roundInd),
     })),
     trick_so_far: myRound.cardsPlayed.map(play => ({
       player: play.name,
       card: cardToCardCode(play.card)
     })),
-    cards_played: getCardsPlayedSoFar(botCardPlay.game as IGameOptions, roundInd),
-  };
+    cards_played: getCardsPlayedSoFar(game as IGameOptions, roundInd),
+  } as GameStateForTurn;
 };
