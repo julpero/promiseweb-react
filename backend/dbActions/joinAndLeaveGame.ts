@@ -1,6 +1,6 @@
 import { IuiJoinLeaveGameRequest, JOIN_LEAVE_RESULT } from "../../frontend/src/interfaces/IuiGameList";
 import { GAME_STATUS } from "../../frontend/src/interfaces/IuiGameOptions";
-import { IHumanPlayer } from "../interfaces/IGameOptions";
+import { IGameOptions, IHumanPlayer } from "../interfaces/IGameOptions";
 import GameOptions from "../models/GameOptions";
 import { startGame } from "../common/initGame";
 import { IuiLeaveOngoingGameRequest, IuiLeaveOngoingGameResponse, LEAVE_ONGOING_GAME_RESULT } from "../../frontend/src/interfaces/IuiLeaveOngoingGame";
@@ -33,16 +33,33 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
   }
 
   if (gameInDb.humanPlayers.some(player => player.name === joinGameRequest.userName)) {
-    console.warn("player name is already in game", joinGameRequest.userName);
-    return JOIN_LEAVE_RESULT.alreadyInGame;
+    if (joinGameRequest.isBot) {
+      console.info("adding bot to the game", joinGameRequest.userName);
+    } else {
+      console.warn("player name is already in game", joinGameRequest.userName);
+      return JOIN_LEAVE_RESULT.alreadyInGame;
+    }
   }
 
+  if (joinGameRequest.userName.startsWith("Bot")) {
+    console.warn("player name cannot start with Bot", joinGameRequest.userName);
+    return JOIN_LEAVE_RESULT.notOk;
+  }
+
+  const botName = (gameOptions: IGameOptions): string => {
+    return `Bot${gameOptions.humanPlayers.filter(player => player.isBot).length}`;
+  };
+
   const newPlayer: IHumanPlayer = {
-    name: joinGameRequest.userName,
+    name: joinGameRequest.isBot ? botName(gameInDb) : joinGameRequest.userName,
     active: true,
+    isBot: joinGameRequest.isBot,
   };
 
   gameInDb.humanPlayers.push(newPlayer);
+  if (joinGameRequest.isBot) {
+    gameInDb.botPlayersCount += 1;
+  }
 
   let gameStartOk = true;
   if (gameInDb.humanPlayers.length === gameInDb.humanPlayersCount) {
@@ -83,15 +100,35 @@ export const leaveTheGame = async (leaveGameRequest: IuiJoinLeaveGameRequest): P
     return JOIN_LEAVE_RESULT.notOk;
   }
 
-  if (!game.humanPlayers.find(player => player.name === leaveGameRequest.userName)) {
+  if (leaveGameRequest.botName && leaveGameRequest.botName.startsWith("Bot")) {
+    if (!game.humanPlayers.find(player => player.name === leaveGameRequest.botName && player.isBot)) {
+      console.warn("bot name is not in game", leaveGameRequest.botName);
+      return JOIN_LEAVE_RESULT.notOk;
+    }
+  } else if (!game.humanPlayers.find(player => player.name === leaveGameRequest.userName)) {
     console.warn("player name is not in game", leaveGameRequest.userName);
     return JOIN_LEAVE_RESULT.notOk;
   }
 
   // remove player from humanPlayers
-  game.humanPlayers = game.humanPlayers.filter(player => player.name !== leaveGameRequest.userName);
+  if (leaveGameRequest.botName && leaveGameRequest.botName.startsWith("Bot")) {
+    game.humanPlayers = game.humanPlayers.filter(player => player.name !== leaveGameRequest.botName);
+    game.botPlayersCount = Math.max(0, game.botPlayersCount - 1);
+    if (game.botPlayersCount > 0) {
+      // rename bots so that they have correct numbering
+      let botIndex = 0;
+      game.humanPlayers.forEach(player => {
+        if (player.isBot) {
+          player.name = `Bot${botIndex}`;
+          botIndex += 1;
+        }
+      });
+    }
+  } else {
+    game.humanPlayers = game.humanPlayers.filter(player => player.name !== leaveGameRequest.userName);
+  }
 
-  if (game.humanPlayers.length === 0) {
+  if (game.humanPlayers.filter(player => !player.isBot).length === 0) {
     // this was last player in the game -> set game dismissed
     game.gameStatus = GAME_STATUS.dismissed;
   }
@@ -129,7 +166,7 @@ export const leaveTheOngoingGame = async (leaveOngoingGameRequest: IuiLeaveOngoi
       leaver.active = false;
       leaver.playedBy = undefined;
 
-      if (!gameInDb.humanPlayers.some(player => player.active)) {
+      if (!gameInDb.humanPlayers.some(player => player.active && player.isBot === false)) {
         // all players have left the game -> dismiss it
         gameInDb.gameStatus = GAME_STATUS.dismissed;
         leaveOngoingGameResponse.leaveStatus = LEAVE_ONGOING_GAME_RESULT.gameDismissed;

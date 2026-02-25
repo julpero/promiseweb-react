@@ -12,6 +12,13 @@ export const checkLogin = async ({userName, userPass1, userPass2, email, needsTo
   if (!userName || !userPass1) {
     return loginObj;
   }
+
+  if (userName.startsWith("Bot")) {
+    console.warn("invalid user name, can't start with Bot", userName);
+    loginObj.result = LOGIN_RESPONSE.invalidUserName;
+    return loginObj;
+  }
+
   const secretConfig = process.env.BCRYPT_SECRET ?? "qwaszxpolkmn";
   const passStr = userPass1+":"+secretConfig+":"+userName;
   const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS ?? "10", 10);

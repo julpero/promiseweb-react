@@ -141,6 +141,10 @@ const HomeScreen = () => {
             setLoginFormValidationError("New user, type password again in second field!");
             break;
           }
+          case LOGIN_RESPONSE.invalidUserName: {
+            setLoginFormValidationError("User name cannot start with 'Bot'!");
+            break;
+          }
           default: {
             setLoginFormValidationError("Check your password!");
             break;

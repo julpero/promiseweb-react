@@ -179,7 +179,7 @@ const getPromiseTable = (gameInDb: IGameOptions): IuiPromiseTable => {
   } as IuiPromiseTable;
 };
 
-const isMyPromiseTurn = (name: string, round: IRound, originalPlayerName?: string): boolean => {
+export const isMyPromiseTurn = (name: string, round: IRound, originalPlayerName?: string): boolean => {
   const promiser = getPromiser(round);
   if (promiser) {
     return promiser.name === name || promiser.name === originalPlayerName;
@@ -216,7 +216,7 @@ const starterOfThisPlay = (round: IRound, playInd: number): string => {
   }
 };
 
-const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, originalPlayerName?: string): IuiRoundToPlayer => {
+export const roundToPlayer = (gameInDb: IGameOptions, roundInd: number, name: string, originalPlayerName?: string): IuiRoundToPlayer => {
   const gameIsPlayed = gameInDb.gameStatus === GAME_STATUS.played;
   const round = gameInDb.game.rounds[roundInd];
   const playIndex = getCurrentPlayIndex(round);

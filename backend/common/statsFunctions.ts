@@ -7,7 +7,7 @@ interface IPlayedRoundTypes {
   smallRounds: number,
 }
 
-const getGamePointsForPlayer = (rounds: IRound[], playerName: string): number => {
+export const getGamePointsForPlayer = (rounds: IRound[], playerName: string): number => {
   let points = 0;
   rounds.forEach(round => {
     points+= round.roundPlayers.find(player => player.name === playerName)?.points ?? 0;

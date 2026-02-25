@@ -6,6 +6,7 @@ const humanPlayerSchema = new Schema<IHumanPlayer>({
   active: {type: Boolean, required: true},
   playerStats: {playerAvgPointsInRounds: [Number]},
   playedBy: {type: String, required: false},
+  isBot: {type: Boolean, required: false},
 },
 {
   timestamps: true,

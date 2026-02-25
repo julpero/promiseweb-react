@@ -1,9 +1,11 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import { Application, Request, Response } from "express";
 import http from "http";
 import { Server, Socket } from "socket.io";
 import cors from "cors";
-import dotenv from "dotenv";
 import path from "path";
 
 import connectDB from "./backend/config/db";
@@ -15,6 +17,7 @@ import { getOpenGamesList } from "./backend/actions/getGameList";
 import { joinGame } from "./backend/actions/joinGame";
 import { leaveGame } from "./backend/actions/leaveGame";
 import { checkIfObservableGame, checkIfOngoingGame } from "./backend/actions/checkIfOngoingGame";
+import { isBotPlayTurn, isBotPromiseTurn } from "./backend/actions/botActions";
 import { CREATE_GAME_STATUS, IuiCreateGameRequest, IuiCreateGameResponse } from "./frontend/src/interfaces/IuiNewGame";
 import { IuiGetGameListResponse, IuiJoinLeaveGameRequest, IuiJoinLeaveGameResponse, JOIN_LEAVE_RESULT } from "./frontend/src/interfaces/IuiGameList";
 import { CHECK_GAME_STATUS, IuiCheckIfOngoingGameResponse } from "./frontend/src/interfaces/IuiCheckIfOngoingGame";
@@ -34,8 +37,9 @@ import { IuiGetGamesResponse, IuiReCreateGameStatisticsRequest, IuiReNameNickReq
 import { convertOldData, getGamesForAdmin, reCreateAllGameStats, reCreateGameStats, reNameNick, updateRulesFromOldData } from "./backend/actions/adminActions";
 import { getValidToken, isUserAuthenticated, isValidAdminUser, isValidUser, signUserToken } from "./backend/common/userValidation";
 import { deletePing, doPing } from "./backend/actions/pingHandler";
+import { IBotCardPlay, IBotMakePromiseRequest, IBotPlayCardRequest, IBotPromise } from "./backend/interfaces/IBot";
+import { botPool } from "./backend/bot/botPoolManager";
 
-dotenv.config();
 
 const app: Application = express();
 const server = http.createServer(app);
@@ -46,6 +50,7 @@ app.use(express.json());
 
 // app.use("/", express.static(path.join(__dirname, "/build")));
 // app.use(express.static(path.join(__dirname, "../build")));
+console.log("server: " + process.env.NODE_ENV);
 if (process.env.NODE_ENV === "development") {
   app.use(express.static(path.join(__dirname, "./frontend/build")));
 } else {
@@ -151,7 +156,7 @@ connectDB().then(() => {
       const validToken = getValidToken(token);
       console.log("validToken?.timestamp", validToken?.timestamp);
       console.log("username", validToken?.userName ?? "");
-      console.log("timestamp fo username", csm.getLastTimestamp(validToken?.userName ?? ""));
+      console.log("timestamp for username", csm.getLastTimestamp(validToken?.userName ?? ""));
       if (validToken && validToken.uuid === uuid && userName === "dummy" && validToken.timestamp === csm.getLastTimestamp(validToken.userName)) {
         const userNameFromToken = validToken.userName;
         const timestamp = Date.now();
@@ -466,6 +471,15 @@ connectDB().then(() => {
           io.to(gameId).emit("game begins", { gameId: gameId, asAObserver: false } as IuiGameBeginsNotification);
           io.to(gameId).socketsLeave("waiting lobby");
           io.to("waiting lobby").emit("changes in game players");
+
+          console.log("game begins - gameId", gameId);
+          // when game begins it is possible that first player is bot, so we need to check if it is bot turn and if it is we need to do bot turn
+          const botPromise: IBotPromise = await isBotPromiseTurn(gameId, 0);
+          if (botPromise.isBotPromiseTurn) {
+            // init bot promise
+            console.log("init bot promise for bot", botPromise.botName);
+            botPool.getBotPromise(botPromise);
+          }
         }
         csm.setLastTimestamp(userName, socket.id, timestamp);
         const newToken = signUserToken(userName, uuid, timestamp);
@@ -722,11 +736,83 @@ connectDB().then(() => {
         promiseResponse.isAuthenticated = true;
         promiseResponse.token = newToken;
         fn(promiseResponse);
+
+        if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
+          // check if it is bots turn to promise and if yes make promise for bot and notify
+          const botPromise: IBotPromise = await isBotPromiseTurn(gameId, roundInd);
+          if (botPromise.isBotPromiseTurn) {
+            // init bot promise
+            console.log("init bot promise for bot", botPromise.botName);
+            botPool.getBotPromise(botPromise);
+          } else {
+            // check if it is now bot play turn
+            const botPlay: IBotCardPlay = await isBotPlayTurn(gameId, roundInd);
+            if (botPlay.isBotCardPlayTurn) {
+              console.log("init bot play for bot", botPlay.botName);
+              botPool.getBotCardPlay(botPlay);
+            }
+          }
+        }
       } else {
         fn({
           isAuthenticated: false,
         } as IuiMakePromiseResponse);
         return null;
+      }
+    });
+
+    socket.on("make bot promise", async (makePromiseRequest: IBotMakePromiseRequest) => {
+      console.log("make bot promise", makePromiseRequest);
+      const { gameId, roundInd, userName } = makePromiseRequest;
+
+      if (!gameId) {
+        return null;
+      }
+
+      const promiseResponse: IuiMakePromiseResponse = await makePromise(makePromiseRequest);
+      if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
+        const { promiser, promise, promiseTime } = promiseResponse;
+
+        const botChatLine = `${promiser}: ${makePromiseRequest.promiseChatMessage}`;
+        const botChatObj: IuiChatNotification = {
+          chatLine: botChatLine,
+          focusedPlayer: promiser,
+          type: CHAT_TYPE.chat,
+        };
+        io.to(gameId).emit("new chat line", botChatObj);
+
+        const promiseNotification: IuiPromiseMadeNotification = {
+          playerName: promiser,
+          promise: promise,
+          currentRoundIndex: roundInd,
+        };
+        io.to(gameId).emit("promise made", promiseNotification);
+
+        const chatLine = (promiseResponse.promise === -1)
+          ? `${promiser} promised in ${(promiseTime/1000).toFixed(1)} seconds`
+          : `${promiser} promised ${promise} in ${(promiseTime/1000).toFixed(1)} seconds`;
+        const chatObj: IuiChatNotification = {
+          chatLine: chatLine,
+          focusedPlayer: userName,
+          type: CHAT_TYPE.promise,
+        };
+        io.to(gameId).emit("new chat line", chatObj);
+      }
+
+      if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
+        // check if it is bots turn to promise and if yes make promise for bot and notify
+        const botPromise: IBotPromise = await isBotPromiseTurn(gameId, roundInd);
+        if (botPromise.isBotPromiseTurn) {
+          // init bot promise
+          botPool.getBotPromise(botPromise);
+        } else {
+          // check if it is now bot play turn
+          const botPlay: IBotCardPlay = await isBotPlayTurn(gameId, roundInd);
+          if (botPlay.isBotCardPlayTurn) {
+            console.log("init bot play for bot", botPlay.botName);
+            botPool.getBotCardPlay(botPlay);
+          }
+        }
       }
     });
 
@@ -827,9 +913,13 @@ connectDB().then(() => {
               type: CHAT_TYPE.dealer,
             };
             io.to(gameId).emit("new chat line", chatObj2);
-          }
 
-          if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.played) {
+            const botPromise: IBotPromise = await isBotPromiseTurn(gameId, roundInd + 1); // next round bot promise turn check
+            if (botPromise.isBotPromiseTurn) {
+              // init bot promise
+              botPool.getBotPromise(botPromise);
+            }
+          } else if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.played) {
             const chatLine = "GAME OVER!";
             const chatObj: IuiChatNotification = {
               chatLine: chatLine,
@@ -845,6 +935,13 @@ connectDB().then(() => {
             io.to(gameId).emit("new chat line", chatObj2);
             io.to(gameId).socketsJoin("waiting lobby");
             io.to("waiting lobby").emit("changes in game players");
+          } else {
+            // check if it is now bot play turn
+            const botPlay: IBotCardPlay = await isBotPlayTurn(gameId, roundInd);
+            if (botPlay.isBotCardPlayTurn) {
+              console.log("init bot play for bot", botPlay.botName);
+              botPool.getBotCardPlay(botPlay);
+            }
           }
         }
         const timestamp = Date.now();
@@ -859,6 +956,129 @@ connectDB().then(() => {
           isAuthenticated: false,
         } as IuiPlayCardResponse);
         return null;
+      }
+    });
+
+    socket.on("play bot card", async (playCardRequest: IBotPlayCardRequest) => {
+      console.log("play bot card", playCardRequest);
+      const { gameId, roundInd } = playCardRequest;
+
+      if (!gameId) {
+        return null;
+      }
+
+      // console.time(`playCardResponse ${userName}`);
+      const playCardResponse: IuiPlayCardResponse = await playCard(playCardRequest);
+      // console.timeEnd(`playCardResponse ${userName}`);
+      if (playCardResponse.playResponse === PLAY_CARD_RESPONSE.playOk) {
+        const {
+          playerName,
+          playedFromSlot,
+          card,
+          newPlayAfterHit,
+          gameStatusAfterPlay,
+          roundStatusAfterPlay,
+          playTime,
+          winnerOfPlay,
+          winCount,
+          newDealer,
+          winnerOfGame,
+          playWentOver,
+        } = playCardResponse;
+
+        const cardPlayedNotification: IuiCardPlayedNotification = {
+          playerName: playerName,
+          playedFromSlot: playedFromSlot,
+          playedCard: card,
+          currentRoundIndex: roundInd,
+          newPlayAfterHit: newPlayAfterHit,
+          gameStatusAfterPlay: gameStatusAfterPlay,
+          roundStatusAfterPlay: roundStatusAfterPlay,
+          winnerOfPlay: winnerOfPlay,
+          winCount: winCount,
+        };
+
+        const botChatLine = `${playerName}: ${playCardRequest.cardPlayChatMessage}`;
+        const botChatObj: IuiChatNotification = {
+          chatLine: botChatLine,
+          focusedPlayer: playerName,
+          type: CHAT_TYPE.chat,
+        };
+        io.to(gameId).emit("new chat line", botChatObj);
+
+        socket.to(gameId).emit("card played", cardPlayedNotification);
+
+        const chatLine = `${playerName} hit card in ${(playTime/1000).toFixed(1)} seconds`;
+        const chatObj: IuiChatNotification = {
+          chatLine: chatLine,
+          focusedPlayer: playerName,
+          type: CHAT_TYPE.hit,
+        };
+        io.to(gameId).emit("new chat line", chatObj);
+
+        if (newPlayAfterHit) {
+          const chatLine = `${winnerOfPlay} won this play`;
+          const chatObj: IuiChatNotification = {
+            chatLine: chatLine,
+            focusedPlayer: winnerOfPlay,
+            type: CHAT_TYPE.winnerOfPlay,
+          };
+          io.to(gameId).emit("new chat line", chatObj);
+          if (playWentOver) {
+            const chatLine2 = `${winnerOfPlay} played just over promising`;
+            const chatObj2: IuiChatNotification = {
+              chatLine: chatLine2,
+              focusedPlayer: winnerOfPlay,
+              type: CHAT_TYPE.overPoints,
+            };
+            io.to(gameId).emit("new chat line", chatObj2);
+          }
+        }
+
+        if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.onGoing) {
+          const chatLine = `Round ${roundInd + 2} starts...`;
+          const chatObj: IuiChatNotification = {
+            chatLine: chatLine,
+            type: CHAT_TYPE.roundStart,
+          };
+          io.to(gameId).emit("new chat line", chatObj);
+          const chatLine2 = `... and ${newDealer} is a dealer!`;
+          const chatObj2: IuiChatNotification = {
+            chatLine: chatLine2,
+            focusedPlayer: newDealer,
+            type: CHAT_TYPE.dealer,
+          };
+          io.to(gameId).emit("new chat line", chatObj2);
+
+          const botPromise: IBotPromise = await isBotPromiseTurn(gameId, roundInd + 1); // next round starts, so check for next round
+          if (botPromise.isBotPromiseTurn) {
+            // init bot promise
+            botPool.getBotPromise(botPromise);
+          }
+        } else if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.played) {
+          const chatLine = "GAME OVER!";
+          const chatObj: IuiChatNotification = {
+            chatLine: chatLine,
+            type: CHAT_TYPE.gameOver,
+          };
+          io.to(gameId).emit("new chat line", chatObj);
+          const chatLine2 = `${winnerOfGame} won the Game!`;
+          const chatObj2: IuiChatNotification = {
+            chatLine: chatLine2,
+            focusedPlayer: winnerOfGame,
+            type: CHAT_TYPE.winnerOfGame,
+          };
+          io.to(gameId).emit("new chat line", chatObj2);
+          io.to(gameId).socketsJoin("waiting lobby");
+          io.to("waiting lobby").emit("changes in game players");
+        } else {
+          // check if it is now bot play turn
+          const botPlay: IBotCardPlay = await isBotPlayTurn(gameId, roundInd);
+          if (botPlay.isBotCardPlayTurn) {
+            console.log("init bot play for bot", botPlay.botName);
+            botPool.getBotCardPlay(botPlay);
+          }
+        }
       }
     });
 
