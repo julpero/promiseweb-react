@@ -4,12 +4,13 @@ import { IBotTask, IBotCardPlay, IBotCardPlayResponse, IBotPromise, IBotPromiseR
 import { IGameOptions } from "../interfaces/IGameOptions";
 import { GameStateForTurn, PlayCardResult } from "./botTypes";
 import { cardCodeToCard, handlePlayCardCall, myRoundToGameStateForTurn, playCardTool } from "./botFunctions";
+import { ChatCompletionCreateParamsNonStreaming } from "openai/resources/index";
 
 const apiKey = process.env.AZURE_OPENAI_API_KEY;
-const apiVersion = "2024-04-01-preview";
+const apiVersion = process.env.AZURE_OPENAI_API_VERSION || "2024-04-01-preview";
 const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
-const modelName = "gpt-4.1";
-const deployment = "gpt-4.1";
+const modelName = process.env.AZURE_OPENAI_MODEL_NAME || "gpt-4.1";
+const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4.1";
 const options = { endpoint, apiKey, deployment, apiVersion };
 
 const client = new AzureOpenAI(options);
@@ -97,7 +98,7 @@ When deciding a move, you MUST call the function "play_card" with:
 - mode: "normal" unless promise is impossible, then "sabotage"; use "safe" when ahead and "risky" when behind
 - confidence: 0..1 indicating your confidence
 - reasoning: short, actionable explanation tied to the rules (trump, lead suit, promise, sabotage target)
-- cardChatMessage: optional message to show to the user when playing the card
+- cardChatMessage: message to show to the user when playing the card, never reveal your hand or strategy in this message, but you can be playful or misleading if you want.
 Never output plain text decisions if the function is available.
 `;
 
@@ -126,11 +127,11 @@ const getBotPromise = (botPromise: IBotPromise): IBotPromiseResponse => {
 
 const getBotCardPlay = async (botCardPlay: IBotCardPlay): Promise<IBotCardPlayResponse> => {
   // Heavy computation/AI logic here
-  console.log("Bot is calculating card play with game state:", botCardPlay.game);
+  console.log("Bot is calculating card play with game state...");
 
   const state = myRoundToGameStateForTurn(botCardPlay);
-
-  const response = await client.chat.completions.create({
+  // console.log("Derived game state for bot's turn: ", state);
+  const parameterObject: ChatCompletionCreateParamsNonStreaming = {
     model: modelName,
     temperature: 0.2,
     messages: [
@@ -139,9 +140,12 @@ const getBotCardPlay = async (botCardPlay: IBotCardPlay): Promise<IBotCardPlayRe
     ],
     tools: [playCardTool],
     tool_choice: "auto", // allow the model to call play_card
-  });
+  };
+  // console.log("Sending the following parameters to Azure OpenAI:");
+  // console.log(JSON.stringify(parameterObject));
+  const response = await client.chat.completions.create(parameterObject);
 
-  console.log("Raw response from Azure OpenAI:", response);
+  // console.log("Raw response from Azure OpenAI:", response);
 
   const choice = response.choices[0];
   const toolCall = choice.message?.tool_calls?.[0];

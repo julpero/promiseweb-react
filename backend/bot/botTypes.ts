@@ -8,6 +8,7 @@ export interface PlayerPublicState {
   promise: number;
   tricksTaken: number;
   score: number;
+  doesNotHaveSuits: Suit[]; // Optional property to indicate if we know the player does not have a certain suits
 }
 
 export interface TrickPlay {
@@ -27,6 +28,7 @@ export interface GameStateForTurn {
   your_tricks_taken: number;
   other_players: PlayerPublicState[];
   trick_so_far: TrickPlay[]; // cards played in current trick in order
+  cards_played: CardCode[];  // all cards played in the round so far
 }
 
 export type DecisionMode = "normal" | "sabotage" | "safe" | "risky";

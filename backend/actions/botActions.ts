@@ -45,7 +45,6 @@ export const isBotPlayTurn = async (gameId: string, roundInd: number): Promise<I
   if (roundPhase !== ROUND_PHASE.onPlay) return response;
 
   const playerInTurn = getPlayerInTurn(round);
-  console.log(playerInTurn);
   if (playerInTurn && playerInTurn.type === "bot") {
     response.isBotCardPlayTurn = true;
     response.botName = playerInTurn.name;

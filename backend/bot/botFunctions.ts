@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { IuiCard } from "../../frontend/src/interfaces/IuiPlayingGame";
-import { CardCode, DecisionMode, GameStateForTurn, PlayCardResult } from "./botTypes";
+import { CardCode, DecisionMode, GameStateForTurn, PlayCardResult, Suit } from "./botTypes";
 import { IGameOptions } from "../interfaces/IGameOptions";
 import { roundToPlayer } from "../actions/playingGame";
 import { IBotCardPlay } from "../interfaces/IBot";
@@ -96,6 +96,40 @@ const cardToCardCode = (card: IuiCard): CardCode => {
   return `${rank}${suit}` as CardCode;
 };
 
+const getCardsPlayedSoFar = (game: IGameOptions, roundInd: number): CardCode[] => {
+  const round = game.game.rounds[roundInd];
+  const cardsPlayed: CardCode[] = [];
+  for (const play of round.cardsPlayed) {
+    for (const card of play) {
+      cardsPlayed.push(cardToCardCode(card.card));
+    }
+  }
+  return cardsPlayed;
+};
+
+const playerHasNoSuits = (playerName: string, game: IGameOptions, roundInd: number): Suit[] => {
+  const suits: Suit[] = [];
+  const round = game.game.rounds[roundInd];
+  for (const play of round.cardsPlayed) {
+    let leadSuit: Suit | null = null;
+    for (let i = 0; i < play.length; i++) {
+      const card = play[i];
+      if (i === 0) {
+        // this is leading suit, if player did not follow it, we know they do not have it
+        leadSuit = card.card.suite.toUpperCase().substring(0,1) as Suit;
+      } else if (card.name === playerName) {
+        if (card.card.suite.toUpperCase().substring(0,1) !== leadSuit) {
+          // player did not follow suit, we can add the leading suit to the list of suits they might not have
+          if (leadSuit && !suits.includes(leadSuit)) {
+            suits.push(leadSuit);
+          }
+        }
+      }
+    }
+  }
+  return suits;
+};
+
 export const myRoundToGameStateForTurn = (botCardPlay: IBotCardPlay): GameStateForTurn => {
   const { roundInd, botName } = botCardPlay;
   const myRound = roundToPlayer(botCardPlay.game as IGameOptions, roundInd, botName || "unknown_bot");
@@ -114,11 +148,13 @@ export const myRoundToGameStateForTurn = (botCardPlay: IBotCardPlay): GameStateF
       name: p.name,
       promise: p.promise ?? 0,
       tricksTaken: p.keeps,
-      score: getGamePointsForPlayer(botCardPlay.game!.game.rounds, p.name)
+      score: getGamePointsForPlayer(botCardPlay.game!.game.rounds, p.name),
+      doesNotHaveSuits: playerHasNoSuits(p.name, botCardPlay.game as IGameOptions, roundInd),
     })),
     trick_so_far: myRound.cardsPlayed.map(play => ({
       player: play.name,
       card: cardToCardCode(play.card)
     })),
+    cards_played: getCardsPlayedSoFar(botCardPlay.game as IGameOptions, roundInd),
   };
 };

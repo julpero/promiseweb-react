@@ -5,9 +5,6 @@ import io from "socket.io-client";
 import { roundToPlayer } from "../actions/playingGame";
 import { IGameOptions } from "../interfaces/IGameOptions";
 
-const isDevelopment = process.env.NODE_ENV === "development";
-console.log(process.env.NODE_ENV);
-console.log("BotPoolManager is running in", isDevelopment ? "development" : "production", "mode");
 // In production, __dirname is 'dist/bot'.
 // We want to point to 'botWorker.js' in that same folder.
 const workerFileName = path.resolve(
