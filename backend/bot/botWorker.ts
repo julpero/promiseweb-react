@@ -1,7 +1,6 @@
 import { AzureOpenAI } from "openai";
 
 import { IBotTask, IBotCardPlay, IBotCardPlayResponse, IBotPromise, IBotPromiseResponse } from "../interfaces/IBot";
-import { IGameOptions } from "../interfaces/IGameOptions";
 import { AiPlayCardResult, AiPromiseResult, GameStateForPromise, GameStateForTurn } from "./botTypes";
 import { cardCodeToCard, handlePlayCardCall, handlePromiseCall, makePromiseTool, myRoundToGameStateForPromise, myRoundToGameStateForTurn, playCardTool } from "./botFunctions";
 import { ChatCompletionCreateParamsNonStreaming } from "openai/resources/index";
@@ -66,12 +65,16 @@ SCORING
 PROMISING STRATEGY
 =============================
 - Identify “ultimatum cards” (cards that guarantee a trick). Never promise fewer tricks than ultimatum cards.
-- As first player in a big round, a non-trump Ace can usually win if played first.
+- When playing small rounds and there are less cards in play also non ultimatum trump cards can often guarantee tricks, so consider that in your promise.
+- If you have two or more ultimatum cards and also few smaller trump cards, you can often get extra tricks by leading the round with an ultimatum card to draw out opponents' trumps, then playing your smaller trump cards to win additional tricks.
+- Also when playing first, a high card in a non-trump suit can often win a trick, so consider that in your promise especially in big rounds.
 - Use the average expected promises:
   Example: 5 players with 10 cards → average is 2.
 - If you promise last, adjust based on existing promises.
-- Holding many cards of one suit, especially low cards, increases your chances of playing zero.
-- Big rounds reward zero with 15 points; small rounds only 5 points.
+- Holding many cards of one suit with some low cards, increases your chances of playing zero if there is no strong trump.
+- Big rounds reward zero promise with 15 points; small rounds only 5 points.
+- In big rounds, it can be worth risking a zero promise with a weak hand for the higher reward, especially if you are in an early position and can adjust based on others' promises.
+- If you do not have all suits represented in your hand, it can be easier to promise zero and try to get rid of your cards quickly, especially if you have no strong cards.
 
 =============================
 PLAYING STRATEGY
@@ -80,11 +83,22 @@ PLAYING STRATEGY
 - Match play to your promise and trick probabilities.
 - Track which cards have been played by all players.
 - Notice when a player breaks suit: that player no longer has that suit.
+- During tricks you must always reconsider which cards in your hand are guaranteed to win tricks (ultimatum cards), which cards can only win if opponents play certain cards (conditional winners), and which cards cannot win any tricks. Use this to guide your play.
+- During tricks you must always reconsider which are your cards that you are going to play to reach your promised number of tricks in the safest way possible, and which cards are risky to play because they might win unwanted tricks or lose expected tricks. Use this to guide your play and adjust your strategy between safe and sabotage.
+- If there is a possibility to sabotage a leading opponent, consider playing a card that forces them to win an unwanted trick or lose an expected trick.
+- Use trumps strategically to disrupt opponents, especially the leading opponent if you are in sabotage mode.
+- If you need not to win any tricks anymore it is usually easier to play if you do not have all suits represented in your hand, so you can get rid of cards quickly by playing off-suit cards when you cannot follow suit.
+- If the round is over promised, try to get your tricks as quickly as possible to minimize risk. Of course if you have ultimatum cards you know that you will get certain tricks, so you can play those strategically to draw out opponents' trumps or high cards. But if you have no strong cards, it's often best to just get your tricks over with quickly.
+- If the round is under promised, try to delay getting your tricks until you have more information and can play more safely.
 
 =============================
 PRIMARY/SECONDARY BEHAVIOR LOGIC
 =============================
+- If you have reached your promised number of tricks or you are sure that with your remaining ultimatum cards you can get your remaining promised tricks → switch to safe mode.
 - If your current hand makes your promise impossible → switch to sabotage mode.
+- Safe strategy:
+  • Try get rid of cards which are likely to win unwanted tricks and are not in your ultimatum cards.
+  • If you have ultimatum cards, play them strategically to draw out opponents' trumps or high cards, then play your smaller cards safely.
 - Sabotage strategy:
   • Target the player with most points.
   • Force them to win unwanted tricks or lose expected tricks.
@@ -154,18 +168,19 @@ const getBotPromise = async (botPromise: IBotPromise): Promise<IBotPromiseRespon
   const choice = response.choices[0];
   const toolCall = choice.message?.tool_calls?.[0];
 
-  let cardPlayResult: AiPromiseResult | null = null;
+  let promiseResult: AiPromiseResult | null = null;
   if (toolCall && toolCall.type === "function" && toolCall.function?.name === "make_promise") {
     const toolArgs = JSON.parse(toolCall.function.arguments) as AiPromiseResult;
-    cardPlayResult = handlePromiseCall(toolArgs, state);
+    promiseResult = handlePromiseCall(toolArgs, state);
   }
 
-  const promiseLogic = cardPlayResult?.reasoning || "Bot logic for playing a card";
-  const promiseChatMessage = cardPlayResult?.promiseChatMessage || "I just played a random card.";
+  const promiseLogic = promiseResult?.reasoning || "Bot logic for making a promise";
+  const promiseChatMessage = promiseResult?.promiseChatMessage || "I just made a random promise.";
   return {
-    promise: Math.floor(Math.random() * ((botPromise.game as IGameOptions).game.rounds[botPromise.roundInd].cardsInRound + 1)),
+    promise: promiseResult?.promise ?? 1,
     promiseLogic: promiseLogic,
     promiseChatMessage: promiseChatMessage,
+    success: true,
   } as IBotPromiseResponse;
 };
 

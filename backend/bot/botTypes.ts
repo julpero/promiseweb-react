@@ -7,6 +7,7 @@ export interface PlayerPublicState {
   name: string;
   promise?: number;
   score: number;
+  thisIsMe: boolean;
 }
 
 export interface PlayerPublicStateForPlay extends PlayerPublicState {
@@ -21,23 +22,21 @@ export interface TrickPlay {
 
 export type RoundType = "big" | "small";
 
-export interface GameStateForPromise {
+export interface GameStateForAi {
   hand: CardCode[];
   trump: Suit;
   deal_round: number;       // number of cards dealt to each player this deal
   round_type: RoundType;    // "big" (>=6) | "small" (<=5)
-  other_players: PlayerPublicState[];
+}
+export interface GameStateForPromise extends GameStateForAi {
+  players_in_order: PlayerPublicState[]; // players in the order they will promise, with info on their promises and scores
 }
 
-export interface GameStateForTurn {
-  hand: CardCode[];
+export interface GameStateForTurn extends GameStateForAi {
   legal_cards: CardCode[];
-  trump: Suit;
-  deal_round: number;       // number of cards dealt to each player this deal
-  round_type: RoundType;    // "big" (>=6) | "small" (<=5)
   your_promise: number;
   your_tricks_taken: number;
-  other_players: PlayerPublicStateForPlay[];
+  players_in_order: PlayerPublicStateForPlay[]; // players in the order they will play, with info on their promises, scores, tricks taken, and known suit information
   trick_so_far: TrickPlay[]; // cards played in current trick in order
   cards_played: CardCode[];  // all cards played in the round so far
 }

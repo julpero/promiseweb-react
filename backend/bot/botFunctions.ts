@@ -1,10 +1,11 @@
 import OpenAI from "openai";
 import { IuiCard } from "../../frontend/src/interfaces/IuiPlayingGame";
-import { CardCode, DecisionMode, GameStateForPromise, GameStateForTurn, AiPlayCardResult, Suit, AiPromiseResult } from "./botTypes";
-import { IGameOptions } from "../interfaces/IGameOptions";
+import { CardCode, DecisionMode, GameStateForPromise, GameStateForTurn, AiPlayCardResult, Suit, AiPromiseResult, PlayerPublicState, PlayerPublicStateForPlay } from "./botTypes";
+import { IGameOptions, IRound } from "../interfaces/IGameOptions";
 import { roundToPlayer } from "../actions/playingGame";
 import { IBotCardPlay, IBotPromise } from "../interfaces/IBot";
 import { getGamePointsForPlayer } from "../common/statsFunctions";
+import { getPlayerInTurn } from "../common/common";
 
 // Correct tool definition
 export const makePromiseTool: OpenAI.Chat.Completions.ChatCompletionTool = {
@@ -166,8 +167,7 @@ const cardToCardCode = (card: IuiCard): CardCode => {
   return `${rank}${suit}` as CardCode;
 };
 
-const getCardsPlayedSoFar = (game: IGameOptions, roundInd: number): CardCode[] => {
-  const round = game.game.rounds[roundInd];
+const getCardsPlayedSoFar = (round: IRound): CardCode[] => {
   const cardsPlayed: CardCode[] = [];
   for (const play of round.cardsPlayed) {
     for (const card of play) {
@@ -177,9 +177,8 @@ const getCardsPlayedSoFar = (game: IGameOptions, roundInd: number): CardCode[] =
   return cardsPlayed;
 };
 
-const playerHasNoSuits = (playerName: string, game: IGameOptions, roundInd: number): Suit[] => {
+const playerHasNoSuits = (playerName: string, round: IRound): Suit[] => {
   const suits: Suit[] = [];
-  const round = game.game.rounds[roundInd];
   for (const play of round.cardsPlayed) {
     let leadSuit: Suit | null = null;
     for (let i = 0; i < play.length; i++) {
@@ -200,31 +199,67 @@ const playerHasNoSuits = (playerName: string, game: IGameOptions, roundInd: numb
   return suits;
 };
 
+const playersInOrderForPromise = (game: IGameOptions, roundInd: number, myName: string): PlayerPublicState[] => {
+  const playerOrder: PlayerPublicState[] = [];
+  const round = game.game.rounds[roundInd];
+  for (let i = round.starterPositionIndex; i < round.starterPositionIndex + round.roundPlayers.length; i++) {
+    const checkInd = i >= round.roundPlayers.length ? i - round.roundPlayers.length : i;
+    const player = round.roundPlayers[checkInd];
+    playerOrder.push({
+      name: player.name,
+      thisIsMe: player.name === myName,
+      promise: player.promise ?? undefined,
+      score: getGamePointsForPlayer(game.game.rounds, player.name),
+    });
+  }
+  return playerOrder;
+};
+
+const playersInOrderForPlay = (game: IGameOptions, roundInd: number, myName: string): PlayerPublicStateForPlay[] => {
+  const playerOrder: PlayerPublicStateForPlay[] = [];
+  const round = game.game.rounds[roundInd];
+  const currentPlayIndex = getPlayerInTurn(round)?.index;
+  if (currentPlayIndex === undefined || currentPlayIndex === null) {
+    throw new Error("No player in turn found for round " + roundInd);
+  }
+  for (let i = currentPlayIndex; i < currentPlayIndex + round.roundPlayers.length; i++) {
+    const checkInd = i >= round.roundPlayers.length ? i - round.roundPlayers.length : i;
+    const player = round.roundPlayers[checkInd];
+    playerOrder.push({
+      name: player.name,
+      thisIsMe: player.name === myName,
+      promise: player.promise ?? undefined,
+      score: getGamePointsForPlayer(game.game.rounds, player.name),
+      tricksTaken: player.keeps,
+      doesNotHaveSuits: playerHasNoSuits(player.name, round),
+    });
+  }
+  return playerOrder;
+};
+
 export const myRoundToGameStateForPromise = (botPromise: IBotPromise): GameStateForPromise => {
   const { game, roundInd, botName } = botPromise;
   const myRound = roundToPlayer(game as IGameOptions, roundInd, botName || "unknown_bot");
   // const myIndex = myRound.promiseTable.players.findIndex(p => p === botPromise.botName);
 
   return {
+    players_in_order: playersInOrderForPromise(game!, roundInd, botName || "unknown_bot"),
     hand: myRound.myCards.map(card => cardToCardCode(card)),
-    trump: myRound.trumpCard?.suite.toUpperCase() as GameStateForPromise["trump"] || "H", // default to Hearts if not provided
+    trump: myRound.trumpCard?.suite.toUpperCase().substring(0,1) as GameStateForPromise["trump"] || "H", // default to Hearts if not provided
     deal_round: myRound.cardsInRound,
     round_type: myRound.cardsInRound >= 6 ? "big" : "small",
-    other_players: myRound.players.filter(p => p.name !== botName).map(p => ({
-      name: p.name,
-      promise: p.promise,
-      score: getGamePointsForPlayer(game!.game.rounds, p.name),
-    })),
   } as GameStateForPromise;
 };
 
 export const myRoundToGameStateForTurn = (botCardPlay: IBotCardPlay): GameStateForTurn => {
   const { game, roundInd, botName } = botCardPlay;
+  const round = (game as IGameOptions).game.rounds[roundInd];
   const myRound = roundToPlayer(game as IGameOptions, roundInd, botName || "unknown_bot");
   // const myIndex = myRound.promiseTable.players.findIndex(p => p === botCardPlay.botName);
   const me = myRound.players.find(p => p.name === botName) || { promise: 0, keeps: 0, name: botName || "unknown_bot", score: 0 };
 
   return {
+    players_in_order: playersInOrderForPlay(game!, roundInd, botName || "unknown_bot"),
     hand: myRound.myCards.map(card => cardToCardCode(card)),
     legal_cards: myRound.playableCards.map(index => cardToCardCode(myRound.myCards[index])),
     trump: myRound.trumpCard?.suite.toUpperCase() as GameStateForTurn["trump"] || "H", // default to Hearts if not provided
@@ -232,17 +267,10 @@ export const myRoundToGameStateForTurn = (botCardPlay: IBotCardPlay): GameStateF
     round_type: myRound.cardsInRound >= 6 ? "big" : "small",
     your_promise: me.promise ?? 0,
     your_tricks_taken: me.keeps ?? 0,
-    other_players: myRound.players.filter(p => p.name !== botName).map(p => ({
-      name: p.name,
-      promise: p.promise ?? 0,
-      tricksTaken: p.keeps,
-      score: getGamePointsForPlayer(game!.game.rounds, p.name),
-      doesNotHaveSuits: playerHasNoSuits(p.name, game as IGameOptions, roundInd),
-    })),
     trick_so_far: myRound.cardsPlayed.map(play => ({
       player: play.name,
       card: cardToCardCode(play.card)
     })),
-    cards_played: getCardsPlayedSoFar(game as IGameOptions, roundInd),
+    cards_played: getCardsPlayedSoFar(round),
   } as GameStateForTurn;
 };
