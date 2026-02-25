@@ -34,13 +34,13 @@ export class BotPoolManager {
   }
 
   public async getBotPromise(botPromise: IBotPromise): Promise<void> {
-    console.log("Submitting bot promise task to worker pool with game state...");
+    // console.log("Submitting bot promise task to worker pool with game state...");
 
     try {
       // Offload task to the next available worker in the pool
       const botTask = { task: "promise", botPromise } as IBotTask;
       const result: IBotPromiseResponse = await this.pool.run(botTask);
-      console.log("Bot promise result from worker pool:", result);
+      // console.log("Bot promise result from worker pool:", result);
       const thisTimeOut = result.success ? simulateThinkingTimePromise / 8 : simulateThinkingTimePromise; // If the bot failed to get a good promise, respond faster with fallback logic
       setTimeout(() => {
         socket.emit("make bot promise", {
@@ -76,14 +76,14 @@ export class BotPoolManager {
   }
 
   public async getBotCardPlay(botCardPlay: IBotCardPlay): Promise<void> {
-    console.log("Submitting bot card play task to worker pool...");
+    // console.log("Submitting bot card play task to worker pool...");
     const myRound = roundToPlayer(botCardPlay.game as IGameOptions, botCardPlay.roundInd, botCardPlay.botName || "unknown_bot");
 
     try {
       // Offload task to the next available worker in the pool
       const botTask = { task: "play", botCardPlay } as IBotTask;
       const result: IBotCardPlayResponse = await this.pool.run(botTask);
-      console.log("Bot card play result from worker pool:", result);
+      // console.log("Bot card play result from worker pool:", result);
       const thisTimeOut = result.success ? simulateThinkingTimeCard / 8 : simulateThinkingTimeCard; // If the bot failed to get a good card, respond faster with fallback logic
       setTimeout(() => {
         socket.emit("play bot card", {

@@ -20,7 +20,7 @@ export const isBotPromiseTurn = async (gameId: string, roundInd: number): Promis
     if (player.type === "bot" && player.promise === null) {
       // this may be the bot whose turn it is to promise, but we need to check if the player before him has promised or not
       if (isMyPromiseTurn(player.name, round)) {
-        console.log("It's bot's promise turn for bot:", player.name);
+        // console.log("It's bot's promise turn for bot:", player.name);
         response.isBotPromiseTurn = true;
         response.game = game;
         response.botName = player.name;

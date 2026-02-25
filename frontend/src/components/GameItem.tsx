@@ -83,7 +83,7 @@ const GameItem = (props: IuiGameListItem & IProps) => {
   const renderEmptyPlayers = () => {
     const emptyPlayers: JSX.Element[] = [];
     for (let i = props.humanPlayers.length; i < props.playerCount; i++) {
-      if (props.creator === "ju-ha" && props.rules.ruleList.length === 0 && props.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal) {
+      if (props.rules.ruleList.length === 0 && props.rules.hiddenCardsMode === HIDDEN_CARDS_MODE.normal) {
         emptyPlayers.push(<li key={i}>{renderAddBotButton()}</li>);
       } else {
         emptyPlayers.push(<li key={i}>[ ]</li>);

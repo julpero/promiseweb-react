@@ -33,7 +33,7 @@ export const joinOnGame = async (joinGameRequest: IuiJoinLeaveGameRequest): Prom
   }
 
   if (gameInDb.humanPlayers.some(player => player.name === joinGameRequest.userName)) {
-    if (joinGameRequest.userName === "ju-ha" && joinGameRequest.isBot) {
+    if (joinGameRequest.isBot) {
       console.info("adding bot to the game", joinGameRequest.userName);
     } else {
       console.warn("player name is already in game", joinGameRequest.userName);
