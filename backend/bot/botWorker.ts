@@ -148,7 +148,7 @@ const stateToUserTextPlayCard = (state: GameStateForTurn): string => {
 // This function runs in a separate thread
 const getBotPromise = async (botPromise: IBotPromise): Promise<IBotPromiseResponse> => {
   // Heavy computation/AI logic here
-  // console.log("Bot is calculating promise with game state:", botPromise.game);
+  console.log("Bot is calculating promise with game state:", botPromise.game);
 
   const state = myRoundToGameStateForPromise(botPromise);
   // console.log("Derived game state for bot's turn: ", state);
@@ -165,6 +165,7 @@ const getBotPromise = async (botPromise: IBotPromise): Promise<IBotPromiseRespon
   // console.log("Sending the following parameters to Azure OpenAI:");
   // console.log(JSON.stringify(parameterObject));
   const response = await client.chat.completions.create(parameterObject);
+  console.log("Raw response from Azure OpenAI promise:", response);
   const choice = response.choices[0];
   const toolCall = choice.message?.tool_calls?.[0];
 
@@ -186,7 +187,7 @@ const getBotPromise = async (botPromise: IBotPromise): Promise<IBotPromiseRespon
 
 const getBotCardPlay = async (botCardPlay: IBotCardPlay): Promise<IBotCardPlayResponse> => {
   // Heavy computation/AI logic here
-  // console.log("Bot is calculating card play with game state...");
+  console.log("Bot is calculating card play with game state...");
 
   const state = myRoundToGameStateForTurn(botCardPlay);
   // console.log("Derived game state for bot's turn: ", state);
@@ -203,7 +204,7 @@ const getBotCardPlay = async (botCardPlay: IBotCardPlay): Promise<IBotCardPlayRe
   // console.log("Sending the following parameters to Azure OpenAI:");
   // console.log(JSON.stringify(parameterObject));
   const response = await client.chat.completions.create(parameterObject);
-  // console.log("Raw response from Azure OpenAI:", response);
+  console.log("Raw response from Azure OpenAI play:", response);
   const choice = response.choices[0];
   const toolCall = choice.message?.tool_calls?.[0];
 
