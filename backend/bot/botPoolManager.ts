@@ -48,6 +48,8 @@ export class BotPoolManager {
     console.log("Submitting bot promise task to worker pool with game state...");
 
     try {
+      console.log("checking endpoint...?", process.env.SOCKET_SERVER_URL);
+      console.log("checking connection...?", this.socket);
       // Offload task to the next available worker in the pool
       const botTask = { task: "promise", botPromise } as IBotTask;
       const result: IBotPromiseResponse = await this.pool.run(botTask);
