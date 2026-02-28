@@ -1,7 +1,8 @@
 import Piscina from "piscina";
 import path from "path";
 import { IBotCardPlay, IBotCardPlayResponse, IBotMakePromiseRequest, IBotPlayCardRequest, IBotPromise, IBotPromiseResponse, IBotTask } from "../interfaces/IBot";
-import io, { Socket } from "socket.io-client";
+import { Socket } from "socket.io-client";
+// import { Socket } from "socket.io";
 import { roundToPlayer } from "../actions/playingGame";
 import { IGameOptions } from "../interfaces/IGameOptions";
 
@@ -26,7 +27,7 @@ export class BotPoolManager {
   private simulateThinkingTimePromise = 1500;
   private simulateThinkingTimeCard = 4000;
 
-  constructor() {
+  constructor(socket: Socket) {
     this.pool = new Piscina({
       // Point to the compiled JS file in production
       filename: workerFileName,
@@ -36,19 +37,20 @@ export class BotPoolManager {
       env: process.env,
     });
 
-    if (process.env.NODE_ENV === "development") {
-      const socketEndpoint = process.env.SOCKET_SERVER_URL || "http://localhost:5000";
-      console.log("Connecting bot worker to socket server at:", socketEndpoint);
-      this.socket = io(socketEndpoint, {
-        reconnection: true,
-      });
-    } else {
-      // In production, we assume the socket server is at the same origin
-      console.log("Connecting bot worker to socket server at same origin");
-      this.socket = io("/", {
-        reconnection: true,
-      });
-    }
+    // if (process.env.NODE_ENV === "development") {
+    //   const socketEndpoint = process.env.SOCKET_SERVER_URL || "http://localhost:5000";
+    //   console.log("Connecting bot worker to socket server at:", socketEndpoint);
+    //   this.socket = io(socketEndpoint, {
+    //     reconnection: true,
+    //   });
+    // } else {
+    //   // In production, we assume the socket server is at the same origin
+    //   console.log("Connecting bot worker to socket server at same origin");
+    //   this.socket = io("/", {
+    //     reconnection: true,
+    //   });
+    // }
+    this.socket = socket;
     console.log("Bot worker socket status:", this.socket);
   }
 
@@ -140,4 +142,4 @@ export class BotPoolManager {
 }
 
 // Export a singleton instance
-export const botPool = new BotPoolManager();
+// export const botPool = new BotPoolManager();

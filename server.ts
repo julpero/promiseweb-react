@@ -5,6 +5,7 @@ import express from "express";
 import { Application, Request, Response } from "express";
 import http from "http";
 import { Server, Socket } from "socket.io";
+import { io } from "socket.io-client";
 import cors from "cors";
 import path from "path";
 
@@ -38,12 +39,12 @@ import { convertOldData, getGamesForAdmin, reCreateAllGameStats, reCreateGameSta
 import { getValidToken, isUserAuthenticated, isValidAdminUser, isValidUser, signUserToken } from "./backend/common/userValidation";
 import { deletePing, doPing } from "./backend/actions/pingHandler";
 import { IBotCardPlay, IBotMakePromiseRequest, IBotPlayCardRequest, IBotPromise } from "./backend/interfaces/IBot";
-import { botPool } from "./backend/bot/botPoolManager";
+import { BotPoolManager } from "./backend/bot/botPoolManager";
 
 
 const app: Application = express();
 const server = http.createServer(app);
-const io = new Server<ClientToServerEvents, ServerToClientEvents>(server);
+const ioServer = new Server<ClientToServerEvents, ServerToClientEvents>(server);
 
 app.use(cors());
 app.use(express.json());
@@ -64,6 +65,8 @@ app.get("/", (req: Request, res: Response) => {
 
 
 const PORT = process.env.PORT || 5000;
+const botPool = new BotPoolManager(io(process.env.SOCKET_SERVER_URL ?? "http://localhost:5000"));
+
 connectDB().then(() => {
   server.listen(PORT, () => {
     console.log("server listening on *:" + PORT);
@@ -91,7 +94,7 @@ connectDB().then(() => {
     res.sendStatus(500);
   });
 
-  io.on("connection", (socket: Socket) => {
+  ioServer.on("connection", (socket: Socket) => {
     console.log("connected!", socket.id);
 
     socket.on("disconnect", () => {
@@ -110,7 +113,7 @@ connectDB().then(() => {
           focusedPlayer: userName,
           type: CHAT_TYPE.disconnect,
         };
-        io.to(gameIdStr).emit("new chat line", chatObj);
+        ioServer.to(gameIdStr).emit("new chat line", chatObj);
       }
       csm.removeUserSocketsAndGames(userName);
       csm.unsetUserAsAdmin(userName);
@@ -374,7 +377,7 @@ connectDB().then(() => {
           csm.addUserToMap(userName, socket.id, timestamp, gameIdStr);
 
           const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(createGameRequest, GAME_STATUS.created);
-          io.to("waiting lobby").emit("new game created", getGameListResponse.games);
+          ioServer.to("waiting lobby").emit("new game created", getGameListResponse.games);
         }
         csm.setLastTimestamp(userName, socket.id, timestamp);
         const newToken = signUserToken(userName, uuid, timestamp);
@@ -463,14 +466,14 @@ connectDB().then(() => {
           // notify other users
           const getGameListResponse: IuiGetGameListResponse = await getOpenGamesList(joinGameRequest, GAME_STATUS.created);
           joinResponse.games = getGameListResponse.games;
-          io.to("waiting lobby").emit("game list updated", joinResponse.games);
+          ioServer.to("waiting lobby").emit("game list updated", joinResponse.games);
         }
 
         if (joinResponse.joinLeaveResult === JOIN_LEAVE_RESULT.lastOk) {
           // notify all games players about game start
-          io.to(gameId).emit("game begins", { gameId: gameId, asAObserver: false } as IuiGameBeginsNotification);
-          io.to(gameId).socketsLeave("waiting lobby");
-          io.to("waiting lobby").emit("changes in game players");
+          ioServer.to(gameId).emit("game begins", { gameId: gameId, asAObserver: false } as IuiGameBeginsNotification);
+          ioServer.to(gameId).socketsLeave("waiting lobby");
+          ioServer.to("waiting lobby").emit("changes in game players");
 
           console.log("game begins - gameId", gameId);
           // when game begins it is possible that first player is bot, so we need to check if it is bot turn and if it is we need to do bot turn
@@ -507,7 +510,7 @@ connectDB().then(() => {
           socket.leave(gameId);
           csm.removeUserFromGame(userName, gameId);
           // notify other users
-          io.emit("game list updated", leaveResponse.games);
+          ioServer.emit("game list updated", leaveResponse.games);
         }
         const timestamp = Date.now();
         csm.setLastTimestamp(userName, socket.id, timestamp);
@@ -550,7 +553,7 @@ connectDB().then(() => {
                     focusedPlayer: userName,
                     type: CHAT_TYPE.observe,
                   };
-                  io.to(gameId).emit("new chat line", chatObj);
+                  ioServer.to(gameId).emit("new chat line", chatObj);
                   checkResponse.gameId = gameId;
                   checkResponse.checkStatus = CHECK_GAME_STATUS.onGoingGame;
                   joinToWaitingLobby = false;
@@ -573,7 +576,7 @@ connectDB().then(() => {
             // check if i was not in game players
             const playersInSockets = csm.getPlayersOfTheGame(gameIdStr);
             if (!playersInSockets.some(player => player === userName)) {
-              io.to("waiting lobby").emit("changes in game players");
+              ioServer.to("waiting lobby").emit("changes in game players");
             }
 
             socket.join(gameIdStr);
@@ -586,7 +589,7 @@ connectDB().then(() => {
               type: CHAT_TYPE.join,
             };
             // console.log("sending new chat line", chatLine, gameIdStr);
-            io.to(gameIdStr).emit("new chat line", chatObj);
+            ioServer.to(gameIdStr).emit("new chat line", chatObj);
 
             if (playAsName !== userName) {
               // add also this user name to map
@@ -597,7 +600,7 @@ connectDB().then(() => {
                 focusedPlayer: userName,
                 type: CHAT_TYPE.asAPlayer,
               };
-              io.to(gameIdStr).emit("new chat line", chatObj2);
+              ioServer.to(gameIdStr).emit("new chat line", chatObj2);
             }
 
             break;
@@ -718,7 +721,7 @@ connectDB().then(() => {
             promise: promise,
             currentRoundIndex: roundInd,
           };
-          io.to(gameId).emit("promise made", promiseNotification);
+          ioServer.to(gameId).emit("promise made", promiseNotification);
 
           const chatLine = (promiseResponse.promise === -1)
             ? `${promiser} promised in ${(promiseTime/1000).toFixed(1)} seconds`
@@ -728,7 +731,7 @@ connectDB().then(() => {
             focusedPlayer: userName,
             type: CHAT_TYPE.promise,
           };
-          io.to(gameId).emit("new chat line", chatObj);
+          ioServer.to(gameId).emit("new chat line", chatObj);
         }
         const timestamp = Date.now();
         csm.setLastTimestamp(userName, socket.id, timestamp);
@@ -779,14 +782,14 @@ connectDB().then(() => {
           focusedPlayer: promiser,
           type: CHAT_TYPE.chat,
         };
-        io.to(gameId).emit("new chat line", botChatObj);
+        ioServer.to(gameId).emit("new chat line", botChatObj);
 
         const promiseNotification: IuiPromiseMadeNotification = {
           playerName: promiser,
           promise: promise,
           currentRoundIndex: roundInd,
         };
-        io.to(gameId).emit("promise made", promiseNotification);
+        ioServer.to(gameId).emit("promise made", promiseNotification);
 
         const chatLine = (promiseResponse.promise === -1)
           ? `${promiser} promised in ${(promiseTime/1000).toFixed(1)} seconds`
@@ -796,7 +799,7 @@ connectDB().then(() => {
           focusedPlayer: userName,
           type: CHAT_TYPE.promise,
         };
-        io.to(gameId).emit("new chat line", chatObj);
+        ioServer.to(gameId).emit("new chat line", chatObj);
       }
 
       if (promiseResponse.promiseResponse === PROMISE_RESPONSE.promiseOk) {
@@ -878,7 +881,7 @@ connectDB().then(() => {
             focusedPlayer: playerName,
             type: CHAT_TYPE.hit,
           };
-          io.to(gameId).emit("new chat line", chatObj);
+          ioServer.to(gameId).emit("new chat line", chatObj);
 
           if (newPlayAfterHit) {
             const chatLine = `${winnerOfPlay} won this play`;
@@ -887,7 +890,7 @@ connectDB().then(() => {
               focusedPlayer: winnerOfPlay,
               type: CHAT_TYPE.winnerOfPlay,
             };
-            io.to(gameId).emit("new chat line", chatObj);
+            ioServer.to(gameId).emit("new chat line", chatObj);
             if (playWentOver) {
               const chatLine2 = `${winnerOfPlay} played just over promising`;
               const chatObj2: IuiChatNotification = {
@@ -895,7 +898,7 @@ connectDB().then(() => {
                 focusedPlayer: winnerOfPlay,
                 type: CHAT_TYPE.overPoints,
               };
-              io.to(gameId).emit("new chat line", chatObj2);
+              ioServer.to(gameId).emit("new chat line", chatObj2);
             }
           }
 
@@ -905,14 +908,14 @@ connectDB().then(() => {
               chatLine: chatLine,
               type: CHAT_TYPE.roundStart,
             };
-            io.to(gameId).emit("new chat line", chatObj);
+            ioServer.to(gameId).emit("new chat line", chatObj);
             const chatLine2 = `... and ${newDealer} is a dealer!`;
             const chatObj2: IuiChatNotification = {
               chatLine: chatLine2,
               focusedPlayer: newDealer,
               type: CHAT_TYPE.dealer,
             };
-            io.to(gameId).emit("new chat line", chatObj2);
+            ioServer.to(gameId).emit("new chat line", chatObj2);
 
             const botPromise: IBotPromise = await isBotPromiseTurn(gameId, roundInd + 1); // next round bot promise turn check
             if (botPromise.isBotPromiseTurn) {
@@ -925,16 +928,16 @@ connectDB().then(() => {
               chatLine: chatLine,
               type: CHAT_TYPE.gameOver,
             };
-            io.to(gameId).emit("new chat line", chatObj);
+            ioServer.to(gameId).emit("new chat line", chatObj);
             const chatLine2 = `${winnerOfGame} won the Game!`;
             const chatObj2: IuiChatNotification = {
               chatLine: chatLine2,
               focusedPlayer: winnerOfGame,
               type: CHAT_TYPE.winnerOfGame,
             };
-            io.to(gameId).emit("new chat line", chatObj2);
-            io.to(gameId).socketsJoin("waiting lobby");
-            io.to("waiting lobby").emit("changes in game players");
+            ioServer.to(gameId).emit("new chat line", chatObj2);
+            ioServer.to(gameId).socketsJoin("waiting lobby");
+            ioServer.to("waiting lobby").emit("changes in game players");
           } else {
             // check if it is now bot play turn
             const botPlay: IBotCardPlay = await isBotPlayTurn(gameId, roundInd);
@@ -1004,7 +1007,7 @@ connectDB().then(() => {
           focusedPlayer: playerName,
           type: CHAT_TYPE.chat,
         };
-        io.to(gameId).emit("new chat line", botChatObj);
+        ioServer.to(gameId).emit("new chat line", botChatObj);
 
         socket.to(gameId).emit("card played", cardPlayedNotification);
 
@@ -1014,7 +1017,7 @@ connectDB().then(() => {
           focusedPlayer: playerName,
           type: CHAT_TYPE.hit,
         };
-        io.to(gameId).emit("new chat line", chatObj);
+        ioServer.to(gameId).emit("new chat line", chatObj);
 
         if (newPlayAfterHit) {
           const chatLine = `${winnerOfPlay} won this play`;
@@ -1023,7 +1026,7 @@ connectDB().then(() => {
             focusedPlayer: winnerOfPlay,
             type: CHAT_TYPE.winnerOfPlay,
           };
-          io.to(gameId).emit("new chat line", chatObj);
+          ioServer.to(gameId).emit("new chat line", chatObj);
           if (playWentOver) {
             const chatLine2 = `${winnerOfPlay} played just over promising`;
             const chatObj2: IuiChatNotification = {
@@ -1031,7 +1034,7 @@ connectDB().then(() => {
               focusedPlayer: winnerOfPlay,
               type: CHAT_TYPE.overPoints,
             };
-            io.to(gameId).emit("new chat line", chatObj2);
+            ioServer.to(gameId).emit("new chat line", chatObj2);
           }
         }
 
@@ -1041,14 +1044,14 @@ connectDB().then(() => {
             chatLine: chatLine,
             type: CHAT_TYPE.roundStart,
           };
-          io.to(gameId).emit("new chat line", chatObj);
+          ioServer.to(gameId).emit("new chat line", chatObj);
           const chatLine2 = `... and ${newDealer} is a dealer!`;
           const chatObj2: IuiChatNotification = {
             chatLine: chatLine2,
             focusedPlayer: newDealer,
             type: CHAT_TYPE.dealer,
           };
-          io.to(gameId).emit("new chat line", chatObj2);
+          ioServer.to(gameId).emit("new chat line", chatObj2);
 
           const botPromise: IBotPromise = await isBotPromiseTurn(gameId, roundInd + 1); // next round starts, so check for next round
           if (botPromise.isBotPromiseTurn) {
@@ -1061,16 +1064,16 @@ connectDB().then(() => {
             chatLine: chatLine,
             type: CHAT_TYPE.gameOver,
           };
-          io.to(gameId).emit("new chat line", chatObj);
+          ioServer.to(gameId).emit("new chat line", chatObj);
           const chatLine2 = `${winnerOfGame} won the Game!`;
           const chatObj2: IuiChatNotification = {
             chatLine: chatLine2,
             focusedPlayer: winnerOfGame,
             type: CHAT_TYPE.winnerOfGame,
           };
-          io.to(gameId).emit("new chat line", chatObj2);
-          io.to(gameId).socketsJoin("waiting lobby");
-          io.to("waiting lobby").emit("changes in game players");
+          ioServer.to(gameId).emit("new chat line", chatObj2);
+          ioServer.to(gameId).socketsJoin("waiting lobby");
+          ioServer.to("waiting lobby").emit("changes in game players");
         } else {
           // check if it is now bot play turn
           const botPlay: IBotCardPlay = await isBotPlayTurn(gameId, roundInd);
@@ -1112,7 +1115,7 @@ connectDB().then(() => {
           type: CHAT_TYPE.chat,
         };
           // console.log("sending new chat line", chat, gameId);
-        io.to(gameId).emit("new chat line", chatObj);
+        ioServer.to(gameId).emit("new chat line", chatObj);
       } else {
         return null;
       }
@@ -1140,9 +1143,9 @@ connectDB().then(() => {
               focusedPlayer: leaverName,
               type: CHAT_TYPE.leave,
             };
-            io.to(gameId).emit("new chat line", chatObj);
+            ioServer.to(gameId).emit("new chat line", chatObj);
           }
-          io.to("waiting lobby").emit("changes in game players");
+          ioServer.to("waiting lobby").emit("changes in game players");
 
           socket.leave(gameId);
           csm.removeUserFromGame(userName, gameId);
@@ -1197,7 +1200,7 @@ connectDB().then(() => {
                   if (val !== undefined) {
                     pingOk = true;
                     const socketId = val;
-                    io.to(socketId).emit("hey"); // TODO this is just to notify that someone tried to play
+                    ioServer.to(socketId).emit("hey"); // TODO this is just to notify that someone tried to play
                     // console.log(`join game by id - pinged socket ${socketId}`, gameId, playAsPlayer);
                   }
                 }
@@ -1227,7 +1230,7 @@ connectDB().then(() => {
               replacedPlayer: playAsPlayer,
               joinerName: userName,
             };
-            io.to(gameId).emit("player wants to join", playerWantsToJoinNotification);
+            ioServer.to(gameId).emit("player wants to join", playerWantsToJoinNotification);
             csm.setWaiting(userName, timestamp, socket.id, playAsPlayer, gameId);
             const chatLine = `player ${userName} want's to play as ${playAsPlayer}`;
             const chatObj: IuiChatNotification = {
@@ -1235,7 +1238,7 @@ connectDB().then(() => {
               focusedPlayer: userName,
               type: CHAT_TYPE.requestToJoin,
             };
-            io.to(gameId).emit("new chat line", chatObj);
+            ioServer.to(gameId).emit("new chat line", chatObj);
           } else if (joinResponse.joinStatus === JOIN_GAME_STATUS.ok) {
             if (reJoiningMySelf && otherPlayer) {
               // send notification to player who probably plays as me
@@ -1253,9 +1256,9 @@ connectDB().then(() => {
                     if (val !== undefined) {
                       const otherPlayerSocketId = val;
                       // console.log("kick off notification", playerJoinedNotification, socketId);
-                      io.to(otherPlayerSocketId).emit("player joined on going game", playerJoinedNotification);
-                      io.in(otherPlayerSocketId).socketsLeave(gameId);
-                      io.in(otherPlayerSocketId).socketsJoin("waiting lobby");
+                      ioServer.to(otherPlayerSocketId).emit("player joined on going game", playerJoinedNotification);
+                      ioServer.in(otherPlayerSocketId).socketsLeave(gameId);
+                      ioServer.in(otherPlayerSocketId).socketsJoin("waiting lobby");
                     }
                   }
                 }
@@ -1269,7 +1272,7 @@ connectDB().then(() => {
             csm.addUserToMap(userName, socket.id, timestamp, gameId);
 
             socket.leave("waiting lobby");
-            io.to("waiting lobby").emit("changes in game players");
+            ioServer.to("waiting lobby").emit("changes in game players");
 
             const chatLine = `player ${playAsPlayer} connected again as played by ${userName}`;
             const chatObj: IuiChatNotification = {
@@ -1277,7 +1280,7 @@ connectDB().then(() => {
               focusedPlayer: userName,
               type: CHAT_TYPE.join,
             };
-            io.to(gameId).emit("new chat line", chatObj);
+            ioServer.to(gameId).emit("new chat line", chatObj);
 
             // straight to game
             socket.emit("game begins", { gameId: gameId, asAObserver: false } as IuiGameBeginsNotification);
@@ -1382,12 +1385,12 @@ connectDB().then(() => {
                   focusedPlayer: userName,
                   type: CHAT_TYPE.allowedToJoin,
                 };
-                io.to(gameId).emit("new chat line", chatObj);
-                io.to(gameId).emit("player wants to join", { joinerName: "", replacedPlayer: "" } as IuiPlayerWantsToJoinNotification);
+                ioServer.to(gameId).emit("new chat line", chatObj);
+                ioServer.to(gameId).emit("player wants to join", { joinerName: "", replacedPlayer: "" } as IuiPlayerWantsToJoinNotification);
 
-                io.to(otherPlayerSocketId).socketsJoin(gameId);
-                io.to(otherPlayerSocketId).socketsLeave("waiting lobby");
-                io.to(otherPlayerSocketId).emit("game begins", { gameId: gameId, asAObserver: false } as IuiGameBeginsNotification);
+                ioServer.to(otherPlayerSocketId).socketsJoin(gameId);
+                ioServer.to(otherPlayerSocketId).socketsLeave("waiting lobby");
+                ioServer.to(otherPlayerSocketId).emit("game begins", { gameId: gameId, asAObserver: false } as IuiGameBeginsNotification);
 
                 joinOk = true;
               }
@@ -1402,10 +1405,10 @@ connectDB().then(() => {
               focusedPlayer: userName,
               type: CHAT_TYPE.rejectedToJoin,
             };
-            io.to(gameId).emit("new chat line", chatObj);
-            io.to(gameId).emit("player wants to join", { joinerName: "", replacedPlayer: "" } as IuiPlayerWantsToJoinNotification);
+            ioServer.to(gameId).emit("new chat line", chatObj);
+            ioServer.to(gameId).emit("player wants to join", { joinerName: "", replacedPlayer: "" } as IuiPlayerWantsToJoinNotification);
 
-            io.to(otherPlayerSocketId).emit("join request rejected", gameId);
+            ioServer.to(otherPlayerSocketId).emit("join request rejected", gameId);
           }
         }
 
@@ -1437,14 +1440,14 @@ connectDB().then(() => {
         const waitingToGame = csm.getWaitingGame(userName);
         csm.clearWaiting(userName);
         if (waitingToGame) {
-          io.to(waitingToGame).emit("player wants to join", { joinerName: "", replacedPlayer: "" } as IuiPlayerWantsToJoinNotification);
+          ioServer.to(waitingToGame).emit("player wants to join", { joinerName: "", replacedPlayer: "" } as IuiPlayerWantsToJoinNotification);
           const chatLine = `player ${userName} cancelled his/her join request`;
           const chatObj: IuiChatNotification = {
             chatLine: chatLine,
             focusedPlayer: userName,
             type: CHAT_TYPE.cancelledToJoin,
           };
-          io.to(waitingToGame).emit("new chat line", chatObj);
+          ioServer.to(waitingToGame).emit("new chat line", chatObj);
         }
 
         csm.setLastTimestamp(userName, socket.id, timestamp);
@@ -1483,14 +1486,14 @@ connectDB().then(() => {
         const onGoingResponse: IuiCheckIfOngoingGameResponse = await checkIfOngoingGame(userName);
         if (onGoingResponse.checkStatus === CHECK_GAME_STATUS.noGame && csm.getObservingGame(userName) === null) {
           csm.setObserving(userName, timestamp, socket.id, gameId, true);
-          // io.to(gameId).emit("players wants to observe", { observerNames: csm.getWaitingGameObservers(gameId) } as IuiPlayersWantsToObserveNotification);
+          // ioServer.to(gameId).emit("players wants to observe", { observerNames: csm.getWaitingGameObservers(gameId) } as IuiPlayersWantsToObserveNotification);
           const chatLine = `player ${userName} want's to observe this game`;
           const chatObj: IuiChatNotification = {
             chatLine: chatLine,
             focusedPlayer: userName,
             type: CHAT_TYPE.requestToObserve,
           };
-          io.to(gameId).emit("new chat line", chatObj);
+          ioServer.to(gameId).emit("new chat line", chatObj);
 
           csm.setLastTimestamp(userName, socket.id, timestamp);
           const newToken = signUserToken(userName, uuid, timestamp);
@@ -1539,8 +1542,8 @@ connectDB().then(() => {
           const observerSocketId = observer.socketId;
           if (!allow) {
             csm.clearObserving(observerName);
-            io.to(observerSocketId).socketsLeave(gameId);
-            io.to(observerSocketId).emit("observe request rejected", gameId);
+            ioServer.to(observerSocketId).socketsLeave(gameId);
+            ioServer.to(observerSocketId).emit("observe request rejected", gameId);
           } else {
             const checkResponse: IuiCheckIfOngoingGameResponse = await checkIfOngoingGame(observerName);
             if (checkResponse.checkStatus === CHECK_GAME_STATUS.noGame) {
@@ -1555,11 +1558,11 @@ connectDB().then(() => {
                 focusedPlayer: userName,
                 type: CHAT_TYPE.allowedToObserve,
               };
-              io.to(gameId).emit("new chat line", chatObj);
+              ioServer.to(gameId).emit("new chat line", chatObj);
 
-              io.to(observerSocketId).socketsJoin(gameId);
-              io.to(observerSocketId).socketsLeave("waiting lobby");
-              io.to(observerSocketId).emit("game begins", { gameId: gameId, asAObserver: true } as IuiGameBeginsNotification);
+              ioServer.to(observerSocketId).socketsJoin(gameId);
+              ioServer.to(observerSocketId).socketsLeave("waiting lobby");
+              ioServer.to(observerSocketId).emit("game begins", { gameId: gameId, asAObserver: true } as IuiGameBeginsNotification);
 
               observeOk = true;
             }
@@ -1602,7 +1605,7 @@ connectDB().then(() => {
             focusedPlayer: userName,
             type: CHAT_TYPE.leavedObserving,
           };
-          io.to(observedGame.gameId).emit("new chat line", chatObj);
+          ioServer.to(observedGame.gameId).emit("new chat line", chatObj);
         }
 
         const timestamp = Date.now();
@@ -1632,14 +1635,14 @@ connectDB().then(() => {
         const waitingToGame = csm.getObservingGame(userName)?.gameId;
         csm.clearObserving(userName);
         if (waitingToGame) {
-          // io.to(waitingToGame).emit("players wants to observe", { observerNames: csm.getGameObservers(waitingToGame) } as IuiPlayersWantsToObserveNotification);
+          // ioServer.to(waitingToGame).emit("players wants to observe", { observerNames: csm.getGameObservers(waitingToGame) } as IuiPlayersWantsToObserveNotification);
           const chatLine = `player ${userName} cancelled his/her observe request`;
           const chatObj: IuiChatNotification = {
             chatLine: chatLine,
             focusedPlayer: userName,
             type: CHAT_TYPE.cancelledToObserve,
           };
-          io.to(waitingToGame).emit("new chat line", chatObj);
+          ioServer.to(waitingToGame).emit("new chat line", chatObj);
         }
 
         csm.setLastTimestamp(userName, socket.id, timestamp);
