@@ -5,15 +5,15 @@ export type CardCode = `${number}${Suit}` | `A${Suit}` | `K${Suit}` | `Q${Suit}`
 
 export interface PlayerPublicState {
   name: string;
-  promise?: number;
+  promise: number | string;
   score: number;
-  thisIsMe: boolean;
+  this_is_me: boolean;
 }
 
 export interface PlayerPublicStateForPlay extends PlayerPublicState {
-  tricksTaken: number;
-  doesNotHaveSuits: Suit[]; // Optional property to indicate if we know the player does not have a certain suits
-  hasPlayedCards: CardCode[]; // Optional property to indicate which cards the player has already played in the current round
+  tricks_taken: number;
+  does_not_have_suits: Suit[]; // Optional property to indicate if we know the player does not have a certain suits
+  has_played_cards_earlier: CardCode[]; // Optional property to indicate which cards the player has already played in the current round
 }
 
 export interface TrickPlay {
@@ -43,7 +43,7 @@ export interface GameStateForTurn extends GameStateForAi {
   your_tricks_taken: number;
   players_in_order: PlayerPublicStateForPlay[]; // players in the order they will play, with info on their promises, scores, tricks taken, and known suit information
   trick_so_far: TrickPlay[]; // cards played in current trick in order
-  cards_played: CardCode[];  // all cards played in the round so far
+  cards_played_in_this_game: CardCode[];  // all cards played in the round so far
 }
 
 export type DecisionMode = "normal" | "sabotage" | "safe" | "risky";
@@ -53,7 +53,7 @@ export interface AiPromiseResult {
   confidence?: number; // 0..1
   mode?: DecisionMode;
   reasoning: string;
-  promiseChatMessage?: string; // Optional message to say when playing the card
+  promise_chat_message?: string; // Optional message to say when playing the card
 }
 
 export interface AiPlayCardResult {
@@ -61,5 +61,5 @@ export interface AiPlayCardResult {
   confidence?: number; // 0..1
   mode?: DecisionMode;
   reasoning: string;
-  cardChatMessage?: string; // Optional message to say when playing the card
+  card_chat_message?: string; // Optional message to say when playing the card
 }

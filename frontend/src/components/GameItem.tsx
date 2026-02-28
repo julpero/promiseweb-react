@@ -73,7 +73,7 @@ const GameItem = (props: IuiGameListItem & IProps) => {
 
   const renderRemoveBotButton = (botName: string) => {
     return (<Button
-      className='btn-sm'
+      className='btn-sm float-end'
       variant="danger"
       onClick={() => leaveBotClick(botName)}
     >X</Button>
@@ -95,7 +95,12 @@ const GameItem = (props: IuiGameListItem & IProps) => {
   const renderPlayerList = () => {
     return props.humanPlayers.map(player => {
       if (player.startsWith("Bot")) {
-        return <li className="playersInGame" key={player}>{player} {renderRemoveBotButton(player)}</li>;
+        return (
+          <li className="playersInGame d-flex justify-content-between align-items-center" key={player}>
+            <span>{player}</span>
+            {renderRemoveBotButton(player)}
+          </li>
+        );
       } else {
         return <li className="playersInGame" key={player}>{player}</li>;
       }

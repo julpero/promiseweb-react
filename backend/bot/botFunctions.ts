@@ -5,7 +5,7 @@ import { IGameOptions, IRound } from "../interfaces/IGameOptions";
 import { roundToPlayer } from "../actions/playingGame";
 import { IBotCardPlay, IBotPromise } from "../interfaces/IBot";
 import { getGamePointsForPlayer } from "../common/statsFunctions";
-import { getPlayerInTurn } from "../common/common";
+import { getCurrentPlayIndex, winnerOfPlay } from "../common/common";
 
 // Correct tool definition
 export const makePromiseTool: OpenAI.Chat.Completions.ChatCompletionTool = {
@@ -36,12 +36,12 @@ export const makePromiseTool: OpenAI.Chat.Completions.ChatCompletionTool = {
           type: "string",
           description: "Short explanation referencing promise, trump, trick state, sabotage target, etc."
         },
-        promiseChatMessage: {
+        promise_chat_message: {
           type: "string",
           description: "Message to say when making the promise but do not reveal your hand in any manner - of course you can fool other players. Max 500 chars."
         }
       },
-      required: ["promise", "reasoning", "promiseChatMessage" ],
+      required: ["promise", "reasoning", "promise_chat_message" ],
       additionalProperties: false
     }
   }
@@ -75,12 +75,12 @@ export const playCardTool: OpenAI.Chat.Completions.ChatCompletionTool = {
           type: "string",
           description: "Short explanation referencing promise, trump, trick state, sabotage target, etc."
         },
-        cardChatMessage: {
+        card_chat_message: {
           type: "string",
           description: "Message to say when playing the card but do not reveal your hand in any manner - of course you can fool other players. Max 500 chars."
         }
       },
-      required: ["card", "reasoning", "cardChatMessage" ],
+      required: ["card", "reasoning", "card_chat_message" ],
       additionalProperties: false
     }
   }
@@ -113,7 +113,7 @@ export const handlePromiseCall = (
     confidence,
     mode,
     reasoning: args.reasoning?.slice(0, 1000) ?? "No reasoning provided by the model.",
-    promiseChatMessage: args.promiseChatMessage?.slice(0, 500) // optional message to say when playing the card
+    promise_chat_message: args.promise_chat_message?.slice(0, 500) // optional message to say when playing the card
   } as AiPromiseResult;
 };
 
@@ -144,7 +144,7 @@ export const handlePlayCardCall = (
     confidence,
     mode,
     reasoning: args.reasoning?.slice(0, 1000) ?? "No reasoning provided by the model.",
-    cardChatMessage: args.cardChatMessage?.slice(0, 500) // optional message to say when playing the card
+    card_chat_message: args.card_chat_message?.slice(0, 500) // optional message to say when playing the card
   } as AiPlayCardResult;
 };
 
@@ -218,8 +218,8 @@ const playersInOrderForPromise = (game: IGameOptions, roundInd: number, myName: 
     const player = round.roundPlayers[checkInd];
     playerOrder.push({
       name: player.name,
-      thisIsMe: player.name === myName,
-      promise: player.promise ?? undefined,
+      this_is_me: player.name === myName,
+      promise: player.promise ?? "not promised yet",
       score: getGamePointsForPlayer(game.game.rounds, player.name),
     });
   }
@@ -229,22 +229,39 @@ const playersInOrderForPromise = (game: IGameOptions, roundInd: number, myName: 
 const playersInOrderForPlay = (game: IGameOptions, roundInd: number, myName: string): PlayerPublicStateForPlay[] => {
   const playerOrder: PlayerPublicStateForPlay[] = [];
   const round = game.game.rounds[roundInd];
-  const currentPlayIndex = getPlayerInTurn(round)?.index;
-  if (currentPlayIndex === undefined || currentPlayIndex === null) {
-    throw new Error("No player in turn found for round " + roundInd);
-  }
-  for (let i = currentPlayIndex; i < currentPlayIndex + round.roundPlayers.length; i++) {
-    const checkInd = i >= round.roundPlayers.length ? i - round.roundPlayers.length : i;
-    const player = round.roundPlayers[checkInd];
-    playerOrder.push({
-      name: player.name,
-      thisIsMe: player.name === myName,
-      promise: player.promise ?? undefined,
-      score: getGamePointsForPlayer(game.game.rounds, player.name),
-      tricksTaken: player.keeps,
-      doesNotHaveSuits: playerHasNoSuits(player.name, round),
-      hasPlayedCards: round.cardsPlayed.flatMap(play => play.filter(p => p.name === player.name).map(p => cardToCardCode(p.card))),
-    });
+  const currentPlayIndex = getCurrentPlayIndex(round);
+  if (currentPlayIndex === 0) {
+    // first play of the round, use starter position index to determine player order
+    for (let i = round.starterPositionIndex; i < round.starterPositionIndex + round.roundPlayers.length; i++) {
+      const checkInd = i >= round.roundPlayers.length ? i - round.roundPlayers.length : i;
+      const player = round.roundPlayers[checkInd];
+      playerOrder.push({
+        name: player.name,
+        this_is_me: player.name === myName,
+        promise: player.promise ?? "not promised yet",
+        score: getGamePointsForPlayer(game.game.rounds, player.name),
+        tricks_taken: player.keeps,
+        does_not_have_suits: playerHasNoSuits(player.name, round),
+        has_played_cards_earlier: round.cardsPlayed.flatMap(play => play.filter(p => p.name === player.name).map(p => cardToCardCode(p.card))),
+      });
+    }
+  } else {
+    // not first play, use current play index to determine player order (the player in turn is first, then the rest in order)
+    const prevWinner = winnerOfPlay(round.cardsPlayed[currentPlayIndex-1], round.trumpCard.suite);
+    const starterIndex = round.roundPlayers.findIndex(player => player.name === prevWinner!.name);
+    for (let i = starterIndex; i < starterIndex + round.roundPlayers.length; i++) {
+      const checkInd = i >= round.roundPlayers.length ? i - round.roundPlayers.length : i;
+      const player = round.roundPlayers[checkInd];
+      playerOrder.push({
+        name: player.name,
+        this_is_me: player.name === myName,
+        promise: player.promise ?? "not promised yet",
+        score: getGamePointsForPlayer(game.game.rounds, player.name),
+        tricks_taken: player.keeps,
+        does_not_have_suits: playerHasNoSuits(player.name, round),
+        has_played_cards_earlier: round.cardsPlayed.flatMap(play => play.filter(p => p.name === player.name).map(p => cardToCardCode(p.card))),
+      });
+    }
   }
   return playerOrder;
 };
@@ -275,7 +292,7 @@ export const myRoundToGameStateForTurn = (botCardPlay: IBotCardPlay): GameStateF
     players_in_order: playersInOrderForPlay(game!, roundInd, botName || "unknown_bot"),
     hand: myRound.myCards.map(card => cardToCardCode(card)),
     legal_cards: myRound.playableCards.map(index => cardToCardCode(myRound.myCards[index])),
-    trump: myRound.trumpCard?.suite.toUpperCase() as GameStateForTurn["trump"] || "H", // default to Hearts if not provided
+    trump: myRound.trumpCard?.suite.toUpperCase().substring(0,1) as GameStateForTurn["trump"] || "H", // default to Hearts if not provided
     deal_round: myRound.cardsInRound,
     round_type: myRound.cardsInRound >= 6 ? "big" : "small",
     your_promise: me.promise ?? 0,
@@ -284,7 +301,7 @@ export const myRoundToGameStateForTurn = (botCardPlay: IBotCardPlay): GameStateF
       player: play.name,
       card: cardToCardCode(play.card)
     })),
-    cards_played: getCardsPlayedSoFar(round),
+    cards_played_in_this_game: getCardsPlayedSoFar(round),
     round_promise_type: roundPromiseType(round),
   };
 };

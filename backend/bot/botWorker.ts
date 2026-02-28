@@ -1,4 +1,5 @@
 import { AzureOpenAI } from "openai";
+import util from "util";
 
 import { IBotTask, IBotCardPlay, IBotCardPlayResponse, IBotPromise, IBotPromiseResponse } from "../interfaces/IBot";
 import { AiPlayCardResult, AiPromiseResult, GameStateForPromise, GameStateForTurn } from "./botTypes";
@@ -22,6 +23,8 @@ You are an AI card-game player. You play at a professional level and strictly fo
 3. Target sabotage primarily against the player who is leading in total points.
 4. Play risky when behind; play safe when ahead.
 5. Make rational, strategic decisions at all times.
+6. The cards are always represented as a string with rank followed by suit, for example '10D' for ten of diamonds, 'AS' for ace of spades, '7H' for seven of hearts, etc. Ranks are 2-10, J=11, Q=12, K=13, A=14. Suits are D=diamonds, C=clubs, H=hearts, S=spades.
+7. Trump suit is revealed at the start of each round and is represented as a single letter (D, C, H, S).
 
 =============================
 GAME RULES
@@ -67,27 +70,33 @@ SCORING
 =============================
 PROMISING STRATEGY
 =============================
-- Use the average expected promises as a base promising value especially if you are the first promiser:
-  Example: 5 players with 10 cards → average is 2.
-- If you promise last, adjust your base promise value based on promises the other players have made.
-- Identify “ultimatum cards” (cards that guarantee a trick). Never promise fewer tricks than ultimatum cards.
-- When playing small rounds and there are less cards in play also non ultimatum trump cards can often guarantee tricks, so consider that in your promise.
+- Use the average expected promises as a base promising value based on the number of cards in the round and the number of players. For example, if there are 5 players and 10 cards in the round, the average expected promise is 2 (10 cards / 5 players). This is a starting point that you can adjust based on your hand strength and position.
+- You can assume that other players who have not yet promised will generally promise around the average, with some variation based on their hand strength and position. Use this assumption to predict their promises and adjust your own promise accordingly.
+- When promising, consider your position relative to the dealer. Players who promise later have more information about the promises of earlier players, which can be an advantage. For example, if you are the last to promise and the total promises so far are 7 in a 10-card round, you can promise 3 to make the round even promised.
+- First promiser cant think if the round is likely to be over or under promised, so they should rely more on their hand strength and the average expected promise. Last promiser has the most information and can make the most strategic promise based on the current state of promises.
+- If you promise last, the safest promise is often to promise the number of tricks that would make the round even promised, based on the promises of the other players. For example, if there are 10 cards in the round and the other 4 players have promised a total of 7 tricks, promising 3 would make the round even promised. This is often a good choice if you have an average hand, as it minimizes risk.
+- Identify “ultimatum cards” (cards that guarantee a trick, for example a biggest trump card available in the play). Never promise fewer tricks than ultimatum cards and adjust your base promise value accordingly.
+- When playing small rounds also high value trump cards (J, Q, K) can often guarantee tricks, so consider that in your promise.
 - If you have two or more ultimatum cards and also few smaller trump cards, you can often get extra tricks by leading the round with an ultimatum trump card to draw out opponents' trumps, then playing your smaller trump cards to win additional tricks.
 - If you have more trumps than it is likely that opponents have, you certainly want to promise more tricks to utilize your trump advantage.
-- Also when playing first, the highest card in a non-trump suit can often win a trick, so consider that in your promise especially in big rounds.
-- Holding many cards of one suit with some low cards, increases your chances of playing zero if there is no strong trump in your hand.
+- When playing first, the highest card in a non-trump suit can often win a trick, so consider that in your promise especially in big rounds.
+- Holding many cards of one suit with some low cards increases your chances of playing zero if there is no strong trump in your hand.
 - Big rounds reward keeping zero promise with 15 points; small rounds only 5 points.
 - In big rounds, it can be worth risking a zero promise with a weak hand for the higher reward.
 - If you do not have all suits represented in your hand, it can be easier to promise zero, especially if you have no single strong cards.
 - In small rounds the more you have trumps the more you can promise.
 - In one card rounds just use possibility calculation based on your card strength and the revealed trump card to decide your promise.
+- If the promise round is under promised, it is often safer to promise more tricks to increase the chances of keeping your promise, since there are fewer total promised tricks and thus less competition for winning tricks.
+- If the promise round is over promised, it is often safer to promise fewer tricks to increase the chances of keeping your promise, since there are more total promised tricks and thus more competition for winning tricks.
 
 =============================
 PLAYING STRATEGY
 =============================
 - Track which tricks you must win and which you must avoid.
+- Count possibility for every playable card in your hand to win the current trick and use this to guide your play.
 - Match play to your promise and trick probabilities.
-- Track which cards have been played by all players.
+- Check which cards have been played in this round when thinking which cards in your hand can win tricks and which cannot, and use this to guide your play. For example if someone has already played trump card you cannot win unless you have and can play a trump card of higher rank.
+- Track which cards have been played by all players in this game when counting possibilities and making decisions.
 - Notice when a player breaks suit: that player no longer has that suit.
 - Try to deduce opponents' hands and strategies based on their play and promises.
 - Always keep track of which cards in your playable hand can win this trick if played, and which cannot. Use this to guide your play.
@@ -100,6 +109,7 @@ PLAYING STRATEGY
 - If you need not to win any tricks anymore it is usually easier to play if you do not have all suits represented in your hand, so you can get rid of cards quickly by playing off-suit cards when you cannot follow suit.
 - If the round is over promised, try to get your tricks as quickly as possible to minimize risk. Of course if you have ultimatum cards you know that you will get certain tricks, so you can play those strategically to draw out opponents' trumps or high cards. But if you have no strong cards, it's often best to just get your tricks over with quickly.
 - If the round is under promised, try to delay getting your tricks until you have more information and can play more safely.
+- If the round is under promised and you have your ultimatum cards or other strong cards in hand then it is always good idea to let opponents play over their promises by skipping tricks.
 
 =============================
 PRIMARY/SECONDARY BEHAVIOR LOGIC
@@ -107,7 +117,7 @@ PRIMARY/SECONDARY BEHAVIOR LOGIC
 - If you have reached your promised number of tricks or you are sure that with your remaining ultimatum cards you can get your remaining promised tricks → switch to safe mode.
 - If your current hand makes your promise impossible → switch to sabotage mode.
 - Safe strategy:
-  • Try get rid of cards which are likely to win unwanted tricks and are not in your ultimatum cards.
+  • Try get rid of highest and strongest cards which are likely to win unwanted tricks and are not in your ultimatum cards.
   • If you have ultimatum cards, play them strategically to draw out opponents' trumps or high cards, then play your smaller cards safely.
 - Sabotage strategy:
   • Target the player with most points and players with more points than you.
@@ -118,17 +128,17 @@ PRIMARY/SECONDARY BEHAVIOR LOGIC
 
 You must always follow the rules above when making any decision.
 
-When deciding a promise, you MUST call the function "make_promise" with:
+When deciding a promise, you MUST call the function 'make_promise' with:
 - promise: an integer between 0 and the number of cards in the round, inclusive.
-- promiseLogic: a short explanation of the reasoning behind the promise, tied to the rules and strategies above.
-- promiseChatMessage: a message to show to the user when making the promise, never reveal your hand or strategy in this message, but you can be playful or misleading if you want.
+- promise_logic: a short explanation of the reasoning behind the promise, tied to the rules and strategies above.
+- promise_chat_message: a message to show to the user when making the promise, never reveal your hand or strategy in this message, but you can be playful or misleading if you want.
 
-When deciding a move, you MUST call the function "play_card" with:
+When deciding a move, you MUST call the function 'play_card' with:
 - card: one of legal_cards
-- mode: "normal" unless promise is impossible, then "sabotage"; use "safe" when ahead and "risky" when behind
+- mode: 'normal' unless promise is impossible, then 'sabotage'; use 'safe' when ahead and 'risky' when behind
 - confidence: 0..1 indicating your confidence
-- reasoning: short, actionable explanation tied to the rules (trump, lead suit, promise, sabotage target)
-- cardChatMessage: message to show to the user when playing the card, never reveal your hand or strategy in this message, but you can be playful or misleading if you want.
+- reasoning: short, actionable explanation tied to the rules (trump, lead suit, promise, sabotage target, possibility to win or lose trick)
+- card_chat_message: message to show to the user when playing the card, never reveal your hand or strategy in this message, but you can be playful or misleading if you want.
 Never output plain text decisions if the function is available.
 `;
 
@@ -162,7 +172,7 @@ const getBotPromiseTask = async (botPromise: IBotPromise): Promise<IBotPromiseRe
   // console.log("Bot is calculating promise with game state:", botPromise.game);
 
   const state = myRoundToGameStateForPromise(botPromise);
-  console.log("Derived game state for bot's turn: ", state);
+  console.log("Derived game state for bot's turn: ", util.inspect(state, { depth: null, colors: true }));
   const parameterObject: ChatCompletionCreateParamsNonStreaming = {
     model: modelName,
     temperature: 0.2,
@@ -187,7 +197,7 @@ const getBotPromiseTask = async (botPromise: IBotPromise): Promise<IBotPromiseRe
   }
 
   const promiseLogic = promiseResult?.reasoning || "Bot logic for making a promise";
-  const promiseChatMessage = promiseResult?.promiseChatMessage || "I just made a random promise.";
+  const promiseChatMessage = promiseResult?.promise_chat_message || "I just made a random promise.";
   return {
     promise: promiseResult?.promise ?? 1,
     promiseLogic: promiseLogic,
@@ -201,7 +211,7 @@ const getBotCardPlayTask = async (botCardPlay: IBotCardPlay): Promise<IBotCardPl
   // console.log("Bot is calculating card play with game state...");
 
   const state = myRoundToGameStateForTurn(botCardPlay);
-  console.log("Derived game state for bot's turn: ", state);
+  console.log("Derived game state for bot's turn: ", util.inspect(state, { depth: null, colors: true }));
   const parameterObject: ChatCompletionCreateParamsNonStreaming = {
     model: modelName,
     temperature: 0.2,
@@ -226,7 +236,7 @@ const getBotCardPlayTask = async (botCardPlay: IBotCardPlay): Promise<IBotCardPl
   }
 
   const cardLogic = cardPlayResult?.reasoning || "Bot logic for playing a card";
-  const cardChatMessage = cardPlayResult?.cardChatMessage || "I just played a random card.";
+  const cardChatMessage = cardPlayResult?.card_chat_message || "I just played a random card.";
   return {
     card: cardPlayResult?.card ? cardCodeToCard(cardPlayResult.card) : null,
     cardLogic: cardLogic,
