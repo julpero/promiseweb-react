@@ -31,6 +31,9 @@ test("Play game as creator Eka", async ({ page }) => {
     await page.selectOption("[label='Turn round of the game']", gameVariables.turn);
     await page.selectOption("[label='End round of the game']", gameVariables.end);
 
+    // player count
+    await page.selectOption("[label='Total number of players']", gameVariables.playerCount);
+
     // rules
     await page.getByLabel(ruleText.thisIsDemoGame).check();
     if (gameVariables.hidePromiseRound) {
@@ -46,12 +49,17 @@ test("Play game as creator Eka", async ({ page }) => {
 
     const joinGameButton = page.locator("button", {hasText: `JOIN GAME - created by ${ekaUser.name}`});
     const leaveGameButton = page.locator("button", {hasText: `LEAVE GAME - created by ${ekaUser.name}`});
+    const addBotButton = page.locator("button", {hasText: `ADD BOT`}).first();
 
     await expect(joinGameButton).toBeVisible();
     await expect(joinGameButton).toBeDisabled();
 
     await expect(leaveGameButton).toBeVisible();
     await expect(leaveGameButton).toBeEnabled();
+
+    await expect(addBotButton).toBeVisible();
+    await expect(addBotButton).toBeEnabled();
+    await addBotButton.click();
 
     console.log(`${myName} buttons ok`);
 

@@ -38,6 +38,7 @@ export const gameVariables = {
   start: "6",
   turn: "5",
   end: "6",
+  playerCount: "4",
   hidePromiseRound: false,
   onlyTotalPromise: false,
 };
