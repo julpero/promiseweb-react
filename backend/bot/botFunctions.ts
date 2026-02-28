@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { IuiCard } from "../../frontend/src/interfaces/IuiPlayingGame";
-import { CardCode, DecisionMode, GameStateForPromise, GameStateForTurn, AiPlayCardResult, Suit, AiPromiseResult, PlayerPublicState, PlayerPublicStateForPlay } from "./botTypes";
+import { CardCode, DecisionMode, GameStateForPromise, GameStateForTurn, AiPlayCardResult, Suit, AiPromiseResult, PlayerPublicState, PlayerPublicStateForPlay, RoundPromiseType } from "./botTypes";
 import { IGameOptions, IRound } from "../interfaces/IGameOptions";
 import { roundToPlayer } from "../actions/playingGame";
 import { IBotCardPlay, IBotPromise } from "../interfaces/IBot";
@@ -199,6 +199,17 @@ const playerHasNoSuits = (playerName: string, round: IRound): Suit[] => {
   return suits;
 };
 
+const roundPromiseType = (round: IRound): RoundPromiseType => {
+  const totalPromise = round.roundPlayers.reduce((sum, player) => sum + (player.promise ?? 0), 0);
+  if (totalPromise > round.cardsInRound) {
+    return "over";
+  } else if (totalPromise < round.cardsInRound) {
+    return "under";
+  } else {
+    return "even";
+  }
+};
+
 const playersInOrderForPromise = (game: IGameOptions, roundInd: number, myName: string): PlayerPublicState[] => {
   const playerOrder: PlayerPublicState[] = [];
   const round = game.game.rounds[roundInd];
@@ -232,6 +243,7 @@ const playersInOrderForPlay = (game: IGameOptions, roundInd: number, myName: str
       score: getGamePointsForPlayer(game.game.rounds, player.name),
       tricksTaken: player.keeps,
       doesNotHaveSuits: playerHasNoSuits(player.name, round),
+      hasPlayedCards: round.cardsPlayed.flatMap(play => play.filter(p => p.name === player.name).map(p => cardToCardCode(p.card))),
     });
   }
   return playerOrder;
@@ -248,7 +260,8 @@ export const myRoundToGameStateForPromise = (botPromise: IBotPromise): GameState
     trump: myRound.trumpCard?.suite.toUpperCase().substring(0,1) as GameStateForPromise["trump"] || "H", // default to Hearts if not provided
     deal_round: myRound.cardsInRound,
     round_type: myRound.cardsInRound >= 6 ? "big" : "small",
-  } as GameStateForPromise;
+    round_promise_type: roundPromiseType(game!.game.rounds[roundInd]),
+  };
 };
 
 export const myRoundToGameStateForTurn = (botCardPlay: IBotCardPlay): GameStateForTurn => {
@@ -272,5 +285,6 @@ export const myRoundToGameStateForTurn = (botCardPlay: IBotCardPlay): GameStateF
       card: cardToCardCode(play.card)
     })),
     cards_played: getCardsPlayedSoFar(round),
-  } as GameStateForTurn;
+    round_promise_type: roundPromiseType(round),
+  };
 };

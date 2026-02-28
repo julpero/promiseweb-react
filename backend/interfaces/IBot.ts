@@ -25,6 +25,7 @@ export interface IBotPromiseResponse {
 export interface IBotMakePromiseRequest extends IuiMakePromiseRequest {
   promiseLogic: string,
   promiseChatMessage: string,
+  success: boolean,
 }
 
 export interface IBotCardPlay {
@@ -45,4 +46,5 @@ export interface IBotCardPlayResponse {
 export interface IBotPlayCardRequest extends IuiPlayCardRequest {
   cardPlayLogic: string,
   cardPlayChatMessage: string,
+  success: boolean,
 }

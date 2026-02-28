@@ -1,7 +1,7 @@
 import Piscina from "piscina";
 import path from "path";
 import { IBotCardPlay, IBotCardPlayResponse, IBotMakePromiseRequest, IBotPlayCardRequest, IBotPromise, IBotPromiseResponse, IBotTask } from "../interfaces/IBot";
-import { Socket } from "socket.io-client";
+// import { Socket } from "socket.io-client";
 // import { Socket } from "socket.io";
 import { roundToPlayer } from "../actions/playingGame";
 import { IGameOptions } from "../interfaces/IGameOptions";
@@ -22,12 +22,7 @@ const workerFileName = path.resolve(
 
 export class BotPoolManager {
   private pool: Piscina;
-  private socket: Socket;
-
-  private simulateThinkingTimePromise = 1500;
-  private simulateThinkingTimeCard = 4000;
-
-  constructor(socket: Socket) {
+  constructor() {
     this.pool = new Piscina({
       // Point to the compiled JS file in production
       filename: workerFileName,
@@ -36,69 +31,77 @@ export class BotPoolManager {
       maxThreads: 4,
       env: process.env,
     });
-
-    // if (process.env.NODE_ENV === "development") {
-    //   const socketEndpoint = process.env.SOCKET_SERVER_URL || "http://localhost:5000";
-    //   console.log("Connecting bot worker to socket server at:", socketEndpoint);
-    //   this.socket = io(socketEndpoint, {
-    //     reconnection: true,
-    //   });
-    // } else {
-    //   // In production, we assume the socket server is at the same origin
-    //   console.log("Connecting bot worker to socket server at same origin");
-    //   this.socket = io("/", {
-    //     reconnection: true,
-    //   });
-    // }
-    this.socket = socket;
-    console.log("Bot worker socket status:", this.socket);
   }
 
-  public async getBotPromise(botPromise: IBotPromise): Promise<void> {
-    console.log("Submitting bot promise task to worker pool with game state...");
+  public async getBotPromise(botPromise: IBotPromise): Promise<IBotMakePromiseRequest> {
+    // console.log("Submitting bot promise task to worker pool with game state...");
 
     try {
-      console.log("checking connection...?", this.socket);
+      // console.log("checking connection...?", this.socket);
       // Offload task to the next available worker in the pool
       const botTask = { task: "promise", botPromise } as IBotTask;
       const result: IBotPromiseResponse = await this.pool.run(botTask);
       console.log("Bot promise result from worker pool:", result);
-      const thisTimeOut = result.success ? this.simulateThinkingTimePromise / 8 : this.simulateThinkingTimePromise; // If the bot failed to get a good promise, respond faster with fallback logic
-      setTimeout(() => {
-        this.socket.emit("make bot promise", {
-          promise: result.promise,
-          gameId: botPromise.gameId,
-          roundInd: botPromise.roundInd,
-          isSpeedPromise: false,
-          userName: botPromise.botName,
-          uuid: "",
-          promiseLogic: result.promiseLogic,
-          promiseChatMessage: result.promiseChatMessage,
-        } as IBotMakePromiseRequest);
-      }, thisTimeOut); // Simulate thinking time
-      return;
+      // const thisTimeOut = result.success ? this.simulateThinkingTimePromise / 8 : this.simulateThinkingTimePromise; // If the bot failed to get a good promise, respond faster with fallback logic
+      // setTimeout(() => {
+      //   this.socket.emit("make bot promise", {
+      //     promise: result.promise,
+      //     gameId: botPromise.gameId,
+      //     roundInd: botPromise.roundInd,
+      //     isSpeedPromise: false,
+      //     userName: botPromise.botName,
+      //     uuid: "",
+      //     promiseLogic: result.promiseLogic,
+      //     promiseChatMessage: result.promiseChatMessage,
+      //   });
+      // }, thisTimeOut); // Simulate thinking time
+      const botPromiseRespond: IBotMakePromiseRequest = {
+        promise: result.promise,
+        gameId: botPromise.gameId,
+        roundInd: botPromise.roundInd,
+        isSpeedPromise: false,
+        userName: botPromise.botName || "unknown_bot",
+        uuid: "",
+        promiseLogic: result.promiseLogic,
+        promiseChatMessage: result.promiseChatMessage,
+        success: result.success || false,
+      };
+      return botPromiseRespond;
     } catch (err) {
       console.error("Worker Pool Error:", err);
       // Fallback logic if the worker fails
-      setTimeout(() => {
-        this.socket.emit("make bot promise", {
-          // random promise between 0 and count of cards in this round for this bot
-          promise: Math.floor(Math.random() * ((botPromise.game as IGameOptions).game.rounds[botPromise.roundInd].cardsInRound + 1)),
-          gameId: botPromise.gameId,
-          roundInd: botPromise.roundInd,
-          isSpeedPromise: false,
-          userName: botPromise.botName,
-          uuid: "",
-          promiseLogic: "Fallback logic",
-          promiseChatMessage: "Sorry, I had a brain fart and promised a random number!",
-        } as IBotMakePromiseRequest);
-      }, this.simulateThinkingTimePromise); // Simulate thinking time
-      return;
+      // setTimeout(() => {
+      //   this.socket.emit("make bot promise", {
+      //     // random promise between 0 and count of cards in this round for this bot
+      //     promise: Math.floor(Math.random() * ((botPromise.game as IGameOptions).game.rounds[botPromise.roundInd].cardsInRound + 1)),
+      //     gameId: botPromise.gameId,
+      //     roundInd: botPromise.roundInd,
+      //     isSpeedPromise: false,
+      //     userName: botPromise.botName,
+      //     uuid: "",
+      //     promiseLogic: "Fallback logic",
+      //     promiseChatMessage: "Sorry, I had a brain fart and promised a random number!",
+      //   });
+      // }, this.simulateThinkingTimePromise); // Simulate thinking time
+      // return;
+      const botPromiseRespond: IBotMakePromiseRequest = {
+        // random promise between 0 and count of cards in this round for this bot
+        promise: Math.floor(Math.random() * ((botPromise.game as IGameOptions).game.rounds[botPromise.roundInd].cardsInRound + 1)),
+        gameId: botPromise.gameId,
+        roundInd: botPromise.roundInd,
+        isSpeedPromise: false,
+        userName: botPromise.botName || "unknown_bot",
+        uuid: "",
+        promiseLogic: "Fallback logic",
+        promiseChatMessage: "Sorry, I had a brain fart and promised a random number!",
+        success: false,
+      };
+      return botPromiseRespond;
     }
   }
 
-  public async getBotCardPlay(botCardPlay: IBotCardPlay): Promise<void> {
-    console.log("Submitting bot card play task to worker pool...");
+  public async getBotCardPlay(botCardPlay: IBotCardPlay): Promise<IBotPlayCardRequest> {
+    // console.log("Submitting bot card play task to worker pool...");
     const myRound = roundToPlayer(botCardPlay.game as IGameOptions, botCardPlay.roundInd, botCardPlay.botName || "unknown_bot");
 
     try {
@@ -106,37 +109,60 @@ export class BotPoolManager {
       const botTask = { task: "play", botCardPlay } as IBotTask;
       const result: IBotCardPlayResponse = await this.pool.run(botTask);
       console.log("Bot card play result from worker pool:", result);
-      const thisTimeOut = result.success ? this.simulateThinkingTimeCard / 8 : this.simulateThinkingTimeCard; // If the bot failed to get a good card, respond faster with fallback logic
-      setTimeout(() => {
-        this.socket.emit("play bot card", {
-          gameId: botCardPlay.gameId,
-          card: result.card,
-          roundInd: botCardPlay.roundInd,
-          userName: botCardPlay.botName,
-          uuid: "",
-          isSpeedPlay: false,
-          cardPlayLogic: result.cardLogic,
-          cardPlayChatMessage: result.cardChatMessage,
-        } as IBotPlayCardRequest);
-      }, thisTimeOut); // Simulate thinking time
-      return;
+      // const thisTimeOut = result.success ? this.simulateThinkingTimeCard / 8 : this.simulateThinkingTimeCard; // If the bot failed to get a good card, respond faster with fallback logic
+      // setTimeout(() => {
+      //   this.socket.emit("play bot card", {
+      //     gameId: botCardPlay.gameId,
+      //     card: result.card,
+      //     roundInd: botCardPlay.roundInd,
+      //     userName: botCardPlay.botName,
+      //     uuid: "",
+      //     isSpeedPlay: false,
+      //     cardPlayLogic: result.cardLogic,
+      //     cardPlayChatMessage: result.cardChatMessage,
+      //   });
+      // }, thisTimeOut); // Simulate thinking time
+      const botPlay: IBotPlayCardRequest = {
+        gameId: botCardPlay.gameId,
+        card: result.card,
+        roundInd: botCardPlay.roundInd,
+        userName: botCardPlay.botName || "unknown_bot",
+        uuid: "",
+        isSpeedPlay: false,
+        cardPlayLogic: result.cardLogic,
+        cardPlayChatMessage: result.cardChatMessage,
+        success: result.success || false,
+      };
+
+      return botPlay;
     } catch (err) {
       console.error("Worker Pool Error:", err);
       // Fallback logic if the worker fails
-      const randomCard = myRound.playableCards.length > 0 ? myRound.myCards[myRound.playableCards[Math.floor(Math.random() * myRound.playableCards.length)]] : null;
-      setTimeout(() => {
-        this.socket.emit("play bot card", {
-          gameId: botCardPlay.gameId,
-          card: randomCard,
-          roundInd: botCardPlay.roundInd,
-          userName: botCardPlay.botName,
-          uuid: "",
-          isSpeedPlay: false,
-          cardPlayLogic: "Fallback logic",
-          cardPlayChatMessage: "Sorry, I had a brain fart and played a random card!",
-        } as IBotPlayCardRequest);
-      }, this.simulateThinkingTimeCard); // Simulate thinking time
-      return;
+      const randomCard = myRound.myCards[myRound.playableCards[Math.floor(Math.random() * myRound.playableCards.length)]];
+      // setTimeout(() => {
+      //   this.socket.emit("play bot card", {
+      //     gameId: botCardPlay.gameId,
+      //     card: randomCard,
+      //     roundInd: botCardPlay.roundInd,
+      //     userName: botCardPlay.botName,
+      //     uuid: "",
+      //     isSpeedPlay: false,
+      //     cardPlayLogic: "Fallback logic",
+      //     cardPlayChatMessage: "Sorry, I had a brain fart and played a random card!",
+      //   });
+      // }, this.simulateThinkingTimeCard); // Simulate thinking time
+      const botPlay: IBotPlayCardRequest = {
+        gameId: botCardPlay.gameId,
+        card: randomCard,
+        roundInd: botCardPlay.roundInd,
+        userName: botCardPlay.botName || "unknown_bot",
+        uuid: "",
+        isSpeedPlay: false,
+        cardPlayLogic: "Fallback logic",
+        cardPlayChatMessage: "Sorry, I had a brain fart and played a random card!",
+        success: false,
+      };
+      return botPlay;
     }
   }
 }

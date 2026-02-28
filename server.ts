@@ -5,7 +5,7 @@ import express from "express";
 import { Application, Request, Response } from "express";
 import http from "http";
 import { Server, Socket } from "socket.io";
-import { io } from "socket.io-client";
+// import { io } from "socket.io-client";
 import cors from "cors";
 import path from "path";
 
@@ -63,9 +63,11 @@ app.get("/", (req: Request, res: Response) => {
   res.sendFile("index.html");
 });
 
+const baseBotPromiseTimeout = process.env.BASE_BOT_PROMISE_TIMEOUT ? parseInt(process.env.BASE_BOT_PROMISE_TIMEOUT) : 4000;
+const baseBotPlayTimeout = process.env.BASE_BOT_PLAY_TIMEOUT ? parseInt(process.env.BASE_BOT_PLAY_TIMEOUT) : 6000;
 
 const PORT = process.env.PORT || 5000;
-const botPool = new BotPoolManager(io(process.env.SOCKET_SERVER_URL ?? "http://localhost:5000"));
+const botPool = new BotPoolManager();
 
 connectDB().then(() => {
   server.listen(PORT, () => {
@@ -481,7 +483,11 @@ connectDB().then(() => {
           if (botPromise.isBotPromiseTurn) {
             // init bot promise
             console.log("init bot promise for bot", botPromise.botName);
-            botPool.getBotPromise(botPromise);
+            const botPromiseResponse = await botPool.getBotPromise(botPromise);
+            const promiseTimeOut = botPromiseResponse.success ? baseBotPromiseTimeout / 4 : baseBotPromiseTimeout;
+            setTimeout(async () => {
+              await botPromiseHandler(botPromiseResponse);
+            }, promiseTimeOut);
           }
         }
         csm.setLastTimestamp(userName, socket.id, timestamp);
@@ -746,13 +752,21 @@ connectDB().then(() => {
           if (botPromise.isBotPromiseTurn) {
             // init bot promise
             console.log("init bot promise for bot", botPromise.botName);
-            botPool.getBotPromise(botPromise);
+            const botPromiseResponse = await botPool.getBotPromise(botPromise);
+            const promiseTimeOut = botPromiseResponse.success ? baseBotPromiseTimeout / 4 : baseBotPromiseTimeout;
+            setTimeout(async () => {
+              await botPromiseHandler(botPromiseResponse);
+            }, promiseTimeOut);
           } else {
             // check if it is now bot play turn
             const botPlay: IBotCardPlay = await isBotPlayTurn(gameId, roundInd);
             if (botPlay.isBotCardPlayTurn) {
               console.log("init bot play for bot", botPlay.botName);
-              botPool.getBotCardPlay(botPlay);
+              const botPlayResponse = await botPool.getBotCardPlay(botPlay);
+              const playTimeOut = botPlayResponse.success ? baseBotPlayTimeout / 4 : baseBotPlayTimeout;
+              setTimeout(async () => {
+                await botPlayHandler(botPlayResponse);
+              }, playTimeOut); // add some delay to bot play to make it more natural
             }
           }
         }
@@ -764,7 +778,7 @@ connectDB().then(() => {
       }
     });
 
-    socket.on("make bot promise", async (makePromiseRequest: IBotMakePromiseRequest) => {
+    const botPromiseHandler = async (makePromiseRequest: IBotMakePromiseRequest) => {
       console.log("make bot promise", makePromiseRequest);
       const { gameId, roundInd, userName } = makePromiseRequest;
 
@@ -807,17 +821,26 @@ connectDB().then(() => {
         const botPromise: IBotPromise = await isBotPromiseTurn(gameId, roundInd);
         if (botPromise.isBotPromiseTurn) {
           // init bot promise
-          botPool.getBotPromise(botPromise);
+          const botPromiseResponse = await botPool.getBotPromise(botPromise);
+          const promiseTimeOut = botPromiseResponse.success ? baseBotPromiseTimeout / 4 : baseBotPromiseTimeout;
+          setTimeout(async () => {
+            await botPromiseHandler(botPromiseResponse);
+          }, promiseTimeOut);
         } else {
           // check if it is now bot play turn
           const botPlay: IBotCardPlay = await isBotPlayTurn(gameId, roundInd);
           if (botPlay.isBotCardPlayTurn) {
             console.log("init bot play for bot", botPlay.botName);
-            botPool.getBotCardPlay(botPlay);
+            const botPlayResponse = await botPool.getBotCardPlay(botPlay);
+            const playTimeOut = botPlayResponse.success ? baseBotPlayTimeout / 4 : baseBotPlayTimeout;
+            setTimeout(async () => {
+              await botPlayHandler(botPlayResponse);
+            }, playTimeOut); // add some delay to bot play to make it more natural
+
           }
         }
       }
-    });
+    };
 
     socket.on("play card", async (playCardRequest: IuiPlayCardRequest, fn: (playCardResponse: IuiPlayCardResponse) => void) => {
       // console.log("play card", playCardRequest);
@@ -920,7 +943,11 @@ connectDB().then(() => {
             const botPromise: IBotPromise = await isBotPromiseTurn(gameId, roundInd + 1); // next round bot promise turn check
             if (botPromise.isBotPromiseTurn) {
               // init bot promise
-              botPool.getBotPromise(botPromise);
+              const botPromiseResponse = await botPool.getBotPromise(botPromise);
+              const promiseTimeOut = botPromiseResponse.success ? baseBotPromiseTimeout / 4 : baseBotPromiseTimeout;
+              setTimeout(async () => {
+                await botPromiseHandler(botPromiseResponse);
+              }, promiseTimeOut);
             }
           } else if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.played) {
             const chatLine = "GAME OVER!";
@@ -943,7 +970,11 @@ connectDB().then(() => {
             const botPlay: IBotCardPlay = await isBotPlayTurn(gameId, roundInd);
             if (botPlay.isBotCardPlayTurn) {
               console.log("init bot play for bot", botPlay.botName);
-              botPool.getBotCardPlay(botPlay);
+              const botPlayResponse = await botPool.getBotCardPlay(botPlay);
+              const playTimeOut = botPlayResponse.success ? baseBotPlayTimeout / 4 : baseBotPlayTimeout;
+              setTimeout(async () => {
+                await botPlayHandler(botPlayResponse);
+              }, playTimeOut); // add some delay to bot play to make it more natural
             }
           }
         }
@@ -962,7 +993,7 @@ connectDB().then(() => {
       }
     });
 
-    socket.on("play bot card", async (playCardRequest: IBotPlayCardRequest) => {
+    const botPlayHandler = async (playCardRequest: IBotPlayCardRequest) => {
       console.log("play bot card", playCardRequest);
       const { gameId, roundInd } = playCardRequest;
 
@@ -1000,6 +1031,7 @@ connectDB().then(() => {
           winnerOfPlay: winnerOfPlay,
           winCount: winCount,
         };
+        ioServer.to(gameId).emit("card played", cardPlayedNotification);
 
         const botChatLine = `${playerName}: ${playCardRequest.cardPlayChatMessage}`;
         const botChatObj: IuiChatNotification = {
@@ -1008,8 +1040,6 @@ connectDB().then(() => {
           type: CHAT_TYPE.chat,
         };
         ioServer.to(gameId).emit("new chat line", botChatObj);
-
-        socket.to(gameId).emit("card played", cardPlayedNotification);
 
         const chatLine = `${playerName} hit card in ${(playTime/1000).toFixed(1)} seconds`;
         const chatObj: IuiChatNotification = {
@@ -1056,7 +1086,11 @@ connectDB().then(() => {
           const botPromise: IBotPromise = await isBotPromiseTurn(gameId, roundInd + 1); // next round starts, so check for next round
           if (botPromise.isBotPromiseTurn) {
             // init bot promise
-            botPool.getBotPromise(botPromise);
+            const botPromiseResponse = await botPool.getBotPromise(botPromise);
+            const promiseTimeOut = baseBotPromiseTimeout;
+            setTimeout(async () => {
+              await botPromiseHandler(botPromiseResponse);
+            }, promiseTimeOut);
           }
         } else if (roundStatusAfterPlay === ROUND_STATUS.played && gameStatusAfterPlay === GAME_STATUS.played) {
           const chatLine = "GAME OVER!";
@@ -1079,11 +1113,15 @@ connectDB().then(() => {
           const botPlay: IBotCardPlay = await isBotPlayTurn(gameId, roundInd);
           if (botPlay.isBotCardPlayTurn) {
             console.log("init bot play for bot", botPlay.botName);
-            botPool.getBotCardPlay(botPlay);
+            const botPlayResponse = await botPool.getBotCardPlay(botPlay);
+            const playTimeOut = botPlayResponse.success ? baseBotPlayTimeout / 4 : baseBotPlayTimeout;
+            setTimeout(async () => {
+              await botPlayHandler(botPlayResponse);
+            }, playTimeOut); // add some delay to bot play to make it more natural
           }
         }
       }
-    });
+    };
 
     socket.on("end game", (endGameRequest: IuiEndGameRequest) => {
       const {userName, gameId, uuid, token} = endGameRequest;

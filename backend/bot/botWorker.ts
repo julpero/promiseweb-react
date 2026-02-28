@@ -37,6 +37,9 @@ GENERAL RULES
 - After promises, trick-taking begins starting from the player after the dealer.
 - 6+ cards per player = Big Round.
   5 or fewer cards per player = Small Round.
+- Round is even promised if total promises = number of cards in the round
+  Round is under promised if total promises < number of cards in the round
+  Round is over promised if total promises > number of cards in the round
 
 =============================
 TRICK-TAKING RULES
@@ -64,17 +67,20 @@ SCORING
 =============================
 PROMISING STRATEGY
 =============================
+- Use the average expected promises as a base promising value especially if you are the first promiser:
+  Example: 5 players with 10 cards → average is 2.
+- If you promise last, adjust your base promise value based on promises the other players have made.
 - Identify “ultimatum cards” (cards that guarantee a trick). Never promise fewer tricks than ultimatum cards.
 - When playing small rounds and there are less cards in play also non ultimatum trump cards can often guarantee tricks, so consider that in your promise.
-- If you have two or more ultimatum cards and also few smaller trump cards, you can often get extra tricks by leading the round with an ultimatum card to draw out opponents' trumps, then playing your smaller trump cards to win additional tricks.
-- Also when playing first, a high card in a non-trump suit can often win a trick, so consider that in your promise especially in big rounds.
-- Use the average expected promises:
-  Example: 5 players with 10 cards → average is 2.
-- If you promise last, adjust based on existing promises.
-- Holding many cards of one suit with some low cards, increases your chances of playing zero if there is no strong trump.
-- Big rounds reward zero promise with 15 points; small rounds only 5 points.
-- In big rounds, it can be worth risking a zero promise with a weak hand for the higher reward, especially if you are in an early position and can adjust based on others' promises.
-- If you do not have all suits represented in your hand, it can be easier to promise zero and try to get rid of your cards quickly, especially if you have no strong cards.
+- If you have two or more ultimatum cards and also few smaller trump cards, you can often get extra tricks by leading the round with an ultimatum trump card to draw out opponents' trumps, then playing your smaller trump cards to win additional tricks.
+- If you have more trumps than it is likely that opponents have, you certainly want to promise more tricks to utilize your trump advantage.
+- Also when playing first, the highest card in a non-trump suit can often win a trick, so consider that in your promise especially in big rounds.
+- Holding many cards of one suit with some low cards, increases your chances of playing zero if there is no strong trump in your hand.
+- Big rounds reward keeping zero promise with 15 points; small rounds only 5 points.
+- In big rounds, it can be worth risking a zero promise with a weak hand for the higher reward.
+- If you do not have all suits represented in your hand, it can be easier to promise zero, especially if you have no single strong cards.
+- In small rounds the more you have trumps the more you can promise.
+- In one card rounds just use possibility calculation based on your card strength and the revealed trump card to decide your promise.
 
 =============================
 PLAYING STRATEGY
@@ -83,10 +89,14 @@ PLAYING STRATEGY
 - Match play to your promise and trick probabilities.
 - Track which cards have been played by all players.
 - Notice when a player breaks suit: that player no longer has that suit.
-- During tricks you must always reconsider which cards in your hand are guaranteed to win tricks (ultimatum cards), which cards can only win if opponents play certain cards (conditional winners), and which cards cannot win any tricks. Use this to guide your play.
-- During tricks you must always reconsider which are your cards that you are going to play to reach your promised number of tricks in the safest way possible, and which cards are risky to play because they might win unwanted tricks or lose expected tricks. Use this to guide your play and adjust your strategy between safe and sabotage.
-- If there is a possibility to sabotage a leading opponent, consider playing a card that forces them to win an unwanted trick or lose an expected trick.
-- Use trumps strategically to disrupt opponents, especially the leading opponent if you are in sabotage mode.
+- Try to deduce opponents' hands and strategies based on their play and promises.
+- Always keep track of which cards in your playable hand can win this trick if played, and which cannot. Use this to guide your play.
+  • For example if someone starts round with a suit you do not have, you can win the trick only with a biggest trump card in round, so if you have no trumps you know you cannot win the trick and can play safely if you want.
+  • For example if someone starts round with a suit you have, but someone has already played a trump card then you cannot win this trick anymore.
+- During tricks you must always reconsider which cards in your hand are guaranteed to win tricks in later rounds (ultimatum cards), which cards can only win if opponents play certain cards (conditional winners), and which cards cannot win any tricks. Use this to guide your play.
+- During tricks you must always reconsider which are your cards that you are going to play to reach your promised number of tricks in the safest way possible, and which cards are risky to play because they might win unwanted tricks or lose expected tricks. Use this also to guide your play and adjust your strategy between safe and sabotage.
+- If there is a possibility to sabotage a opponent which have more points than you, consider playing a card that forces them to win an unwanted trick or lose an expected trick.
+- Use trumps strategically to disrupt opponents, especially the players with more points than you if you are in sabotage mode.
 - If you need not to win any tricks anymore it is usually easier to play if you do not have all suits represented in your hand, so you can get rid of cards quickly by playing off-suit cards when you cannot follow suit.
 - If the round is over promised, try to get your tricks as quickly as possible to minimize risk. Of course if you have ultimatum cards you know that you will get certain tricks, so you can play those strategically to draw out opponents' trumps or high cards. But if you have no strong cards, it's often best to just get your tricks over with quickly.
 - If the round is under promised, try to delay getting your tricks until you have more information and can play more safely.
@@ -100,9 +110,10 @@ PRIMARY/SECONDARY BEHAVIOR LOGIC
   • Try get rid of cards which are likely to win unwanted tricks and are not in your ultimatum cards.
   • If you have ultimatum cards, play them strategically to draw out opponents' trumps or high cards, then play your smaller cards safely.
 - Sabotage strategy:
-  • Target the player with most points.
+  • Target the player with most points and players with more points than you.
   • Force them to win unwanted tricks or lose expected tricks.
   • Use trumps and off-suit cards strategically to disrupt.
+  • Usually a player who has promised zero is easier to sabotage by forcing them to win a trick for example playing a small card of the suit you know they may have.
 - Otherwise follow normal optimal play.
 
 You must always follow the rules above when making any decision.
@@ -146,12 +157,12 @@ const stateToUserTextPlayCard = (state: GameStateForTurn): string => {
 };
 
 // This function runs in a separate thread
-const getBotPromise = async (botPromise: IBotPromise): Promise<IBotPromiseResponse> => {
+const getBotPromiseTask = async (botPromise: IBotPromise): Promise<IBotPromiseResponse> => {
   // Heavy computation/AI logic here
-  console.log("Bot is calculating promise with game state:", botPromise.game);
+  // console.log("Bot is calculating promise with game state:", botPromise.game);
 
   const state = myRoundToGameStateForPromise(botPromise);
-  // console.log("Derived game state for bot's turn: ", state);
+  console.log("Derived game state for bot's turn: ", state);
   const parameterObject: ChatCompletionCreateParamsNonStreaming = {
     model: modelName,
     temperature: 0.2,
@@ -162,10 +173,10 @@ const getBotPromise = async (botPromise: IBotPromise): Promise<IBotPromiseRespon
     tools: [makePromiseTool],
     tool_choice: "auto", // allow the model to call make_promise
   };
-  // console.log("Sending the following parameters to Azure OpenAI:");
-  // console.log(JSON.stringify(parameterObject));
+  console.log("Sending the following parameters to Azure OpenAI:");
+  console.log(JSON.stringify(parameterObject));
   const response = await client.chat.completions.create(parameterObject);
-  console.log("Raw response from Azure OpenAI promise:", response);
+  // console.log("Raw response from Azure OpenAI promise:", response);
   const choice = response.choices[0];
   const toolCall = choice.message?.tool_calls?.[0];
 
@@ -185,12 +196,12 @@ const getBotPromise = async (botPromise: IBotPromise): Promise<IBotPromiseRespon
   } as IBotPromiseResponse;
 };
 
-const getBotCardPlay = async (botCardPlay: IBotCardPlay): Promise<IBotCardPlayResponse> => {
+const getBotCardPlayTask = async (botCardPlay: IBotCardPlay): Promise<IBotCardPlayResponse> => {
   // Heavy computation/AI logic here
-  console.log("Bot is calculating card play with game state...");
+  // console.log("Bot is calculating card play with game state...");
 
   const state = myRoundToGameStateForTurn(botCardPlay);
-  // console.log("Derived game state for bot's turn: ", state);
+  console.log("Derived game state for bot's turn: ", state);
   const parameterObject: ChatCompletionCreateParamsNonStreaming = {
     model: modelName,
     temperature: 0.2,
@@ -201,10 +212,10 @@ const getBotCardPlay = async (botCardPlay: IBotCardPlay): Promise<IBotCardPlayRe
     tools: [playCardTool],
     tool_choice: "auto", // allow the model to call play_card
   };
-  // console.log("Sending the following parameters to Azure OpenAI:");
-  // console.log(JSON.stringify(parameterObject));
+  console.log("Sending the following parameters to Azure OpenAI:");
+  console.log(JSON.stringify(parameterObject));
   const response = await client.chat.completions.create(parameterObject);
-  console.log("Raw response from Azure OpenAI play:", response);
+  // console.log("Raw response from Azure OpenAI play:", response);
   const choice = response.choices[0];
   const toolCall = choice.message?.tool_calls?.[0];
 
@@ -227,8 +238,8 @@ const getBotCardPlay = async (botCardPlay: IBotCardPlay): Promise<IBotCardPlayRe
 // The DEFAULT export that Piscina calls
 export default async (input: IBotTask) => {
   if (input.task === "promise") {
-    return getBotPromise(input.botPromise as IBotPromise);
+    return await getBotPromiseTask(input.botPromise as IBotPromise);
   } else {
-    return await getBotCardPlay(input.botCardPlay as IBotCardPlay);
+    return await getBotCardPlayTask(input.botCardPlay as IBotCardPlay);
   }
 };

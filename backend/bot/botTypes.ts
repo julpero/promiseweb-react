@@ -13,6 +13,7 @@ export interface PlayerPublicState {
 export interface PlayerPublicStateForPlay extends PlayerPublicState {
   tricksTaken: number;
   doesNotHaveSuits: Suit[]; // Optional property to indicate if we know the player does not have a certain suits
+  hasPlayedCards: CardCode[]; // Optional property to indicate which cards the player has already played in the current round
 }
 
 export interface TrickPlay {
@@ -22,12 +23,16 @@ export interface TrickPlay {
 
 export type RoundType = "big" | "small";
 
+export type RoundPromiseType = "over" | "under" | "even";
+
 export interface GameStateForAi {
   hand: CardCode[];
   trump: Suit;
   deal_round: number;       // number of cards dealt to each player this deal
   round_type: RoundType;    // "big" (>=6) | "small" (<=5)
+  round_promise_type: RoundPromiseType; // "over" | "under" | "even"
 }
+
 export interface GameStateForPromise extends GameStateForAi {
   players_in_order: PlayerPublicState[]; // players in the order they will promise, with info on their promises and scores
 }
