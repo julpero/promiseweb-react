@@ -36,19 +36,26 @@ export class BotPoolManager {
       env: process.env,
     });
 
-    const socketEndpoint = process.env.SOCKET_SERVER_URL || "http://localhost:5000";
-    console.log("Connecting bot worker to socket server at:", socketEndpoint);
-    this.socket = io(socketEndpoint, {
-      reconnection: true,
-    });
-    console.log("Bot worker socket connection status:", this.socket.connected ? "connected" : "not connected");
+    if (process.env.NODE_ENV === "development") {
+      const socketEndpoint = process.env.SOCKET_SERVER_URL || "http://localhost:5000";
+      console.log("Connecting bot worker to socket server at:", socketEndpoint);
+      this.socket = io(socketEndpoint, {
+        reconnection: true,
+      });
+    } else {
+      // In production, we assume the socket server is at the same origin
+      console.log("Connecting bot worker to socket server at same origin");
+      this.socket = io("/", {
+        reconnection: true,
+      });
+    }
+    console.log("Bot worker socket status:", this.socket);
   }
 
   public async getBotPromise(botPromise: IBotPromise): Promise<void> {
     console.log("Submitting bot promise task to worker pool with game state...");
 
     try {
-      console.log("checking endpoint...?", process.env.SOCKET_SERVER_URL);
       console.log("checking connection...?", this.socket);
       // Offload task to the next available worker in the pool
       const botTask = { task: "promise", botPromise } as IBotTask;
