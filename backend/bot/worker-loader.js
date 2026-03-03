@@ -16,9 +16,13 @@ if (process.env.NODE_ENV === "development") {
 }
 // This tells the worker to look at the .ts file in dev
 // or the .js file in production
-const workerPath = process.env.NODE_ENV === "development"
-  ? "./botWorker.ts"
-  : "./botWorker.js";
+const workerPath = process.env.BOT_TYPE === "gemini"
+  ? process.env.NODE_ENV === "development"
+    ? "./geminiWorker.ts"
+    : "./geminiWorker.js"
+  : process.env.NODE_ENV === "development"
+    ? "./botWorker.ts"
+    : "./botWorker.js";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const workerModule = require(path.resolve(__dirname, workerPath));

@@ -243,6 +243,7 @@ const playersInOrderForPlay = (game: IGameOptions, roundInd: number, myName: str
         tricks_taken: player.keeps,
         does_not_have_suits: playerHasNoSuits(player.name, round),
         has_played_cards_earlier: round.cardsPlayed.flatMap(play => play.filter(p => p.name === player.name).map(p => cardToCardCode(p.card))),
+        played_card_this_trick: round.cardsPlayed[currentPlayIndex].find(p => p.name === player.name) ? cardToCardCode(round.cardsPlayed[currentPlayIndex].find(p => p.name === player.name)!.card) : null,
       });
     }
   } else {
@@ -260,6 +261,7 @@ const playersInOrderForPlay = (game: IGameOptions, roundInd: number, myName: str
         tricks_taken: player.keeps,
         does_not_have_suits: playerHasNoSuits(player.name, round),
         has_played_cards_earlier: round.cardsPlayed.flatMap(play => play.filter(p => p.name === player.name).map(p => cardToCardCode(p.card))),
+        played_card_this_trick: round.cardsPlayed[currentPlayIndex].find(p => p.name === player.name) ? cardToCardCode(round.cardsPlayed[currentPlayIndex].find(p => p.name === player.name)!.card) : null,
       });
     }
   }
@@ -305,3 +307,146 @@ export const myRoundToGameStateForTurn = (botCardPlay: IBotCardPlay): GameStateF
     round_promise_type: roundPromiseType(round),
   };
 };
+
+//#region Gemini prompt construction functions
+const geminiBasicInfoFromIBotPromise = (game: IGameOptions, roundInd: number, botName: string): string => {
+  return `
+You are a bot playing a card game. Here is the current game state:
+- There are ${game.humanPlayersCount - 1} other players in the game. You are playing against them.
+- Your name is ${botName}, the other players are ${game.game.rounds[roundInd].roundPlayers.filter(p => p.name !== botName).map(p => p.name).join(", ")}.
+- The game is currently in round ${roundInd + 1} and every player started with ${game.game.rounds[roundInd].cardsInRound} cards in this round, so this is ${game.game.rounds[roundInd].cardsInRound >= 6 ? "a big round" : "a small round"}.
+- The trump card revealed for this round is ${cardToCardCode(game.game.rounds[roundInd].trumpCard)}.
+- The total scores of the players so far are: ${game.game.rounds[roundInd].roundPlayers.map(p => `${p.name}: ${getGamePointsForPlayer(game.game.rounds, p.name)}`).join(", ")}.
+- Your have these cards in your hand at the moment: ${game.game.rounds[roundInd].roundPlayers.find(p => p.name === botName)?.cards.map(c => cardToCardCode(c)).join(", ") || "unknown"}.
+`;
+};
+
+const indexToPosition = (index: number, totalPlayers?: number): string => {
+  const positions = ["first", "second", "third", "fourth", "fifth", "sixth"];
+  if (totalPlayers && index === totalPlayers - 1) {
+    return "last";
+  }
+  return positions[index] || `position ${index}`;
+};
+
+const promisesSoFarToString = (round: IRound): string => {
+  return round.roundPlayers.map(p => `${p.name} ${p.promise !== null ? "promised " + p.promise : "has not promised yet"}`).join(", ");
+};
+
+const geminiPromisesSoFar = (botPromise: IBotPromise): string => {
+  const game: IGameOptions = botPromise.game!;
+  const round = game.game.rounds[botPromise.roundInd];
+
+  const playersInOrder = playersInOrderForPromise(game, botPromise.roundInd, botPromise.botName || "unknown_bot");
+  const myIndex = playersInOrder.findIndex(p => p.name === botPromise.botName);
+  const myPosition = indexToPosition(myIndex, playersInOrder.length);
+
+  return `
+- You are the ${myPosition} player and promiser in this round.
+- Promises so far in order: ${promisesSoFarToString(round)}.
+`;
+};
+
+const geminiBasicPromiseInstruction = (): string => {
+
+  return `
+
+You will decide a promise for the current round with information given above.
+The promise is the number of tricks you think you will take in this round.
+You can use the information about the trump card, your hand, and the scores of the players to make your decision. You want to make a promise that you think you can achieve based on your hand and the game state. You can also consider the current scores of the players and whether you want to play it safe or take a risk.
+
+What is your promise and why? Say also something about your reasoning as chat line but do not reveal your hand or strategy in any way. You can be playful or misleading if you want, but try to make it sound like a reasonable promise based on the game state. Do not say anything that would directly reveal your cards or your exact strategy to the other players.
+Respond with a JSON object with the following format:
+{
+  "promise": integer, // between 0 and the number of cards in the round, inclusive
+  "confidence": number, // 0..1 indicating your confidence in this promise
+  "reasoning": string, // a short explanation of the reasoning behind the promise, tied to the rules and strategies above
+  "promise_chat_message": string // a message to show to the other players when making the promise, never reveal your hand or strategy in this message, but you can be playful or misleading if you want
+}
+`;
+};
+
+const geminiBasicPlayState = (botCardPlay: IBotCardPlay): string => {
+  const game: IGameOptions = botCardPlay.game!;
+  const { roundInd, botName } = botCardPlay;
+  const myRound = roundToPlayer(game as IGameOptions, roundInd, botName || "unknown_bot");
+  const playersInOrder = playersInOrderForPlay(game, roundInd, botName || "unknown_bot");
+  let stateString = `Players in order: ${playersInOrder.map(p => p.name).join(", ")}.`;
+  stateString += "\nThey have promised to take the following number of tricks in this round: " + playersInOrder.filter(p => p.this_is_me === false).map(p => `${p.name}: ${p.promise}`).join(", ") + ".";
+  if (roundInd === 0) {
+    stateString += "\nThis is the first round, so no one has taken any tricks yet.";
+    stateString += `\nYour promise for this round is ${playersInOrder.find(p => p.this_is_me)?.promise ?? "unknown"}.`;
+  } else {
+    stateString += "\nIn the previous rounds, the players have taken the following number of tricks: " + playersInOrder.filter(p => p.this_is_me === false).map(p => `${p.name}: ${p.tricks_taken}`).join(", ") + ".";
+    stateString += `\nYour promise for this round is ${playersInOrder.find(p => p.this_is_me)?.promise ?? "unknown"}, and you have taken ${playersInOrder.find(p => p.this_is_me)?.tricks_taken ?? "unknown"} tricks so far.`;
+  }
+  stateString += `\nBased on the total promises and tricks available, this round is a ${roundPromiseType(game.game.rounds[roundInd])} promised round.`;
+  if (playersInOrder[0].this_is_me) {
+    stateString += "\nYou are the first player in this trick, so you can play any card.";
+  } else {
+    stateString += `\nThe lead player for this trick is ${playersInOrder[0].name}, so you must follow suit if you have any cards of the lead suit. The lead suit for this trick is determined by the first card played in this trick, which is ${cardToCardCode(game.game.rounds[roundInd].cardsPlayed.flatMap(play => play)[0]?.card) || "unknown"}. If you do not have any cards of the lead suit, you can play any card. Remember to consider your promise and how many tricks you have taken so far in this round when making your decision.`;
+    for (let i = 1; i < playersInOrder.length; i++) {
+      if (playersInOrder[i].this_is_me) {
+        stateString += `\nYou are the ${indexToPosition(i, playersInOrder.length)} player to play and now it is your turn to play a card. Consider the current trick state, your hand, the trump suit, and your promise when making your decision.`;
+        break;
+      } else {
+        stateString += `\nThe ${indexToPosition(i, playersInOrder.length)} player to play in this trick was ${playersInOrder[i].name} and he/she played ${playersInOrder[i].played_card_this_trick || "unknown"}`;
+        if (cardCodeToCard(playersInOrder[i].played_card_this_trick!).suite !== cardCodeToCard(playersInOrder[0].played_card_this_trick!).suite) {
+          stateString += " and broke the lead suit so he/she does not have any more cards of the lead suit.";
+        } else {
+          stateString += ".";
+        }
+      }
+    }
+    const playWinner = myRound.playerGoingToWinThisPlay!;
+    stateString += `\nBased on the current trick state, ${playWinner} is likely to win this trick with the card ${playersInOrder.find(p => p.name === playWinner)?.played_card_this_trick || "unknown"}.`;
+  }
+  stateString += "\nYou can play the following legal cards from your hand (legal_cards): " + myRound.playableCards.map(index => cardToCardCode(myRound.myCards[index])).join(", ");
+  if (playersInOrder.findIndex(p => p.this_is_me) < playersInOrder.length - 1) {
+    stateString += `\nThe players who have not yet played in this trick are: ${playersInOrder.filter(p => p.this_is_me === false && !p.played_card_this_trick).map(p => p.name).join(", ")}.`;
+  }
+
+  if (roundInd > 0) {
+    stateString += `\nThe cards played in this game so far are: ${getCardsPlayedSoFar(game.game.rounds[roundInd]).join(", ")} so they and the trump card ${cardToCardCode(myRound.trumpCard!)} are not available to play by any player anymore.`;
+  }
+  if (playersInOrder.some(p => p.this_is_me === false && p.does_not_have_suits.length > 0)) {
+    stateString += `\nBased on the previous tricks, you know that some players do not have cards of certain suits anymore in their hands: ${playersInOrder.filter(p => p.this_is_me === false && p.does_not_have_suits.length > 0).map(p => `${p.name} does not have ${p.does_not_have_suits.join(", ")}`).join("; ")}.`;
+  }
+
+  return stateString;
+};
+
+const geminiBasicPlayInstruction = (): string => {
+
+  return `
+
+Card is represented as a string with rank followed by suit, e.g. "AS" for Ace of Spades, "10H" for Ten of Hearts, "QD" for Queen of Diamonds, etc.
+You must choose a card from the legal_cards list. Use the information about the current trick, your hand, the trump suit, and the game state to make your decision. You can also consider your promise and how many tricks you have taken so far in this round.
+Try to win the trick if it helps you achieve your promise, but also consider when it might be better to lose a trick. You can also consider the current scores of the players and whether you want to play it safe or take a risk.
+
+Which card do you play and why? Say also something about your reasoning as chat line but do not reveal your hand or strategy in any way. You can be playful or misleading if you want, but try to make it sound like a reasonable play based on the game state. Do not say anything that would directly reveal your cards or your exact strategy to the other players.
+Respond with a JSON object with the following format:
+{
+  "card": string, // one of legal_cards
+  "mode": string, // 'normal' unless promise is impossible, then 'sabotage'; use 'safe' when ahead and 'risky' when behind
+  "confidence": number, // 0..1 indicating your confidence in this play
+  "reasoning": string, // a short, actionable explanation tied to the rules (trump, lead suit, promise, sabotage target, possibility to win or lose trick)
+  "card_chat_message": string // a message to show to the user when playing the card, never reveal your hand or strategy in this message, but you can be playful or misleading if you want
+}
+`;
+};
+
+export const myRoundToGeminiGameStateForPromise = (botPromise: IBotPromise): string => {
+  return geminiBasicInfoFromIBotPromise(botPromise.game!, botPromise.roundInd, botPromise.botName!) +
+    geminiPromisesSoFar(botPromise) +
+    geminiBasicPromiseInstruction();
+};
+
+export const myRoundToGeminiGameStateForPlay = (botCardPlay: IBotCardPlay): string => {
+  const game: IGameOptions = botCardPlay.game!;
+  return geminiBasicInfoFromIBotPromise(game, botCardPlay.roundInd, botCardPlay.botName!) +
+    geminiBasicPlayState(botCardPlay) +
+    geminiBasicPlayInstruction();
+};
+
+//#endregion
