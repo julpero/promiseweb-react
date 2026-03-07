@@ -1,22 +1,22 @@
-import {
-  GoogleGenAI,
-  MediaResolution,
-  ThinkingLevel,
-} from "@google/genai";
+import { DefaultAzureCredential } from "@azure/identity";
+import { AIProjectClient } from "@azure/ai-projects";
+
 // import util from "util";
 
 import { IBotTask, IBotCardPlay, IBotCardPlayResponse, IBotPromise, IBotPromiseResponse } from "../interfaces/IBot";
 import { AiPlayCardResult, AiPromiseResult } from "./botTypes";
 import { cardCodeToCard, myRoundToGeminiGameStateForPlay, myRoundToGeminiGameStateForPromise } from "./botFunctions";
 
-// const geminiApiKey = process.env.GEMINI_API_KEY;
-// const geminiApiEndpoint = process.env.GEMINI_API_ENDPOINT || "https://gemini.googleapis.com/v1/models/gemini-3-flash-preview:generateContentStream";
-const modelName = "gemini-3-flash-preview";
+const projectEndpoint = process.env["AZURE_EXISTING_AIPROJECT_ENDPOINT"] || "";
+const agentName = process.env["AZURE_EXISTING_AGENT_NAME"] || "";
+const agentVersion = process.env["AZURE_EXISTING_AGENT_VERSION"] || "";
 
-const client = new GoogleGenAI({});
+// Create AI Project client
+const projectClient = new AIProjectClient(projectEndpoint, new DefaultAzureCredential());
 
+/*
 const systemPrompt = `
-You are an AI card-game player. You play at a professional level and strictly follow the rules and strategies defined here. Your goals:
+You are an AI card-game player in a Judgement based game. You play at a professional level and strictly follow the rules and strategies defined here. Your goals:
 
 1. Your primary goal is to win the entire game.
 2. If you are sure that you cannot keep your promise anymore, your new primary goal becomes sabotaging other players.
@@ -25,6 +25,7 @@ You are an AI card-game player. You play at a professional level and strictly fo
 5. Make rational, strategic decisions at all times.
 6. The cards are always represented as a string with rank followed by suit, for example '10D' for ten of diamonds, 'AS' for ace of spades, '7H' for seven of hearts, etc. Ranks are 2-10, J=11, Q=12, K=13, A=14. Suits are D=diamonds, C=clubs, H=hearts, S=spades.
 7. Trump suit is revealed at the start of each round and is represented as a card code of the revealed card, for example '5H' if the revealed card is five of hearts (so hearts is trump suit). Notice that the trump card itself is not in play, so it cannot be played by any player and is not in any player's hand.
+8. When counting probabilities and making decisions, always consider the current state of the game, including which cards have been played in this round and in the entire game, the promises made by all players, the tricks taken by all players, how many cards are left in the deck after dealing, and any other relevant information that can be derived from the game state.
 
 =============================
 GAME RULES
@@ -128,6 +129,7 @@ PRIMARY/SECONDARY BEHAVIOR LOGIC
 
 You must always follow the rules above when making any decision.
 `;
+*/
 
 // This function runs in a separate thread
 const getBotPromiseTask = async (botPromise: IBotPromise): Promise<IBotPromiseResponse> => {
@@ -136,41 +138,34 @@ const getBotPromiseTask = async (botPromise: IBotPromise): Promise<IBotPromiseRe
 
   const state = myRoundToGeminiGameStateForPromise(botPromise);
   // console.log("Derived game state for bot's turn: ", util.inspect(state, { depth: null, colors: true }));
-  const config = {
-    thinkingConfig: {
-      thinkingLevel: ThinkingLevel.HIGH,
-    },
-    mediaResolution: MediaResolution.MEDIA_RESOLUTION_LOW,
-    responseMimeType: "application/json",
-    systemInstruction: [
-      {
-        text: systemPrompt,
-      }
-    ],
-  };
-  const model = modelName;
-  const contents = [
-    {
-      role: "user",
-      parts: [
-        {
-          text: state,
-        },
-      ],
-    },
-  ];
 
-  const response = await client.models.generateContent({
-    model,
-    config,
-    contents,
+  const openAIClient = await projectClient.getOpenAIClient();
+
+  // Create conversation with initial user message
+  // console.log("\nCreating conversation with initial user message...");
+  const conversation = await openAIClient.conversations.create({
+    items: [{ type: "message", role: "user", content: state }]
   });
+  // console.log("Created conversation with initial user message (id: ");
+  // console.log(conversation.id);
 
-  if (!response.text) {
-    throw new Error("No text response from Gemini");
+  // Generate response using the agent
+  // console.log("\nGenerating response...");
+  const response = await openAIClient.responses.create(
+    {
+      conversation: conversation.id,
+    },
+    {
+      body: { agent: { name: agentName, version: agentVersion, type: "agent_reference" } },
+    },
+  );
+  // console.log("Response output: ");
+  // console.log(response.output_text);
+  if (!response.output_text) {
+    throw new Error("No text response from Azure AI");
   }
-  // console.log("Raw result from Gemini for promise:", util.inspect(response, { depth: null, colors: true }));
-  const resultJson = JSON.parse(response.text) as AiPromiseResult;
+  // console.log("Raw result from Azure AI for promise:", util.inspect(response, { depth: null, colors: true }));
+  const resultJson = JSON.parse(response.output_text) as AiPromiseResult;
 
   const promiseLogic = resultJson.reasoning || "Bot logic for making a promise";
   const promiseChatMessage = resultJson.promise_chat_message || "I just made a random promise.";
@@ -189,41 +184,34 @@ const getBotCardPlayTask = async (botCardPlay: IBotCardPlay): Promise<IBotCardPl
 
   const state = myRoundToGeminiGameStateForPlay(botCardPlay);
   // console.log("Derived game state for bot's turn: ", util.inspect(state, { depth: null, colors: true }));
-  const config = {
-    thinkingConfig: {
-      thinkingLevel: ThinkingLevel.HIGH,
-    },
-    mediaResolution: MediaResolution.MEDIA_RESOLUTION_LOW,
-    responseMimeType: "application/json",
-    systemInstruction: [
-      {
-        text: systemPrompt,
-      }
-    ],
-  };
-  const model = modelName;
-  const contents = [
-    {
-      role: "user",
-      parts: [
-        {
-          text: state,
-        },
-      ],
-    },
-  ];
 
-  const response = await client.models.generateContent({
-    model,
-    config,
-    contents,
+  const openAIClient = await projectClient.getOpenAIClient();
+
+  // Create conversation with initial user message
+  // console.log("\nCreating conversation with initial user message...");
+  const conversation = await openAIClient.conversations.create({
+    items: [{ type: "message", role: "user", content: state }]
   });
+  // console.log("Created conversation with initial user message (id: ");
+  // console.log(conversation.id);
 
-  if (!response.text) {
-    throw new Error("No text response from Gemini");
+  // Generate response using the agent
+  // console.log("\nGenerating response...");
+  const response = await openAIClient.responses.create(
+    {
+      conversation: conversation.id,
+    },
+    {
+      body: { agent: { name: agentName, version: agentVersion, type: "agent_reference" } },
+    },
+  );
+  // console.log("Response output: ");
+  // console.log(response.output_text);
+  if (!response.output_text) {
+    throw new Error("No text response from Azure AI");
   }
-  // console.log("Raw result from Gemini for play card:", util.inspect(response, { depth: null, colors: true }));
-  const resultJson = JSON.parse(response.text) as AiPlayCardResult;
+  // console.log("Raw result from Azure AI for play card:", util.inspect(response, { depth: null, colors: true }));
+  const resultJson = JSON.parse(response.output_text) as AiPlayCardResult;
 
   const cardLogic = resultJson?.reasoning || "Bot logic for playing a card";
   const cardChatMessage = resultJson?.card_chat_message || "I just played a random card.";

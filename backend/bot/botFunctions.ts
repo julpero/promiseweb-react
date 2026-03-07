@@ -319,6 +319,7 @@ You are a bot playing a card game. Here is the current game state:
 - Your name is ${botName}, the other players are ${round.roundPlayers.filter(p => p.name !== botName).map(p => p.name).join(", ")}.
 - The game is currently in round ${roundInd + 1} and every player started with ${round.cardsInRound} cards in this round, so this is ${round.cardsInRound >= 6 ? "a big round" : "a small round"}.
 - The trump card revealed for this round is ${cardToCardCode(round.trumpCard)}.
+- ${round.cardsInRound * (round.roundPlayers.length + 1)} cards have been dealt in this round plus the trump card so there are ${52 - (round.cardsInRound * (round.roundPlayers.length + 1) + 1)} cards that have not been dealt and are not in play in this round. Keep this in mind when making your promise and try to deduce what cards the other players might have in their hands based on the cards played in this round and the previous rounds.
 - The total scores of the players so far are: ${round.roundPlayers.map(p => `${p.name}: ${getGamePointsForPlayer(game.game.rounds, p.name)}`).join(", ")}.
 - Your have these cards in your hand at the moment: ${round.roundPlayers.find(p => p.name === botName)?.cards.map(c => cardToCardCode(c)).join(", ") || "unknown"}.
 `;
@@ -387,7 +388,7 @@ const geminiBasicPlayState = (botCardPlay: IBotCardPlay): string => {
   if (playersInOrder[0].this_is_me) {
     stateString += "\nYou are the first player in this trick, so you can play any card.";
   } else {
-    stateString += `\nThe lead player for this trick is ${playersInOrder[0].name}, so you must follow suit if you have any cards of the lead suit. The lead suit for this trick is determined by the first card played in this trick, which is ${cardToCardCode(round.cardsPlayed.flatMap(play => play)[0]?.card) || "unknown"}. If you do not have any cards of the lead suit, you can play any card. Remember to consider your promise and how many tricks you have taken so far in this round when making your decision.`;
+    stateString += `\nThe lead player for this trick is ${playersInOrder[0].name}, so you must follow suit if you have any cards of the lead suit. The lead suit for this trick is determined by the first card played in this trick, which is ${playersInOrder[0].played_card_this_trick || "unknown"}. If you do not have any cards of the lead suit, you can play any card. Remember to consider your promise and how many tricks you have taken so far in this round when making your decision.`;
     for (let i = 1; i < playersInOrder.length; i++) {
       if (playersInOrder[i].this_is_me) {
         stateString += `\nYou are the ${indexToPosition(i, playersInOrder.length)} player to play and now it is your turn to play a card. Consider the current trick state, your hand, the trump suit, and your promise when making your decision.`;

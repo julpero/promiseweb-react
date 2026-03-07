@@ -1,5 +1,5 @@
 import { AzureOpenAI } from "openai";
-import util from "util";
+// import util from "util";
 
 import { IBotTask, IBotCardPlay, IBotCardPlayResponse, IBotPromise, IBotPromiseResponse } from "../interfaces/IBot";
 import { AiPlayCardResult, AiPromiseResult, GameStateForPromise, GameStateForTurn } from "./botTypes";
@@ -172,7 +172,7 @@ const getBotPromiseTask = async (botPromise: IBotPromise): Promise<IBotPromiseRe
   // console.log("Bot is calculating promise with game state:", botPromise.game);
 
   const state = myRoundToGameStateForPromise(botPromise);
-  console.log("Derived game state for bot's turn: ", util.inspect(state, { depth: null, colors: true }));
+  // console.log("Derived game state for bot's turn: ", util.inspect(state, { depth: null, colors: true }));
   const parameterObject: ChatCompletionCreateParamsNonStreaming = {
     model: modelName,
     temperature: 0.2,
@@ -183,8 +183,8 @@ const getBotPromiseTask = async (botPromise: IBotPromise): Promise<IBotPromiseRe
     tools: [makePromiseTool],
     tool_choice: "auto", // allow the model to call make_promise
   };
-  console.log("Sending the following parameters to Azure OpenAI:");
-  console.log(JSON.stringify(parameterObject));
+  // console.log("Sending the following parameters to Azure OpenAI:");
+  // console.log(JSON.stringify(parameterObject));
   const response = await client.chat.completions.create(parameterObject);
   // console.log("Raw response from Azure OpenAI promise:", response);
   const choice = response.choices[0];
@@ -211,7 +211,7 @@ const getBotCardPlayTask = async (botCardPlay: IBotCardPlay): Promise<IBotCardPl
   // console.log("Bot is calculating card play with game state...");
 
   const state = myRoundToGameStateForTurn(botCardPlay);
-  console.log("Derived game state for bot's turn: ", util.inspect(state, { depth: null, colors: true }));
+  // console.log("Derived game state for bot's turn: ", util.inspect(state, { depth: null, colors: true }));
   const parameterObject: ChatCompletionCreateParamsNonStreaming = {
     model: modelName,
     temperature: 0.2,
@@ -222,8 +222,8 @@ const getBotCardPlayTask = async (botCardPlay: IBotCardPlay): Promise<IBotCardPl
     tools: [playCardTool],
     tool_choice: "auto", // allow the model to call play_card
   };
-  console.log("Sending the following parameters to Azure OpenAI:");
-  console.log(JSON.stringify(parameterObject));
+  // console.log("Sending the following parameters to Azure OpenAI:");
+  // console.log(JSON.stringify(parameterObject));
   const response = await client.chat.completions.create(parameterObject);
   // console.log("Raw response from Azure OpenAI play:", response);
   const choice = response.choices[0];
