@@ -19,7 +19,7 @@
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/knuth-shuffle": "^1.0.2",
-    "@types/node": "^22.7.6",
+    "@types/node": "^22.19.13",
     "@types/uuid": "^11.0.0",
     "@typescript-eslint/eslint-plugin": "^8.49.0",
     "@typescript-eslint/parser": "^8.49.0",
@@ -32,7 +32,10 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@azure/ai-agents": "^1.1.0",
     "@azure/ai-projects": "^2.0.0-beta.4",
+    "@azure/identity": "^4.13.0",
+    "@google/genai": "^1.43.0",
     "bcrypt": "^6.0.0",
     "card-games-typescript": "^1.2.5",
     "cors": "^2.8.5",
@@ -40,6 +43,7 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "knuth-shuffle": "^1.0.8",
+    "mime": "^4.1.0",
     "mongoose": "^8.20.2",
     "openai": "^6.22.0",
     "piscina": "^5.1.4",

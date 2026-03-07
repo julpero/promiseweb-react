@@ -1,19 +1,19 @@
-import { AzureOpenAI } from "openai";
+import {
+  GoogleGenAI,
+  MediaResolution,
+  ThinkingLevel,
+} from "@google/genai";
 // import util from "util";
 
 import { IBotTask, IBotCardPlay, IBotCardPlayResponse, IBotPromise, IBotPromiseResponse } from "../interfaces/IBot";
-import { AiPlayCardResult, AiPromiseResult, GameStateForPromise, GameStateForTurn } from "./botTypes";
-import { cardCodeToCard, handlePlayCardCall, handlePromiseCall, makePromiseTool, myRoundToGameStateForPromise, myRoundToGameStateForTurn, playCardTool } from "./botFunctions";
-import { ChatCompletionCreateParamsNonStreaming } from "openai/resources/index";
+import { AiPlayCardResult, AiPromiseResult } from "./botTypes";
+import { cardCodeToCard, myRoundToGeminiGameStateForPlay, myRoundToGeminiGameStateForPromise } from "./botFunctions";
 
-const apiKey = process.env.AZURE_OPENAI_API_KEY;
-const apiVersion = process.env.AZURE_OPENAI_API_VERSION || "2024-04-01-preview";
-const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
-const modelName = process.env.AZURE_OPENAI_MODEL_NAME || "gpt-4.1";
-const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4.1";
-const options = { endpoint, apiKey, deployment, apiVersion };
+// const geminiApiKey = process.env.GEMINI_API_KEY;
+// const geminiApiEndpoint = process.env.GEMINI_API_ENDPOINT || "https://gemini.googleapis.com/v1/models/gemini-3-flash-preview:generateContentStream";
+const modelName = "gemini-3-flash-preview";
 
-const client = new AzureOpenAI(options);
+const client = new GoogleGenAI({});
 
 const systemPrompt = `
 You are an AI card-game player. You play at a professional level and strictly follow the rules and strategies defined here. Your goals:
@@ -24,7 +24,7 @@ You are an AI card-game player. You play at a professional level and strictly fo
 4. Play risky when behind; play safe when ahead.
 5. Make rational, strategic decisions at all times.
 6. The cards are always represented as a string with rank followed by suit, for example '10D' for ten of diamonds, 'AS' for ace of spades, '7H' for seven of hearts, etc. Ranks are 2-10, J=11, Q=12, K=13, A=14. Suits are D=diamonds, C=clubs, H=hearts, S=spades.
-7. Trump suit is revealed at the start of each round and is represented as a single letter (D, C, H, S).
+7. Trump suit is revealed at the start of each round and is represented as a card code of the revealed card, for example '5H' if the revealed card is five of hearts (so hearts is trump suit). Notice that the trump card itself is not in play, so it cannot be played by any player and is not in any player's hand.
 
 =============================
 GAME RULES
@@ -59,7 +59,7 @@ TRICK-TAKING RULES
 =============================
 SCORING
 =============================
-- If the promise is not met → 0 points.
+- If the promise is not kept → 0 points.
 - If the promise is kept:
   - If promise = 0:
     • Small round: 5 points
@@ -72,9 +72,9 @@ PROMISING STRATEGY
 =============================
 - Use the average expected promises as a base promising value based on the number of cards in the round and the number of players. For example, if there are 5 players and 10 cards in the round, the average expected promise is 2 (10 cards / 5 players). This is a starting point that you can adjust based on your hand strength and position.
 - You can assume that other players who have not yet promised will generally promise around the average, with some variation based on their hand strength and position. Use this assumption to predict their promises and adjust your own promise accordingly.
-- When promising, consider your position relative to the dealer. Players who promise later have more information about the promises of earlier players, which can be an advantage. For example, if you are the last to promise and the total promises so far are 7 in a 10-card round, you can promise 3 to make the round even promised.
-- First promiser cant think if the round is likely to be over or under promised, so they should rely more on their hand strength and the average expected promise. Last promiser has the most information and can make the most strategic promise based on the current state of promises.
-- If you promise last, the safest promise is often to promise the number of tricks that would make the round even promised, based on the promises of the other players. For example, if there are 10 cards in the round and the other 4 players have promised a total of 7 tricks, promising 3 would make the round even promised. This is often a good choice if you have an average hand, as it minimizes risk.
+- When promising, consider your position relative to the dealer. Players who promise later have more information about the promises of earlier players, which can be an advantage. For example, if you are the last to promise and the total promises so far are 5 in a 10-card round, you can promise 5 to make the round even promised even with lower hand strength.
+- First promiser cant think if the round is likely to be over or under promised, so they should just rely more on their hand strength and the average expected promise. The last promiser has the most information and can make the most strategic promise based on the current state of promises.
+- If you are the last promiser, the safest promise is often to promise the number of tricks that would make the round even promised, based on the promises of the other players. For example, if there are 10 cards in the round and the other 4 players have promised a total of 7 tricks, promising 3 would make the round even promised. This is often a good choice if you have an average hand, as it minimizes risk.
 - Identify “ultimatum cards” (cards that guarantee a trick, for example a biggest trump card available in the play). Never promise fewer tricks than ultimatum cards and adjust your base promise value accordingly.
 - When playing small rounds also high value trump cards (J, Q, K) can often guarantee tricks, so consider that in your promise.
 - If you have two or more ultimatum cards and also few smaller trump cards, you can often get extra tricks by leading the round with an ultimatum trump card to draw out opponents' trumps, then playing your smaller trump cards to win additional tricks.
@@ -98,7 +98,7 @@ PLAYING STRATEGY
 - Check which cards have been played in this round when thinking which cards in your hand can win tricks and which cannot, and use this to guide your play. For example if someone has already played trump card you cannot win unless you have and can play a trump card of higher rank.
 - Track which cards have been played by all players in this game when counting possibilities and making decisions.
 - Notice when a player breaks suit: that player no longer has that suit.
-- Try to deduce opponents' hands and strategies based on their play and promises.
+- Try to deduce opponents' hands and strategies based on their play, taken tricks and promises.
 - Always keep track of which cards in your playable hand can win this trick if played, and which cannot. Use this to guide your play.
   • For example if someone starts round with a suit you do not have, you can win the trick only with a biggest trump card in round, so if you have no trumps you know you cannot win the trick and can play safely if you want.
   • For example if someone starts round with a suit you have, but someone has already played a trump card then you cannot win this trick anymore.
@@ -114,131 +114,121 @@ PLAYING STRATEGY
 =============================
 PRIMARY/SECONDARY BEHAVIOR LOGIC
 =============================
-- If you have reached your promised number of tricks or you are sure that with your remaining ultimatum cards you can get your remaining promised tricks → switch to safe mode.
+- If you have reached your promised number of tricks or you are sure that with your remaining cards you can get your remaining promised tricks → switch to safe or sabotage mode.
 - If your current hand makes your promise impossible → switch to sabotage mode.
 - Safe strategy:
   • Try get rid of highest and strongest cards which are likely to win unwanted tricks and are not in your ultimatum cards.
   • If you have ultimatum cards, play them strategically to draw out opponents' trumps or high cards, then play your smaller cards safely.
 - Sabotage strategy:
-  • Target the player with most points and players with more points than you.
-  • Force them to win unwanted tricks or lose expected tricks.
+  • Target the player with most points and other players with more points than you.
+  • Force them to win unwanted tricks or lose expected tricks. Player who started round with small card is likely not counting to win that trick so it is an easy target for sabotage by skipping the trick with a card that cannot win, or by playing a card that forces them to win the trick.
   • Use trumps and off-suit cards strategically to disrupt.
   • Usually a player who has promised zero is easier to sabotage by forcing them to win a trick for example playing a small card of the suit you know they may have.
 - Otherwise follow normal optimal play.
 
 You must always follow the rules above when making any decision.
-
-When deciding a promise, you MUST call the function 'make_promise' with:
-- promise: an integer between 0 and the number of cards in the round, inclusive.
-- promise_logic: a short explanation of the reasoning behind the promise, tied to the rules and strategies above.
-- promise_chat_message: a message to show to the user when making the promise, never reveal your hand or strategy in this message, but you can be playful or misleading if you want.
-
-When deciding a move, you MUST call the function 'play_card' with:
-- card: one of legal_cards
-- mode: 'normal' unless promise is impossible, then 'sabotage'; use 'safe' when ahead and 'risky' when behind
-- confidence: 0..1 indicating your confidence
-- reasoning: short, actionable explanation tied to the rules (trump, lead suit, promise, sabotage target, possibility to win or lose trick)
-- card_chat_message: message to show to the user when playing the card, never reveal your hand or strategy in this message, but you can be playful or misleading if you want.
-Never output plain text decisions if the function is available.
 `;
-
-const stateToUserTextMakePromise = (state: GameStateForPromise): string => {
-  return [
-    "Game state for your promise turn.",
-    "You will decide a promise by calling the function `make_promise`.",
-    "",
-    "JSON STATE:",
-    "```json",
-    JSON.stringify(state),
-    "```"
-  ].join("\n");
-};
-
-const stateToUserTextPlayCard = (state: GameStateForTurn): string => {
-  return [
-    "Game state for your turn.",
-    "You will decide a move by calling the function `play_card`.",
-    "",
-    "JSON STATE:",
-    "```json",
-    JSON.stringify(state),
-    "```"
-  ].join("\n");
-};
 
 // This function runs in a separate thread
 const getBotPromiseTask = async (botPromise: IBotPromise): Promise<IBotPromiseResponse> => {
   // Heavy computation/AI logic here
   // console.log("Bot is calculating promise with game state:", botPromise.game);
 
-  const state = myRoundToGameStateForPromise(botPromise);
+  const state = myRoundToGeminiGameStateForPromise(botPromise);
   // console.log("Derived game state for bot's turn: ", util.inspect(state, { depth: null, colors: true }));
-  const parameterObject: ChatCompletionCreateParamsNonStreaming = {
-    model: modelName,
-    temperature: 0.2,
-    messages: [
-      { role: "system", content: [{ type: "text", text: systemPrompt }] },
-      { role: "user", content: stateToUserTextMakePromise(state) }
+  const config = {
+    thinkingConfig: {
+      thinkingLevel: ThinkingLevel.HIGH,
+    },
+    mediaResolution: MediaResolution.MEDIA_RESOLUTION_LOW,
+    responseMimeType: "application/json",
+    systemInstruction: [
+      {
+        text: systemPrompt,
+      }
     ],
-    tools: [makePromiseTool],
-    tool_choice: "auto", // allow the model to call make_promise
   };
-  // console.log("Sending the following parameters to Azure OpenAI:");
-  // console.log(JSON.stringify(parameterObject));
-  const response = await client.chat.completions.create(parameterObject);
-  // console.log("Raw response from Azure OpenAI promise:", response);
-  const choice = response.choices[0];
-  const toolCall = choice.message?.tool_calls?.[0];
+  const model = modelName;
+  const contents = [
+    {
+      role: "user",
+      parts: [
+        {
+          text: state,
+        },
+      ],
+    },
+  ];
 
-  let promiseResult: AiPromiseResult | null = null;
-  if (toolCall && toolCall.type === "function" && toolCall.function?.name === "make_promise") {
-    const toolArgs = JSON.parse(toolCall.function.arguments) as AiPromiseResult;
-    promiseResult = handlePromiseCall(toolArgs, state);
+  const response = await client.models.generateContent({
+    model,
+    config,
+    contents,
+  });
+
+  if (!response.text) {
+    throw new Error("No text response from Gemini");
   }
+  // console.log("Raw result from Gemini for promise:", util.inspect(response, { depth: null, colors: true }));
+  const resultJson = JSON.parse(response.text) as AiPromiseResult;
 
-  const promiseLogic = promiseResult?.reasoning || "Bot logic for making a promise";
-  const promiseChatMessage = promiseResult?.promise_chat_message || "I just made a random promise.";
-  return {
-    promise: promiseResult?.promise ?? 1,
+  const promiseLogic = resultJson.reasoning || "Bot logic for making a promise";
+  const promiseChatMessage = resultJson.promise_chat_message || "I just made a random promise.";
+  const retValue: IBotPromiseResponse = {
+    promise: resultJson.promise ?? 1,
     promiseLogic: promiseLogic,
     promiseChatMessage: promiseChatMessage,
     success: true,
-  } as IBotPromiseResponse;
+  };
+  return retValue;
 };
 
 const getBotCardPlayTask = async (botCardPlay: IBotCardPlay): Promise<IBotCardPlayResponse> => {
   // Heavy computation/AI logic here
   // console.log("Bot is calculating card play with game state...");
 
-  const state = myRoundToGameStateForTurn(botCardPlay);
+  const state = myRoundToGeminiGameStateForPlay(botCardPlay);
   // console.log("Derived game state for bot's turn: ", util.inspect(state, { depth: null, colors: true }));
-  const parameterObject: ChatCompletionCreateParamsNonStreaming = {
-    model: modelName,
-    temperature: 0.2,
-    messages: [
-      { role: "system", content: [{ type: "text", text: systemPrompt }] },
-      { role: "user", content: stateToUserTextPlayCard(state) }
+  const config = {
+    thinkingConfig: {
+      thinkingLevel: ThinkingLevel.HIGH,
+    },
+    mediaResolution: MediaResolution.MEDIA_RESOLUTION_LOW,
+    responseMimeType: "application/json",
+    systemInstruction: [
+      {
+        text: systemPrompt,
+      }
     ],
-    tools: [playCardTool],
-    tool_choice: "auto", // allow the model to call play_card
   };
-  // console.log("Sending the following parameters to Azure OpenAI:");
-  // console.log(JSON.stringify(parameterObject));
-  const response = await client.chat.completions.create(parameterObject);
-  // console.log("Raw response from Azure OpenAI play:", response);
-  const choice = response.choices[0];
-  const toolCall = choice.message?.tool_calls?.[0];
+  const model = modelName;
+  const contents = [
+    {
+      role: "user",
+      parts: [
+        {
+          text: state,
+        },
+      ],
+    },
+  ];
 
-  let cardPlayResult: AiPlayCardResult | null = null;
-  if (toolCall && toolCall.type === "function" && toolCall.function?.name === "play_card") {
-    const toolArgs = JSON.parse(toolCall.function.arguments) as AiPlayCardResult;
-    cardPlayResult = handlePlayCardCall(toolArgs, state);
+  const response = await client.models.generateContent({
+    model,
+    config,
+    contents,
+  });
+
+  if (!response.text) {
+    throw new Error("No text response from Gemini");
   }
+  // console.log("Raw result from Gemini for play card:", util.inspect(response, { depth: null, colors: true }));
+  const resultJson = JSON.parse(response.text) as AiPlayCardResult;
 
-  const cardLogic = cardPlayResult?.reasoning || "Bot logic for playing a card";
-  const cardChatMessage = cardPlayResult?.card_chat_message || "I just played a random card.";
+  const cardLogic = resultJson?.reasoning || "Bot logic for playing a card";
+  const cardChatMessage = resultJson?.card_chat_message || "I just played a random card.";
   return {
-    card: cardPlayResult?.card ? cardCodeToCard(cardPlayResult.card) : null,
+    card: resultJson?.card ? cardCodeToCard(resultJson.card) : null,
     cardLogic: cardLogic,
     cardChatMessage: cardChatMessage,
     success: true,

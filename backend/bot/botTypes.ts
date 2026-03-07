@@ -14,6 +14,7 @@ export interface PlayerPublicStateForPlay extends PlayerPublicState {
   tricks_taken: number;
   does_not_have_suits: Suit[]; // Optional property to indicate if we know the player does not have a certain suits
   has_played_cards_earlier: CardCode[]; // Optional property to indicate which cards the player has already played in the current round
+  played_card_this_trick: CardCode | null; // Optional property to indicate which card the player has played in the current trick, if any
 }
 
 export interface TrickPlay {
