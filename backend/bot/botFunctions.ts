@@ -318,10 +318,10 @@ You are a bot playing a card game. Here is the current game state:
 - There are ${round.roundPlayers.length - 1} other players in the game. You are playing against them.
 - Your name is ${botName}, the other players are ${round.roundPlayers.filter(p => p.name !== botName).map(p => p.name).join(", ")}.
 - The game is currently in round ${roundInd + 1} and every player started with ${round.cardsInRound} cards in this round, so this is ${round.cardsInRound >= 6 ? "a big round" : "a small round"}.
-- The trump card revealed for this round is ${cardToCardCode(round.trumpCard)}.
 - ${round.cardsInRound * (round.roundPlayers.length + 1)} cards have been dealt in this round plus the trump card so there are ${52 - (round.cardsInRound * (round.roundPlayers.length + 1) + 1)} cards that have not been dealt and are not in play in this round. Keep this in mind when making your promise and try to deduce what cards the other players might have in their hands based on the cards played in this round and the previous rounds.
-- The total scores of the players so far are: ${round.roundPlayers.map(p => `${p.name}: ${getGamePointsForPlayer(game.game.rounds, p.name)}`).join(", ")}.
-- Your have these cards in your hand at the moment: ${round.roundPlayers.find(p => p.name === botName)?.cards.map(c => cardToCardCode(c)).join(", ") || "unknown"}.
+- The total scores of the players so far are: ${round.roundPlayers.map(p => `${p.name === botName ? "You" : p.name}: ${getGamePointsForPlayer(game.game.rounds, p.name)}`).join(", ")}.
+- You have these cards in your hand at the moment: ${round.roundPlayers.find(p => p.name === botName)?.cards.map(c => cardToCardCode(c)).join(", ") || "unknown"}.
+- The trump card revealed for this round is ${cardToCardCode(round.trumpCard)} so the trump suit for this round is ${round.trumpCard.suite}.
 `;
 };
 
@@ -333,20 +333,33 @@ const indexToPosition = (index: number, totalPlayers?: number): string => {
   return positions[index] || `position ${index}`;
 };
 
+const promiseToString = (player: PlayerPublicState): string => {
+  let promiseStr = player.this_is_me ? "You" : player.name;
+  if (player.promise === "not promised yet") {
+    promiseStr += ` ${player.this_is_me ? "have" : "has"} not promised yet`;
+  } else {
+    promiseStr += ` promised ${player.promise}`;
+  }
+  return promiseStr;
+};
+
 const promisesSoFarToString = (playersInOrder: PlayerPublicState[]): string => {
-  return playersInOrder.map(p => `${p.name} ${p.promise !== null ? "promised " + p.promise : "has not promised yet"}`).join(", ");
+  return playersInOrder.map(p => promiseToString(p)).join(", ");
 };
 
 const geminiPromisesSoFar = (botPromise: IBotPromise): string => {
   const game: IGameOptions = botPromise.game!;
-
-  const playersInOrder = playersInOrderForPromise(game, botPromise.roundInd, botPromise.botName || "unknown_bot");
-  const myIndex = playersInOrder.findIndex(p => p.name === botPromise.botName);
+  const { roundInd, botName } = botPromise;
+  const playersInOrder = playersInOrderForPromise(game,roundInd, botName || "unknown_bot");
+  const myIndex = playersInOrder.findIndex(p => p.name === botName);
   const myPosition = indexToPosition(myIndex, playersInOrder.length);
+
+  const totalPromiseSoFar = playersInOrder.reduce((sum, p) => sum + (typeof p.promise === "number" ? p.promise : 0), 0);
 
   return `
 - You are the ${myPosition} player and promiser in this round.
 - Promises so far in order: ${promisesSoFarToString(playersInOrder)}.
+${myIndex !== 0 ? `- Based on the total number of early promises (${totalPromiseSoFar}), the average promise for the last players is ${((game.game.rounds[roundInd].cardsInRound - totalPromiseSoFar) / playersInOrder.filter(p => p.promise === "not promised yet").length).toFixed(1)}`: "- You are the first player to promise in this round, so no promises have been made yet."}
 `;
 };
 
@@ -358,12 +371,12 @@ You will decide a promise for the current round with information given above.
 The promise is the number of tricks you think you will take in this round, from 0 to the number of cards in this round. You want to make a promise that you think you can achieve based on your hand and the game state. You can also consider the current scores of the players and whether you want to play it safe or take a risk.
 You can use the information about the trump card, your hand, and the scores of the players to make your decision. You want to make a promise that you think you can achieve based on your hand and the game state. You can also consider the current scores of the players and whether you want to play it safe or take a risk.
 
-What is your promise and why? Say also something about your reasoning as chat line but do not reveal your hand or strategy in any way. You can be playful or misleading if you want, but try to make it sound like a reasonable promise based on the game state. Do not say anything that would directly reveal your cards or your exact strategy to the other players.
-Respond with a JSON object with the following format:
+What is your promise and why? Include in the reasoning the list of cards in your hand and probabilities of winning the trick for every card. Say also something about your reasoning as chat line but do not reveal your hand or strategy in any way. You can be playful or misleading if you want, but try to make it sound like a reasonable promise based on the game state. Do not say anything that would directly reveal your cards or your exact strategy to the other players.
+Respond must be a valid JSON object with the following format:
 {
   "promise": integer, // between 0 and the number of cards in the round, inclusive
   "confidence": number, // 0..1 indicating your confidence in this promise
-  "reasoning": string, // a short explanation of the reasoning behind the promise, tied to the rules and strategies above
+  "reasoning": string, // a explanation of the reasoning behind the promise, tied to the rules and strategies above
   "promise_chat_message": string // a message to show to the other players when making the promise, never reveal your hand or strategy in this message, but you can be playful or misleading if you want
 }
 `;
@@ -428,13 +441,13 @@ Card is represented as a string with rank followed by suit, e.g. "AS" for Ace of
 You must choose a card from the legal_cards list. Use the information about the current trick, your hand, the trump suit, and the game state to make your decision. You can also consider your promise and how many tricks you have taken so far in this round.
 Try to win the trick if it helps you achieve your promise, but also consider when it might be better to lose a trick. You can also consider the current scores of the players and whether you want to play it safe or take a risk.
 
-Which card do you play and why? Say also something about your reasoning as chat line but do not reveal your hand or strategy in any way. You can be playful or misleading if you want, but try to make it sound like a reasonable play based on the game state. Do not say anything that would directly reveal your cards or your exact strategy to the other players.
-Respond with a JSON object with the following format:
+Which card do you play and why? Include in the reasoning the list of cards in your hand, your legal cards and probabilities of winning the trick for every card in your hand and after playing the card you choose. Say also something about your reasoning as chat line but do not reveal your hand or strategy in any way. You can be playful or misleading if you want, but try to make it sound like a reasonable play based on the game state. Do not say anything that would directly reveal your cards or your exact strategy to the other players.
+Respond must be a valid JSON object with the following format:
 {
   "card": string, // one of legal_cards
   "mode": string, // 'normal' unless promise is impossible, then 'sabotage'; use 'safe' when ahead and 'risky' when behind
   "confidence": number, // 0..1 indicating your confidence in this play
-  "reasoning": string, // a short, actionable explanation tied to the rules (trump, lead suit, promise, sabotage target, possibility to win or lose trick)
+  "reasoning": string, // actionable explanation tied to the rules (trump, lead suit, promise, sabotage target, possibility to win or lose trick)
   "card_chat_message": string // a message to show to the user when playing the card, never reveal your hand or strategy in this message, but you can be playful or misleading if you want
 }
 `;
