@@ -803,7 +803,7 @@ connectDB().then(() => {
             };
             io.to(gameId).emit("new chat line", chatObj);
             if (playWentOver) {
-              const chatLine2 = `${winnerOfPlay} played just over promising`;
+              const chatLine2 = `${winnerOfPlay} Pitkäksi Oy:stä päivää!`;
               const chatObj2: IuiChatNotification = {
                 chatLine: chatLine2,
                 focusedPlayer: winnerOfPlay,
