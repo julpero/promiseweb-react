@@ -1,11 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import express from "express";
-import { Application, Request, Response } from "express";
+import express, { Application, Request, Response } from "express";
 import http from "http";
 import { Server, Socket } from "socket.io";
-// import { io } from "socket.io-client";
 import cors from "cors";
 import path from "path";
 
@@ -13,6 +11,7 @@ import connectDB from "./backend/config/db";
 import { ClientToServerEvents, ServerToClientEvents } from "./frontend/src/socket/ISocket";
 import * as csm from "./backend/socket/clientSocketMapper";
 
+//#region common imports
 import { createGame } from "./backend/actions/createGame";
 import { getOpenGamesList } from "./backend/actions/getGameList";
 import { joinGame } from "./backend/actions/joinGame";
@@ -40,7 +39,7 @@ import { getValidToken, isUserAuthenticated, isValidAdminUser, isValidUser, sign
 import { deletePing, doPing } from "./backend/actions/pingHandler";
 import { IBotCardPlay, IBotMakePromiseRequest, IBotPlayCardRequest, IBotPromise } from "./backend/interfaces/IBot";
 import { BotPoolManager } from "./backend/bot/botPoolManager";
-
+//#endregion common imports
 
 const app: Application = express();
 const server = http.createServer(app);
@@ -49,18 +48,16 @@ const ioServer = new Server<ClientToServerEvents, ServerToClientEvents>(server);
 app.use(cors());
 app.use(express.json());
 
-// app.use("/", express.static(path.join(__dirname, "/build")));
-// app.use(express.static(path.join(__dirname, "../build")));
-console.log("server: " + process.env.NODE_ENV);
-if (process.env.NODE_ENV === "development") {
-  app.use(express.static(path.join(__dirname, "./frontend/build")));
-} else {
-  app.use(express.static(path.join(__dirname, "./build")));
-}
+// Use native __dirname directly in CommonJS
+const staticPath = process.env.NODE_ENV === "development"
+  ? path.join(__dirname, "./frontend/build")
+  : path.join(__dirname, "./build");
 
-// // Default
+console.log(staticPath);
+// Serve static assets
+app.use(express.static(staticPath));
 app.get("/", (req: Request, res: Response) => {
-  res.sendFile("index.html");
+  res.sendFile("index.html", { root: staticPath });
 });
 
 const baseBotPromiseTimeout = process.env.BASE_BOT_PROMISE_TIMEOUT ? parseInt(process.env.BASE_BOT_PROMISE_TIMEOUT) : 4000;
